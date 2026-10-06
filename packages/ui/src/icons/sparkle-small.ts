@@ -1,4 +1,4 @@
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * ✦ SparkleSmall — 16×16 pixel art small sparkle/diamond icon

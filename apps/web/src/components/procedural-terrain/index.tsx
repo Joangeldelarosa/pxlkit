@@ -709,9 +709,12 @@ export default function ProceduralTerrain() {
               </h1>
             </PixelFadeIn>
             <PixelFadeIn duration={400} delay={200}>
-              <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
+              <div className="flex flex-wrap items-center justify-center gap-2 mb-3 sm:mb-4">
                 <PixelBadge tone="purple">
                   <span className="text-[8px] sm:text-[9px]">@pxlkit/voxel</span>
+                </PixelBadge>
+                <PixelBadge tone="gold">
+                  <span className="text-[8px] sm:text-[9px]">Early preview · not yet on npm</span>
                 </PixelBadge>
                 <PixelBadge tone="green">
                   <span className="text-[8px] sm:text-[9px]">MIT Licensed</span>
@@ -862,12 +865,13 @@ export default function ProceduralTerrain() {
                     ? 'text-retro-gold border-retro-gold/60 bg-retro-gold/10'
                     : 'text-retro-muted border-retro-border/50 hover:text-retro-gold hover:border-retro-gold/40'
                 }`}
-                title={showFullscreenMap ? 'Close fullscreen map' : 'Open fullscreen map'}>
-                <PxlKitIcon icon={QuestMapIcon} size={12} colorful={showFullscreenMap} />
+                title={showFullscreenMap ? 'Close fullscreen map' : 'Open fullscreen map'}
+                aria-label={showFullscreenMap ? 'Close fullscreen map' : 'Open fullscreen map'}>
+                <PxlKitIcon icon={QuestMapIcon} size={12} colorful={showFullscreenMap} decorative />
               </button>
               <button onClick={() => setShowSettings(true)}
                 className="p-2 bg-retro-bg/80 border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none"
-                title="Settings">⚙</button>
+                title="Settings" aria-label="Settings">⚙</button>
               <button onClick={() => { setShowFullscreenMap(false); setShowControls(true); }}
                 className="px-2.5 py-1.5 bg-retro-bg/80 border border-retro-border/50 rounded font-pixel text-[8px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none"
                 title="Back to menu">Menu</button>

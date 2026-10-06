@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCommandDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCommandDocsMeta = {
@@ -17,16 +23,86 @@ export const PixelCommandDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionProps): React.ReactElement {
+/** PixelCommand's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCommand } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCommand',
+        props: [
+          { name: 'open', type: 'boolean', required: true, description: 'Whether the palette is visible; set it from `onOpenChange`.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', required: true, description: 'Called with the open state the palette asks for: its shortcut toggles it; Escape and the backdrop close it.' },
+          { name: 'shortcut', type: 'string', default: "'mod+k'", description: 'Global shortcut that toggles the palette, such as `mod+k` (Cmd or Ctrl + K).' },
+          { name: 'placeholder', type: 'string', default: "'Type a command or search…'", description: 'Placeholder of the search field.' },
+          { name: 'emptyMessage', type: 'string', default: "'No results.'", description: 'Shown instead of the list when nothing matches.' },
+          { name: 'groups', type: 'PixelCommandGroup[]', required: true, description: 'The commands, by group.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCommand } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCommand',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: 'v-model:open', description: 'Whether the palette is visible (`v-model:open`).' },
+          { name: 'shortcut', type: 'string', default: "'mod+k'", description: 'Global shortcut that toggles the palette, such as `mod+k` (Cmd or Ctrl + K).' },
+          { name: 'placeholder', type: 'string', default: "'Type a command or search…'", description: 'Placeholder of the search field.' },
+          { name: 'emptyMessage', type: 'string', default: "'No results.'", description: 'Shown instead of the list when nothing matches.' },
+          { name: 'groups', type: 'PixelCommandGroup[]', required: true, description: 'The commands, by group.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: 'The requested open state: the shortcut toggles it; Escape and the backdrop close it.' },
+        ],
+        notes: [
+          'Its template ref exposes `element`: the palette panel while it is open.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCommand } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCommand',
+        selector: 'pxl-command',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: '[(open)]', description: 'Whether the palette is visible (`[(open)]`).' },
+          { name: 'shortcut', type: 'string', default: "'mod+k'", description: 'Global shortcut that toggles the palette, such as `mod+k` (Cmd or Ctrl + K).' },
+          { name: 'placeholder', type: 'string', default: "'Type a command or search…'", description: 'Placeholder of the search field.' },
+          { name: 'emptyMessage', type: 'string', default: "'No results.'", description: 'Shown instead of the list when nothing matches.' },
+          { name: 'groups', type: 'PixelCommandGroup[]', required: true, description: 'The commands, by group.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: 'The open state the palette asks for: its shortcut toggles it; Escape and the backdrop close it.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelCommandDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCommandDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-command-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-command-heading'>PixelCommand</h2>
+      <Title id='pixel-command-heading'>PixelCommand</Title>
       <p className="docs-lead">Command palette overlay with fuzzy search, grouped items, keyboard shortcut binding, focus trap, scroll lock and Escape-to-close.</p>
       <ul className="docs-highlights">
         <li>Configurable global shortcut (default mod+k) toggles the palette open from anywhere</li>
         <li>Grouped items with headings, icons, keywords for search, and per-item keyboard hints</li>
         <li>Full keyboard navigation: ArrowUp/Down, Home/End, Enter to select, Escape to close</li>
-        <li>Surface-aware chrome (pixel vs linear) inherited from theme context</li>
+        <li>Surface-aware chrome (pixel vs linear) from the nearest PxlKitSurfaceProvider</li>
         <li>Combobox + listbox a11y pattern with aria-activedescendant for assistive tech</li>
       </ul>
     <dl className="docs-meta">
@@ -34,12 +110,12 @@ export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionPr
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-command-api">
+      <Heading id="pixel-command-api">API</Heading>
+      <FrameworkApi label={'PixelCommand API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-command-a11y">
-      <h3 id="pixel-command-a11y">Accessibility</h3>
+      <Heading id="pixel-command-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>role=&quot;dialog&quot; with aria-modal=&quot;true&quot; for the palette container</code></li>
@@ -49,7 +125,7 @@ export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionPr
         <li><code>Focus trap inside the panel and scroll lock on body while open</code></li>
       </ul>
       <p className="docs-aria-notes">Items without matching results render an emptyMessage region instead of the listbox; aria-expanded and aria-controls track whether the listbox is currently mounted.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -98,8 +174,11 @@ export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionPr
       </table>
     </section>
     <section aria-labelledby="pixel-command-usage">
-      <h3 id="pixel-command-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-command-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCommand usage'}
+        react={`import { useState } from 'react';
 import { PixelCommand } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -157,14 +236,86 @@ export function Default() {
       />
     </>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+const close = () => {
+  open.value = false;
+};
+const groups: PixelCommandGroup[] = [
+  {
+    heading: 'Actions',
+    items: [
+      { id: 'new-file', label: 'New file', shortcut: 'Ctrl+N', onSelect: close },
+      { id: 'open-file', label: 'Open file…', shortcut: 'Ctrl+O', onSelect: close },
+      { id: 'save', label: 'Save', shortcut: 'Ctrl+S', onSelect: close },
+    ],
+  },
+  {
+    heading: 'Navigation',
+    items: [
+      { id: 'go-home', label: 'Go to home', keywords: ['dashboard', 'start'], onSelect: close },
+      { id: 'go-settings', label: 'Go to settings', keywords: ['preferences', 'config'], onSelect: close },
+    ],
+  },
+];
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open command palette</button>
+  <PixelCommand v-model:open="open" :groups="groups" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCommand],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open command palette</button>
+    <pxl-command [(open)]="open" [groups]="groups" />
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+  readonly groups: PixelCommandGroup[] = [
+    {
+      heading: 'Actions',
+      items: [
+        { id: 'new-file', label: 'New file', shortcut: 'Ctrl+N', onSelect: () => this.open.set(false) },
+        { id: 'open-file', label: 'Open file…', shortcut: 'Ctrl+O', onSelect: () => this.open.set(false) },
+        { id: 'save', label: 'Save', shortcut: 'Ctrl+S', onSelect: () => this.open.set(false) },
+      ],
+    },
+    {
+      heading: 'Navigation',
+      items: [
+        { id: 'go-home', label: 'Go to home', keywords: ['dashboard', 'start'], onSelect: () => this.open.set(false) },
+        {
+          id: 'go-settings',
+          label: 'Go to settings',
+          keywords: ['preferences', 'config'],
+          onSelect: () => this.open.set(false),
+        },
+      ],
+    },
+  ];
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelCommand } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -219,11 +370,84 @@ export function Default() {
       />
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+const close = () => {
+  open.value = false;
+};
+const groups: PixelCommandGroup[] = [
+  {
+    heading: 'Actions',
+    items: [
+      { id: 'new-file', label: 'New file', shortcut: 'Ctrl+N', onSelect: close },
+      { id: 'open-file', label: 'Open file…', shortcut: 'Ctrl+O', onSelect: close },
+      { id: 'save', label: 'Save', shortcut: 'Ctrl+S', onSelect: close },
+    ],
+  },
+  {
+    heading: 'Navigation',
+    items: [
+      { id: 'go-home', label: 'Go to home', keywords: ['dashboard', 'start'], onSelect: close },
+      { id: 'go-settings', label: 'Go to settings', keywords: ['preferences', 'config'], onSelect: close },
+    ],
+  },
+];
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open command palette</button>
+  <PixelCommand v-model:open="open" :groups="groups" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCommand],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open command palette</button>
+    <pxl-command [(open)]="open" [groups]="groups" />
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+  readonly groups: PixelCommandGroup[] = [
+    {
+      heading: 'Actions',
+      items: [
+        { id: 'new-file', label: 'New file', shortcut: 'Ctrl+N', onSelect: () => this.open.set(false) },
+        { id: 'open-file', label: 'Open file…', shortcut: 'Ctrl+O', onSelect: () => this.open.set(false) },
+        { id: 'save', label: 'Save', shortcut: 'Ctrl+S', onSelect: () => this.open.set(false) },
+      ],
+    },
+    {
+      heading: 'Navigation',
+      items: [
+        { id: 'go-home', label: 'Go to home', keywords: ['dashboard', 'start'], onSelect: () => this.open.set(false) },
+        {
+          id: 'go-settings',
+          label: 'Go to settings',
+          keywords: ['preferences', 'config'],
+          onSelect: () => this.open.set(false),
+        },
+      ],
+    },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-custom-shortcut">
-        <h4>Custom shortcut</h4>
-        <pre className="docs-code"><code>{`export function WithCustomShortcut() {
+        <Subheading>Custom shortcut</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Custom shortcut code'}
+          react={`import { useState } from 'react';
+import { PixelCommand } from '@pxlkit/ui-kit';
+
+export function WithCustomShortcut() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -255,11 +479,63 @@ export function Default() {
       />
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+const close = () => {
+  open.value = false;
+};
+const groups: PixelCommandGroup[] = [
+  {
+    heading: 'Commands',
+    items: [
+      { id: 'reload', label: 'Reload window', onSelect: close },
+      { id: 'toggle-theme', label: 'Toggle theme', onSelect: close },
+    ],
+  },
+];
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open (or press Ctrl+Shift+P)</button>
+  <PixelCommand v-model:open="open" shortcut="mod+shift+p" placeholder="Run a command…" :groups="groups" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCommand],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open (or press Ctrl+Shift+P)</button>
+    <pxl-command [(open)]="open" shortcut="mod+shift+p" placeholder="Run a command…" [groups]="groups" />
+  \`,
+})
+export class WithCustomShortcut {
+  readonly open = signal(false);
+  readonly groups: PixelCommandGroup[] = [
+    {
+      heading: 'Commands',
+      items: [
+        { id: 'reload', label: 'Reload window', onSelect: () => this.open.set(false) },
+        { id: 'toggle-theme', label: 'Toggle theme', onSelect: () => this.open.set(false) },
+      ],
+    },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-linear-surface">
-        <h4>Linear surface</h4>
-        <pre className="docs-code"><code>{`export function LinearSurface() {
+        <Subheading>Linear surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Linear surface code'}
+          react={`import { useState } from 'react';
+import { PixelCommand } from '@pxlkit/ui-kit';
+
+export function LinearSurface() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -291,15 +567,61 @@ export function Default() {
       />
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+const close = () => {
+  open.value = false;
+};
+const groups: PixelCommandGroup[] = [
+  {
+    heading: 'Recent',
+    items: [
+      { id: 'doc-1', label: 'Project roadmap', onSelect: close },
+      { id: 'doc-2', label: 'Sprint notes', onSelect: close },
+    ],
+  },
+];
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open linear palette</button>
+  <PixelCommand v-model:open="open" surface="linear" empty-message="Nothing matches your search." :groups="groups" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCommand],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open linear palette</button>
+    <pxl-command [(open)]="open" surface="linear" emptyMessage="Nothing matches your search." [groups]="groups" />
+  \`,
+})
+export class LinearSurface {
+  readonly open = signal(false);
+  readonly groups: PixelCommandGroup[] = [
+    {
+      heading: 'Recent',
+      items: [
+        { id: 'doc-1', label: 'Project roadmap', onSelect: () => this.open.set(false) },
+        { id: 'doc-2', label: 'Sprint notes', onSelect: () => this.open.set(false) },
+      ],
+    },
+  ];
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-dropdown">PixelDropdown</a></li>
-        <li><a href="#pixel-modal">PixelModal</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-dropdown' : '#pixel-dropdown'}>PixelDropdown</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-modal' : '#pixel-modal'}>PixelModal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
       </ul>
     </section>
     </section>

@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "types": [],
+    "noEmit": true,
+    "paths": {
+      "@pxlkit/ui-kit-vue": ["./src/index.ts"]
+    }
+  },
+  "vueCompilerOptions": {
+    "checkUnknownComponents": true,
+    "checkUnknownDirectives": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "examples/**/*.vue", "examples/**/*.ts", "stories/**/*.ts"],
+  "exclude": ["src/**/__tests__/**"]
+}

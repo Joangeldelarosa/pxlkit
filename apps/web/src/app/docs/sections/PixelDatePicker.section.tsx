@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDatePickerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelDatePickerDocsMeta = {
@@ -17,13 +23,120 @@ export const PixelDatePickerDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSectionProps): React.ReactElement {
+/** PixelDatePicker's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelDatePicker } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelDatePicker',
+        props: [
+          { name: 'value', type: 'Date | null', description: 'The picked day, `null` for none; leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'Date', description: 'Initial day while uncontrolled.' },
+          { name: 'onChange', type: '(date: Date | null) => void', description: 'Called with the day picked, at its start, or `null` once cleared.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'disabledDates', type: 'Date[] | ((d: Date) => boolean)', description: 'Days that cannot be picked: a list, or a test of each day.' },
+          { name: 'format', type: '(d: Date) => string', description: "The trigger's text for the picked day; the locale's long date by default." },
+          { name: 'placeholder', type: 'string', default: "'Select date'", description: 'Text shown while no day is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows a Clear button under the grid while a day is picked.' },
+          { name: 'presets', type: '{ label: string; value: Date }[]', description: 'Quick picks shown above the grid.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the day as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'data-testid', type: 'string', description: 'Hook for tests + custom triggers.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelDatePicker } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelDatePicker',
+        props: [
+          { name: 'modelValue', type: 'Date | null', binding: 'v-model', description: 'The picked day (`v-model`), `null` for none; leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'Date', description: 'Initial day while uncontrolled.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'disabledDates', type: 'Date[] | ((date: Date) => boolean)', description: 'Days that cannot be picked: a list, or a test of each day.' },
+          { name: 'format', type: '(date: Date) => string', description: "The trigger's text for the picked day; the locale's long date by default." },
+          { name: 'placeholder', type: 'string', default: "'Select date'", description: 'Text shown while no day is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows a Clear button under the grid while a day is picked.' },
+          { name: 'presets', type: 'PixelDatePickerPreset[]', description: 'Quick picks shown above the grid.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the day as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'date: Date | null', description: 'The day picked, at its start, or `null` once cleared.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+          'Its template ref exposes `element`: the trigger button.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelDatePicker } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelDatePicker',
+        selector: 'pxl-date-picker',
+        props: [
+          { name: 'value', type: 'Date | null', binding: '[(value)]', description: 'The picked day (`[(value)]`), `null` for none; leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'Date', description: 'Initial day while uncontrolled.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'disabledDates', type: 'Date[] | ((date: Date) => boolean)', description: 'Days that cannot be picked: a list, or a test of each day.' },
+          { name: 'format', type: '(date: Date) => string', description: "The trigger's text for the picked day; the locale's long date by default." },
+          { name: 'placeholder', type: 'string', default: "'Select date'", description: 'Text shown while no day is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows a Clear button under the grid while a day is picked.' },
+          { name: 'presets', type: 'PixelDatePickerPreset[]', description: 'Quick picks shown above the grid.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the day as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the trigger; its hint / error is added while one shows.' },
+          { name: 'data-testid', type: 'string', description: '`data-testid` of the trigger.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'Date | null', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`Date | null`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelDatePickerDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelDatePickerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-date-picker-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-date-picker-heading'>PixelDatePicker</h2>
+      <Title id='pixel-date-picker-heading'>PixelDatePicker</Title>
       <p className="docs-lead">Accessible date input with popover calendar grid, keyboard navigation, presets, and min/max constraints.</p>
       <ul className="docs-highlights">
-        <li>Controlled and uncontrolled usage via value/defaultValue + onChange</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code></li>
         <li>Popover calendar with roving tabindex and full keyboard navigation</li>
         <li>Min/max bounds plus disabledDates (array or predicate)</li>
         <li>Optional quick-select presets and clearable trigger</li>
@@ -34,20 +147,20 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-date-picker-api">
+      <Heading id="pixel-date-picker-api">API</Heading>
+      <FrameworkApi label={'PixelDatePicker API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-date-picker-a11y">
-      <h3 id="pixel-date-picker-a11y">Accessibility</h3>
+      <Heading id="pixel-date-picker-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>input + popover calendar (role=grid)</code></li>
         <li><code>aria-label on day cells</code></li>
         <li><code>min/max enforced</code></li>
       </ul>
-      <p className="docs-aria-notes">Day cells expose aria-selected and aria-disabled; the calendar grid uses role=grid with explicit role=row wrappers and an aria-live month label.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Opening moves focus to the picked day, else today; Escape, Enter and a pick return it to the trigger. The popover is a dialog named &quot;Choose date&quot;. Day cells expose aria-selected, aria-current=&quot;date&quot; (today) and aria-disabled; the calendar grid uses role=grid with explicit role=row wrappers and an aria-live month label. Moves skip disabled days and stop at min/max.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -89,12 +202,22 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
           </tr>
           <tr>
             <td><kbd>PageUp</kbd></td>
-            <td>Move focus to the previous month</td>
+            <td>Move focus to the same day of the previous month (its last day when shorter)</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
             <td><kbd>PageDown</kbd></td>
-            <td>Move focus to the next month</td>
+            <td>Move focus to the same day of the next month (its last day when shorter)</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+PageUp</kbd></td>
+            <td>Move focus to the same day of the previous year</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+PageDown</kbd></td>
+            <td>Move focus to the same day of the next year</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
@@ -111,8 +234,11 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-date-picker-usage">
-      <h3 id="pixel-date-picker-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-date-picker-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelDatePicker usage'}
+        react={`import { useState } from 'react';
 import { PixelDatePicker } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -125,14 +251,41 @@ export function Default() {
       placeholder="Select date"
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDatePicker } from '@pxlkit/ui-kit-vue';
+
+const date = ref<Date | null>(null);
+</script>
+
+<template>
+  <PixelDatePicker v-model="date" label="Pick a date" placeholder="Select date" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelDatePicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDatePicker],
+  template: \`<pxl-date-picker label="Pick a date" placeholder="Select date" [(value)]="date" />\`,
+})
+export class Default {
+  readonly date = signal<Date | null>(null);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <p>The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today&#39;s mark can differ from the browser&#39;s.</p>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelDatePicker } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [date, setDate] = useState<Date | null>(null);
   return (
     <PixelDatePicker
@@ -142,11 +295,38 @@ export function Default() {
       placeholder="Select date"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDatePicker } from '@pxlkit/ui-kit-vue';
+
+const date = ref<Date | null>(null);
+</script>
+
+<template>
+  <PixelDatePicker v-model="date" label="Pick a date" placeholder="Select date" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDatePicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDatePicker],
+  template: \`<pxl-date-picker label="Pick a date" placeholder="Select date" [(value)]="date" />\`,
+})
+export class Default {
+  readonly date = signal<Date | null>(null);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-presets">
-        <h4>With Presets</h4>
-        <pre className="docs-code"><code>{`export function WithPresets() {
+        <Subheading>With Presets</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Presets code'}
+          react={`import { useState } from 'react';
+import { PixelDatePicker } from '@pxlkit/ui-kit';
+
+export function WithPresets() {
   const [date, setDate] = useState<Date | null>(null);
   const today = new Date();
   const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
@@ -164,11 +344,52 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDatePicker } from '@pxlkit/ui-kit-vue';
+
+const date = ref<Date | null>(null);
+const today = new Date();
+const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+const presets = [
+  { label: 'Today', value: today },
+  { label: 'Tomorrow', value: tomorrow },
+  { label: 'Next week', value: nextWeek },
+];
+</script>
+
+<template>
+  <PixelDatePicker v-model="date" label="Due date" clearable :presets="presets" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDatePicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDatePicker],
+  template: \`<pxl-date-picker label="Due date" clearable [presets]="presets" [(value)]="date" />\`,
+})
+export class WithPresets {
+  readonly date = signal<Date | null>(null);
+  private readonly today = new Date();
+  readonly presets = [
+    { label: 'Today', value: this.today },
+    { label: 'Tomorrow', value: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1) },
+    { label: 'Next week', value: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 7) },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-min-max">
-        <h4>With Min/Max</h4>
-        <pre className="docs-code"><code>{`export function WithMinMax() {
+        <Subheading>With Min/Max</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Min/Max code'}
+          react={`import { useState } from 'react';
+import { PixelDatePicker } from '@pxlkit/ui-kit';
+
+export function WithMinMax() {
   const [date, setDate] = useState<Date | null>(null);
   const today = new Date();
   const min = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -183,15 +404,56 @@ export function Default() {
       max={max}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDatePicker } from '@pxlkit/ui-kit-vue';
+
+const date = ref<Date | null>(null);
+const today = new Date();
+const min = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+const max = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+</script>
+
+<template>
+  <PixelDatePicker
+    v-model="date"
+    label="Within one month"
+    hint="Only the next 30 days are selectable"
+    :min="min"
+    :max="max"
+  />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDatePicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDatePicker],
+  template: \`
+    <pxl-date-picker
+      label="Within one month"
+      hint="Only the next 30 days are selectable"
+      [min]="min"
+      [max]="max"
+      [(value)]="date"
+    />
+  \`,
+})
+export class WithMinMax {
+  readonly date = signal<Date | null>(null);
+  private readonly today = new Date();
+  readonly min = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate());
+  readonly max = new Date(this.today.getFullYear(), this.today.getMonth() + 1, this.today.getDate());
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
-        <li><a href="#pixel-select">PixelSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-select' : '#pixel-select'}>PixelSelect</a></li>
       </ul>
     </section>
     </section>

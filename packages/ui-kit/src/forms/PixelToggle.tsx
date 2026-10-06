@@ -6,34 +6,24 @@ import React, {
   useContext,
   useRef,
 } from 'react';
+import { toggleClasses } from '@pxlkit/ui-kit-core';
 import {
   Surface,
   cn,
-  focusRing,
-  surfaceClasses,
-  toneMap,
   useEffectiveSurface,
 } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
-import {
-  ToggleGroupContext,
-  type GroupSize,
-  type GroupVariant,
-} from './PixelToggleGroup';
-
-const sizeClasses: Record<GroupSize, string> = {
-  sm: 'h-8 px-2.5 text-xs gap-1.5',
-  md: 'h-10 px-3 text-sm gap-2',
-  lg: 'h-12 px-4 text-sm gap-2.5',
-};
+import { ToggleGroupContext } from './PixelToggleGroup';
 
 /** Public prop bag for {@link PixelToggle}. */
 export interface PixelToggleProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Identifies the toggle within its group; also exposed as `data-pxl-toggle-value`. */
   value: string;
   /** Standalone (uncontrolled) toggle: pressed state. */
   pressed?: boolean;
   /** Standalone (uncontrolled) toggle: notified on press change. */
   onPressedChange?: (next: boolean) => void;
+  /** Surface override; defaults to the group's, then to the nearest provider. */
   surface?: Surface;
 }
 
@@ -57,7 +47,6 @@ export const PixelToggle = forwardRef<HTMLButtonElement, PixelToggleProps>(
     const group = useContext(ToggleGroupContext);
 
     const effectiveSurface = useEffectiveSurface(surfaceProp ?? group?.surface);
-    const s = surfaceClasses(effectiveSurface);
 
     // Controlled-by-group OR standalone (uses internal state via useControllableState)
     const [standalonePressed, setStandalonePressed] = useControllableState<boolean>({
@@ -108,28 +97,12 @@ export const PixelToggle = forwardRef<HTMLButtonElement, PixelToggleProps>(
       [group, value, onKeyDown],
     );
 
-    const tone = toneMap.cyan;
-
     // Roving tabindex: only the focused item is tab-reachable when rovingFocus is on
     let tabIndex: number | undefined = rest.tabIndex;
     if (group?.rovingFocus) {
       const focused = group.focusedValue ?? null;
       tabIndex = focused === value ? 0 : -1;
     }
-
-    const groupVariant: GroupVariant = group?.variant ?? 'soft';
-
-    const pressedClasses = isPressed
-      ? cn(tone.bg, tone.text, tone.border)
-      : groupVariant === 'solid'
-        ? cn('bg-retro-surface/60 text-retro-text border-retro-border')
-        : groupVariant === 'outline'
-          ? cn('bg-transparent text-retro-muted border-retro-border hover:text-retro-text')
-          : groupVariant === 'ghost'
-            ? cn('bg-transparent text-retro-muted border-transparent hover:text-retro-text')
-            : cn('bg-retro-surface/40 text-retro-muted border-retro-border/60 hover:text-retro-text');
-
-    const sizeCls = group ? sizeClasses[group.size] : sizeClasses.md;
 
     // Single-select groups expose radio semantics; multi-select uses
     // aria-pressed button toggles. role on a <button> would normally be
@@ -152,15 +125,11 @@ export const PixelToggle = forwardRef<HTMLButtonElement, PixelToggleProps>(
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         className={cn(
-          'inline-flex items-center justify-center font-medium outline-none disabled:opacity-50 disabled:cursor-not-allowed',
-          s.font,
-          s.radius,
-          s.transition,
-          s.border,
-          sizeCls,
-          focusRing,
-          tone.ring,
-          pressedClasses,
+          toggleClasses(effectiveSurface, {
+            pressed: isPressed,
+            size: group?.size ?? 'md',
+            variant: group?.variant ?? 'soft',
+          }),
           className,
         )}
         {...rest}

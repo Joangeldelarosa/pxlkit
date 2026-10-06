@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import { PixelAvatar } from '../../data/PixelAvatar';
 
 describe('PixelAvatar — status dot', () => {
@@ -24,6 +24,17 @@ describe('PixelAvatar — status dot', () => {
     // Status text is composed into the avatar's accessible name on the frame.
     const frame = container.querySelector('[data-shape]') as HTMLElement;
     expect(frame.getAttribute('aria-label')).toBe(`Jane Doe (${status})`);
+  });
+
+  // Regression: the frame carried aria-label as a plain div, a generic element
+  // ARIA 1.2 does not allow to be named (axe: aria-prohibited-attr).
+  it('makes the frame a named image only while it has a status', () => {
+    const { container, rerender } = render(<PixelAvatar name="Jane Doe" status="busy" />);
+    const frame = () => container.querySelector('[data-shape]') as HTMLElement;
+    expect(frame().getAttribute('role')).toBe('img');
+    rerender(<PixelAvatar name="Jane Doe" />);
+    expect(frame().hasAttribute('role')).toBe(false);
+    expect(frame().hasAttribute('aria-label')).toBe(false);
   });
 });
 
@@ -75,6 +86,20 @@ describe('PixelAvatar — lazy image attrs', () => {
     expect(img!.getAttribute('loading')).toBe('lazy');
     expect(img!.getAttribute('decoding')).toBe('async');
     expect(img!.getAttribute('alt')).toBe('Jane Doe');
+  });
+
+  // Regression: `src` documents a fallback to the initials on load failure,
+  // but a broken image stayed on screen.
+  it('falls back to initials when the image fails to load, and retries a new src', () => {
+    const { container, rerender } = render(
+      <PixelAvatar name="Jane Doe" src="https://example.com/broken.png" />,
+    );
+    fireEvent.error(container.querySelector('img')!);
+    expect(container.querySelector('img')).toBeNull();
+    expect((container.querySelector('[title="Jane Doe"]') as HTMLElement).textContent).toBe('JD');
+
+    rerender(<PixelAvatar name="Jane Doe" src="https://example.com/avatar.png" />);
+    expect(container.querySelector('img')!.getAttribute('src')).toBe('https://example.com/avatar.png');
   });
 
   it('falls back to initials when src is missing (no img tag)', () => {

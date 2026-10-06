@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTooltipDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTooltipDocsMeta = {
@@ -17,16 +23,102 @@ export const PixelTooltipDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionProps): React.ReactElement {
+/** PixelTooltip's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTooltip } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTooltip',
+        props: [
+          { name: 'content', type: 'React.ReactNode', description: 'Tooltip body. Accepts any ReactNode; falls back to `PixelTooltipProps.label` when omitted.' },
+          { name: 'label', type: 'string', description: 'Backwards-compat string alias for `PixelTooltipProps.content`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The element the tooltip is anchored to.' },
+          { name: 'position', type: "'top' | 'bottom' | 'left' | 'right'", default: "'top'", description: 'Preferred placement. floating-ui will flip/shift away from viewport edges.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override. Falls back to nearest `<PxlKitProvider>` surface.' },
+          { name: 'delay', type: 'number | { open?: number; close?: number }', description: 'Open/close delays in ms. A bare `number` is treated as `{ open }` for backwards-compat with the previous API. Defaults to `{ open: 200, close: 100 }`.' },
+          { name: 'open', type: 'boolean', description: 'Controlled open state. When provided, the tooltip ignores its internal state.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Initial open state when uncontrolled.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', description: 'Called whenever the tooltip wants to change open state (controlled or uncontrolled).' },
+          { name: 'trigger', type: "'hover' | 'click' | 'focus'", default: "'hover'", description: "How the tooltip opens. Default `'hover'`." },
+          { name: 'sideOffset', type: 'number', default: '8', description: 'Distance in px from the trigger. Default `8`.' },
+        ],
+        notes: [
+          '`ref` points to `<span>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTooltip } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTooltip',
+        props: [
+          { name: 'label', type: 'string', description: 'Text of the tooltip; the `content` slot takes richer content.' },
+          { name: 'position', type: "'top' | 'bottom' | 'left' | 'right'", default: "'top'", description: 'Preferred side of the trigger; the tooltip flips and shifts to stay in view.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'delay', type: 'number | { open?: number; close?: number }', description: 'Open / close delays in ms (default `{ open: 200, close: 100 }`); a bare number is the open delay.' },
+          { name: 'open', type: 'boolean', binding: 'v-model:open', description: 'Whether the tooltip is open (`v-model:open`); leave unset for an uncontrolled tooltip.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Initial open state while uncontrolled.' },
+          { name: 'trigger', type: "'hover' | 'click' | 'focus'", default: "'hover'", description: 'What opens it: `hover` (and focus), `focus` only, or `click` to toggle.' },
+          { name: 'sideOffset', type: 'number', default: '8', description: 'Gap between the trigger and the tooltip, in px.' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: 'Every open state the tooltip asks for, for `v-model:open`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The trigger the tooltip is anchored to — an interactive element for click tooltips.' },
+          { name: 'content', description: 'Tooltip content, in place of `label`.' },
+        ],
+        notes: [
+          'Its template ref exposes `element`: the wrapper around the trigger.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTooltip } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTooltip',
+        selector: 'pxl-tooltip',
+        props: [
+          { name: 'content', type: 'string | TemplateRef<any>', description: 'Tooltip content: text or an `<ng-template>`, in place of `label`.' },
+          { name: 'label', type: 'string', description: 'Text of the tooltip.' },
+          { name: 'position', type: "'top' | 'bottom' | 'left' | 'right'", default: "'top'", description: 'Preferred side of the trigger; the tooltip flips and shifts to stay in view.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'delay', type: 'number | { open?: number; close?: number }', description: 'Open / close delays in ms (default `{ open: 200, close: 100 }`); a bare number is the open delay.' },
+          { name: 'open', type: 'boolean', binding: '[(open)]', description: 'Whether the tooltip is open (`[(open)]`); leave unset for an uncontrolled tooltip.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Initial open state while uncontrolled.' },
+          { name: 'trigger', type: "'hover' | 'click' | 'focus'", default: "'hover'", description: 'What opens it: `hover` (and focus), `focus` only, or `click` to toggle.' },
+          { name: 'sideOffset', type: 'number', default: '8', accepts: 'unknown', description: 'Gap between the trigger and the tooltip, in px.' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: 'Every open state the tooltip asks for (hover, focus, a click, Escape, a press outside), for `[(open)]`.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelTooltipDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelTooltipDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-tooltip-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-tooltip-heading'>PixelTooltip</h2>
+      <Title id='pixel-tooltip-heading'>PixelTooltip</Title>
       <p className="docs-lead">Floating-UI-positioned tooltip that anchors a portal-rendered hint to a trigger, with hover/focus/click activation, controlled or uncontrolled open state, and configurable open/close delays.</p>
       <ul className="docs-highlights">
         <li>Auto-flip and shift via floating-ui — stays inside the viewport across all four positions.</li>
         <li>Three trigger modes (hover, focus, click) — click variant accepts pointer events and dismisses on outside click or Escape.</li>
         <li>Portal-rendered so it escapes overflow/transform ancestors without z-index gymnastics.</li>
-        <li>Controlled (`open` + `onOpenChange`) or uncontrolled (`defaultOpen`) — uses useControllableState internally.</li>
+        <li>Controlled — <code>open</code> + <code>onOpenChange</code> (React), <code>v-model:open</code> (Vue), <code>[(open)]</code> (Angular) — or uncontrolled (<code>defaultOpen</code>).</li>
         <li>Surface-aware (pixel/linear) and inherits from PxlKitSurfaceProvider when no surface prop is passed.</li>
       </ul>
     <dl className="docs-meta">
@@ -34,18 +126,18 @@ export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionPr
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-tooltip-api">
+      <Heading id="pixel-tooltip-api">API</Heading>
+      <FrameworkApi label={'PixelTooltip API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-tooltip-a11y">
-      <h3 id="pixel-tooltip-a11y">Accessibility</h3>
+      <Heading id="pixel-tooltip-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>tooltip</code></li>
       </ul>
-      <p className="docs-aria-notes">Floating panel has role=&quot;tooltip&quot; and is wired to the trigger via aria-describedby when open. Hover and focus triggers render a non-interactive panel (pointer-events: none) so the cursor stays on the anchor. Click triggers listen for clicks bubbling from the anchor child — the wrapper itself stays non-interactive so an interactive child (the common case) is not nested inside another control; anchor click tooltips to a button or link for keyboard support. Outside pointerdown and Escape close a click tooltip. Use focus or click trigger when the tooltip must be reachable without a pointer device.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Floating panel has role=&quot;tooltip&quot;. While it is open, its id joins the aria-describedby of the first focusable element inside the anchor — the element a screen reader announces on focus — next to that element&#39;s own references; with nothing focusable inside, the wrapper carries it. Hover and focus triggers render a non-interactive panel (pointer-events: none) so the cursor stays on the anchor. Click triggers listen for clicks bubbling from the anchor child — the wrapper itself stays non-interactive so an interactive child (the common case) is not nested inside another control; anchor click tooltips to a button or link for keyboard support. Escape dismisses the tooltip in every trigger mode without moving the pointer or focus (WCAG 1.4.13); outside pointerdown also closes a click tooltip. Use focus or click trigger when the tooltip must be reachable without a pointer device.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -72,17 +164,18 @@ export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionPr
           </tr>
           <tr>
             <td><kbd>Escape</kbd></td>
-            <td>Closes the tooltip</td>
-            <td>trigger=&quot;click&quot; and open</td>
+            <td>Closes the tooltip, or cancels one about to open; with the hover and focus triggers it then stays closed until the pointer leaves and re-enters or focus leaves and returns</td>
+            <td>open or opening, any trigger</td>
           </tr>
         </tbody>
       </table>
     </section>
     <section aria-labelledby="pixel-tooltip-usage">
-      <h3 id="pixel-tooltip-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+      <Heading id="pixel-tooltip-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelTooltip usage'}
+        react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -90,24 +183,77 @@ export function Default() {
       <PixelButton>Save</PixelButton>
     </PixelTooltip>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTooltip label="Save your changes">
+    <PixelButton>Save</PixelButton>
+  </PixelTooltip>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelTooltip],
+  template: \`
+    <pxl-tooltip label="Save your changes">
+      <button pxlButton>Save</button>
+    </pxl-tooltip>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelTooltip label="Save your changes">
       <PixelButton>Save</PixelButton>
     </PixelTooltip>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTooltip label="Save your changes">
+    <PixelButton>Save</PixelButton>
+  </PixelTooltip>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelTooltip],
+  template: \`
+    <pxl-tooltip label="Save your changes">
+      <button pxlButton>Save</button>
+    </pxl-tooltip>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-positions">
-        <h4>Positions</h4>
-        <pre className="docs-code"><code>{`export function Positions() {
+        <Subheading>Positions</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Positions code'}
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
+
+export function Positions() {
   return (
     <div className="flex flex-wrap items-center gap-6">
       <PixelTooltip label="Top tooltip" position="top">
@@ -124,11 +270,60 @@ export function Default() {
       </PixelTooltip>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-6">
+    <PixelTooltip label="Top tooltip" position="top">
+      <PixelButton>Top</PixelButton>
+    </PixelTooltip>
+    <PixelTooltip label="Bottom tooltip" position="bottom">
+      <PixelButton>Bottom</PixelButton>
+    </PixelTooltip>
+    <PixelTooltip label="Left tooltip" position="left">
+      <PixelButton>Left</PixelButton>
+    </PixelTooltip>
+    <PixelTooltip label="Right tooltip" position="right">
+      <PixelButton>Right</PixelButton>
+    </PixelTooltip>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelTooltip],
+  template: \`
+    <div class="flex flex-wrap items-center gap-6">
+      <pxl-tooltip label="Top tooltip" position="top">
+        <button pxlButton>Top</button>
+      </pxl-tooltip>
+      <pxl-tooltip label="Bottom tooltip" position="bottom">
+        <button pxlButton>Bottom</button>
+      </pxl-tooltip>
+      <pxl-tooltip label="Left tooltip" position="left">
+        <button pxlButton>Left</button>
+      </pxl-tooltip>
+      <pxl-tooltip label="Right tooltip" position="right">
+        <button pxlButton>Right</button>
+      </pxl-tooltip>
+    </div>
+  \`,
+})
+export class Positions {}`}
+        />
       </article>
       <article className="docs-example" id="example-triggers">
-        <h4>Triggers</h4>
-        <pre className="docs-code"><code>{`export function Triggers() {
+        <Subheading>Triggers</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Triggers code'}
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
+
+export function Triggers() {
   return (
     <div className="flex flex-wrap items-center gap-6">
       <PixelTooltip label="Opens on hover or focus" trigger="hover">
@@ -142,11 +337,54 @@ export function Default() {
       </PixelTooltip>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-6">
+    <PixelTooltip label="Opens on hover or focus" trigger="hover">
+      <PixelButton>Hover</PixelButton>
+    </PixelTooltip>
+    <PixelTooltip label="Opens on focus only" trigger="focus">
+      <PixelButton>Focus</PixelButton>
+    </PixelTooltip>
+    <PixelTooltip label="Click to toggle, Escape to close" trigger="click">
+      <PixelButton>Click</PixelButton>
+    </PixelTooltip>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelTooltip],
+  template: \`
+    <div class="flex flex-wrap items-center gap-6">
+      <pxl-tooltip label="Opens on hover or focus" trigger="hover">
+        <button pxlButton>Hover</button>
+      </pxl-tooltip>
+      <pxl-tooltip label="Opens on focus only" trigger="focus">
+        <button pxlButton>Focus</button>
+      </pxl-tooltip>
+      <pxl-tooltip label="Click to toggle, Escape to close" trigger="click">
+        <button pxlButton>Click</button>
+      </pxl-tooltip>
+    </div>
+  \`,
+})
+export class Triggers {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap items-center gap-6">
       <PixelTooltip label="Pixel surface" surface="pixel">
@@ -157,11 +395,48 @@ export function Default() {
       </PixelTooltip>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-6">
+    <PixelTooltip label="Pixel surface" surface="pixel">
+      <PixelButton surface="pixel">Pixel</PixelButton>
+    </PixelTooltip>
+    <PixelTooltip label="Linear surface" surface="linear">
+      <PixelButton surface="linear">Linear</PixelButton>
+    </PixelTooltip>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelTooltip],
+  template: \`
+    <div class="flex flex-wrap items-center gap-6">
+      <pxl-tooltip label="Pixel surface" surface="pixel">
+        <button pxlButton surface="pixel">Pixel</button>
+      </pxl-tooltip>
+      <pxl-tooltip label="Linear surface" surface="linear">
+        <button pxlButton surface="linear">Linear</button>
+      </pxl-tooltip>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-rich-content">
-        <h4>Rich content</h4>
-        <pre className="docs-code"><code>{`export function RichContent() {
+        <Subheading>Rich content</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Rich content code'}
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
+
+export function RichContent() {
   return (
     <PixelTooltip
       content={
@@ -174,11 +449,50 @@ export function Default() {
       <PixelButton>Hover for details</PixelButton>
     </PixelTooltip>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTooltip>
+    <template #content>
+      <span class="flex flex-col gap-0.5">
+        <span class="font-semibold">Keyboard shortcut</span>
+        <span class="opacity-80">Press ⌘K to open the command palette</span>
+      </span>
+    </template>
+    <PixelButton>Hover for details</PixelButton>
+  </PixelTooltip>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelTooltip],
+  template: \`
+    <pxl-tooltip [content]="details">
+      <button pxlButton>Hover for details</button>
+    </pxl-tooltip>
+    <ng-template #details>
+      <span class="flex flex-col gap-0.5">
+        <span class="font-semibold">Keyboard shortcut</span>
+        <span class="opacity-80">Press ⌘K to open the command palette</span>
+      </span>
+    </ng-template>
+  \`,
+})
+export class RichContent {}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-delay">
-        <h4>Custom delay</h4>
-        <pre className="docs-code"><code>{`export function CustomDelay() {
+        <Subheading>Custom delay</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Custom delay code'}
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
+
+export function CustomDelay() {
   return (
     <div className="flex flex-wrap items-center gap-6">
       <PixelTooltip label="Opens instantly" delay={{ open: 0, close: 0 }}>
@@ -189,11 +503,49 @@ export function Default() {
       </PixelTooltip>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-6">
+    <PixelTooltip label="Opens instantly" :delay="{ open: 0, close: 0 }">
+      <PixelButton>Instant</PixelButton>
+    </PixelTooltip>
+    <PixelTooltip label="Slow open, fast close" :delay="{ open: 600, close: 0 }">
+      <PixelButton>Slow open</PixelButton>
+    </PixelTooltip>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelTooltip],
+  template: \`
+    <div class="flex flex-wrap items-center gap-6">
+      <pxl-tooltip label="Opens instantly" [delay]="{ open: 0, close: 0 }">
+        <button pxlButton>Instant</button>
+      </pxl-tooltip>
+      <pxl-tooltip label="Slow open, fast close" [delay]="{ open: 600, close: 0 }">
+        <button pxlButton>Slow open</button>
+      </pxl-tooltip>
+    </div>
+  \`,
+})
+export class CustomDelay {}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
+        <Subheading>Controlled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import { useState } from 'react';
+import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
+
+export function Controlled() {
   const [open, setOpen] = useState(false);
   return (
     <div className="flex items-center gap-4">
@@ -205,21 +557,86 @@ export function Default() {
       </PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <div class="flex items-center gap-4">
+    <PixelTooltip v-model:open="open" label="Controlled tooltip">
+      <PixelButton>Anchor</PixelButton>
+    </PixelTooltip>
+    <PixelButton tone="cyan" variant="outline" @click="open = !open">{{ open ? 'Hide' : 'Show' }}</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelTooltip],
+  template: \`
+    <div class="flex items-center gap-4">
+      <pxl-tooltip [(open)]="open" label="Controlled tooltip">
+        <button pxlButton>Anchor</button>
+      </pxl-tooltip>
+      <button pxlButton tone="cyan" variant="outline" (click)="open.set(!open())">{{ open() ? 'Hide' : 'Show' }}</button>
+    </div>
+  \`,
+})
+export class Controlled {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
-        <pre className="docs-code"><code>{`export function Uncontrolled() {
+        <Subheading>Uncontrolled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Uncontrolled code'}
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
+
+export function Uncontrolled() {
   return (
     <PixelTooltip defaultOpen label="Open by default" trigger="click">
       <PixelButton>Click to toggle</PixelButton>
     </PixelTooltip>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTooltip default-open label="Open by default" trigger="click">
+    <PixelButton>Click to toggle</PixelButton>
+  </PixelTooltip>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelTooltip],
+  template: \`
+    <pxl-tooltip defaultOpen label="Open by default" trigger="click">
+      <button pxlButton>Click to toggle</button>
+    </pxl-tooltip>
+  \`,
+})
+export class Uncontrolled {}`}
+        />
       </article>
       <article className="docs-example" id="example-side-offset">
-        <h4>Side offset</h4>
-        <pre className="docs-code"><code>{`export function SideOffset() {
+        <Subheading>Side offset</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Side offset code'}
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
+
+export function SideOffset() {
   return (
     <div className="flex flex-wrap items-center gap-6">
       <PixelTooltip label="Tight (2px)" sideOffset={2}>
@@ -230,14 +647,46 @@ export function Default() {
       </PixelTooltip>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-6">
+    <PixelTooltip label="Tight (2px)" :side-offset="2">
+      <PixelButton>Tight</PixelButton>
+    </PixelTooltip>
+    <PixelTooltip label="Roomy (16px)" :side-offset="16">
+      <PixelButton>Roomy</PixelButton>
+    </PixelTooltip>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelTooltip],
+  template: \`
+    <div class="flex flex-wrap items-center gap-6">
+      <pxl-tooltip label="Tight (2px)" [sideOffset]="2">
+        <button pxlButton>Tight</button>
+      </pxl-tooltip>
+      <pxl-tooltip label="Roomy (16px)" [sideOffset]="16">
+        <button pxlButton>Roomy</button>
+      </pxl-tooltip>
+    </div>
+  \`,
+})
+export class SideOffset {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-popover">PixelPopover</a></li>
-        <li><a href="#pixel-dropdown">PixelDropdown</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-dropdown' : '#pixel-dropdown'}>PixelDropdown</a></li>
       </ul>
     </section>
     </section>

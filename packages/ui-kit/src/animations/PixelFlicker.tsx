@@ -1,8 +1,9 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import { flickerStyle } from '@pxlkit/ui-kit-core';
 import type { AnimationRepeat, AnimationTrigger } from './types';
-import { mergeRefs, repeatToCss, useAnimationTrigger, usePixelAnimations } from './_internal/animation-hooks';
+import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelFlicker — broken-neon-sign opacity flicker loop.
@@ -34,17 +35,12 @@ export const PixelFlicker = forwardRef<HTMLDivElement, PixelFlickerProps>(functi
   },
   forwardedRef,
 ) {
-  usePixelAnimations();
   const { ref, active, handlers, handleAnimEnd } = useAnimationTrigger(trigger, onComplete);
   return (
     <div
       ref={mergeRefs(ref, forwardedRef)}
       className={className}
-      style={
-        active
-          ? { animation: `pxl-flicker ${duration}ms steps(1) 0ms ${repeatToCss(repeat)} both` }
-          : undefined
-      }
+      style={active ? flickerStyle({ duration, repeat }) : undefined}
       {...handlers}
       onAnimationEnd={handleAnimEnd}
     >

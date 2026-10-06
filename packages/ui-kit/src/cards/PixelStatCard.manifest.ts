@@ -21,8 +21,8 @@ export default defineManifest({
     'Seven tone presets aligned with the pxlkit palette (green, cyan, gold, red, purple, pink, neutral).',
     'Three sizes (sm/md/lg) that scale padding, value, label and trend typography in lockstep.',
     'Icon position aware: top, left, right or bottom-left layouts without prop drilling.',
-    'Surface-aware (pixel vs linear) — inherits the ambient surface context or override per-card.',
-    'Pure presentational + SSR-safe — no client hooks, fully tree-shakable.',
+    'Surface-aware (pixel vs linear) — follows the nearest PxlKitSurfaceProvider or a per-card override.',
+    'Pure presentational + SSR-safe — no client state, fully tree-shakable.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

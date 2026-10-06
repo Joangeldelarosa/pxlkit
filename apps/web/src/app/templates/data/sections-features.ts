@@ -1,10 +1,10 @@
 import type { TemplateSection } from '../types';
+import { UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 
 const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/feedback';
 
 const iconGrid = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Package, Palette, CloudSync } from '@pxlkit/ui';
 import { ShieldCheck, Sparkles, Bell } from '@pxlkit/feedback';
@@ -20,7 +20,7 @@ const FEATURES = [
   {
     icon: Package,
     title: 'Modular Packages',
-    description: 'Install only what you need. Each package is tree-shakeable and independently versioned.',
+    description: 'Install only what you need. Each package is versioned independently, and the icon packs are tree-shakeable.',
     tone: 'green',
   },
   {
@@ -72,7 +72,7 @@ export function IconFeatureGrid() {
               <PixelFeatureCard
                 className="h-full"
                 tone={f.tone}
-                icon={<PxlKitIcon icon={f.icon} size={24} colorful />}
+                icon={<PxlKitIcon icon={f.icon} size={24} colorful decorative />}
                 title={f.title}
                 description={f.description}
                 descriptionLines={3}
@@ -88,7 +88,6 @@ export function IconFeatureGrid() {
 
 const alternatingFeatures = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { AnimatedPxlKitIcon } from '@pxlkit/core';
 import { SparkleStar, CoinSpin, GlowingSword } from '@pxlkit/gamification';
 import {
@@ -111,7 +110,7 @@ const FEATURES = [
   {
     badge: 'Components',
     tone: 'cyan' as const,
-    title: '60+ React Components',
+    title: '${UI_COMPONENTS_COUNT} React Components',
     description: 'Buttons, cards, inputs, tables, modals, accordions, tabs, pagination, animations — all built with Tailwind CSS and the retro design token system. No third-party UI library required.',
     icon: CoinSpin,
   },
@@ -119,7 +118,7 @@ const FEATURES = [
     badge: '3D Effects',
     tone: 'gold' as const,
     title: 'Parallax & 3D Icons',
-    description: 'Mouse-tracking 3D parallax icons with layered depth using React Three Fiber. 10 iconic characters including rockets, skulls, orbs, and more.',
+    description: 'Mouse-tracking 3D parallax icons with layered depth, drawn with CSS 3D transforms. 10 iconic characters including rockets, skulls, orbs, and more.',
     icon: GlowingSword,
   },
 ] as const;
@@ -153,7 +152,7 @@ export function AlternatingFeatures() {
               <PixelSlideIn from={i % 2 === 0 ? 'right' : 'left'}>
                 <PixelHeroMedia ratio="16/10" framed tone={f.tone}>
                   <div className="flex h-full w-full items-center justify-center bg-retro-surface/30">
-                    <AnimatedPxlKitIcon icon={f.icon} size={80} colorful />
+                    <AnimatedPxlKitIcon icon={f.icon} size={80} colorful decorative />
                   </div>
                 </PixelHeroMedia>
               </PixelSlideIn>
@@ -168,7 +167,6 @@ export function AlternatingFeatures() {
 
 const bentoGrid = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { Palette } from '@pxlkit/ui';
 import { ShieldCheck } from '@pxlkit/feedback';
@@ -200,7 +198,7 @@ export function BentoFeatureGrid() {
         <PixelBento columns={3} gap={4}>
           {/* Large card spanning 2 cols */}
           <PixelBentoCell span="2x1" variant="feature" tone="green">
-            <AnimatedPxlKitIcon icon={SparkleStar} size={40} colorful />
+            <AnimatedPxlKitIcon icon={SparkleStar} size={40} colorful decorative />
             <h3 className="font-pixel text-sm text-retro-text leading-relaxed">Pixel-perfect icons</h3>
             <p className="text-retro-muted font-mono text-xs leading-relaxed">226+ SVG icons hand-crafted on a pixel grid. Crisp at any resolution.</p>
             <PixelCluster gap={3} className="mt-auto">
@@ -211,7 +209,7 @@ export function BentoFeatureGrid() {
 
           {/* Tall card */}
           <PixelBentoCell span="1x2" variant="feature">
-            <PxlKitIcon icon={Palette} size={24} colorful />
+            <PxlKitIcon icon={Palette} size={24} colorful decorative />
             <h3 className="font-pixel text-xs text-retro-text leading-relaxed">Design tokens</h3>
             <p className="text-retro-muted font-mono text-xs">Complete CSS variable system.</p>
             <PixelStack gap={3} className="w-full">
@@ -224,13 +222,13 @@ export function BentoFeatureGrid() {
 
           {/* Small cards */}
           <PixelBentoCell span="1x1" variant="feature">
-            <PxlKitIcon icon={ShieldCheck} size={24} colorful />
+            <PxlKitIcon icon={ShieldCheck} size={24} colorful decorative />
             <h3 className="font-pixel text-[10px] text-retro-text leading-relaxed">Type-safe</h3>
             <p className="text-retro-muted font-mono text-xs">Full TypeScript support.</p>
           </PixelBentoCell>
 
           <PixelBentoCell span="1x1" variant="feature" tone="gold">
-            <PxlKitIcon icon={Trophy} size={24} colorful />
+            <PxlKitIcon icon={Trophy} size={24} colorful decorative />
             <h3 className="font-pixel text-[10px] text-retro-text leading-relaxed">MIT License</h3>
             <p className="text-retro-muted font-mono text-xs">Free forever, open-source.</p>
           </PixelBentoCell>

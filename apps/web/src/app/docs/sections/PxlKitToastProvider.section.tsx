@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitToastProviderDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PxlKitToastProviderDocsMeta = {
@@ -17,35 +23,104 @@ export const PxlKitToastProviderDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProviderDocsSectionProps): React.ReactElement {
+/** PxlKitToastProvider's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PxlKitToastProvider } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PxlKitToastProvider',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The part of the app that shows toasts: `useToast()` works inside it.' },
+          { name: 'position', type: "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'", default: "'top-right'", description: 'Corner, or edge centre, of the screen the toasts appear at.' },
+          { name: 'max', type: 'number', default: '5', description: 'Maximum simultaneous toasts. Oldest is dropped if exceeded. Defaults to 5.' },
+          { name: 'duration', type: 'number', default: '4500', description: "Auto-dismiss delay, in ms, of the toasts that set no `duration` of their own; `0` keeps them until dismissed. Defaults to 4500. A promise's error toast stays at least 6 s, unless this is `0`." },
+          { name: 'hotkey', type: 'string | false', default: "'F8'", description: "Key that moves focus to the toasts, written like `F8` or `alt+t`, or `false` for none. Defaults to `F8`; the viewport's accessible name tells it." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toasts; defaults to the nearest provider.' },
+          { name: 'stacked', type: 'boolean', default: 'true', description: 'Sonner-style stacked-offset visual: toasts collapse into a small stack showing only the front card; hover expands them into a vertical list. Defaults to `true`.' },
+          { name: 'stackVisible', type: 'number', default: '2', description: 'How many additional cards peek behind the front when stacked. Defaults to 2.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PxlKitToastProvider } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PxlKitToastProvider',
+        props: [
+          { name: 'position', type: "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'", default: "'top-right'", description: 'Corner, or edge centre, of the screen the toasts appear at.' },
+          { name: 'max', type: 'number', default: '5', description: 'Maximum simultaneous toasts. Oldest is dropped if exceeded.' },
+          { name: 'duration', type: 'number', default: '4500', description: "Auto-dismiss delay, in ms, of the toasts that set no `duration` of their own; `0` keeps them until dismissed. A promise's error toast stays at least 6 s, unless this is `0`." },
+          { name: 'hotkey', type: 'string | false', default: "'F8'", description: "Key that moves focus to the toasts, written like `F8` or `alt+t`, or `false` for none; the viewport's accessible name tells it." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toasts; defaults to the nearest provider.' },
+          { name: 'stacked', type: 'boolean', default: 'true', description: 'Sonner-style stacked-offset visual: toasts collapse into a small stack showing only the front card; hovering or focusing it expands it into a vertical list.' },
+          { name: 'stackVisible', type: 'number', default: '2', description: 'How many additional cards peek behind the front when stacked.' },
+        ],
+        slots: [
+          { name: 'default', props: "Omit<UseToastReturn, 'toasts'> & { toasts: readonly ToastItem[] }", description: 'The part of the app that shows toasts; receives the toast API, with `toasts` unwrapped.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PxlKitToastProvider } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PxlKitToastProvider',
+        selector: 'pxl-toast-provider',
+        props: [
+          { name: 'position', type: "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'", default: "'top-right'", description: 'Corner, or edge centre, of the screen the toasts appear at.' },
+          { name: 'max', type: 'number', default: '5', accepts: 'unknown', description: 'Maximum simultaneous toasts. Oldest is dropped if exceeded.' },
+          { name: 'duration', type: 'number', default: '4500', accepts: 'unknown', description: "Auto-dismiss delay, in ms, of the toasts that set no `duration` of their own; `0` keeps them until dismissed. A promise's error toast stays at least 6 s, unless this is `0`." },
+          { name: 'hotkey', type: 'string | false', default: "'F8'", description: "Key that moves focus to the toasts, written like `F8` or `alt+t`, or `false` for none; the viewport's accessible name tells it." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toasts; defaults to the nearest provider.' },
+          { name: 'stacked', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Sonner-style stacked-offset visual: toasts collapse into a small stack showing only the front card; hovering or focusing it expands it into a vertical list.' },
+          { name: 'stackVisible', type: 'number', default: '2', accepts: 'unknown', description: 'How many additional cards peek behind the front when stacked.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PxlKitToastProviderDocsSection({ className, headingLevel = 2, links = 'anchors' }: PxlKitToastProviderDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pxl-kit-toast-provider-heading'} className={className} data-status='stable'>
-      <h2 id='pxl-kit-toast-provider-heading'>PxlKitToastProvider</h2>
-      <p className="docs-lead">App-root toast provider that hosts the toast queue, viewport portal, and stacked/expanded visual mode — paired with useToast() for imperative push/update/dismiss/promise APIs.</p>
+      <Title id='pxl-kit-toast-provider-heading'>PxlKitToastProvider</Title>
+      <p className="docs-lead">App-root toast provider that hosts the toast queue, viewport portal, and stacked/expanded visual mode — paired with useToast() (injectToast() in Angular) for imperative push/update/dismiss/promise APIs.</p>
       <ul className="docs-highlights">
         <li>Six positions (top/bottom × left/right/center) with portal-rendered viewport.</li>
         <li>Sonner-style stacked mode: collapsed cards peek behind the front, hover/focus expands the stack.</li>
         <li>Configurable max simultaneous toasts; oldest are dropped when the queue exceeds the cap.</li>
         <li>Surface-aware (auto / pixel / linear) — pixel surface adds an HP-bar tone accent to each toast.</li>
-        <li>Single role=&quot;region&quot; landmark announces &quot;Notifications&quot;; per-toast aria-live avoids double announcements.</li>
+        <li>Announced through two persistent live regions, polite and assertive; F8 moves focus to the toasts, and <code>duration</code> sets or turns off their auto-dismiss.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pxl-kit-toast-provider-api">
+      <Heading id="pxl-kit-toast-provider-api">API</Heading>
+      <FrameworkApi label={'PxlKitToastProvider API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-toast-provider-a11y">
-      <h3 id="pxl-kit-toast-provider-a11y">Accessibility</h3>
+      <Heading id="pxl-kit-toast-provider-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
+        <li><code>region</code></li>
+        <li><code>status</code></li>
         <li><code>alert</code></li>
       </ul>
-      <p className="docs-aria-notes">The provider mounts a single role=&quot;region&quot; with aria-label=&quot;Notifications&quot; as a landmark for the toast viewport. Individual toasts declare their own role (alert for assertive tones like red/gold, status for the rest) with matching aria-live (assertive/polite) and aria-atomic=&quot;true&quot;, so nesting another aria-live region here is intentionally avoided to prevent double announcements. Hovering or focusing the viewport expands the stacked layout so assistive-tech users can read all queued toasts; focusing inside any toast also pauses its auto-dismiss timer.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">The viewport is a <code>role=&quot;region&quot;</code> landmark named after its hotkey — &quot;Notifications (F8)&quot; by default; <code>hotkey</code> sets another key or, with <code>false</code>, none — and takes focus from it (<code>tabindex=&quot;-1&quot;</code>), from where Tab reaches the toasts&#39; buttons. The hotkey works in text fields too, since F8 types nothing. Two visually hidden live regions inside the viewport, there and empty before any toast, announce the toasts: each toast&#39;s title and message are written to <code>role=&quot;status&quot;</code> — or <code>role=&quot;alert&quot;</code> for critical tones (red, gold) and <code>assertive</code> toasts — when it is pushed and when an update changes its title, message or tone (a settled promise), as new content each time, so a repeated message is read again. The cards themselves are not live regions. Toasts dismiss themselves after the provider&#39;s <code>duration</code> (4.5 s; <code>0</code> keeps them until dismissed, WCAG 2.2.1), a promise&#39;s error toast after at least 6 s; a toast&#39;s countdown holds while it is hovered or focused, while the page is hidden and while the window is in the background. Hovering or focusing the viewport expands the stacked layout. When the toast holding focus leaves, focus moves to the dismiss button of the next toast, else the previous one, else back to the element it entered the viewport from.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -56,23 +131,35 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
         </thead>
         <tbody>
           <tr>
+            <td><kbd>F8</kbd></td>
+            <td>Move focus to the toast viewport, expanding stacked toasts.</td>
+            <td>Toasts on screen; another key, or none, with <code>hotkey</code>.</td>
+          </tr>
+          <tr>
             <td><kbd>Tab</kbd></td>
-            <td>Move focus into the toast viewport, expanding stacked toasts.</td>
+            <td>Move through the toasts&#39; action and dismiss buttons, from the viewport or the page, expanding stacked toasts.</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
             <td><kbd>Shift+Tab</kbd></td>
-            <td>Move focus back out of the viewport, collapsing the stack.</td>
+            <td>Move focus back through the toasts and out of the viewport, collapsing the stack.</td>
             <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Enter</kbd></td>
+            <td>Dismiss the toast; focus moves to the next toast&#39;s dismiss button, or the previous one&#39;s, or back to where it came from.</td>
+            <td>Dismiss button focused.</td>
           </tr>
         </tbody>
       </table>
     </section>
     <section aria-labelledby="pxl-kit-toast-provider-usage">
-      <h3 id="pxl-kit-toast-provider-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+      <Heading id="pxl-kit-toast-provider-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PxlKitToastProvider usage'}
+        react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -95,138 +182,1047 @@ export function Default() {
       <DefaultTriggers />
     </PxlKitToastProvider>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" @click="toast({ title: 'Saved', message: 'Your changes were persisted.' })">
+        Push toast
+      </PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster>
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" (click)="toaster.toast({ title: 'Saved', message: 'Your changes were persisted.' })">
+          Push toast
+        </button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function DefaultTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton size="sm" onClick={() => toast({ title: 'Saved', message: 'Your changes were persisted.' })}>
+        Push toast
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function Default() {
   return (
     <PxlKitToastProvider>
       <DefaultTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" @click="toast({ title: 'Saved', message: 'Your changes were persisted.' })">
+        Push toast
+      </PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster>
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" (click)="toaster.toast({ title: 'Saved', message: 'Your changes were persisted.' })">
+          Push toast
+        </button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function ToneTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton size="sm" tone="green" onClick={() => toast.success('Saved', 'Changes persisted.')}>
+        Success
+      </PixelButton>
+      <PixelButton size="sm" tone="cyan" onClick={() => toast.info('Heads up', 'New release available.')}>
+        Info
+      </PixelButton>
+      <PixelButton size="sm" tone="gold" onClick={() => toast.warning('Careful', 'Storage almost full.')}>
+        Warning
+      </PixelButton>
+      <PixelButton size="sm" tone="red" onClick={() => toast.error('Failed', 'Upload could not finish.')}>
+        Error
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function Tones() {
   return (
     <PxlKitToastProvider>
       <ToneTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" tone="green" @click="toast.success('Saved', 'Changes persisted.')">Success</PixelButton>
+      <PixelButton size="sm" tone="cyan" @click="toast.info('Heads up', 'New release available.')">Info</PixelButton>
+      <PixelButton size="sm" tone="gold" @click="toast.warning('Careful', 'Storage almost full.')">Warning</PixelButton>
+      <PixelButton size="sm" tone="red" @click="toast.error('Failed', 'Upload could not finish.')">Error</PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster>
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" tone="green" (click)="toaster.toast.success('Saved', 'Changes persisted.')">Success</button>
+        <button pxlButton size="sm" tone="cyan" (click)="toaster.toast.info('Heads up', 'New release available.')">Info</button>
+        <button pxlButton size="sm" tone="gold" (click)="toaster.toast.warning('Careful', 'Storage almost full.')">Warning</button>
+        <button pxlButton size="sm" tone="red" (click)="toaster.toast.error('Failed', 'Upload could not finish.')">Error</button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-bottom-right">
-        <h4>Bottom Right</h4>
-        <pre className="docs-code"><code>{`export function BottomRight() {
+        <Subheading>Bottom Right</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Bottom Right code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function PositionTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton size="sm" onClick={() => toast({ title: 'Bottom-right toast' })}>
+        Push to bottom-right
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function BottomRight() {
   return (
     <PxlKitToastProvider position="bottom-right">
       <PositionTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }" position="bottom-right">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" @click="toast({ title: 'Bottom-right toast' })">Push to bottom-right</PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster position="bottom-right">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" (click)="toaster.toast({ title: 'Bottom-right toast' })">Push to bottom-right</button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class BottomRight {}`}
+        />
       </article>
       <article className="docs-example" id="example-top-center">
-        <h4>Top Center</h4>
-        <pre className="docs-code"><code>{`export function TopCenter() {
+        <Subheading>Top Center</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Top Center code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function PositionTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton size="sm" onClick={() => toast({ title: 'Bottom-right toast' })}>
+        Push to bottom-right
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function TopCenter() {
   return (
     <PxlKitToastProvider position="top-center">
       <PositionTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }" position="top-center">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" @click="toast({ title: 'Bottom-right toast' })">Push to bottom-right</PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster position="top-center">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" (click)="toaster.toast({ title: 'Bottom-right toast' })">Push to bottom-right</button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class TopCenter {}`}
+        />
       </article>
       <article className="docs-example" id="example-stacked">
-        <h4>Stacked</h4>
-        <pre className="docs-code"><code>{`export function Stacked() {
+        <Subheading>Stacked</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Stacked code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function StackedTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton
+        size="sm"
+        onClick={() => {
+          toast({ title: 'First', message: 'Oldest of the stack.' });
+          toast({ title: 'Second', message: 'In the middle.' });
+          toast({ title: 'Third', message: 'Newest in front.' });
+        }}
+      >
+        Push three
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function Stacked() {
   return (
     <PxlKitToastProvider stacked stackVisible={2}>
       <StackedTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider, type UseToastReturn } from '@pxlkit/ui-kit-vue';
+
+function pushThree(toast: UseToastReturn['toast']) {
+  toast({ title: 'First', message: 'Oldest of the stack.' });
+  toast({ title: 'Second', message: 'In the middle.' });
+  toast({ title: 'Third', message: 'Newest in front.' });
+}
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }" stacked :stack-visible="2">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" @click="pushThree(toast)">Push three</PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider, type ToastApi } from '@pxlkit/ui-kit-angular';
+
+type ToastFn = ToastApi['toast'];
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster stacked [stackVisible]="2">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" (click)="pushThree(toaster.toast)">Push three</button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class Stacked {
+  pushThree(toast: ToastFn): void {
+    toast({ title: 'First', message: 'Oldest of the stack.' });
+    toast({ title: 'Second', message: 'In the middle.' });
+    toast({ title: 'Third', message: 'Newest in front.' });
+  }
+}`}
+        />
       </article>
       <article className="docs-example" id="example-flat">
-        <h4>Flat</h4>
-        <pre className="docs-code"><code>{`export function Flat() {
+        <Subheading>Flat</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Flat code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function StackedTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton
+        size="sm"
+        onClick={() => {
+          toast({ title: 'First', message: 'Oldest of the stack.' });
+          toast({ title: 'Second', message: 'In the middle.' });
+          toast({ title: 'Third', message: 'Newest in front.' });
+        }}
+      >
+        Push three
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function Flat() {
   return (
     <PxlKitToastProvider stacked={false}>
       <StackedTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider, type UseToastReturn } from '@pxlkit/ui-kit-vue';
+
+function pushThree(toast: UseToastReturn['toast']) {
+  toast({ title: 'First', message: 'Oldest of the stack.' });
+  toast({ title: 'Second', message: 'In the middle.' });
+  toast({ title: 'Third', message: 'Newest in front.' });
+}
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }" :stacked="false">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" @click="pushThree(toast)">Push three</PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider, type ToastApi } from '@pxlkit/ui-kit-angular';
+
+type ToastFn = ToastApi['toast'];
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster [stacked]="false">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" (click)="pushThree(toaster.toast)">Push three</button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class Flat {
+  pushThree(toast: ToastFn): void {
+    toast({ title: 'First', message: 'Oldest of the stack.' });
+    toast({ title: 'Second', message: 'In the middle.' });
+    toast({ title: 'Third', message: 'Newest in front.' });
+  }
+}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <Subheading>Pixel Surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel Surface code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function SurfaceTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton
+        size="sm"
+        onClick={() =>
+          toast({ title: 'Pixel surface', message: 'HP-bar accent on the left edge.', tone: 'cyan' })
+        }
+      >
+        Push pixel toast
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function PixelSurface() {
   return (
     <PxlKitToastProvider surface="pixel">
       <SurfaceTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }" surface="pixel">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton
+        size="sm"
+        @click="toast({ title: 'Pixel surface', message: 'HP-bar accent on the left edge.', tone: 'cyan' })"
+      >
+        Push pixel toast
+      </PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster surface="pixel">
+      <div class="flex flex-wrap gap-2">
+        <button
+          pxlButton
+          size="sm"
+          (click)="toaster.toast({ title: 'Pixel surface', message: 'HP-bar accent on the left edge.', tone: 'cyan' })"
+        >
+          Push pixel toast
+        </button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class PixelSurface {}`}
+        />
       </article>
       <article className="docs-example" id="example-linear-surface">
-        <h4>Linear Surface</h4>
-        <pre className="docs-code"><code>{`export function LinearSurface() {
+        <Subheading>Linear Surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Linear Surface code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function SurfaceTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton
+        size="sm"
+        onClick={() =>
+          toast({ title: 'Pixel surface', message: 'HP-bar accent on the left edge.', tone: 'cyan' })
+        }
+      >
+        Push pixel toast
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function LinearSurface() {
   return (
     <PxlKitToastProvider surface="linear">
       <SurfaceTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }" surface="linear">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton
+        size="sm"
+        @click="toast({ title: 'Pixel surface', message: 'HP-bar accent on the left edge.', tone: 'cyan' })"
+      >
+        Push pixel toast
+      </PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster surface="linear">
+      <div class="flex flex-wrap gap-2">
+        <button
+          pxlButton
+          size="sm"
+          (click)="toaster.toast({ title: 'Pixel surface', message: 'HP-bar accent on the left edge.', tone: 'cyan' })"
+        >
+          Push pixel toast
+        </button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class LinearSurface {}`}
+        />
       </article>
       <article className="docs-example" id="example-loading">
-        <h4>Loading → Success</h4>
-        <pre className="docs-code"><code>{`export function Loading() {
+        <Subheading>Loading → Success</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Loading → Success code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function LoadingTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton
+        size="sm"
+        onClick={() => {
+          const id = toast.loading('Uploading…', 'Hang tight.');
+          setTimeout(() => {
+            toast.update(id, {
+              title: 'Uploaded',
+              message: 'File is ready.',
+              tone: 'green',
+              loading: false,
+              duration: 4500,
+            });
+          }, 1000);
+        }}
+      >
+        Run loading → success
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function Loading() {
   return (
     <PxlKitToastProvider>
       <LoadingTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider, type UseToastReturn } from '@pxlkit/ui-kit-vue';
+
+function runUpload(toast: UseToastReturn['toast']) {
+  const id = toast.loading('Uploading…', 'Hang tight.');
+  setTimeout(() => {
+    toast.update(id, {
+      title: 'Uploaded',
+      message: 'File is ready.',
+      tone: 'green',
+      loading: false,
+      duration: 4500,
+    });
+  }, 1000);
+}
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" @click="runUpload(toast)">Run loading → success</PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider, type ToastApi } from '@pxlkit/ui-kit-angular';
+
+type ToastFn = ToastApi['toast'];
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster>
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" (click)="runUpload(toaster.toast)">Run loading → success</button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class Loading {
+  runUpload(toast: ToastFn): void {
+    const id = toast.loading('Uploading…', 'Hang tight.');
+    setTimeout(() => {
+      toast.update(id, {
+        title: 'Uploaded',
+        message: 'File is ready.',
+        tone: 'green',
+        loading: false,
+        duration: 4500,
+      });
+    }, 1000);
+  }
+}`}
+        />
       </article>
       <article className="docs-example" id="example-promise-flow">
-        <h4>Promise Flow</h4>
-        <pre className="docs-code"><code>{`export function PromiseFlow() {
+        <Subheading>Promise Flow</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Promise Flow code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function PromiseTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton
+        size="sm"
+        onClick={() =>
+          toast.promise(
+            () => new Promise<string>((resolve) => setTimeout(() => resolve('ok'), 1000)),
+            {
+              loading: { title: 'Saving…' },
+              success: { title: 'Saved', message: 'All set.' },
+              error: { title: 'Failed', message: 'Try again.' },
+            },
+          )
+        }
+      >
+        Run promise
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function PromiseFlow() {
   return (
     <PxlKitToastProvider>
       <PromiseTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider, type UseToastReturn } from '@pxlkit/ui-kit-vue';
+
+function runSave(toast: UseToastReturn['toast']) {
+  return toast.promise(() => new Promise<string>((resolve) => setTimeout(() => resolve('ok'), 1000)), {
+    loading: { title: 'Saving…' },
+    success: { title: 'Saved', message: 'All set.' },
+    error: { title: 'Failed', message: 'Try again.' },
+  });
+}
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" @click="runSave(toast)">Run promise</PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider, type ToastApi } from '@pxlkit/ui-kit-angular';
+
+type ToastFn = ToastApi['toast'];
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster>
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" (click)="runSave(toaster.toast)">Run promise</button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class PromiseFlow {
+  runSave(toast: ToastFn): Promise<string> {
+    return toast.promise(() => new Promise<string>((resolve) => setTimeout(() => resolve('ok'), 1000)), {
+      loading: { title: 'Saving…' },
+      success: { title: 'Saved', message: 'All set.' },
+      error: { title: 'Failed', message: 'Try again.' },
+    });
+  }
+}`}
+        />
+      </article>
+      <article className="docs-example" id="example-promise-rejected">
+        <Subheading>Promise Rejected</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Promise Rejected code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function RejectedPromiseTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton
+        size="sm"
+        tone="red"
+        onClick={() =>
+          toast
+            .promise(
+              () => new Promise<string>((_resolve, reject) => setTimeout(() => reject(new Error('Network down')), 1000)),
+              {
+                loading: { title: 'Saving…' },
+                success: { title: 'Saved', message: 'All set.' },
+                error: { title: 'Failed', message: 'Try again.' },
+              },
+            )
+            // The error toast tells the user; the rejection needs no other handling.
+            .catch(() => {})
+        }
+      >
+        Run failing promise
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function PromiseRejected() {
+  return (
+    <PxlKitToastProvider>
+      <RejectedPromiseTriggers />
+    </PxlKitToastProvider>
+  );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider, type UseToastReturn } from '@pxlkit/ui-kit-vue';
+
+function runFailingSave(toast: UseToastReturn['toast']) {
+  toast
+    .promise(() => new Promise<string>((_resolve, reject) => setTimeout(() => reject(new Error('Network down')), 1000)), {
+      loading: { title: 'Saving…' },
+      success: { title: 'Saved', message: 'All set.' },
+      error: { title: 'Failed', message: 'Try again.' },
+    })
+    // The error toast tells the user; the rejection needs no other handling.
+    .catch(() => {});
+}
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" tone="red" @click="runFailingSave(toast)">Run failing promise</PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider, type ToastApi } from '@pxlkit/ui-kit-angular';
+
+type ToastFn = ToastApi['toast'];
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster>
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" tone="red" (click)="runFailingSave(toaster.toast)">Run failing promise</button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class PromiseRejected {
+  runFailingSave(toast: ToastFn): void {
+    toast
+      .promise(() => new Promise<string>((_resolve, reject) => setTimeout(() => reject(new Error('Network down')), 1000)), {
+        loading: { title: 'Saving…' },
+        success: { title: 'Saved', message: 'All set.' },
+        error: { title: 'Failed', message: 'Try again.' },
+      })
+      // The error toast tells the user; the rejection needs no other handling.
+      .catch(() => {});
+  }
+}`}
+        />
       </article>
       <article className="docs-example" id="example-max-limit">
-        <h4>Max Limit</h4>
-        <pre className="docs-code"><code>{`export function MaxLimit() {
+        <Subheading>Max Limit</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Max Limit code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function MaxTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton
+        size="sm"
+        onClick={() => {
+          for (let i = 1; i <= 5; i += 1) {
+            toast({ title: \`Toast \${i}\`, message: 'Only the latest two stay.' });
+          }
+        }}
+      >
+        Push five (max 2)
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function MaxLimit() {
   return (
     <PxlKitToastProvider max={2}>
       <MaxTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider, type UseToastReturn } from '@pxlkit/ui-kit-vue';
+
+function pushFive(toast: UseToastReturn['toast']) {
+  for (let i = 1; i <= 5; i += 1) {
+    toast({ title: \`Toast \${i}\`, message: 'Only the latest two stay.' });
+  }
+}
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }" :max="2">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" @click="pushFive(toast)">Push five (max 2)</PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider, type ToastApi } from '@pxlkit/ui-kit-angular';
+
+type ToastFn = ToastApi['toast'];
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster [max]="2">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" (click)="pushFive(toaster.toast)">Push five (max 2)</button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class MaxLimit {
+  pushFive(toast: ToastFn): void {
+    for (let i = 1; i <= 5; i += 1) {
+      toast({ title: \`Toast \${i}\`, message: 'Only the latest two stay.' });
+    }
+  }
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-action">
-        <h4>With Action</h4>
-        <pre className="docs-code"><code>{`export function WithAction() {
+        <Subheading>With Action</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Action code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function ActionTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton
+        size="sm"
+        tone="red"
+        onClick={() =>
+          toast({
+            tone: 'red',
+            title: 'File deleted',
+            message: 'You can still restore it.',
+            action: (
+              <PixelButton size="sm" tone="red" variant="outline">
+                Undo
+              </PixelButton>
+            ),
+          })
+        }
+      >
+        Push with action
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function WithAction() {
   return (
     <PxlKitToastProvider>
       <ActionTriggers />
     </PxlKitToastProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelButton, PxlKitToastProvider, type UseToastReturn } from '@pxlkit/ui-kit-vue';
+
+function pushDeleted(toast: UseToastReturn['toast']) {
+  toast({
+    tone: 'red',
+    title: 'File deleted',
+    message: 'You can still restore it.',
+    action: () => h(PixelButton, { size: 'sm', tone: 'red', variant: 'outline' }, () => 'Undo'),
+  });
+}
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" tone="red" @click="pushDeleted(toast)">Push with action</PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster>
+      <div class="flex flex-wrap gap-2">
+        <button
+          pxlButton
+          size="sm"
+          tone="red"
+          (click)="toaster.toast({ tone: 'red', title: 'File deleted', message: 'You can still restore it.', action: undo })"
+        >
+          Push with action
+        </button>
+      </div>
+    </pxl-toast-provider>
+    <ng-template #undo><button pxlButton size="sm" tone="red" variant="outline">Undo</button></ng-template>
+  \`,
+})
+export class WithAction {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-toast">PixelToast</a></li>
-        <li><a href="#pixel-alert">PixelAlert</a></li>
-        <li><a href="#pixel-alert-dialog">PixelAlertDialog</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toast' : '#pixel-toast'}>PixelToast</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert' : '#pixel-alert'}>PixelAlert</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert-dialog' : '#pixel-alert-dialog'}>PixelAlertDialog</a></li>
       </ul>
     </section>
     </section>

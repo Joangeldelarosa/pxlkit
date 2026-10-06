@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitLocaleProviderDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PxlKitLocaleProviderDocsMeta = {
@@ -17,15 +23,67 @@ export const PxlKitLocaleProviderDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProviderDocsSectionProps): React.ReactElement {
+/** PxlKitLocaleProvider's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PxlKitLocaleProvider',
+        props: [
+          { name: 'locale', type: "'en' | 'tr'", default: "'en'", description: "BCP 47 locale tag. Default `'en'`." },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The part of the app that follows the locale.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PxlKitLocaleProvider',
+        props: [
+          { name: 'locale', type: "'en' | 'tr'", default: "'en'", description: 'BCP 47 locale tag.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The part of the app that follows the locale.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PxlKitLocaleProvider',
+        selector: 'pxl-locale-provider',
+        props: [
+          { name: 'locale', type: "'en' | 'tr'", default: "'en'", description: 'BCP 47 locale tag.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PxlKitLocaleProviderDocsSection({ className, headingLevel = 2 }: PxlKitLocaleProviderDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pxl-kit-locale-provider-heading'} className={className} data-status='stable'>
-      <h2 id='pxl-kit-locale-provider-heading'>PxlKitLocaleProvider</h2>
-      <p className="docs-lead">Provides locale-aware font loading and text utilities (upper/lower) to all PxlKit components via context.</p>
+      <Title id='pxl-kit-locale-provider-heading'>PxlKitLocaleProvider</Title>
+      <p className="docs-lead">Sets the locale for every nested PxlKit component: lang on a layout-neutral wrapper, locale-aware upper/lower helpers and the matching Google Fonts URL.</p>
       <ul className="docs-highlights">
         <li>Sets lang on a wrapper so CSS text-transform handles Turkish i → İ correctly</li>
         <li>Builds Google Fonts URL with the correct subsets (latin-ext for Turkish)</li>
-        <li>Exposes locale-aware upper() and lower() helpers via usePxlKitLocale()</li>
+        <li>Exposes locale-aware upper() and lower() helpers via usePxlKitLocale() (injectPxlKitLocale() in Angular)</li>
         <li>Supports BCP 47 locales en and tr out of the box</li>
       </ul>
     <dl className="docs-meta">
@@ -33,21 +91,24 @@ export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProvi
       <dt>Category</dt><dd>overlay-foundation</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pxl-kit-locale-provider-api">
+      <Heading id="pxl-kit-locale-provider-api">API</Heading>
+      <FrameworkApi label={'PxlKitLocaleProvider API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-locale-provider-a11y">
-      <h3 id="pxl-kit-locale-provider-a11y">Accessibility</h3>
+      <Heading id="pxl-kit-locale-provider-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>sets lang/dir context for descendants; no direct ARIA</code></li>
       </ul>
-      <p className="docs-aria-notes">Wraps children in a div with lang=&#123;locale&#125; so assistive tech and CSS text-transform pick up the correct language. For Next.js apps, also set lang on the &lt;html&gt; tag.</p>
+      <p className="docs-aria-notes">Wraps its content in a layout-neutral element carrying <code>lang</code> (in Angular, the host element) so assistive tech and CSS text-transform pick up the correct language. In server-rendered apps (Next.js, Nuxt, Angular SSR), also set lang on the &lt;html&gt; tag.</p>
     </section>
     <section aria-labelledby="pxl-kit-locale-provider-usage">
-      <h3 id="pxl-kit-locale-provider-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
+      <Heading id="pxl-kit-locale-provider-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PxlKitLocaleProvider usage'}
+        react={`import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -55,30 +116,105 @@ export function Default() {
       <p>Hello, world!</p>
     </PxlKitLocaleProvider>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitLocaleProvider locale="en">
+    <p>Hello, world!</p>
+  </PxlKitLocaleProvider>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitLocaleProvider],
+  template: \`
+    <pxl-locale-provider locale="en">
+      <p>Hello, world!</p>
+    </pxl-locale-provider>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PxlKitLocaleProvider locale="en">
       <p>Hello, world!</p>
     </PxlKitLocaleProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitLocaleProvider locale="en">
+    <p>Hello, world!</p>
+  </PxlKitLocaleProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitLocaleProvider],
+  template: \`
+    <pxl-locale-provider locale="en">
+      <p>Hello, world!</p>
+    </pxl-locale-provider>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-turkish">
-        <h4>Turkish</h4>
-        <pre className="docs-code"><code>{`export function Turkish() {
+        <Subheading>Turkish</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Turkish code'}
+          react={`import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
+
+export function Turkish() {
   return (
     <PxlKitLocaleProvider locale="tr">
       <p>İstanbul güneşli bir şehirdir</p>
     </PxlKitLocaleProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitLocaleProvider locale="tr">
+    <p>İstanbul güneşli bir şehirdir</p>
+  </PxlKitLocaleProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitLocaleProvider],
+  template: \`
+    <pxl-locale-provider locale="tr">
+      <p>İstanbul güneşli bir şehirdir</p>
+    </pxl-locale-provider>
+  \`,
+})
+export class Turkish {}`}
+        />
       </article>
     </section>
     </section>

@@ -1,4 +1,4 @@
-import type { AnimatedPxlKitData } from '@pxlkit/core';
+import type { AnimatedPxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * 🌪️ SpinningTornado — 16×16 animated spinning tornado

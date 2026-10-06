@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { USAGE_SNIPPETS } from '../docs/sections/usage-snippets.generated';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import {
   PixelAccordion,
@@ -45,6 +44,7 @@ import {
   PixelStatCard,
   PixelSwitch,
   PixelTable,
+  type PixelTableColumn,
   PixelTextLink,
   PixelTabs,
   PixelTextarea,
@@ -64,15 +64,20 @@ import {
 import { Trophy, Lightning, FireSword, Crown, Shield, Coin, Star } from '@pxlkit/gamification';
 import { Bell, CheckCircle, WarningTriangle, InfoCircle } from '@pxlkit/feedback';
 import { Heart, Message } from '@pxlkit/social';
+import { FrameworkCode } from '../../components/FrameworkCode';
 import { CodeBlock } from '../../components/CodeBlock';
-import { PropsTable, type PropDef } from './_doc-section';
-import { useToast, type ToastPosition, type ToastTone } from '../../components/ToastProvider';
-import { WhatsNewStrip, type WhatsNewItem } from '../../components/whats-new-strip';
+import { DocSection, PropsTable, UsageCode, type PropDef } from './_doc-section';
+import { ToastGallery, ToastPlayground } from './_toasts';
+import { WhatsNewStrip } from '../../components/whats-new-strip';
+import { ClientOnly } from '../../components/ClientOnly';
+import { WHATS_NEW_ITEMS, WHATS_NEW_SUMMARY } from '@/lib/whats-new';
 import {
   UI_KIT_VERSION,
   UI_KIT_VERSION_LABEL,
   UI_KIT_LATEST_DATE,
 } from '@/lib/pxlkit-version';
+import { ICON_PACK_COUNT } from '@/lib/pxlkit-counts';
+import { TAILWIND_SETUP } from '@/lib/setup-snippets';
 
 /* ── Live demos imported from package SSOT .examples.tsx files.
    Each export is the `Default` example function authored alongside the component.
@@ -109,7 +114,8 @@ import { Default as PixelBarChartDefault } from '@pxlkit/ui-kit/data/PixelBarCha
 import { Default as PixelAreaChartDefault } from '@pxlkit/ui-kit/data/PixelAreaChart.examples';
 
 // Hero & Cards
-import { Default as PixelHeroSectionDefault } from '@pxlkit/ui-kit/hero/PixelHeroSection.examples';
+// The hero demo with an h2 headline: the page's own h1 stays its only one.
+import { HeadingLevel as PixelHeroSectionDemo } from '@pxlkit/ui-kit/hero/PixelHeroSection.examples';
 import { Default as PixelHeroMediaDefault } from '@pxlkit/ui-kit/hero/PixelHeroMedia.examples';
 import { Default as PixelFeatureCardDefault } from '@pxlkit/ui-kit/cards/PixelFeatureCard.examples';
 import { Default as PixelPricingCardDefault } from '@pxlkit/ui-kit/cards/PixelPricingCard.examples';
@@ -204,6 +210,97 @@ const COMMON_INTERACTIVE: PropDef[] = [PROP_SURFACE, PROP_DISABLED, PROP_CLASSNA
 const COMMON_DISPLAY: PropDef[] = [PROP_SURFACE, PROP_CLASSNAME];
 const COMMON_CONTAINER: PropDef[] = [PROP_SURFACE, PROP_CLASSNAME, PROP_CHILDREN_REQUIRED];
 const COMMON_ANIMATION: PropDef[] = [PROP_CLASSNAME, PROP_CHILDREN_REQUIRED];
+
+/* The Vue and Angular setups shown in their sections (#vue, #angular). */
+const VUE_SETUP = {
+  install: `npm install @pxlkit/ui-kit-vue @pxlkit/vue
+npm install -D tailwindcss @tailwindcss/vite`,
+  vite: `import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({
+  plugins: [vue(), tailwindcss()],
+});`,
+  css: `@import "@pxlkit/ui-kit-vue/styles.css";`,
+  app: `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelButton, PixelInput, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
+
+const email = ref('');
+
+function save() {
+  // send email.value
+}
+</script>
+
+<template>
+  <PxlKitSurfaceProvider surface="pixel">
+    <PixelInput v-model="email" label="Email" placeholder="you@studio.dev" />
+    <PixelButton tone="green" @click="save">Save</PixelButton>
+  </PxlKitSurfaceProvider>
+</template>`,
+};
+
+const ANGULAR_SETUP = {
+  install: `npm install @pxlkit/ui-kit-angular @pxlkit/angular
+# Tailwind CSS v4: ng new my-app --style=tailwind (Angular CLI 21 and later),
+# or on Angular 20: npm install -D tailwindcss @tailwindcss/postcss postcss
+# and a .postcssrc.json with { "plugins": { "@tailwindcss/postcss": {} } }`,
+  css: `@import "@pxlkit/ui-kit-angular/styles.css";`,
+  config: `import type { ApplicationConfig } from '@angular/core';
+import { providePxlKitSurface } from '@pxlkit/ui-kit-angular';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // …keep the providers ng new generated (change detection, router,
+    // provideClientHydration() in SSR apps), and add:
+    providePxlKitSurface('pixel'),
+  ],
+};`,
+  component: `import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { PixelButton, PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  selector: 'app-signup',
+  imports: [FormsModule, PixelButton, PixelInput],
+  template: \`
+    <pxl-input label="Email" placeholder="you@studio.dev" [(ngModel)]="email" />
+    <button pxlButton tone="green" (click)="save()">Save</button>
+  \`,
+})
+export class Signup {
+  protected email = '';
+
+  protected save() {
+    // send this.email
+  }
+}`,
+};
+
+/* How a React prop reads in the Vue and Angular kits (docs/ui-kit-porting.md,
+   "Mapping the API"; the kits' READMEs carry the same table). */
+type FrameworkIdiom = { react: string; vue: string; angular: string };
+
+const FRAMEWORK_IDIOMS: FrameworkIdiom[] = [
+  { react: '<PixelButton>, <PixelTextLink> (render a <button> or an <a>)', vue: '<PixelButton>', angular: 'an attribute on your element: <button pxlButton>, <a pxlTextLink>' },
+  { react: 'any other component: <PixelBadge>', vue: '<PixelBadge>', angular: 'an element: <pxl-badge>' },
+  { react: 'children', vue: 'the default slot', angular: 'projected content' },
+  { react: 'element props: icon, iconLeft, footer, action', vue: 'named slots, kebab-case: #icon-left', angular: 'inputs taking text or an <ng-template>' },
+  { react: 'value + onChange', vue: 'v-model', angular: '[(value)]; form controls also take ngModel and formControlName' },
+  { react: 'open + onOpenChange, checked + onChange', vue: 'v-model:open, v-model:checked', angular: '[(open)], [(checked)]' },
+  { react: 'other callbacks: onClose', vue: 'events: @close', angular: 'outputs: (closed) — past tense where the present would shadow a DOM event' },
+  { react: 'const form = useForm(); <PixelForm form={form}> on React Hook Form', vue: 'const form = useForm() in <script setup>; <PixelForm :form="form"> on VeeValidate', angular: '<form [pxlForm]="group"> on reactive forms' },
+  { react: 'className', vue: 'class', angular: 'class' },
+  { react: '<PxlKitSurfaceProvider surface>', vue: '<PxlKitSurfaceProvider surface>', angular: 'providePxlKitSurface() for the app, pxlKitSurface="…" on an element' },
+];
+
+const FRAMEWORK_IDIOM_COLUMNS: Array<PixelTableColumn<FrameworkIdiom>> = [
+  { key: 'react', header: 'React', render: (row) => <span className="font-mono text-retro-cyan">{row.react}</span> },
+  { key: 'vue', header: 'Vue', render: (row) => <span className="font-mono text-retro-green">{row.vue}</span> },
+  { key: 'angular', header: 'Angular', render: (row) => <span className="font-mono text-retro-red">{row.angular}</span> },
+];
 
 /* ── Sidebar categories are DERIVED from UI_KIT_COMPONENTS to kill drift.
    Add a component to the registry and it shows up in the sidebar automatically.
@@ -366,6 +463,8 @@ const CATEGORY_META: Array<{ id: string; label: string }> = [
 
 const OVERVIEW_ITEMS: { id: string; name: string }[] = [
   { id: 'getting-started', name: 'Getting Started' },
+  { id: 'vue', name: 'Vue — new in 2.2' },
+  { id: 'angular', name: 'Angular — new in 2.2' },
   { id: 'design-tokens', name: 'Design Tokens' },
   { id: 'surface-system', name: 'Surface System' },
   { id: 'locale-support', name: 'Locale / Turkish' },
@@ -452,7 +551,7 @@ const LIVE_DEMOS: Record<string, React.ComponentType> = {
   PixelAreaChart: PixelAreaChartDefault,
 
   // Hero & Cards
-  PixelHeroSection: PixelHeroSectionDefault,
+  PixelHeroSection: PixelHeroSectionDemo,
   PixelHeroMedia: PixelHeroMediaDefault,
   PixelFeatureCard: PixelFeatureCardDefault,
   PixelPricingCard: PixelPricingCardDefault,
@@ -493,15 +592,11 @@ const LIVE_DEMOS: Record<string, React.ComponentType> = {
   PixelSectionHeader: PixelSectionHeaderDefault,
 };
 
-/* v2.1.0 highlights — API upgrades from the responsive-hardening + dogfooding release.
-   Links land on each component's DocSection anchor on this page. */
-const WHATS_NEW_V210_ITEMS: WhatsNewItem[] = [
-  { name: 'PixelCard', category: 'cards', href: '#pixel-card', isNew: true },
-  { name: 'PixelPricingCard', category: 'cards', href: '#pixel-pricing-card', isNew: true },
-  { name: 'PixelStatCard', category: 'cards', href: '#pixel-stat-card', isNew: true },
-  { name: 'PixelStatGroup', category: 'data', href: '#pixel-stat-group', isNew: true },
-  { name: 'PixelChip', category: 'data', href: '#pixel-chip', isNew: true },
-];
+/* Demos whose markup depends on the reader's clock — a calendar shows the
+   current month and marks today — render in the browser only: a page built on
+   one day and read on another would otherwise fail to hydrate. The fallback
+   keeps the calendar's height so nothing moves when it appears. */
+const CLOCK_DEPENDENT_DEMOS = new Set(['PixelCalendarGrid']);
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    INTERNAL: Cross-link helper
@@ -541,18 +636,26 @@ function MoreComponentSection({ id, name }: { id: string; name: string }) {
       title={name}
       description={
         <>
-          Shipped in <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>. See the{' '}
+          In <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>,{' '}
+          <PixelCodeInline>@pxlkit/ui-kit-vue</PixelCodeInline> and{' '}
+          <PixelCodeInline>@pxlkit/ui-kit-angular</PixelCodeInline>. See the{' '}
           <PixelTextLink href={`/changelog#v${UI_KIT_VERSION.replace(/\./g, '')}`}>
             {`${UI_KIT_VERSION_LABEL} changelog`}
           </PixelTextLink>{' '}
           for release notes, or the{' '}
           <PixelTextLink href={`/docs#${id}`}>full reference</PixelTextLink>{' '}
-          for props, accessibility, and keyboard docs generated from the component manifest.
+          for props, accessibility, keyboard and the examples in React, Vue and Angular.
         </>
       }
-      code={USAGE_SNIPPETS[id] ?? `import { ${name} } from '@pxlkit/ui-kit';`}
     >
-      {Demo ? (
+      {Demo && CLOCK_DEPENDENT_DEMOS.has(name) ? (
+        // The calendar always draws six weeks: 263px tall, whatever the month.
+        <div className="min-h-[263px]">
+          <ClientOnly fallback={<PixelSkeleton width="100%" height="263px" className="max-w-xs" />}>
+            <Demo />
+          </ClientOnly>
+        </div>
+      ) : Demo ? (
         <Demo />
       ) : (
         <p className="text-retro-muted text-sm">
@@ -565,55 +668,6 @@ function MoreComponentSection({ id, name }: { id: string; name: string }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   INTERNAL: DocSection
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-function DocSection({
-  id,
-  title,
-  description,
-  props,
-  code,
-  children,
-}: {
-  id: string;
-  title: string;
-  description: React.ReactNode;
-  props?: PropDef[];
-  code?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section data-section={id} id={id} className="scroll-mt-20 space-y-4 pt-10 first:pt-0">
-      <div>
-        <div className="flex items-center gap-2.5">
-          <h2 className="font-pixel text-xs text-retro-green">{title.toUpperCase()}</h2>
-          <PixelBadge tone="neutral">{title.replace('Pixel', '').toLowerCase()}</PixelBadge>
-        </div>
-        <div className="mt-2 text-sm text-retro-muted max-w-2xl">{description}</div>
-      </div>
-
-      {/* Live preview */}
-      <div className="rounded-lg bg-retro-surface/10 p-4 sm:p-6">
-        {children}
-      </div>
-
-      {/* Props table */}
-      {props && props.length > 0 && (
-        <PixelCollapsible label={`Props reference (${props.length})`}>
-          <div>
-            <PropsTable data={props} />
-          </div>
-        </PixelCollapsible>
-      )}
-
-      {/* Code example */}
-      {code && <CodeBlock code={code} language="tsx" />}
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════════
    INTERNAL: AnimationReplay — wrapper for animation demos with a replay button
    ═══════════════════════════════════════════════════════════════════════════════ */
 
@@ -622,14 +676,12 @@ function AnimationReplay({
   title,
   description,
   props,
-  code,
   children,
 }: {
   id: string;
   title: string;
   description: React.ReactNode;
   props?: PropDef[];
-  code?: string;
   children: (key: number) => React.ReactNode;
 }) {
   const [tick, setTick] = useState(0);
@@ -678,7 +730,7 @@ function AnimationReplay({
       )}
 
       {/* Code example */}
-      {code && <CodeBlock code={code} language="tsx" />}
+      <UsageCode component={id} title={title} />
     </section>
   );
 }
@@ -712,7 +764,7 @@ function SidebarContent({
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder="Search components..."
-        icon={<PxlKitIcon icon={Search} size={14} />}
+        prefix={<PxlKitIcon icon={Search} size={14} decorative />}
         size="sm"
       />
 
@@ -720,7 +772,7 @@ function SidebarContent({
       {filtered.map((cat) => (
         <div key={cat.id}>
           <div className="mb-1.5 flex items-center justify-between px-2">
-            <h4 className="font-pixel text-[9px] uppercase tracking-wider text-retro-muted">{cat.label}</h4>
+            <p className="font-pixel text-[9px] uppercase tracking-wider text-retro-muted">{cat.label}</p>
             <span className="font-mono text-[9px] text-retro-muted/50">{cat.items.length}</span>
           </div>
           <ul className="space-y-0.5">
@@ -775,10 +827,6 @@ export default function UIKitPage() {
   const [selectVal, setSelectVal] = useState('ui');
   const [segmented, setSegmented] = useState('comfortable');
   const [progress, setProgress] = useState(72);
-  const [toastTone, setToastTone] = useState<ToastTone>('success');
-  const [toastPosition, setToastPosition] = useState<ToastPosition>('top-right');
-  const [toastDuration, setToastDuration] = useState(2500);
-  const { toast, success, error, info, warning } = useToast();
 
   /* ── Sidebar state ── */
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -909,14 +957,15 @@ export default function UIKitPage() {
               <WhatsNewStrip
                 version={UI_KIT_VERSION}
                 date={UI_KIT_LATEST_DATE}
-                items={WHATS_NEW_V210_ITEMS}
+                items={WHATS_NEW_ITEMS}
+                summary={WHATS_NEW_SUMMARY}
               />
             </div>
 
             {/* ══════════════════ HERO ══════════════════ */}
             <header>
               <PixelBreadcrumb items={[{ label: 'Home', href: '/' }, { label: 'UI Kit', active: true }]} />
-              <h1 className="mt-4 font-pixel text-base text-retro-green sm:text-lg leading-relaxed">PXLKIT UI KIT</h1>
+              <h1 className="mt-4 font-pixel text-base text-retro-green sm:text-lg leading-relaxed">PXLKIT UI KIT FOR REACT</h1>
               <p className="mt-3 max-w-2xl text-sm text-retro-muted leading-relaxed">
                 A React component kit built on three promises.{' '}
                 <strong className="text-retro-cyan">Surface system</strong> — flip every component between an 8-bit
@@ -927,18 +976,24 @@ export default function UIKitPage() {
                 Calendar, Charts, OTPInput and {UI_COMPONENTS_COUNT - 8}+ more are already in the box. Use the sidebar
                 to browse all {UI_COMPONENTS_COUNT} components and the PixelToast guide.
               </p>
+              <p className="mt-3 max-w-2xl text-sm text-retro-muted leading-relaxed">
+                <strong className="text-retro-purple">New in 2.2:</strong> the same {UI_COMPONENTS_COUNT} components for
+                Vue 3 and Angular — same markup, theme and keyboard behaviour, checked against React by parity tests. See{' '}
+                <PixelTextLink href="#vue">Vue</PixelTextLink> and <PixelTextLink href="#angular">Angular</PixelTextLink>{' '}
+                below.
+              </p>
               <div className="mt-5 flex flex-wrap gap-2">
                 <PixelBadge tone="green">{UI_COMPONENTS_COUNT} components</PixelBadge>
                 <PixelBadge tone="cyan">pixel ↔ linear surface</PixelBadge>
                 <PixelBadge tone="gold">typescript-first</PixelBadge>
                 <PixelBadge tone="purple">WAI-ARIA baseline</PixelBadge>
-                <PixelBadge tone="red">zero runtime deps</PixelBadge>
+                <PixelBadge tone="red">Tailwind CSS v4</PixelBadge>
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <PixelStatCard label="Components" value={String(UI_COMPONENTS_COUNT)} icon={<PxlKitIcon icon={Grid} size={16} />} tone="green" />
-                <PixelStatCard label="Icon Packs" value="6" icon={<PxlKitIcon icon={Package} size={16} />} tone="cyan" />
-                <PixelStatCard label="Design Tokens" value="6 tones" icon={<PxlKitIcon icon={SparkleSmall} size={16} />} tone="gold" />
-                <PixelStatCard label="Fully Custom" value="100%" icon={<PxlKitIcon icon={Check} size={16} />} tone="purple" />
+                <PixelStatCard label="Components" value={String(UI_COMPONENTS_COUNT)} icon={<PxlKitIcon icon={Grid} size={16} decorative />} tone="green" />
+                <PixelStatCard label="Icon Packs" value={String(ICON_PACK_COUNT)} icon={<PxlKitIcon icon={Package} size={16} decorative />} tone="cyan" />
+                <PixelStatCard label="Design Tokens" value="7 tones" icon={<PxlKitIcon icon={SparkleSmall} size={16} decorative />} tone="gold" />
+                <PixelStatCard label="New in 2.2" value="Vue + Angular" icon={<PxlKitIcon icon={Check} size={16} decorative />} tone="purple" />
               </div>
             </header>
 
@@ -948,40 +1003,142 @@ export default function UIKitPage() {
             <section data-section="getting-started" id="getting-started" className="scroll-mt-20 space-y-4">
               <h2 className="font-pixel text-xs text-retro-green">GETTING STARTED</h2>
               <p className="text-sm text-retro-muted">
-                Three steps and you&apos;re rendering. Install <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>, import
-                its stylesheet alongside Tailwind, and pull components from the same package. Every primitive accepts the
-                shared <CompLink id="design-tokens"><PixelCodeInline>tone</PixelCodeInline></CompLink>,{' '}
+                Three steps and you&apos;re rendering. Install the React kit,{' '}
+                <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline> — or, new in 2.2,{' '}
+                <PixelCodeInline>@pxlkit/ui-kit-vue</PixelCodeInline> or{' '}
+                <PixelCodeInline>@pxlkit/ui-kit-angular</PixelCodeInline> — with your framework&apos;s icon components and the
+                icon packs you use; import its stylesheet — a Tailwind CSS v4 entry point, so Tailwind&apos;s Vite or PostCSS
+                plugin must run on it; and use the components. The three kits render the same markup and classes and behave
+                the same way. Every primitive accepts the shared{' '}
+                <CompLink id="design-tokens"><PixelCodeInline>tone</PixelCodeInline></CompLink>,{' '}
                 <PixelCodeInline>size</PixelCodeInline>, and <PixelCodeInline>surface</PixelCodeInline> contract — so
                 what you learn on <CompLink id="pixel-button">PixelButton</CompLink> applies to{' '}
                 <CompLink id="pixel-input">PixelInput</CompLink>,{' '}
-                <CompLink id="pixel-select">PixelSelect</CompLink>, and the other {UI_COMPONENTS_COUNT - 3}.
+                <CompLink id="pixel-select">PixelSelect</CompLink>, and the other {UI_COMPONENTS_COUNT - 3}. The code on
+                this page follows the framework you pick.
               </p>
-              <CodeBlock
-                code={`// 1. Setup your Tailwind CSS file (e.g., index.css)
-// @import "tailwindcss";
+              <FrameworkCode
+                title="Install"
+                react="npm install @pxlkit/ui-kit @pxlkit/core @pxlkit/gamification @pxlkit/ui"
+                vue="npm install @pxlkit/ui-kit-vue @pxlkit/vue @pxlkit/gamification @pxlkit/ui"
+                angular="npm install @pxlkit/ui-kit-angular @pxlkit/angular @pxlkit/gamification @pxlkit/ui"
+              />
+              <FrameworkCode
+                title="Tailwind CSS v4 in your build"
+                react={TAILWIND_SETUP.react}
+                vue={TAILWIND_SETUP.vue}
+                angular={TAILWIND_SETUP.angular}
+              />
+              <p className="text-xs text-retro-muted">
+                The kit&apos;s stylesheet is a Tailwind CSS v4 entry point, so Tailwind has to process it. Without that step
+                the build still succeeds, but the CSS keeps <PixelCodeInline>@theme</PixelCodeInline>,{' '}
+                <PixelCodeInline>@source</PixelCodeInline> and <PixelCodeInline>@apply</PixelCodeInline> as written and the
+                components render unstyled.
+              </p>
+              <FrameworkCode
+                title="Quick Start"
+                react={`// 1. In your Tailwind CSS file (e.g., index.css), in place of @import "tailwindcss":
 // @import "@pxlkit/ui-kit/styles.css";
-// @source "../node_modules/@pxlkit/ui-kit";
 
-// 2. Import components in your React app
-import { PixelButton, PixelCard, PixelInput } from '@pxlkit/ui-kit';
+// 2. Use the components
+import { PixelButton, PixelInput } from '@pxlkit/ui-kit';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Trophy } from '@pxlkit/gamification';
 import { Search } from '@pxlkit/ui';
 
-// Button with icon
-<PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} />}>
-  Create Quest
-</PixelButton>
+export function QuickStart() {
+  return (
+    <>
+      <PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} decorative />}>
+        Create Quest
+      </PixelButton>
+      <PixelInput
+        label="Search"
+        prefix={<PxlKitIcon icon={Search} size={16} decorative />}
+        placeholder="Find icons..."
+      />
+    </>
+  );
+}`}
+                vue={`<!-- 1. In your Tailwind CSS file (e.g., src/style.css), in place of @import "tailwindcss":
+     @import "@pxlkit/ui-kit-vue/styles.css"; -->
 
-// Input with icon
-<PixelInput
-  label="Search"
-  icon={<PxlKitIcon icon={Search} size={16} />}
-  placeholder="Find icons..."
-/>`}
-                language="tsx"
-                title="Quick Start"
+<!-- 2. Use the components -->
+<script setup lang="ts">
+import { PixelButton, PixelInput } from '@pxlkit/ui-kit-vue';
+import { PxlKitIcon } from '@pxlkit/vue';
+import { Trophy } from '@pxlkit/gamification';
+import { Search } from '@pxlkit/ui';
+</script>
+
+<template>
+  <PixelButton tone="green">
+    <template #icon-left><PxlKitIcon :icon="Trophy" :size="16" decorative /></template>
+    Create Quest
+  </PixelButton>
+  <PixelInput label="Search" placeholder="Find icons...">
+    <template #prefix><PxlKitIcon :icon="Search" :size="16" decorative /></template>
+  </PixelInput>
+</template>`}
+                angular={`// 1. In your Tailwind CSS file (e.g., src/styles.css), in place of @import "tailwindcss":
+// @import "@pxlkit/ui-kit-angular/styles.css";
+
+// 2. Use the components
+import { Component } from '@angular/core';
+import { PxlKitIcon } from '@pxlkit/angular';
+import { Trophy } from '@pxlkit/gamification';
+import { Search } from '@pxlkit/ui';
+import { PixelButton, PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  selector: 'app-quick-start',
+  imports: [PixelButton, PixelInput, PxlKitIcon],
+  template: \`
+    <button pxlButton tone="green" [iconLeft]="trophyIcon">Create Quest</button>
+    <pxl-input label="Search" [prefix]="searchIcon" placeholder="Find icons..." />
+
+    <ng-template #trophyIcon><pxl-icon [icon]="trophy" [size]="16" decorative /></ng-template>
+    <ng-template #searchIcon><pxl-icon [icon]="search" [size]="16" decorative /></ng-template>
+  \`,
+})
+export class QuickStart {
+  protected readonly trophy = Trophy;
+  protected readonly search = Search;
+}`}
               />
+
+              <p className="text-xs text-retro-muted">
+                <strong className="text-retro-text">Next.js (App Router).</strong> Keep{' '}
+                <PixelCodeInline>app/layout.tsx</PixelCodeInline> a Server Component and put the providers in a{' '}
+                <PixelCodeInline>&apos;use client&apos;</PixelCodeInline> file of your own; start files that use the
+                components&apos; hooks or event handlers with <PixelCodeInline>&apos;use client&apos;</PixelCodeInline>, and
+                import server-side helpers such as <PixelCodeInline>buildGoogleFontsUrl</PixelCodeInline> from{' '}
+                <PixelCodeInline>@pxlkit/ui-kit-core</PixelCodeInline>. The{' '}
+                <PixelTextLink href="/docs#ui-kit">setup guide</PixelTextLink> has the files.
+              </p>
+              <p className="text-xs text-retro-muted">
+                <strong className="text-retro-text">Server rendering.</strong> The three kits render on the server and
+                hydrate — Next.js, Nuxt, <PixelCodeInline>@angular/ssr</PixelCodeInline>. A calendar shows the current
+                month and marks today, which depends on the reader&apos;s clock: give{' '}
+                <PixelCodeInline>PixelCalendarGrid</PixelCodeInline> a <PixelCodeInline>month</PixelCodeInline> (or a{' '}
+                <PixelCodeInline>value</PixelCodeInline>) for a stable server render, or render a current-month calendar in
+                the browser only — <PixelCodeInline>next/dynamic</PixelCodeInline> with{' '}
+                <PixelCodeInline>ssr: false</PixelCodeInline> in Next.js, <PixelCodeInline>&lt;ClientOnly&gt;</PixelCodeInline>{' '}
+                in Nuxt, <PixelCodeInline>@defer</PixelCodeInline> in Angular.
+              </p>
+
+              <div className="rounded-lg border border-retro-border/30 bg-retro-surface/30 p-4">
+                <h3 className="mb-3 font-mono text-xs font-semibold text-retro-text">From React props to Vue and Angular</h3>
+                <p className="text-xs text-retro-muted mb-3">
+                  The props tables on this page use the React names. The Vue and Angular kits keep those names and
+                  defaults, and follow their framework where React has its own idiom:
+                </p>
+                <PixelTable<FrameworkIdiom>
+                  columns={FRAMEWORK_IDIOM_COLUMNS}
+                  data={FRAMEWORK_IDIOMS}
+                  getRowId={(row) => row.react}
+                />
+              </div>
 
               <div className="rounded-lg border border-retro-border/30 bg-retro-surface/30 p-4">
                 <h3 className="mb-3 font-mono text-xs font-semibold text-retro-text">Common API Surface</h3>
@@ -996,12 +1153,68 @@ import { Search } from '@pxlkit/ui';
                   { name: 'size', type: '"sm" | "md" | "lg"', default: '"md"', description: 'Controls height, padding, and font size' },
                   { name: 'surface', type: '"pixel" | "linear"', default: 'inherits from PxlKitSurfaceProvider, falls back to "pixel"', description: 'Visual aesthetic. Per-component override of the global surface — see Surface System.' },
                   { name: 'disabled', type: 'boolean', default: 'false', description: 'Standard HTML disabled state — applies to every interactive component (buttons, inputs, switches, sliders, segmented, etc.).' },
-                  { name: 'iconLeft / iconRight', type: 'ReactNode', default: '—', description: 'Icon slots flanking the label. Accepted by PixelButton; PxlKitButton/PixelSplitButton use the single `icon` slot. Standalone inputs use the `icon` prop instead.' },
+                  { name: 'iconLeft / iconRight', type: 'ReactNode', default: '—', description: 'Icon slots flanking the label. Accepted by PixelButton; PxlKitButton/PixelSplitButton use the single `icon` slot. Inputs take `prefix` and `suffix` instead (`icon` is the older name of `prefix`).' },
                   { name: 'label', type: 'string', default: '—', description: 'Accessible label for inputs/controls (PixelInput, PixelSelect, PixelCheckbox, PixelSwitch, PixelSlider, PixelRadioGroup, …). Buttons use `children` for their visible text, not `label`.' },
                   { name: 'children', type: 'ReactNode', default: '—', description: 'Required for container components (PixelCard, PixelModal, PixelTooltip, animations, etc.). Listed here once; not repeated in each table.' },
                   { name: 'className', type: 'string', default: '—', description: 'Extra CSS class names merged onto the outer element.' },
                 ]} />
               </div>
+            </section>
+
+            {/* ══════════════════ VUE AND ANGULAR (new in 2.2) ══════════════════ */}
+            <section data-section="vue" id="vue" className="scroll-mt-20 space-y-4 pt-10">
+              <h2 className="font-pixel text-xs text-retro-green">PXLKIT FOR VUE 3 · NEW IN 2.2</h2>
+              <p className="text-sm text-retro-muted">
+                <PixelCodeInline>@pxlkit/ui-kit-vue</PixelCodeInline> is the Vue 3 edition of this kit: the same{' '}
+                {UI_COMPONENTS_COUNT} components, markup, Tailwind CSS v4 theme and keyboard behaviour as the React kit,
+                checked against it example by example. They are single-file components — React&apos;s element props
+                become slots, <PixelCodeInline>value</PixelCodeInline> and <PixelCodeInline>open</PixelCodeInline>{' '}
+                become <PixelCodeInline>v-model</PixelCodeInline>, callbacks become events. It needs Vue 3.5 or later,
+                renders on the server with Nuxt or <PixelCodeInline>vue/server-renderer</PixelCodeInline> and hydrates
+                without mismatches. The icon components come from <PixelCodeInline>@pxlkit/vue</PixelCodeInline>; React is
+                never installed.
+              </p>
+              <CodeBlock title="Install (Vite)" language="bash" code={VUE_SETUP.install} />
+              <CodeBlock title="vite.config.ts" language="typescript" code={VUE_SETUP.vite} />
+              <CodeBlock title="src/style.css — in place of @import &quot;tailwindcss&quot;" language="css" code={VUE_SETUP.css} />
+              <CodeBlock title="App.vue" language="vue" code={VUE_SETUP.app} />
+              <p className="text-xs text-retro-muted">
+                <strong className="text-retro-text">Nuxt.</strong> No Nuxt module or{' '}
+                <PixelCodeInline>build.transpile</PixelCodeInline> entry is needed: add{' '}
+                <PixelCodeInline>@tailwindcss/vite</PixelCodeInline> to <PixelCodeInline>vite.plugins</PixelCodeInline> and
+                the stylesheet to <PixelCodeInline>css</PixelCodeInline> in <PixelCodeInline>nuxt.config.ts</PixelCodeInline>{' '}
+                (see the Tailwind step above). Nuxt auto-imports your own components, not a package&apos;s, so import the
+                kit&apos;s components where you use them. Every example on this page has a Vue tab; the{' '}
+                <PixelTextLink href="https://www.npmjs.com/package/@pxlkit/ui-kit-vue">package README</PixelTextLink> maps
+                the whole API.
+              </p>
+            </section>
+
+            <section data-section="angular" id="angular" className="scroll-mt-20 space-y-4 pt-10">
+              <h2 className="font-pixel text-xs text-retro-green">PXLKIT FOR ANGULAR · NEW IN 2.2</h2>
+              <p className="text-sm text-retro-muted">
+                <PixelCodeInline>@pxlkit/ui-kit-angular</PixelCodeInline> brings the same {UI_COMPONENTS_COUNT} components
+                to Angular 20, 21 and 22 as standalone, signal-based components —{' '}
+                <PixelCodeInline>&lt;button pxlButton&gt;</PixelCodeInline>,{' '}
+                <PixelCodeInline>&lt;pxl-modal&gt;</PixelCodeInline> — with the React kit&apos;s markup, theme and keyboard
+                behaviour. Form controls implement <PixelCodeInline>ControlValueAccessor</PixelCodeInline>, so{' '}
+                <PixelCodeInline>ngModel</PixelCodeInline>, <PixelCodeInline>formControlName</PixelCodeInline> and{' '}
+                <PixelCodeInline>[formControl]</PixelCodeInline> work; overlays take{' '}
+                <PixelCodeInline>[(open)]</PixelCodeInline>. They run in zoneless and zone.js applications and hydrate with{' '}
+                <PixelCodeInline>@angular/ssr</PixelCodeInline>. The icon components come from{' '}
+                <PixelCodeInline>@pxlkit/angular</PixelCodeInline>.
+              </p>
+              <CodeBlock title="Install" language="bash" code={ANGULAR_SETUP.install} />
+              <CodeBlock title="src/styles.css — in place of @import &quot;tailwindcss&quot;" language="css" code={ANGULAR_SETUP.css} />
+              <CodeBlock title="src/app/app.config.ts" language="typescript" code={ANGULAR_SETUP.config} />
+              <CodeBlock title="A component" language="typescript" code={ANGULAR_SETUP.component} />
+              <p className="text-xs text-retro-muted">
+                Keep the providers <PixelCodeInline>ng new</PixelCodeInline> generated —{' '}
+                <PixelCodeInline>provideClientHydration()</PixelCodeInline> in particular: without it the browser throws the
+                server markup away and renders again. Every example on this page has an Angular tab; the{' '}
+                <PixelTextLink href="https://www.npmjs.com/package/@pxlkit/ui-kit-angular">package README</PixelTextLink>{' '}
+                maps the whole API, overlays and form controls included.
+              </p>
             </section>
 
             {/* ══════════════════ DESIGN TOKENS ══════════════════ */}
@@ -1036,8 +1249,8 @@ import { Search } from '@pxlkit/ui';
                       <p className="text-xs font-mono text-retro-muted">Code &amp; UI labels — font-mono</p>
                     </div>
                     <div>
-                      <p className="font-body text-sm text-retro-text">Inter</p>
-                      <p className="text-xs font-mono text-retro-muted">Body text — font-body</p>
+                      <p className="font-sans text-sm text-retro-text">Inter</p>
+                      <p className="text-xs font-mono text-retro-muted">Body text — font-sans</p>
                     </div>
                   </div>
                   <PixelDivider />
@@ -1114,21 +1327,20 @@ import { Search } from '@pxlkit/ui';
                 tone="cyan"
               />
 
-              <CodeBlock
-                code={`import { PxlKitSurfaceProvider, PixelButton, PixelCard } from '@pxlkit/ui-kit';
+              <FrameworkCode
+                title="Surface — Setup & override"
+                react={`// === GLOBAL toggle: wrap your whole app once ===
+// app/providers.tsx — in Next.js (App Router) the providers live in a Client Component
+'use client';
 
-// === GLOBAL toggle: wrap your whole app once ===
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        <PxlKitSurfaceProvider surface="linear">
-          {children}
-        </PxlKitSurfaceProvider>
-      </body>
-    </html>
-  );
+import { PxlKitSurfaceProvider, PixelButton, PixelCard } from '@pxlkit/ui-kit';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return <PxlKitSurfaceProvider surface="linear">{children}</PxlKitSurfaceProvider>;
 }
+
+// app/layout.tsx stays a Server Component and renders <Providers>{children}</Providers> in <body>.
+// In a Vite app, wrap <App /> in main.tsx instead.
 
 // === LOCAL override: one component in a different mode ===
 <PxlKitSurfaceProvider surface="pixel">
@@ -1137,8 +1349,53 @@ export default function RootLayout({ children }) {
     <PixelButton tone="green" surface="linear">Modern button</PixelButton>
   </PixelCard>
 </PxlKitSurfaceProvider>`}
-                language="tsx"
-                title="Surface — Setup & override"
+                vue={`<script setup lang="ts">
+import { PxlKitSurfaceProvider, PixelButton, PixelCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <!-- === GLOBAL toggle: wrap your whole app once (App.vue) === -->
+  <PxlKitSurfaceProvider surface="linear">
+    <!-- your app (RouterView with Vue Router) -->
+    <RouterView />
+  </PxlKitSurfaceProvider>
+
+  <!-- === LOCAL override: one component in a different mode === -->
+  <PxlKitSurfaceProvider surface="pixel">
+    <PixelCard title="Retro card">
+      <!-- This one button breaks the pixel surface -->
+      <PixelButton tone="green" surface="linear">Modern button</PixelButton>
+    </PixelCard>
+  </PxlKitSurfaceProvider>
+</template>`}
+                angular={`// === GLOBAL toggle: once, in app.config.ts ===
+import type { ApplicationConfig } from '@angular/core';
+import { providePxlKitSurface } from '@pxlkit/ui-kit-angular';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // …keep the providers ng new generated (provideClientHydration() in SSR apps), and add:
+    providePxlKitSurface('linear'),
+  ],
+};
+
+// === LOCAL override: one component in a different mode ===
+import { Component } from '@angular/core';
+import { PixelButton, PixelCard, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  selector: 'app-retro-card',
+  imports: [PixelButton, PixelCard, PxlKitSurfaceProvider],
+  template: \`
+    <ng-container pxlKitSurface="pixel">
+      <pxl-card title="Retro card">
+        <!-- This one button breaks the pixel surface -->
+        <button pxlButton tone="green" surface="linear">Modern button</button>
+      </pxl-card>
+    </ng-container>
+  \`,
+})
+export class RetroCard {}`}
               />
             </section>
 
@@ -1231,9 +1488,9 @@ export default function RootLayout({ children }) {
                   </div>
                   <PixelDivider />
                   <div>
-                    <p className="text-[10px] font-mono text-retro-muted mb-1">Inter (font-body)</p>
-                    <p className="text-sm text-retro-green">{TURKISH_CHARACTERS.uppercase}</p>
-                    <p className="text-sm text-retro-cyan">{TURKISH_CHARACTERS.lowercase}</p>
+                    <p className="text-[10px] font-mono text-retro-muted mb-1">Inter (font-sans)</p>
+                    <p className="font-sans text-sm text-retro-green">{TURKISH_CHARACTERS.uppercase}</p>
+                    <p className="font-sans text-sm text-retro-cyan">{TURKISH_CHARACTERS.lowercase}</p>
                   </div>
                   <PixelDivider />
                   <div>
@@ -1268,45 +1525,26 @@ export default function RootLayout({ children }) {
               </PixelCollapsible>
 
               {/* ── Setup guide ── */}
-              <CodeBlock
-                code={`// === STEP 1: Install & import ===
+              <FrameworkCode
+                title="Turkish Locale — Complete Setup Guide"
+                react={`// === STEP 1: Wrap your app — in src/main.tsx (Vite), or in a 'use client' providers file (Next.js App Router) ===
 import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
 
-// === STEP 2: Wrap your app (React / Next.js) ===
-
-// For a standard React app (Vite, CRA, etc.):
-function App() {
-  return (
-    <PxlKitLocaleProvider locale="tr">
-      <MyApp />
-    </PxlKitLocaleProvider>
-  );
+export function Providers({ children }: { children: React.ReactNode }) {
+  return <PxlKitLocaleProvider locale="tr">{children}</PxlKitLocaleProvider>;
 }
+// Server-rendered apps: also set lang="tr" on <html> (app/layout.tsx in Next.js).
 
-// For Next.js App Router — also set lang on <html>:
-// app/layout.tsx
-export default function RootLayout({ children }) {
-  return (
-    <html lang="tr">
-      <body>
-        <PxlKitLocaleProvider locale="tr">
-          {children}
-        </PxlKitLocaleProvider>
-      </body>
-    </html>
-  );
-}
-
-// === STEP 3: Google Fonts — ensure latin-ext subset ===
+// === STEP 2: Google Fonts — ensure the latin-ext subset ===
 // In your CSS file or HTML <head>:
 // @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&subset=latin,latin-ext&display=swap');
 
-// Or generate the URL dynamically:
-import { buildGoogleFontsUrl } from '@pxlkit/ui-kit';
+// Or build the URL — from @pxlkit/ui-kit-core, which a Server Component (app/layout.tsx) can import:
+import { buildGoogleFontsUrl } from '@pxlkit/ui-kit-core';
 const fontsUrl = buildGoogleFontsUrl('tr');
 // → includes &subset=latin,latin-ext
 
-// === STEP 4: Use locale-aware text in custom components ===
+// === STEP 3: Use locale-aware text in your components (a Client Component in Next.js) ===
 import { usePxlKitLocale, toLocaleUpper } from '@pxlkit/ui-kit';
 
 function MyTitle({ text }: { text: string }) {
@@ -1318,8 +1556,75 @@ function MyTitle({ text }: { text: string }) {
 // Or use the standalone function:
 toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"
 toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
-                language="tsx"
-                title="Turkish Locale — Complete Setup Guide"
+                vue={`<!-- === STEP 1: Wrap your app (App.vue) — also set lang="tr" on <html> in index.html === -->
+<script setup lang="ts">
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitLocaleProvider locale="tr">
+    <!-- your app (RouterView with Vue Router) -->
+    <RouterView />
+  </PxlKitLocaleProvider>
+</template>
+
+<!-- === STEP 2: Google Fonts — ensure the latin-ext subset ===
+     In your CSS file or index.html <head>:
+     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&subset=latin,latin-ext&display=swap');
+     Or generate the URL: buildGoogleFontsUrl('tr') from '@pxlkit/ui-kit-vue' -->
+
+<!-- === STEP 3: Locale-aware text in your components (MyTitle.vue) === -->
+<script setup lang="ts">
+import { usePxlKitLocale, toLocaleUpper } from '@pxlkit/ui-kit-vue';
+
+defineProps<{ text: string }>();
+const locale = usePxlKitLocale();
+
+// Or use the standalone function:
+toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"
+</script>
+
+<template>
+  <!-- "istanbul" → "İSTANBUL" when the locale is "tr" -->
+  <h1 class="font-pixel">{{ locale.upper(text) }}</h1>
+</template>`}
+                angular={`// === STEP 1: Wrap your app (app.ts) — also set lang="tr" on <html> in index.html ===
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  selector: 'app-root',
+  imports: [PxlKitLocaleProvider, RouterOutlet],
+  template: \`
+    <pxl-locale-provider locale="tr">
+      <router-outlet />
+    </pxl-locale-provider>
+  \`,
+})
+export class App {}
+
+// === STEP 2: Google Fonts — ensure the latin-ext subset ===
+// In src/styles.css or index.html <head>:
+// @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&subset=latin,latin-ext&display=swap');
+// Or generate the URL: buildGoogleFontsUrl('tr') from '@pxlkit/ui-kit-angular'
+
+// === STEP 3: Locale-aware text in your components (my-title.ts) ===
+import { Component, input } from '@angular/core';
+import { injectPxlKitLocale, toLocaleUpper } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  selector: 'app-my-title',
+  // "istanbul" → "İSTANBUL" when the locale is "tr"
+  template: \`<h1 class="font-pixel">{{ locale().upper(text()) }}</h1>\`,
+})
+export class MyTitle {
+  readonly text = input.required<string>();
+  protected readonly locale = injectPxlKitLocale();
+}
+
+// Or use the standalone function:
+toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
               />
 
               {/* ── Important notes ── */}
@@ -1345,7 +1650,9 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               props={[
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Color variant' },
                 { name: 'size', type: 'Size', default: '"md"', description: 'Button size' },
-                { name: 'variant', type: '"solid" | "ghost"', default: '"solid"', description: 'Visual style' },
+                { name: 'variant', type: '"solid" | "soft" | "outline" | "ghost"', default: '"solid"', description: 'Visual style' },
+                { name: 'fullWidth', type: 'boolean', default: 'false', description: "Stretch to the parent's width" },
+                { name: 'asChild', type: 'boolean', default: 'false', description: 'Render the single child element (a link) as the button' },
                 { name: 'iconLeft', type: 'ReactNode', default: '—', description: 'Icon before label' },
                 { name: 'iconRight', type: 'ReactNode', default: '—', description: 'Icon after label' },
                 { name: 'loading', type: 'boolean', default: 'false', description: 'Shows spinner, disables button' },
@@ -1353,28 +1660,17 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 ...COMMON_INTERACTIVE,
                 { name: '(native attrs)', type: 'React.ButtonHTMLAttributes<HTMLButtonElement>', default: '—', description: 'Forwards every native <button> attribute (onClick, type, aria-*, …).' },
               ]}
-              code={`<PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} />}>
-  Primary Action
-</PixelButton>
-
-<PixelButton tone="cyan" variant="ghost">
-  Ghost Button
-</PixelButton>
-
-<PixelButton tone="red" loading>
-  Processing...
-</PixelButton>`}
             >
               <div className="space-y-4">
                 <div>
                   <p className="mb-2 text-[10px] font-pixel text-retro-muted">TONES</p>
                   <div className="flex flex-wrap gap-2">
-                    <PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} />}>Green</PixelButton>
-                    <PixelButton tone="cyan" iconLeft={<PxlKitIcon icon={Edit} size={16} />}>Cyan</PixelButton>
-                    <PixelButton tone="gold" iconLeft={<PxlKitIcon icon={Star} size={16} />}>Gold</PixelButton>
-                    <PixelButton tone="red" iconLeft={<PxlKitIcon icon={Shield} size={16} />}>Red</PixelButton>
-                    <PixelButton tone="purple" iconLeft={<PxlKitIcon icon={Crown} size={16} />}>Purple</PixelButton>
-                    <PixelButton tone="neutral" iconLeft={<PxlKitIcon icon={Gear} size={16} />}>Neutral</PixelButton>
+                    <PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} decorative />}>Green</PixelButton>
+                    <PixelButton tone="cyan" iconLeft={<PxlKitIcon icon={Edit} size={16} decorative />}>Cyan</PixelButton>
+                    <PixelButton tone="gold" iconLeft={<PxlKitIcon icon={Star} size={16} decorative />}>Gold</PixelButton>
+                    <PixelButton tone="red" iconLeft={<PxlKitIcon icon={Shield} size={16} decorative />}>Red</PixelButton>
+                    <PixelButton tone="purple" iconLeft={<PxlKitIcon icon={Crown} size={16} decorative />}>Purple</PixelButton>
+                    <PixelButton tone="neutral" iconLeft={<PxlKitIcon icon={Gear} size={16} decorative />}>Neutral</PixelButton>
                   </div>
                 </div>
                 <div>
@@ -1391,7 +1687,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                     <PixelButton tone="cyan" variant="ghost">Ghost</PixelButton>
                     <PixelButton tone="gold" loading>Loading</PixelButton>
                     <PixelButton tone="neutral" disabled>Disabled</PixelButton>
-                    <PixelButton tone="green" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}>With Icon</PixelButton>
+                    <PixelButton tone="green" iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}>With Icon</PixelButton>
                   </div>
                 </div>
               </div>
@@ -1402,6 +1698,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
             <AnchorAlias id="pxl-kit-button" />
             <DocSection
               id="pxlkit-button"
+              component="pxl-kit-button"
               title="PxlKitButton"
               description={<>Square icon-only button with accessible label via aria-label and title. Ideal for toolbar actions. For labeled buttons, see <CompLink id="pixel-button">PixelButton</CompLink>.</>}
               props={[
@@ -1411,8 +1708,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'size', type: 'Size', default: '"md"', description: 'Button size' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PxlKitButton label="Edit" icon={<PxlKitIcon icon={Edit} size={16} />} tone="cyan" />
-<PxlKitButton label="Copy" icon={<PxlKitIcon icon={Copy} size={16} />} tone="green" />`}
             >
               <div className="flex flex-wrap gap-2">
                 <PxlKitButton label="Edit" icon={<PxlKitIcon icon={Edit} size={16} />} tone="cyan" />
@@ -1438,15 +1733,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'onSelect', type: '(value: string) => void', default: '—', description: 'Dropdown selection handler' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelSplitButton
-  label="Deploy"
-  tone="purple"
-  options={[
-    { value: 'preview', label: 'Preview' },
-    { value: 'production', label: 'Production' },
-  ]}
-  onSelect={(v) => console.log(v)}
-/>`}
             >
               <div className="flex flex-wrap gap-3">
                 <PixelSplitButton
@@ -1478,14 +1764,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'size', type: 'Size', default: '"md"', description: 'Input height' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelInput
-  label="Search"
-  icon={<PxlKitIcon icon={Search} size={16} />}
-  placeholder="Find components..."
-  tone="cyan"
-/>
-
-<PixelInput label="Email" error="Invalid email address" />`}
             >
               <div className="grid gap-4 sm:grid-cols-2">
                 <PixelInput
@@ -1493,7 +1771,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                   value={inputVal}
                   onChange={(e) => setInputVal(e.target.value)}
                   placeholder="Find components..."
-                  icon={<PxlKitIcon icon={Search} size={16} />}
+                  icon={<PxlKitIcon icon={Search} size={16} decorative />}
                   tone="cyan"
                 />
                 <PixelInput label="Email" placeholder="info@pxlkit.xyz" hint="We will never share your email" />
@@ -1515,7 +1793,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'size', type: 'Size', default: '"md"', description: 'Input height' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelPasswordInput label="Password" placeholder="Enter your password" />`}
             >
               <div className="max-w-sm">
                 <PixelPasswordInput label="API Key" placeholder="pk_live_..." hint="Keep this secret" />
@@ -1534,7 +1811,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Focus ring color' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelTextarea label="Bio" placeholder="Tell us about yourself..." />`}
             >
               <div className="max-w-lg">
                 <PixelTextarea label="Description" placeholder="Describe the component style you want..." hint="Markdown supported" />
@@ -1558,16 +1834,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Focus ring color' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelSelect
-  label="Icon Pack"
-  value={pack}
-  onChange={setPack}
-  options={[
-    { value: 'ui', label: 'UI' },
-    { value: 'gamification', label: 'Gamification' },
-    { value: 'social', label: 'Social' },
-  ]}
-/>`}
             >
               <div className="grid gap-4 sm:grid-cols-2">
                 <PixelSelect
@@ -1575,12 +1841,12 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                   value={selectVal}
                   onChange={setSelectVal}
                   options={[
-                    { value: 'ui', label: 'UI', icon: <PxlKitIcon icon={Grid} size={14} /> },
-                    { value: 'gamification', label: 'Gamification', icon: <PxlKitIcon icon={Trophy} size={14} /> },
-                    { value: 'social', label: 'Social', icon: <PxlKitIcon icon={Heart} size={14} /> },
-                    { value: 'feedback', label: 'Feedback', icon: <PxlKitIcon icon={Bell} size={14} /> },
-                    { value: 'effects', label: 'Effects', icon: <PxlKitIcon icon={SparkleSmall} size={14} /> },
-                    { value: 'weather', label: 'Weather', icon: <PxlKitIcon icon={Star} size={14} /> },
+                    { value: 'ui', label: 'UI', icon: <PxlKitIcon icon={Grid} size={14} decorative /> },
+                    { value: 'gamification', label: 'Gamification', icon: <PxlKitIcon icon={Trophy} size={14} decorative /> },
+                    { value: 'social', label: 'Social', icon: <PxlKitIcon icon={Heart} size={14} decorative /> },
+                    { value: 'feedback', label: 'Feedback', icon: <PxlKitIcon icon={Bell} size={14} decorative /> },
+                    { value: 'effects', label: 'Effects', icon: <PxlKitIcon icon={SparkleSmall} size={14} decorative /> },
+                    { value: 'weather', label: 'Weather', icon: <PxlKitIcon icon={Star} size={14} decorative /> },
                   ]}
                 />
                 <PixelSelect
@@ -1609,12 +1875,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'disabled', type: 'boolean', default: 'false', description: 'Disable interaction' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelCheckbox
-  label="Enable animations"
-  checked={enabled}
-  onChange={setEnabled}
-  tone="green"
-/>`}
             >
               <div className="space-y-2">
                 <PixelCheckbox label="Enable icon animations" checked={checked} onChange={setChecked} />
@@ -1636,16 +1896,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Active indicator color' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelRadioGroup
-  label="Framework"
-  value={framework}
-  onChange={setFramework}
-  options={[
-    { value: 'react', label: 'React' },
-    { value: 'vue', label: 'Vue' },
-    { value: 'svelte', label: 'Svelte' },
-  ]}
-/>`}
             >
               <PixelRadioGroup
                 label="Framework"
@@ -1671,7 +1921,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Active color' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelSwitch label="Auto refresh" checked={on} onChange={setOn} />`}
             >
               <div className="space-y-3">
                 <PixelSwitch label="Auto refresh" checked={switched} onChange={setSwitched} />
@@ -1695,8 +1944,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Track and thumb color' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelSlider label="Volume" value={vol} onChange={setVol} min={0} max={100} />
-<PixelSlider label="Opacity" value={opacity} onChange={setOpacity} tone="gold" />`}
             >
               <div className="max-w-md space-y-4">
                 <PixelSlider label="Animation speed" value={slider} onChange={setSlider} />
@@ -1719,15 +1966,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Active segment color' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelSegmented
-  label="Density"
-  value={density}
-  onChange={setDensity}
-  options={[
-    { value: 'compact', label: 'Compact' },
-    { value: 'comfortable', label: 'Comfortable' },
-  ]}
-/>`}
             >
               <PixelSegmented
                 label="Layout density"
@@ -1754,26 +1992,19 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'footer', type: 'ReactNode', default: '—', description: 'Footer section' },
                 ...COMMON_CONTAINER,
               ]}
-              code={`<PixelCard
-  title="Gamification"
-  icon={<PxlKitIcon icon={Trophy} size={16} />}
-  footer={<PixelButton tone="gold" size="sm">Use Pack</PixelButton>}
->
-  RPG icons, rewards, and game UI elements.
-</PixelCard>`}
             >
               <div className="grid gap-3 sm:grid-cols-2">
                 <PixelCard
                   title="Gamification Pack"
-                  icon={<PxlKitIcon icon={Trophy} size={16} />}
-                  footer={<PixelButton tone="gold" size="sm" iconLeft={<PxlKitIcon icon={Lightning} size={14} />}>Use Pack</PixelButton>}
+                  icon={<PxlKitIcon icon={Trophy} size={16} decorative />}
+                  footer={<PixelButton tone="gold" size="sm" iconLeft={<PxlKitIcon icon={Lightning} size={14} decorative />}>Use Pack</PixelButton>}
                 >
                   RPG icons, progress bars, rewards, and game UI elements ready to use.
                 </PixelCard>
                 <PixelCard
                   title="Social Pack"
-                  icon={<PxlKitIcon icon={Heart} size={16} />}
-                  footer={<PixelButton tone="cyan" size="sm" iconLeft={<PxlKitIcon icon={Message} size={14} />}>Preview</PixelButton>}
+                  icon={<PxlKitIcon icon={Heart} size={16} decorative />}
+                  footer={<PixelButton tone="cyan" size="sm" iconLeft={<PxlKitIcon icon={Message} size={14} decorative />}>Preview</PixelButton>}
                 >
                   Emotions, interactions, and communication elements for modern apps.
                 </PixelCard>
@@ -1793,13 +2024,12 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'trend', type: 'string', default: '—', description: 'Trend text' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelStatCard label="Downloads" value="12.4k" tone="green" trend="+15% this week" />`}
             >
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <PixelStatCard label="Total Icons" value="204" icon={<PxlKitIcon icon={Package} size={16} />} tone="green" trend="+12 new" />
-                <PixelStatCard label="Components" value={String(UI_KIT_COMPONENTS.length)} icon={<PxlKitIcon icon={Grid} size={16} />} tone="cyan" trend="100% typed" />
-                <PixelStatCard label="Downloads" value="8.2k" icon={<PxlKitIcon icon={Coin} size={16} />} tone="gold" trend="+24%" />
-                <PixelStatCard label="Stars" value="1.4k" icon={<PxlKitIcon icon={Star} size={16} />} tone="purple" trend="trending" />
+                <PixelStatCard label="Total Icons" value="204" icon={<PxlKitIcon icon={Package} size={16} decorative />} tone="green" trend="+12 new" />
+                <PixelStatCard label="Components" value={String(UI_KIT_COMPONENTS.length)} icon={<PxlKitIcon icon={Grid} size={16} decorative />} tone="cyan" trend="100% typed" />
+                <PixelStatCard label="Downloads" value="8.2k" icon={<PxlKitIcon icon={Coin} size={16} decorative />} tone="gold" trend="+24%" />
+                <PixelStatCard label="Stars" value="1.4k" icon={<PxlKitIcon icon={Star} size={16} decorative />} tone="purple" trend="trending" />
               </div>
             </DocSection>
 
@@ -1814,17 +2044,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'striped', type: 'boolean', default: 'true', description: 'Alternating row backgrounds' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelTable
-  columns={[
-    { key: 'name', header: 'Component' },
-    { key: 'category', header: 'Category' },
-    { key: 'status', header: 'Status' },
-  ]}
-  data={[
-    { name: 'PixelButton', category: 'Actions', status: <PixelBadge tone="green">Stable</PixelBadge> },
-    { name: 'PixelTable', category: 'Data', status: <PixelBadge tone="gold">New</PixelBadge> },
-  ]}
-/>`}
             >
               <PixelTable
                 columns={[
@@ -1854,8 +2073,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Border/background tone' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelAvatar name="Joangel De La Rosa" tone="green" />
-<PixelAvatar name="AI Bot" tone="purple" size="lg" />`}
             >
               <div className="flex flex-wrap items-center gap-3">
                 <PixelAvatar name="Joangel De La Rosa" tone="green" size="sm" />
@@ -1876,9 +2093,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Color variant' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelBadge tone="green">Stable</PixelBadge>
-<PixelBadge tone="gold">Beta</PixelBadge>
-<PixelBadge tone="red">Deprecated</PixelBadge>`}
             >
               <div className="flex flex-wrap gap-2">
                 <PixelBadge tone="green">Stable</PixelBadge>
@@ -1898,18 +2112,22 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               props={[
                 { name: 'label', type: 'string', default: '—', description: 'Chip text content' },
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Color variant' },
-                { name: 'onRemove', type: '() => void', default: '—', description: 'Shows remove button when provided' },
+                { name: 'variant', type: '"soft" | "solid" | "outline" | "ghost"', default: '"soft"', description: 'Visual style' },
+                { name: 'size', type: 'Size', default: '"md"', description: 'Chip size' },
+                { name: 'iconLeft', type: 'ReactNode', default: '—', description: 'Icon before the label' },
+                { name: 'value', type: 'string', default: '—', description: 'Identifies the chip inside a PixelChipGroup' },
+                { name: 'onDelete', type: '() => void', default: '—', description: 'Shows the × button (Vue: @delete; Angular: deletable + (delete)). onRemove is its older name.' },
+                { name: 'deletable', type: 'boolean', default: '—', description: 'false hides the × even with onDelete' },
+                { name: 'onClick', type: 'MouseEventHandler', default: '—', description: 'Makes the label a button (Angular: clickable + (clicked), or <button pxlChip>)' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelChip label="react" tone="cyan" />
-<PixelChip label="removable" tone="gold" onRemove={() => {}} />`}
             >
               <div className="flex flex-wrap gap-2">
                 <PixelChip tone="cyan" label="react" />
                 <PixelChip tone="purple" label="typescript" />
                 <PixelChip tone="green" label="tailwind" />
-                <PixelChip tone="gold" label="removable" onRemove={() => {}} />
-                <PixelChip tone="red" label="deprecated" onRemove={() => {}} />
+                <PixelChip tone="gold" label="removable" onDelete={() => {}} />
+                <PixelChip tone="red" label="deprecated" onDelete={() => {}} />
               </div>
             </DocSection>
 
@@ -1925,8 +2143,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'className', type: 'string', default: '—', description: 'Additional CSS classes' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelTextLink href="/docs" tone="cyan">Documentation</PixelTextLink>
-<PixelTextLink tone="gold" onClick={() => alert('clicked')}>Action Link</PixelTextLink>`}
             >
               <div className="flex flex-wrap items-center gap-4 text-sm">
                 <PixelTextLink href="/docs" tone="cyan">Documentation</PixelTextLink>
@@ -1947,8 +2163,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Color variant' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelCodeInline tone="cyan">useState</PixelCodeInline>
-<PixelCodeInline tone="purple">PxlKitIcon</PixelCodeInline>`}
             >
               <p className="text-sm text-retro-muted">
                 Use <PixelCodeInline tone="cyan">useState</PixelCodeInline> for local state,{' '}
@@ -1969,8 +2183,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'children', type: 'ReactNode', default: '—', description: 'Key label' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelKbd>Ctrl</PixelKbd> + <PixelKbd>K</PixelKbd>
-<PixelKbd>⌘</PixelKbd> + <PixelKbd>Shift</PixelKbd> + <PixelKbd>P</PixelKbd>`}
             >
               <div className="flex flex-wrap items-center gap-1 text-sm text-retro-muted">
                 <PixelKbd>Ctrl</PixelKbd><span>+</span><PixelKbd>K</PixelKbd>
@@ -1995,8 +2207,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'cssVar', type: 'string', default: '—', description: 'CSS custom property name' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelColorSwatch name="Green" cssVar="--retro-green" />
-<PixelColorSwatch name="Cyan" cssVar="--retro-cyan" />`}
             >
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 <PixelColorSwatch name="Green" cssVar="--retro-green" />
@@ -2022,37 +2232,30 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'action', type: 'ReactNode', default: '—', description: 'Action slot (button)' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelAlert
-  tone="green"
-  icon={<PxlKitIcon icon={CheckCircle} size={16} />}
-  title="Build Success"
-  message="Package compiled successfully."
-  action={<PixelButton tone="green" size="sm">View Logs</PixelButton>}
-/>`}
             >
               <div className="space-y-3">
                 <PixelAlert
                   tone="green"
-                  icon={<PxlKitIcon icon={CheckCircle} size={16} />}
+                  icon={<PxlKitIcon icon={CheckCircle} size={16} decorative />}
                   title="Build Success"
                   message="Package compiled and DTS types generated."
-                  action={<PixelButton tone="green" size="sm" iconLeft={<PxlKitIcon icon={Check} size={14} />}>View Logs</PixelButton>}
+                  action={<PixelButton tone="green" size="sm" iconLeft={<PxlKitIcon icon={Check} size={14} decorative />}>View Logs</PixelButton>}
                 />
                 <PixelAlert
                   tone="gold"
-                  icon={<PxlKitIcon icon={WarningTriangle} size={16} />}
+                  icon={<PxlKitIcon icon={WarningTriangle} size={16} decorative />}
                   title="Warning"
                   message="Some components still need visual fine-tuning review."
                 />
                 <PixelAlert
                   tone="red"
-                  icon={<PxlKitIcon icon={Bell} size={16} />}
+                  icon={<PxlKitIcon icon={Bell} size={16} decorative />}
                   title="Breaking Change"
                   message="PixelSelect API changed from native to custom dropdown in v2.0."
                 />
                 <PixelAlert
                   tone="cyan"
-                  icon={<PxlKitIcon icon={InfoCircle} size={16} />}
+                  icon={<PxlKitIcon icon={InfoCircle} size={16} decorative />}
                   title="Tip"
                   message="Use the tone prop to match your alert to the appropriate severity level."
                 />
@@ -2071,7 +2274,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'showValue', type: 'boolean', default: 'true', description: 'Show percentage' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelProgress value={72} tone="green" label="Upload Progress" />`}
             >
               <div className="max-w-md space-y-4">
                 <PixelProgress value={progress} tone="green" label="Build progress" />
@@ -2092,8 +2294,6 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'rounded', type: 'boolean', default: 'false', description: 'Pill shape' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelSkeleton width="200px" height="1rem" />
-<PixelSkeleton width="40px" height="40px" rounded />`}
             >
               <div className="flex items-start gap-3">
                 <PixelSkeleton width="40px" height="40px" rounded />
@@ -2117,224 +2317,54 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'action', type: 'ReactNode', default: '—', description: 'Action button' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelEmptyState
-  title="No results"
-  description="Try adjusting your search or filters."
-  icon={<PxlKitIcon icon={Search} size={20} />}
-  action={<PixelButton tone="green">Reset Filters</PixelButton>}
-/>`}
             >
               <PixelEmptyState
                 title="No results found"
                 description="Adjust your filters or create a new custom component for this kit."
-                icon={<PxlKitIcon icon={SparkleSmall} size={20} />}
-                action={<PixelButton tone="green" iconLeft={<PxlKitIcon icon={Check} size={14} />}>Create Component</PixelButton>}
+                icon={<PxlKitIcon icon={SparkleSmall} size={20} decorative />}
+                action={<PixelButton tone="green" iconLeft={<PxlKitIcon icon={Check} size={14} decorative />}>Create Component</PixelButton>}
               />
             </DocSection>
 
-            {/* ══════════════════ PIXELTOAST (low-level component) ══════════════════ */}
+            {/* ══════════════════ PIXELTOAST (the kit's toast card) ══════════════════ */}
             <DocSection
               id="pixel-toast"
               title="PixelToast"
-              description={<>The low-level <PixelCodeInline>{'<PixelToast>'}</PixelCodeInline> component shipped from <PixelCodeInline>@pxlkit/core</PixelCodeInline>. It renders one toast at a fixed position; you control visibility and lifecycle. For most apps you&apos;ll want the <PixelCodeInline>useToast()</PixelCodeInline> hook below — it stacks multiple toasts and handles timers for you. The old <PixelCodeInline>/toast</PixelCodeInline> route redirects to this section.</>}
+              description={<>The card each toast renders as: a tone, a title and message, an icon or animated icon, an action, a loading spinner and the bar that counts down to its dismissal. <PixelCodeInline>{'<PxlKitToastProvider>'}</PixelCodeInline> draws one for every toast you push with <CompLink id="use-toast">useToast()</CompLink> (<PixelCodeInline>injectToast()</PixelCodeInline> in Angular) — you rarely render it yourself. Push some live in the playground below. The icon packages&apos; standalone <PixelCodeInline>PixelToast</PixelCodeInline>, one toast whose visibility you control, is documented in <PixelTextLink href="/docs#toast-notifications">/docs#toast-notifications</PixelTextLink>.</>}
               props={[
-                { name: 'visible', type: 'boolean', default: '—', description: 'Whether the toast is currently visible (required)' },
-                { name: 'title', type: 'string', default: '—', description: 'Heading text (required)' },
-                { name: 'message', type: 'string', default: '—', description: 'Optional body line below the title' },
-                { name: 'icon', type: 'PxlKitData', default: '—', description: 'Pxlkit icon shown on the left' },
-                { name: 'colorfulIcon', type: 'boolean', default: 'true', description: 'Render the icon in palette mode (false → flat accentColor)' },
-                { name: 'iconSize', type: 'number', default: '24', description: 'Icon size in px' },
-                { name: 'bgColor', type: 'string', default: "'#12121a'", description: 'Background colour (hex)' },
-                { name: 'borderColor', type: 'string', default: "'#2a2a3e'", description: 'Border colour (hex)' },
-                { name: 'textColor', type: 'string', default: "'#e8e6e3'", description: 'Body text colour' },
-                { name: 'accentColor', type: 'string', default: "'#00ff88'", description: 'Title + icon tint colour' },
-                { name: 'position', type: "'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'", default: "'top-right'", description: 'Viewport corner to anchor the toast' },
-                { name: 'duration', type: 'number', default: '2200', description: 'Auto-dismiss after N ms (0 disables auto-dismiss)' },
-                { name: 'showClose', type: 'boolean', default: 'true', description: 'Render the X close button' },
-                { name: 'onClose', type: '() => void', default: '—', description: 'Called when duration elapses or the close button is clicked' },
-                { name: 'className', type: 'string', default: '—', description: 'Extra CSS class names on the outer wrapper' },
+                { name: 'toast', type: 'ToastItem', default: '—', description: 'The toast: { id, title, message?, tone?, duration?, icon?, animatedIcon?, action?, assertive?, loading? } — the fields toast() takes' },
+                { name: 'onDismiss', type: '() => void', default: '—', description: 'Called when its countdown ends or its dismiss button is pressed (the dismiss event in Vue, the dismiss output in Angular)' },
+                PROP_SURFACE,
               ]}
-              code={`import { useToast } from '@/components/ToastProvider';
-import { CheckCircle, WarningTriangle } from '@pxlkit/feedback';
-import { FireSword } from '@pxlkit/gamification';
-
-function SaveButton() {
-  const { toast, success, warning } = useToast();
-
-  return (
-    <>
-      <PixelButton
-        onClick={() => success('SAVED', 'Changes synced to server', CheckCircle)}
-      >
-        Save
-      </PixelButton>
-
-      <PixelButton
-        onClick={() =>
-          toast({
-            tone: 'warning',
-            title: 'LOW HEALTH',
-            message: 'Use a potion now',
-            position: 'bottom-right',
-            duration: 3500,
-            animatedIcon: FireSword,
-          })
-        }
-      >
-        Show Warning Toast
-      </PixelButton>
-    </>
-  );
-}`}
             >
-              <div className="space-y-4">
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <PixelSelect
-                    label="Tone"
-                    value={toastTone}
-                    onChange={(v) => setToastTone(v as ToastTone)}
-                    options={[
-                      { value: 'success', label: 'Success', icon: <PxlKitIcon icon={CheckCircle} size={14} /> },
-                      { value: 'error', label: 'Error', icon: <PxlKitIcon icon={WarningTriangle} size={14} /> },
-                      { value: 'info', label: 'Info', icon: <PxlKitIcon icon={InfoCircle} size={14} /> },
-                      { value: 'warning', label: 'Warning', icon: <PxlKitIcon icon={Bell} size={14} /> },
-                    ]}
-                  />
-                  <PixelSelect
-                    label="Position"
-                    value={toastPosition}
-                    onChange={(v) => setToastPosition(v as ToastPosition)}
-                    options={[
-                      { value: 'top-right', label: 'Top Right' },
-                      { value: 'top-left', label: 'Top Left' },
-                      { value: 'bottom-right', label: 'Bottom Right' },
-                      { value: 'bottom-left', label: 'Bottom Left' },
-                      { value: 'top-center', label: 'Top Center' },
-                      { value: 'bottom-center', label: 'Bottom Center' },
-                    ]}
-                  />
-                  <div className="max-w-sm">
-                    <PixelSlider
-                      label="Duration (ms)"
-                      min={1000}
-                      max={6000}
-                      step={250}
-                      value={toastDuration}
-                      onChange={setToastDuration}
-                      tone="gold"
-                      showMinMax
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <PixelButton
-                    tone="green"
-                    iconLeft={<PxlKitIcon icon={CheckCircle} size={14} />}
-                    onClick={() => {
-                      if (toastTone === 'success') {
-                        success('SAVED', 'Your changes were saved correctly', CheckCircle);
-                        return;
-                      }
-                      if (toastTone === 'error') {
-                        error('ERROR', 'Could not save changes', WarningTriangle);
-                        return;
-                      }
-                      if (toastTone === 'info') {
-                        info('SYNC', 'Fetching latest updates from server', InfoCircle);
-                        return;
-                      }
-                      warning('WARNING', 'Action requires confirmation', Bell);
-                    }}
-                  >
-                    Quick Toast
-                  </PixelButton>
-
-                  <PixelButton
-                    tone="purple"
-                    iconLeft={<AnimatedPxlKitIcon icon={FireSword} size={14} />}
-                    onClick={() => {
-                      toast({
-                        tone: toastTone,
-                        title: 'PIXEL EVENT',
-                        message: `Tone: ${toastTone} · Position: ${toastPosition} · Duration: ${toastDuration}ms`,
-                        position: toastPosition,
-                        duration: toastDuration,
-                        animatedIcon: FireSword,
-                      });
-                    }}
-                  >
-                    Animated Toast
-                  </PixelButton>
-                </div>
-
-                <p className="text-xs text-retro-muted">
-                  Detailed integration docs are also available in <a className="text-retro-cyan hover:underline" href="/docs#toast-notifications">/docs#toast-notifications</a>.
-                </p>
-              </div>
+              <ToastGallery />
             </DocSection>
 
-            {/* ══════════════════ useToast() hook ══════════════════ */}
-            {/* PxlKitToastProvider (the kit's provider behind this pattern) — alias for kebab(manifest name) */}
+            {/* ══════════════════ useToast() / injectToast() ══════════════════ */}
+            {/* PxlKitToastProvider (the provider behind this API) — alias for kebab(manifest name) */}
             <AnchorAlias id="pxl-kit-toast-provider" />
             <DocSection
               id="use-toast"
+              component="pxl-kit-toast-provider"
               title="useToast()"
-              description={<>Application-level hook that manages a stack of <PixelCodeInline>{'<PixelToast>'}</PixelCodeInline> instances. Mount the matching <PixelCodeInline>{'<ToastProvider>'}</PixelCodeInline> once at the root (this site does it in <PixelCodeInline>layout.tsx</PixelCodeInline>). The hook&apos;s methods auto-handle ids, timers, and unmount — you only worry about the message. Returns the API listed below.</>}
+              description={<>Mount <PixelCodeInline>{'<PxlKitToastProvider>'}</PixelCodeInline> once around your app; under it, <PixelCodeInline>useToast()</PixelCodeInline> (React, Vue) or <PixelCodeInline>injectToast()</PixelCodeInline> (Angular) returns the toast API. The provider keeps the queue, draws the <CompLink id="pixel-toast">toast cards</CompLink> in its viewport — stacked by default, a landmark <PixelKbd>F8</PixelKbd> moves focus to — announces each toast to screen readers, and holds the countdowns while the page is hidden. Try it:</>}
               props={[
-                { name: 'toast(options)', type: '({ title, message?, tone?, icon?, animatedIcon?, duration?, position? }) => string', default: '—', description: 'Generic creator; returns the new toast id' },
-                { name: 'success / error / info / warning', type: '(title, message?, icon?) => string', default: '—', description: 'Tone shortcuts with sensible default icons' },
-                { name: 'dismiss(id)', type: '(id: string) => void', default: '—', description: 'Dismiss one toast by its id (returned by toast())' },
-                { name: 'dismissAll()', type: '() => void', default: '—', description: 'Clear every active toast' },
+                { name: 'position', type: 'ToastPosition', default: '"top-right"', description: 'Provider: where the viewport sits — top-left, top-center, top-right, bottom-left, bottom-center or bottom-right' },
+                { name: 'max', type: 'number', default: '5', description: 'Provider: most toasts on screen at once; the oldest goes first' },
+                { name: 'duration', type: 'number', default: '4500', description: 'Provider: auto-dismiss delay of the toasts without their own, in ms; 0 keeps them until dismissed' },
+                { name: 'hotkey', type: 'string | false', default: '"F8"', description: 'Provider: key that moves focus to the toasts, like "F8" or "alt+t"; false for none' },
+                { name: 'stacked', type: 'boolean', default: 'true', description: 'Provider: collapse the toasts into a stack that expands on hover' },
+                { name: 'stackVisible', type: 'number', default: '2', description: 'Provider: cards that peek behind the front one when stacked' },
+                PROP_SURFACE,
+                { name: 'toast(input)', type: '(input: ToastInput) => string', default: '—', description: 'Push a toast and get its id. input: { title, message?, tone?, duration?, icon?, animatedIcon?, action?, assertive?, loading? }' },
+                { name: 'toast.success / .error / .info / .warning', type: '(title, message?) => string', default: '—', description: 'Green, red, cyan and gold toasts; each also takes an input object without tone' },
+                { name: 'toast.loading', type: '(title, message?) => string', default: '—', description: 'A toast with a spinner that stays until you update or dismiss it' },
+                { name: 'toast.promise(p, { loading, success, error })', type: '<T>(p: Promise<T> | (() => Promise<T>), options) => Promise<T>', default: '—', description: 'A loading toast while p is pending, then the success toast, or the error toast (shown for at least 6 s); returns p\'s outcome' },
+                { name: 'update(id, patch) · dismiss(id) · clear()', type: 'functions', default: '—', description: 'Change a toast, remove one, or remove them all' },
+                { name: 'toasts', type: 'ToastItem[]', default: '—', description: 'The toasts on screen, oldest first — a ref in Vue, a signal in Angular' },
               ]}
-              code={`// 1. Mount the provider once at the root
-import { ToastProvider } from '@/components/ToastProvider';
-
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        <ToastProvider>
-          {children}
-        </ToastProvider>
-      </body>
-    </html>
-  );
-}
-
-// 2. Anywhere inside, call useToast() and use it
-import { useToast } from '@/components/ToastProvider';
-import { CheckCircle, WarningTriangle } from '@pxlkit/feedback';
-import { FireSword } from '@pxlkit/gamification';
-
-function SaveButton() {
-  const { toast, success } = useToast();
-  return (
-    <>
-      <PixelButton onClick={() => success('SAVED', 'Changes synced', CheckCircle)}>
-        Save
-      </PixelButton>
-      <PixelButton
-        onClick={() =>
-          toast({
-            tone: 'warning',
-            title: 'LOW HEALTH',
-            message: 'Use a potion now',
-            position: 'bottom-right',
-            duration: 3500,
-            animatedIcon: FireSword,
-          })
-        }
-      >
-        Show Warning Toast
-      </PixelButton>
-    </>
-  );
-}`}
             >
-              <p className="text-xs text-retro-muted">
-                Implementation lives at <PixelCodeInline>apps/web/src/components/ToastProvider.tsx</PixelCodeInline> in this repo. Copy that file (or write your own equivalent) into your project to get the multi-toast stack on top of the low-level <PixelCodeInline>{'<PixelToast>'}</PixelCodeInline> primitive documented above.
-              </p>
+              <ToastPlayground />
             </DocSection>
 
             <PixelDivider label="Navigation" tone="purple" spacing="lg" />
@@ -2349,17 +2379,12 @@ function SaveButton() {
                 { name: 'defaultTab', type: 'string', default: 'first', description: 'Initially active tab ID' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelTabs items={[
-  { id: 'overview', label: 'Overview', content: '...' },
-  { id: 'api', label: 'API', content: '...' },
-  { id: 'tokens', label: 'Tokens', content: '...' },
-]} />`}
             >
               <PixelTabs
                 items={[
-                  { id: 'overview', label: 'Overview', icon: <PxlKitIcon icon={Home} size={14} />, content: 'Quick start guide and component summary for the Pxlkit UI Kit.' },
-                  { id: 'api', label: 'API', icon: <PxlKitIcon icon={Edit} size={14} />, content: 'All components expose typed props with Tone, Size, and icon slots as common patterns.' },
-                  { id: 'tokens', label: 'Tokens', icon: <PxlKitIcon icon={SparkleSmall} size={14} />, content: 'CSS custom properties like --retro-green, --retro-bg control theming globally.' },
+                  { id: 'overview', label: 'Overview', icon: <PxlKitIcon icon={Home} size={14} decorative />, content: 'Quick start guide and component summary for the Pxlkit UI Kit.' },
+                  { id: 'api', label: 'API', icon: <PxlKitIcon icon={Edit} size={14} decorative />, content: 'All components expose typed props with Tone, Size, and icon slots as common patterns.' },
+                  { id: 'tokens', label: 'Tokens', icon: <PxlKitIcon icon={SparkleSmall} size={14} decorative />, content: 'CSS custom properties like --retro-green, --retro-bg control theming globally.' },
                 ]}
               />
             </DocSection>
@@ -2374,10 +2399,6 @@ function SaveButton() {
                 { name: 'allowMultiple', type: 'boolean', default: 'false', description: 'Allow multiple open panels' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelAccordion items={[
-  { id: '1', title: 'How to use icons', content: '...' },
-  { id: '2', title: 'Custom themes', content: '...' },
-]} />`}
             >
               <PixelAccordion
                 items={[
@@ -2399,13 +2420,6 @@ function SaveButton() {
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Button tone' },
                 ...COMMON_CONTAINER,
               ]}
-              code={`<PixelCollapsible label="Show details">
-  <p>Hidden content revealed on toggle.</p>
-</PixelCollapsible>
-
-<PixelCollapsible label="Open by default" defaultOpen tone="green">
-  <p>Visible from the start.</p>
-</PixelCollapsible>`}
             >
               <div className="space-y-3">
                 <PixelCollapsible label="Click to reveal">
@@ -2432,11 +2446,6 @@ function SaveButton() {
                 { name: 'items', type: 'Array<{ label: string; href?: string; onClick?: () => void; active?: boolean }>', default: '—', description: 'Breadcrumb items. `href` renders an anchor; `onClick` renders a button; both omitted → plain text.' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelBreadcrumb items={[
-  { label: 'Home', href: '/' },
-  { label: 'Docs', href: '/docs' },
-  { label: 'UI Kit', active: true },
-]} />`}
             >
               <div className="space-y-3">
                 <PixelBreadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Docs', href: '/docs' }, { label: 'UI Kit', active: true }]} />
@@ -2455,7 +2464,6 @@ function SaveButton() {
                 { name: 'onChange', type: '(next: number) => void', default: '—', description: 'Page change handler (receives the new page index)' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelPagination page={page} total={5} onChange={setPage} />`}
             >
               <PixelPagination page={paginationPage} total={5} onChange={setPaginationPage} />
             </DocSection>
@@ -2471,19 +2479,16 @@ function SaveButton() {
                 { name: 'open', type: 'boolean', default: '—', description: 'Visibility state' },
                 { name: 'title', type: 'string', default: '—', description: 'Modal heading' },
                 { name: 'onClose', type: '() => void', default: '—', description: 'Close handler' },
-                { name: 'size', type: '"sm" | "md" | "lg"', default: '"md"', description: 'Max width' },
+                { name: 'size', type: '"sm" | "md" | "lg" | "xl" | "full"', default: '"md"', description: 'Max width' },
+                { name: 'description', type: 'ReactNode', default: '—', description: 'Text under the title, wired to aria-describedby' },
+                { name: 'footer', type: 'ReactNode', default: '—', description: 'Actions row under the body' },
+                { name: 'closeLabel', type: 'string', default: '"Close"', description: 'Accessible name of the close button' },
+                { name: 'asyncClose', type: '() => Promise<void>', default: '—', description: 'The close button awaits it, showing a busy state, before onClose' },
+                { name: 'container', type: 'HTMLElement | null', default: 'document.body', description: 'Where the dialog is portaled' },
                 ...COMMON_CONTAINER,
               ]}
-              code={`const [open, setOpen] = useState(false);
-
-<PixelButton onClick={() => setOpen(true)}>Open Modal</PixelButton>
-
-<PixelModal open={open} title="Confirm Action" onClose={() => setOpen(false)}>
-  <p>Are you sure you want to proceed?</p>
-  <PixelButton tone="green" onClick={() => setOpen(false)}>Confirm</PixelButton>
-</PixelModal>`}
             >
-              <PixelButton tone="purple" iconLeft={<PxlKitIcon icon={Bell} size={16} />} onClick={() => setModalOpen(true)}>
+              <PixelButton tone="purple" iconLeft={<PxlKitIcon icon={Bell} size={16} decorative />} onClick={() => setModalOpen(true)}>
                 Open Modal Demo
               </PixelButton>
             </DocSection>
@@ -2494,13 +2499,14 @@ function SaveButton() {
               title="PixelTooltip"
               description={<>Informational tooltip that appears on hover and focus. Supports four positions. Wrap any element — works perfectly with <CompLink id="pxlkit-button">PxlKitButton</CompLink>.</>}
               props={[
-                { name: 'content', type: 'string', default: '—', description: 'Tooltip text' },
+                { name: 'content', type: 'ReactNode', default: '—', description: 'Tooltip content (label is its plain-text alias)' },
                 { name: 'position', type: '"top" | "bottom" | "left" | "right"', default: '"top"', description: 'Tooltip placement' },
+                { name: 'trigger', type: '"hover" | "focus" | "click"', default: '"hover"', description: 'What opens it; Escape closes it in every mode' },
+                { name: 'delay', type: 'number | { open?: number; close?: number }', default: '{ open: 200, close: 100 }', description: 'Open and close delays in ms' },
+                { name: 'open / defaultOpen / onOpenChange', type: 'boolean / boolean / (open: boolean) => void', default: '—', description: 'Controlled or uncontrolled open state' },
+                { name: 'sideOffset', type: 'number', default: '8', description: 'Gap between the trigger and the tooltip, in px' },
                 ...COMMON_CONTAINER,
               ]}
-              code={`<PixelTooltip content="Edit this item" position="top">
-  <PxlKitButton label="Edit" icon={<PxlKitIcon icon={Edit} size={16} />} />
-</PixelTooltip>`}
             >
               <div className="flex flex-wrap items-center gap-4">
                 <PixelTooltip content="Top tooltip" position="top">
@@ -2531,15 +2537,6 @@ function SaveButton() {
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Trigger button tone' },
                 ...COMMON_INTERACTIVE,
               ]}
-              code={`<PixelDropdown
-  label="Actions"
-  items={[
-    { value: 'copy', label: 'Copy snippet' },
-    { value: 'preview', label: 'Open preview' },
-    { value: 'delete', label: 'Delete item' },
-  ]}
-  onSelect={(v) => console.log(v)}
-/>`}
             >
               <div className="flex flex-wrap gap-3">
                 <PixelDropdown
@@ -2576,9 +2573,6 @@ function SaveButton() {
                 { name: 'subtitle', type: 'string', default: '—', description: 'Description text' },
                 ...COMMON_CONTAINER,
               ]}
-              code={`<PixelSection title="Actions" subtitle="Interactive button components.">
-  {children}
-</PixelSection>`}
             >
               <PixelSection title="Example Section" subtitle="This is a wrapped content area with border and padding.">
                 <div className="flex gap-2">
@@ -2599,8 +2593,6 @@ function SaveButton() {
                 { name: 'spacing', type: '"none" | "sm" | "md" | "lg"', default: '"none"', description: 'Vertical margin around the divider' },
                 ...COMMON_DISPLAY,
               ]}
-              code={`<PixelDivider />
-<PixelDivider label="Section" tone="green" spacing="lg" />`}
             >
               <div className="space-y-4">
                 <PixelDivider />
@@ -2621,9 +2613,6 @@ function SaveButton() {
                 { name: '(native attrs)', type: 'React.ButtonHTMLAttributes<HTMLButtonElement>', default: '—', description: 'Forwards every native <button> attribute (onClick, disabled, aria-*, data-*, …) onto the underlying element.' },
                 { name: '(ref)', type: 'React.Ref<HTMLButtonElement>', default: '—', description: 'forwardRef passes the ref straight to the native <button>.' },
               ]}
-              code={`<PixelBareButton onClick={() => alert('click')} className="px-3 py-1 bg-retro-green/20 rounded">
-  Custom Button
-</PixelBareButton>`}
             >
               <p className="text-sm text-retro-muted">
                 Renders an unstyled <PixelCodeInline>{'<button type="button">'}</PixelCodeInline> element. Apply your own classes to build custom interactions without inheriting Pxlkit button styles.
@@ -2639,7 +2628,6 @@ function SaveButton() {
                 { name: '(native attrs)', type: 'React.InputHTMLAttributes<HTMLInputElement>', default: '—', description: 'Forwards every native <input> attribute (type, value, placeholder, onChange, …).' },
                 { name: '(ref)', type: 'React.Ref<HTMLInputElement>', default: '—', description: 'forwardRef passes the ref straight to the native <input>.' },
               ]}
-              code={`<PixelBareInput type="text" placeholder="Unstyled input..." className="border px-2 py-1" />`}
             >
               <p className="text-sm text-retro-muted">
                 Renders an unstyled <PixelCodeInline>{'<input>'}</PixelCodeInline> element. For styled text fields with labels, hints, and errors, use <CompLink id="pixel-input">PixelInput</CompLink>.
@@ -2655,7 +2643,6 @@ function SaveButton() {
                 { name: '(native attrs)', type: 'React.TextareaHTMLAttributes<HTMLTextAreaElement>', default: '—', description: 'Forwards every native <textarea> attribute (rows, cols, value, onChange, …).' },
                 { name: '(ref)', type: 'React.Ref<HTMLTextAreaElement>', default: '—', description: 'forwardRef passes the ref straight to the native <textarea>.' },
               ]}
-              code={`<PixelBareTextarea rows={3} placeholder="Unstyled textarea..." className="border px-2 py-1 w-full" />`}
             >
               <p className="text-sm text-retro-muted">
                 Renders an unstyled <PixelCodeInline>{'<textarea>'}</PixelCodeInline> element. For styled multi-line input with labels and errors, use <CompLink id="pixel-textarea">PixelTextarea</CompLink>.
@@ -2705,7 +2692,9 @@ function SaveButton() {
                 </div>
               </div>
 
-              <CodeBlock code={`// Plays on hover
+              <FrameworkCode
+                title="Animation triggers"
+                react={`// Plays on hover
 <PixelBounce trigger="hover">
   <PxlKitIcon icon={Star} size={20} />
 </PixelBounce>
@@ -2729,7 +2718,56 @@ const [active, setActive] = useState(false);
 // Callback when animation completes
 <PixelFadeIn trigger="click" onComplete={() => console.log('done!')}>
   <p>Click me</p>
-</PixelFadeIn>`} language="tsx" />
+</PixelFadeIn>`}
+                vue={`<!-- Plays on hover -->
+<PixelBounce trigger="hover">
+  <PxlKitIcon :icon="Star" :size="20" />
+</PixelBounce>
+
+<!-- Plays twice per click -->
+<PixelShake trigger="click" :repeat="2">
+  <PixelBadge tone="red">Error</PixelBadge>
+</PixelShake>
+
+<!-- Controlled by the parent's state: const active = ref(false) -->
+<PixelPulse :trigger="active">
+  <PixelBadge tone="green">Live</PixelBadge>
+</PixelPulse>
+
+<!-- Fade in when scrolled into view -->
+<PixelFadeIn trigger="inView" :duration="600">
+  <PixelCard title="Hello">Visible!</PixelCard>
+</PixelFadeIn>
+
+<!-- The complete event, when the animation completes -->
+<PixelFadeIn trigger="click" @complete="console.log('done!')">
+  <p>Click me</p>
+</PixelFadeIn>`}
+                angular={`<!-- Plays on hover -->
+<pxl-bounce trigger="hover">
+  <pxl-icon [icon]="star" [size]="20" />
+</pxl-bounce>
+
+<!-- Plays twice per click -->
+<pxl-shake trigger="click" [repeat]="2">
+  <pxl-badge tone="red">Error</pxl-badge>
+</pxl-shake>
+
+<!-- Controlled by the component's state: readonly active = signal(false) -->
+<pxl-pulse [trigger]="active()">
+  <pxl-badge tone="green">Live</pxl-badge>
+</pxl-pulse>
+
+<!-- Fade in when scrolled into view -->
+<pxl-fade-in trigger="inView" [duration]="600">
+  <pxl-card title="Hello">Visible!</pxl-card>
+</pxl-fade-in>
+
+<!-- The complete output, when the animation completes -->
+<pxl-fade-in trigger="click" (complete)="done()">
+  <p>Click me</p>
+</pxl-fade-in>`}
+              />
 
               {/* Live trigger demos */}
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -2761,14 +2799,6 @@ const [active, setActive] = useState(false);
               description={
                 <>Fades in children on mount. Use <PixelCodeInline>trigger</PixelCodeInline> to control when it fires — e.g. <PixelCodeInline>&quot;inView&quot;</PixelCodeInline> for scroll-triggered reveals. Combines well with <CompLink id="pixel-slide-in">PixelSlideIn</CompLink> for staggered entrances.</>
               }
-              code={`<PixelFadeIn duration={400} delay={0} easing="ease-out">
-  <PixelCard title="Hello World">Faded in!</PixelCard>
-</PixelFadeIn>
-
-// Scroll-triggered fade
-<PixelFadeIn trigger="inView" duration={600}>
-  <p>I appear when scrolled into view</p>
-</PixelFadeIn>`}
               props={[
                 { name: 'duration', type: 'number', default: '400', description: 'Animation duration in ms' },
                 { name: 'delay', type: 'number', default: '0', description: 'Delay before animation starts (ms)' },
@@ -2783,7 +2813,7 @@ const [active, setActive] = useState(false);
             >
               {(key) => (
                 <PixelFadeIn key={key} duration={500}>
-                  <PixelCard title="Faded In" icon={<PxlKitIcon icon={SparkleSmall} size={16} />}>
+                  <PixelCard title="Faded In" icon={<PxlKitIcon icon={SparkleSmall} size={16} decorative />}>
                     This card fades in from opacity 0. Click replay to restart.
                   </PixelCard>
                 </PixelFadeIn>
@@ -2797,16 +2827,6 @@ const [active, setActive] = useState(false);
               description={
                 <>Slides in children from a direction with a fade. You can fine tune travel using <PixelCodeInline>distance</PixelCodeInline> and pacing using <PixelCodeInline>easing</PixelCodeInline>. Complements <CompLink id="pixel-fade-in">PixelFadeIn</CompLink>.</>
               }
-              code={`<PixelSlideIn from="down" duration={350} distance={14} easing="ease-out">
-  <PixelButton tone="green">Slid In</PixelButton>
-</PixelSlideIn>
-
-// Staggered list
-{items.map((item, i) => (
-  <PixelSlideIn key={item} from="right" delay={i * 80}>
-    <PixelCard title={item} />
-  </PixelSlideIn>
-))}`}
               props={[
                 { name: 'from', type: '"up" | "down" | "left" | "right"', default: '"down"', description: 'Direction to slide in from' },
                 { name: 'duration', type: 'number', default: '350', description: 'Animation duration in ms' },
@@ -2836,9 +2856,6 @@ const [active, setActive] = useState(false);
               id="pixel-pulse"
               title="PixelPulse"
               description=<>Continuously pulses opacity and scale to draw attention. Ideal for notifications, loading states, or status indicators. Disable by removing the component when not needed.</>
-              code={`<PixelPulse duration={2000}>
-  <PixelBadge tone="red">Live</PixelBadge>
-</PixelPulse>`}
               props={[
                 { name: 'duration', type: 'number', default: '2000', description: 'Pulse cycle duration in ms' },
                 { name: 'repeat', type: 'number | "infinite"', default: '"infinite"', description: 'Loop count for pulse cycles' },
@@ -2862,14 +2879,6 @@ const [active, setActive] = useState(false);
               id="pixel-bounce"
               title="PixelBounce"
               description=<>Applies a pixel-art vertical bounce to any element. Great for icons, badges, and call-to-actions. Control bounce speed with <PixelCodeInline>duration</PixelCodeInline> and stop it with <PixelCodeInline>repeat=1</PixelCodeInline>.</>
-              code={`<PixelBounce duration={800}>
-  <PxlKitIcon icon={Trophy} size={24} />
-</PixelBounce>
-
-// Finite bounce
-<PixelBounce duration={600} repeat={3}>
-  <PixelBadge tone="gold">+100 XP</PixelBadge>
-</PixelBounce>`}
               props={[
                 { name: 'duration', type: 'number', default: '800', description: 'Bounce cycle duration in ms' },
                 { name: 'repeat', type: 'number | "infinite"', default: '"infinite"', description: 'Number of bounces or infinite' },
@@ -2900,9 +2909,6 @@ const [active, setActive] = useState(false);
               id="pixel-float"
               title="PixelFloat"
               description={<>Creates a smooth hovering motion for icons, badges, and decorative cards. Use it as a soft ambient animation and combine with <CompLink id="pixel-pulse">PixelPulse</CompLink> for status signals.</>}
-              code={`<PixelFloat distance={8} duration={2400}>
-  <PxlKitIcon icon={Star} size={20} />
-</PixelFloat>`}
               props={[
                 { name: 'duration', type: 'number', default: '2200', description: 'Float cycle duration in ms' },
                 { name: 'distance', type: 'number', default: '6', description: 'Vertical travel distance in px' },
@@ -2927,9 +2933,6 @@ const [active, setActive] = useState(false);
               id="pixel-shake"
               title="PixelShake"
               description={<>Adds a quick horizontal shake for validation errors or critical alerts. Keep <PixelCodeInline>repeat</PixelCodeInline> low to avoid visual fatigue. Often paired with <CompLink id="pixel-alert">PixelAlert</CompLink>.</>}
-              code={`<PixelShake duration={450} repeat={2} distance={3}>
-  <PixelBadge tone="red">Invalid Input</PixelBadge>
-</PixelShake>`}
               props={[
                 { name: 'duration', type: 'number', default: '450', description: 'Single shake cycle duration in ms' },
                 { name: 'distance', type: 'number', default: '2', description: 'Horizontal shake distance in px' },
@@ -2954,9 +2957,6 @@ const [active, setActive] = useState(false);
               id="pixel-rotate"
               title="PixelRotate"
               description={<>Rotates children continuously or in finite loops. Use <PixelCodeInline>direction</PixelCodeInline> to reverse or alternate spin behavior for loading indicators and decorative accents.</>}
-              code={`<PixelRotate duration={1800} direction="normal" repeat="infinite">
-  <PxlKitIcon icon={Gear} size={22} />
-</PixelRotate>`}
               props={[
                 { name: 'duration', type: 'number', default: '1800', description: 'One full rotation duration in ms' },
                 { name: 'repeat', type: 'number | "infinite"', default: '"infinite"', description: 'Rotation loop count' },
@@ -2981,9 +2981,6 @@ const [active, setActive] = useState(false);
               id="pixel-zoom-in"
               title="PixelZoomIn"
               description={<>Scales and fades elements into view for punchy entrances. Works great for cards, badges, and modal content. Combine with <CompLink id="pixel-fade-in">PixelFadeIn</CompLink> for polished appear transitions.</>}
-              code={`<PixelZoomIn duration={320} startScale={0.9}>
-  <PixelCard title="Quick Reveal">Zoomed entrance</PixelCard>
-</PixelZoomIn>`}
               props={[
                 { name: 'duration', type: 'number', default: '320', description: 'Animation duration in ms' },
                 { name: 'delay', type: 'number', default: '0', description: 'Delay before animation starts (ms)' },
@@ -2999,7 +2996,7 @@ const [active, setActive] = useState(false);
               {(key) => (
                 <div className="grid gap-3 sm:grid-cols-3">
                   <PixelZoomIn key={key}>
-                    <PixelCard title="Pack Ready" icon={<PxlKitIcon icon={Package} size={16} />}>UI pack bundled</PixelCard>
+                    <PixelCard title="Pack Ready" icon={<PxlKitIcon icon={Package} size={16} decorative />}>UI pack bundled</PixelCard>
                   </PixelZoomIn>
                   <PixelZoomIn key={`${key}-b`} delay={80} startScale={0.88}>
                     <PixelBadge tone="gold">New Anim</PixelBadge>
@@ -3016,9 +3013,6 @@ const [active, setActive] = useState(false);
               id="pixel-flicker"
               title="PixelFlicker"
               description={<>Creates a retro monitor/electric flicker effect. Ideal for alert labels, neon headings, and ambient status text. Pair with <CompLink id="pixel-glitch">PixelGlitch</CompLink> for cyberpunk-style UI accents.</>}
-              code={`<PixelFlicker duration={2200}>
-  <p className="font-pixel text-retro-cyan">SIGNAL LOCKED</p>
-</PixelFlicker>`}
               props={[
                 { name: 'duration', type: 'number', default: '2200', description: 'Flicker cycle duration in ms' },
                 { name: 'repeat', type: 'number | "infinite"', default: '"infinite"', description: 'Loop count for the effect' },
@@ -3041,8 +3035,6 @@ const [active, setActive] = useState(false);
               id="pixel-typewriter"
               title="PixelTypewriter"
               description=<>Reveals text character by character at a configurable speed. Supports a blinking cursor and start delay. Inherits the <CompLink id="design-tokens">tone</CompLink> system for color theming.</>
-              code={`<PixelTypewriter text="Hello, World!" speed={60} tone="green" />
-<PixelTypewriter text="// loading system..." speed={40} delay={800} tone="cyan" cursor />`}
               props={[
                 { name: 'text', type: 'string', default: '—', description: 'Text to animate (required)' },
                 { name: 'speed', type: 'number', default: '60', description: 'Milliseconds per character' },
@@ -3074,9 +3066,6 @@ const [active, setActive] = useState(false);
               id="pixel-glitch"
               title="PixelGlitch"
               description=<>Cyberpunk-style scanline glitch with RGB channel split. Three rendered layers shift independently — two ghost layers offset in opposite directions create chromatic aberration. Control with <PixelCodeInline>trigger</PixelCodeInline>, tune speed and intensity.</>
-              code={`<PixelGlitch trigger="hover" duration={3000} intensity={4}>
-  <h1 className="font-pixel text-retro-green">SYSTEM ERROR</h1>
-</PixelGlitch>`}
               props={[
                 { name: 'duration', type: 'number', default: '3000', description: 'Full glitch cycle duration in ms' },
                 { name: 'intensity', type: 'number', default: '4', description: 'Horizontal channel-split offset in px' },
@@ -3257,7 +3246,7 @@ const [active, setActive] = useState(false);
           Supports <PixelCodeInline>sm</PixelCodeInline>, <PixelCodeInline>md</PixelCodeInline>, and <PixelCodeInline>lg</PixelCodeInline> sizes.
         </p>
         <div className="flex gap-2">
-          <PixelButton tone="green" size="sm" iconLeft={<AnimatedPxlKitIcon icon={FireSword} size={14} />} onClick={() => setModalOpen(false)}>
+          <PixelButton tone="green" size="sm" iconLeft={<AnimatedPxlKitIcon icon={FireSword} size={14} decorative />} onClick={() => setModalOpen(false)}>
             Confirm
           </PixelButton>
           <PixelButton tone="neutral" size="sm" onClick={() => setModalOpen(false)}>

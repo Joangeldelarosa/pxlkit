@@ -190,8 +190,9 @@ export function GameHUD({
               : 'text-retro-muted/50 border-retro-border/25 hover:text-retro-gold hover:border-retro-gold/30 hover:bg-retro-gold/10'
           }`}
           title={isFullscreenMapOpen ? 'Close fullscreen map' : 'Open fullscreen map'}
+          aria-label={isFullscreenMapOpen ? 'Close fullscreen map' : 'Open fullscreen map'}
           style={{ touchAction: 'none' }}>
-          <PxlKitIcon icon={QuestMap} size={12} colorful={isFullscreenMapOpen} />
+          <PxlKitIcon icon={QuestMap} size={12} colorful={isFullscreenMapOpen} decorative />
         </button>
 
         {/* Exit */}

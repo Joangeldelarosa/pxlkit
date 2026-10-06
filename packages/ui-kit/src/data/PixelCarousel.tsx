@@ -3,10 +3,25 @@
 import React, { forwardRef, useCallback, useEffect, useId, useMemo, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { EmblaCarouselType, EmblaOptionsType, EmblaPluginType } from 'embla-carousel';
-import { Surface, cn, surfaceClasses, useEffectiveSurface } from '../common';
+import {
+  CAROUSEL_DOTS_LABEL,
+  CAROUSEL_NEXT_LABEL,
+  CAROUSEL_PREVIOUS_LABEL,
+  canRunCarousel,
+  carouselArrowDisabled,
+  carouselClasses,
+  carouselDotClasses,
+  carouselDotCount,
+  carouselDotLabel,
+  carouselItemClasses,
+  carouselKeyStep,
+  carouselOptions,
+  carouselSlideLabel,
+  carouselStatus,
+  type CarouselOrientation,
+} from '@pxlkit/ui-kit-core';
+import { Surface, cn, useEffectiveSurface } from '../common';
 import { useReducedMotion } from '../hooks/useReducedMotion';
-
-type Orientation = 'horizontal' | 'vertical';
 
 export interface PixelCarouselProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
@@ -20,16 +35,22 @@ export interface PixelCarouselProps extends React.HTMLAttributes<HTMLDivElement>
   plugins?: EmblaPluginType[];
   /** Receives the embla API once ready; called again with `undefined` on unmount. */
   setApi?: (api: EmblaCarouselType | undefined) => void;
-  orientation?: Orientation;
+  /** Slides side by side, or stacked. */
+  orientation?: CarouselOrientation;
+  /** Previous and next buttons. */
   showArrows?: boolean;
+  /** A dot per slide, to go to it. */
   showDots?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Accessible name for the carousel region (required for landmark navigation). */
   'aria-label'?: string;
+  /** The slides (`PixelCarousel.Item`). */
   children: React.ReactNode;
 }
 
 interface PixelCarouselItemProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** The slide's content. */
   children: React.ReactNode;
 }
 
@@ -43,14 +64,14 @@ const CarouselItemContext = React.createContext<CarouselItemCtx | null>(null);
 const PixelCarouselItem = forwardRef<HTMLDivElement, PixelCarouselItemProps>(
   function PixelCarouselItem({ children, className, ...rest }, ref) {
     const ctx = React.useContext(CarouselItemContext);
-    const ariaLabel = ctx ? `Slide ${ctx.index + 1} of ${ctx.total}` : undefined;
+    const ariaLabel = ctx ? carouselSlideLabel(ctx.index, ctx.total) : undefined;
     return (
       <div
         ref={ref}
         role="group"
         aria-roledescription="slide"
         aria-label={ariaLabel}
-        className={cn('min-w-0 shrink-0 grow-0 basis-full', className)}
+        className={cn(carouselItemClasses, className)}
         {...rest}
       >
         {children}
@@ -76,22 +97,14 @@ const PixelCarouselRoot = forwardRef<HTMLDivElement, PixelCarouselProps>(functio
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const isVertical = orientation === 'vertical';
+  const classes = carouselClasses(surface, orientation);
   const carouselId = useId();
   const reducedMotion = useReducedMotion();
 
+  // Respects prefers-reduced-motion by zeroing out embla's scroll duration.
   const emblaOptions = useMemo<EmblaOptionsType>(
-    () => ({
-      loop: opts?.loop ?? false,
-      align: opts?.align ?? 'start',
-      slidesToScroll: opts?.slidesToScroll ?? 1,
-      ...opts,
-      axis: isVertical ? 'y' : 'x',
-      // Respect prefers-reduced-motion by zeroing out embla's drag/scroll dur.
-      duration: reducedMotion ? 0 : (opts as { duration?: number } | undefined)?.duration ?? 25,
-    }),
-    [opts, isVertical, reducedMotion],
+    () => carouselOptions(opts, { orientation, reducedMotion }),
+    [opts, orientation, reducedMotion],
   );
 
   const [emblaRef, emblaApi] = useEmblaCarousel(emblaOptions, plugins);
@@ -132,28 +145,16 @@ const PixelCarouselRoot = forwardRef<HTMLDivElement, PixelCarouselProps>(functio
   const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
 
   const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
-    if (isVertical) {
-      if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        scrollPrev();
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        scrollNext();
-      }
-    } else {
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        scrollPrev();
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        scrollNext();
-      }
-    }
+    const step = carouselKeyStep(e.key, orientation);
+    if (!step) return;
+    e.preventDefault();
+    if (step < 0) scrollPrev();
+    else scrollNext();
   };
 
   // Derive slide count from children for dots fallback when api hasn't reported yet.
   const childArray = React.Children.toArray(children).filter(React.isValidElement);
-  const dotCount = scrollSnaps.length > 0 ? scrollSnaps.length : childArray.length;
+  const dotCount = carouselDotCount(scrollSnaps.length, childArray.length);
   const total = childArray.length;
 
   // Wrap each Item child in an index/total context so its aria-label can read
@@ -172,11 +173,7 @@ const PixelCarouselRoot = forwardRef<HTMLDivElement, PixelCarouselProps>(functio
       aria-roledescription="carousel"
       tabIndex={0}
       onKeyDown={onKeyDown}
-      className={cn(
-        'relative outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
-        s.radiusLg,
-        className,
-      )}
+      className={cn(classes.root, className)}
       {...rest}
     >
       {/* Dedicated live region: announces only the slide index, not the slide
@@ -187,19 +184,16 @@ const PixelCarouselRoot = forwardRef<HTMLDivElement, PixelCarouselProps>(functio
         aria-live="polite"
         aria-atomic="true"
       >
-        {total > 0 ? `Slide ${selectedIndex + 1} of ${total}` : ''}
+        {carouselStatus(selectedIndex, total)}
       </span>
+      {/* Embla throws where the browser lacks what it needs (jsdom, old
+          WebViews), unmounting the page: there the strip stays put. */}
       <div
-        ref={emblaRef}
-        className={cn('overflow-hidden', s.radiusLg)}
+        ref={canRunCarousel() ? emblaRef : undefined}
+        className={classes.viewport}
         id={`${carouselId}-viewport`}
       >
-        <div
-          className={cn(
-            'flex',
-            isVertical ? 'flex-col h-full' : 'flex-row',
-          )}
-        >
+        <div className={classes.track}>
           {wrappedChildren}
         </div>
       </div>
@@ -208,47 +202,21 @@ const PixelCarouselRoot = forwardRef<HTMLDivElement, PixelCarouselProps>(functio
         <>
           <button
             type="button"
-            aria-label="Previous slide"
+            aria-label={CAROUSEL_PREVIOUS_LABEL}
             aria-controls={`${carouselId}-viewport`}
-            disabled={!canPrev && !(opts?.loop)}
+            disabled={carouselArrowDisabled(canPrev, opts?.loop)}
             onClick={scrollPrev}
-            className={cn(
-              'absolute z-10 inline-flex items-center justify-center w-9 h-9',
-              s.border,
-              s.radius,
-              s.transition,
-              s.press,
-              'border-retro-border bg-retro-surface/80 text-retro-text',
-              'hover:bg-retro-surface',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-              isVertical
-                ? 'top-2 left-1/2 -translate-x-1/2 rotate-90'
-                : 'left-2 top-1/2 -translate-y-1/2',
-            )}
+            className={classes.previous}
           >
             <span aria-hidden="true">{'<'}</span>
           </button>
           <button
             type="button"
-            aria-label="Next slide"
+            aria-label={CAROUSEL_NEXT_LABEL}
             aria-controls={`${carouselId}-viewport`}
-            disabled={!canNext && !(opts?.loop)}
+            disabled={carouselArrowDisabled(canNext, opts?.loop)}
             onClick={scrollNext}
-            className={cn(
-              'absolute z-10 inline-flex items-center justify-center w-9 h-9',
-              s.border,
-              s.radius,
-              s.transition,
-              s.press,
-              'border-retro-border bg-retro-surface/80 text-retro-text',
-              'hover:bg-retro-surface',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-              isVertical
-                ? 'bottom-2 left-1/2 -translate-x-1/2 rotate-90'
-                : 'right-2 top-1/2 -translate-y-1/2',
-            )}
+            className={classes.next}
           >
             <span aria-hidden="true">{'>'}</span>
           </button>
@@ -257,12 +225,9 @@ const PixelCarouselRoot = forwardRef<HTMLDivElement, PixelCarouselProps>(functio
 
       {showDots && dotCount > 0 && (
         <div
-          className={cn(
-            'flex justify-center gap-1.5 mt-3',
-            isVertical && 'flex-col items-center mt-0 ml-3 absolute right-2 top-1/2 -translate-y-1/2',
-          )}
+          className={classes.dots}
           role="group"
-          aria-label="Slide navigation"
+          aria-label={CAROUSEL_DOTS_LABEL}
         >
           {Array.from({ length: dotCount }).map((_, i) => {
             const active = i === selectedIndex;
@@ -270,20 +235,11 @@ const PixelCarouselRoot = forwardRef<HTMLDivElement, PixelCarouselProps>(functio
               <button
                 key={i}
                 type="button"
-                aria-label={`Go to slide ${i + 1}`}
+                aria-label={carouselDotLabel(i)}
                 aria-current={active ? 'true' : undefined}
                 aria-controls={`${carouselId}-viewport`}
                 onClick={() => scrollTo(i)}
-                className={cn(
-                  'h-2 w-2',
-                  s.border,
-                  surface === 'pixel' ? 'rounded-none' : 'rounded-full',
-                  s.transition,
-                  active
-                    ? 'bg-retro-cyan border-retro-cyan'
-                    : 'bg-retro-bg/40 border-retro-border hover:bg-retro-surface',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
-                )}
+                className={carouselDotClasses(surface, active)}
               />
             );
           })}

@@ -1,66 +1,70 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
-import { tone, ToneKey, rhythm } from '../tokens';
+import {
+  heroAlign,
+  heroContainerPadding,
+  heroLayout,
+  heroParallaxBodyClasses,
+  heroParallaxMediaClasses,
+  heroSectionClasses,
+  heroSplitMediaClasses,
+  type HeroDensity,
+  type HeroHeadlineEffect,
+  type HeroMinHeight,
+  type HeroVariant,
+  type SectionHeaderLevel,
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ToneKey } from '../tokens';
 import { PixelContainer } from '../layout/PixelContainer';
 import { PixelTwoColumn } from '../layout/PixelTwoColumn';
 import { PixelCluster } from '../layout/PixelCluster';
-
-type HeadlineEffect = 'typewriter' | 'glitch' | 'none';
-type HeroVariant = 'centered' | 'split' | 'parallax';
-type HeroDensity = 'compact' | 'comfortable';
-type HeroMinHeight = 'sm' | 'md' | 'lg' | 'fullscreen';
-
-const minHeightMap: Record<HeroMinHeight, string> = {
-  sm: 'min-h-[400px]',
-  md: 'min-h-[480px]',
-  lg: 'min-h-[640px]',
-  fullscreen: 'min-h-screen',
-};
-
-const headlineSize = {
-  compact: 'text-3xl sm:text-4xl lg:text-5xl',
-  comfortable: 'text-4xl sm:text-5xl lg:text-6xl',
-} as const;
-
-const eyebrowSize = 'text-xs sm:text-sm';
-const sublineSize = {
-  compact: 'text-base sm:text-lg',
-  comfortable: 'text-lg sm:text-xl',
-} as const;
-
-const densityRhythm = {
-  compact: {
-    eyebrowToHeadline: 'mt-3',
-    headlineToSubline: 'mt-2',
-    sublineToCtas: 'mt-5',
-    ctasToInstall: 'mt-6',
-    installToMeta: 'mt-4',
-  },
-  comfortable: {
-    eyebrowToHeadline: rhythm.eyebrowToHeadline,
-    headlineToSubline: rhythm.headlineToSubline,
-    sublineToCtas: rhythm.sublineToCtas,
-    ctasToInstall: rhythm.ctasToMeta,
-    installToMeta: rhythm.metaToInstall,
-  },
-} as const;
+import { PixelGlitch } from '../animations/PixelGlitch';
+import { PixelTypewriter } from '../animations/PixelTypewriter';
 
 export interface PixelHeroSectionProps extends React.HTMLAttributes<HTMLElement> {
+  /**
+   * `'centered'` and `'parallax'` centre the text; `'split'` puts the `media`
+   * in a column beside it. Default `'centered'`.
+   */
   variant?: HeroVariant;
+  /** Small upper-cased line above the headline, in the tone. */
   eyebrow?: string;
+  /** The headline: the page's `<h1>`, unless `as` sets another level. */
   headline: string;
-  headlineEffect?: HeadlineEffect;
+  /**
+   * Element of the headline. Default `'h1'`, the page's heading: a hero
+   * embedded under the page's own `<h1>` (a demo, a template) takes a lower
+   * level.
+   */
+  as?: SectionHeaderLevel;
+  /**
+   * Animates the headline: `'typewriter'` types it out once — screen readers
+   * get the whole headline from the start — and `'glitch'` plays PixelGlitch
+   * over it. Both hold still when the user prefers reduced motion. Default
+   * `'none'`.
+   */
+  headlineEffect?: HeroHeadlineEffect;
+  /** Paragraph under the headline. */
   subline?: string;
+  /** First call to action. */
   primaryCta?: React.ReactNode;
+  /** Second call to action, after the first. */
   secondaryCta?: React.ReactNode;
+  /** Install snippet under the calls to action. */
   install?: React.ReactNode;
+  /** Meta line at the end of the text. */
   meta?: React.ReactNode;
+  /** Media, placed by the `variant`: beside the text, behind it or below it. */
   media?: React.ReactNode;
+  /** Tone of the eyebrow. Default `'neutral'`. */
   tone?: ToneKey;
+  /** Type sizes and vertical rhythm. Default `'comfortable'`. */
   density?: HeroDensity;
+  /** Minimum height of the section. Default `'md'`. */
   minHeight?: HeroMinHeight;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 
@@ -70,7 +74,8 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
       variant = 'centered',
       eyebrow,
       headline,
-      headlineEffect: _headlineEffect = 'none',
+      as = 'h1',
+      headlineEffect = 'none',
       subline,
       primaryCta,
       secondaryCta,
@@ -87,51 +92,33 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
-    const sp = densityRhythm[density];
-    const t = tone[toneProp];
-
-    const isCentered = variant === 'centered';
-    const isSplit = variant === 'split' && media;
-    const isParallax = variant === 'parallax';
-    const align = isCentered || isParallax ? 'center' : 'start';
+    const align = heroAlign(variant);
+    const layout = heroLayout(variant, !!media);
+    const c = heroSectionClasses(surface, { tone: toneProp, density, minHeight, align, hasEyebrow: !!eyebrow });
 
     const eyebrowNode = eyebrow ? (
-      <span
-        className={cn(
-          eyebrowSize,
-          s.fontDisplay,
-          'uppercase tracking-[0.18em] max-w-full break-words',
-          t.text,
-        )}
-      >
+      <span className={c.eyebrow}>
         {eyebrow}
       </span>
     ) : null;
 
+    // One heading, its text once, whatever the effect: the glitch goes inside
+    // the heading, as a span, and its copies of the text are drawn by CSS.
+    const Heading = as as 'h1';
     const headlineNode = (
-      <h1
-        className={cn(
-          headlineSize[density],
-          s.fontDisplay,
-          'font-bold leading-tight text-retro-text max-w-full break-words',
-          eyebrow && sp.eyebrowToHeadline,
+      <Heading className={c.headline}>
+        {headlineEffect === 'typewriter' ? (
+          <PixelTypewriter label={headline} tone="inherit" />
+        ) : headlineEffect === 'glitch' ? (
+          <PixelGlitch as="span" label={headline} />
+        ) : (
+          headline
         )}
-      >
-        {headline}
-      </h1>
+      </Heading>
     );
 
     const sublineNode = subline ? (
-      <p
-        className={cn(
-          sublineSize[density],
-          s.font,
-          'text-retro-muted leading-relaxed max-w-prose break-words',
-          sp.headlineToSubline,
-          align === 'center' && 'mx-auto',
-        )}
-      >
+      <p className={c.subline}>
         {subline}
       </p>
     ) : null;
@@ -140,9 +127,9 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
       <PixelCluster
         gap={3}
         align="center"
-        justify={align === 'center' ? 'center' : 'start'}
+        justify={align}
         surface={surface}
-        className={sp.sublineToCtas}
+        className={c.ctas}
       >
         {primaryCta}
         {secondaryCta}
@@ -150,24 +137,19 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
     ) : null;
 
     const installNode = install ? (
-      <div className={cn(sp.ctasToInstall, align === 'center' && 'mx-auto')}>
+      <div className={c.install}>
         {install}
       </div>
     ) : null;
 
     const metaNode = meta ? (
-      <div className={cn(sp.installToMeta, align === 'center' && 'mx-auto')}>
+      <div className={c.meta}>
         {meta}
       </div>
     ) : null;
 
     const textColumn = (
-      <div
-        className={cn(
-          'flex flex-col',
-          align === 'center' && 'items-center text-center mx-auto max-w-3xl',
-        )}
-      >
+      <div className={c.text}>
         {eyebrowNode}
         {headlineNode}
         {sublineNode}
@@ -177,22 +159,22 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
       </div>
     );
 
-    const body = isSplit ? (
+    const body = layout === 'split' ? (
       <PixelTwoColumn
         ratio="60/40"
         gap={8}
         stackBelow="md"
         align="center"
         left={textColumn}
-        right={<div className="w-full">{media}</div>}
+        right={<div className={heroSplitMediaClasses}>{media}</div>}
         surface={surface}
       />
-    ) : isParallax ? (
-      <div className="relative w-full">
+    ) : layout === 'parallax' ? (
+      <div className={heroParallaxBodyClasses}>
         {media && (
           <div
             aria-hidden
-            className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
+            className={heroParallaxMediaClasses}
           >
             {media}
           </div>
@@ -203,7 +185,7 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
       <>
         {textColumn}
         {media && (
-          <div className={cn('mt-10 w-full', align === 'center' && 'mx-auto')}>
+          <div className={c.media}>
             {media}
           </div>
         )}
@@ -213,18 +195,13 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
     return (
       <section
         ref={ref as React.Ref<HTMLElement>}
-        className={cn(
-          'relative w-full flex flex-col justify-center',
-          minHeightMap[minHeight],
-          s.transition,
-          className,
-        )}
+        className={cn(c.root, className)}
         {...rest}
       >
         <PixelContainer
           as="div"
           maxWidth="xl"
-          padding={density === 'compact' ? 'md' : 'lg'}
+          padding={heroContainerPadding(density)}
           surface={surface}
         >
           {body}

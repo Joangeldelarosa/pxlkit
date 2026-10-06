@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelRadioGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelRadioGroupDocsMeta = {
@@ -17,13 +23,93 @@ export const PixelRadioGroupDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelRadioGroupDocsSection({ className }: PixelRadioGroupDocsSectionProps): React.ReactElement {
+/** PixelRadioGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelRadioGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelRadioGroup',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Legend rendered above the group.' },
+          { name: 'value', type: 'string', required: true, description: 'Currently-selected option value.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'Radio items.' },
+          { name: 'onChange', type: '(next: string) => void', required: true, description: 'Fires with the new value when the user picks a radio.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every radio in the group.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: "Visual tone for the selected radio. Default: `'cyan'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'name', type: 'string', description: 'Form-serialization name.' },
+          { name: 'required', type: 'boolean', description: 'Marks the field as required for native form validation.' },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLFieldSetElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelRadioGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelRadioGroup',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Legend rendered above the radios.' },
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Selected value (`v-model`); leave unset for an uncontrolled group.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'The radios.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every radio.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone of the selected radio.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'required', type: 'boolean', default: 'false', description: 'Marks the field as required for native form validation.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The value of the radio the user picked.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<fieldset>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelRadioGroup } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelRadioGroup',
+        selector: 'fieldset[pxlRadioGroup]',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Legend rendered above the radios.' },
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Selected value (`[(value)]`); leave unset for an uncontrolled group.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'The radios.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables every radio.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone of the selected radio.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the field as required for native form validation.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'Goes on a native `<fieldset>`, which keeps its own attributes and events.',
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelRadioGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelRadioGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-radio-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-radio-group-heading'>PixelRadioGroup</h2>
+      <Title id='pixel-radio-group-heading'>PixelRadioGroup</Title>
       <p className="docs-lead">Single-select grouped radios with a pixel dot indicator, fieldset/legend semantics, and tone + surface variants.</p>
       <ul className="docs-highlights">
-        <li>Controlled via value + onChange(next: string) over a list of options.</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — over a list of options.</li>
         <li>Renders as a real &lt;fieldset&gt; with role=&quot;radiogroup&quot; and a &lt;legend&gt; from label.</li>
         <li>Seven tones and pixel/linear surfaces share the kit-wide design tokens.</li>
         <li>Optional name emits a hidden input so it serializes inside native forms.</li>
@@ -34,18 +120,18 @@ export function PixelRadioGroupDocsSection({ className }: PixelRadioGroupDocsSec
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-radio-group-api">
+      <Heading id="pixel-radio-group-api">API</Heading>
+      <FrameworkApi label={'PixelRadioGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-radio-group-a11y">
-      <h3 id="pixel-radio-group-a11y">Accessibility</h3>
+      <Heading id="pixel-radio-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>radiogroup</code></li>
       </ul>
-      <p className="docs-aria-notes">Wrapped in a &lt;fieldset role=&quot;radiogroup&quot;&gt; with &lt;legend&gt; derived from label and aria-disabled / aria-required mirroring the props. Each option is a &lt;button role=&quot;radio&quot;&gt; with aria-checked reflecting selection. When name is set a hidden &lt;input&gt; mirrors the current value so the group participates in native &lt;form&gt; submissions.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Wrapped in a &lt;fieldset role=&quot;radiogroup&quot;&gt; with &lt;legend&gt; derived from label and aria-disabled / aria-required mirroring the props. Each option is a &lt;button role=&quot;radio&quot;&gt; with aria-checked reflecting selection. When name is set a hidden &lt;input&gt; mirrors the current value so the group participates in native &lt;form&gt; submissions. Keyboard focus shows on the focused radio&#39;s indicator: a ring in the tone on the linear surface, the indicator&#39;s edge on the pixel surface, whose cut corners would clip a ring.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -74,8 +160,11 @@ export function PixelRadioGroupDocsSection({ className }: PixelRadioGroupDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-radio-group-usage">
-      <h3 id="pixel-radio-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-radio-group-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelRadioGroup usage'}
+        react={`import { useState } from 'react';
 import { PixelRadioGroup } from '@pxlkit/ui-kit';
 
 const PLANS = [
@@ -94,14 +183,58 @@ export function Default() {
       onChange={setValue}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-vue';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+const value = ref('free');
+</script>
+
+<template>
+  <PixelRadioGroup v-model="value" label="Plan" :options="PLANS" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-angular';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+@Component({
+  imports: [PixelRadioGroup],
+  template: \`<fieldset pxlRadioGroup label="Plan" [options]="plans" [(value)]="value"></fieldset>\`,
+})
+export class Default {
+  readonly plans = PLANS;
+  readonly value = signal('free');
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelRadioGroup } from '@pxlkit/ui-kit';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+export function Default() {
   const [value, setValue] = useState('free');
   return (
     <PixelRadioGroup
@@ -111,11 +244,56 @@ export function Default() {
       onChange={setValue}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-vue';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+const value = ref('free');
+</script>
+
+<template>
+  <PixelRadioGroup v-model="value" label="Plan" :options="PLANS" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-angular';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+@Component({
+  imports: [PixelRadioGroup],
+  template: \`<fieldset pxlRadioGroup label="Plan" [options]="plans" [(value)]="value"></fieldset>\`,
+})
+export class Default {
+  readonly plans = PLANS;
+  readonly value = signal('free');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
+        <Subheading>Controlled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import { useState } from 'react';
+import { PixelRadioGroup } from '@pxlkit/ui-kit';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+export function Controlled() {
   const [value, setValue] = useState('pro');
   return (
     <div className="space-y-2">
@@ -129,11 +307,64 @@ export function Default() {
       <p className="text-xs text-retro-muted">Picked: {value}</p>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-vue';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+const value = ref('pro');
+</script>
+
+<template>
+  <div class="space-y-2">
+    <PixelRadioGroup v-model="value" label="Selected plan" :options="PLANS" tone="cyan" />
+    <p class="text-xs text-retro-muted">Picked: {{ value }}</p>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-angular';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+@Component({
+  imports: [PixelRadioGroup],
+  template: \`
+    <div class="space-y-2">
+      <fieldset pxlRadioGroup label="Selected plan" [options]="plans" [(value)]="value" tone="cyan"></fieldset>
+      <p class="text-xs text-retro-muted">Picked: {{ value() }}</p>
+    </div>
+  \`,
+})
+export class Controlled {
+  readonly plans = PLANS;
+  readonly value = signal('pro');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { useState } from 'react';
+import { PixelRadioGroup } from '@pxlkit/ui-kit';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+export function Tones() {
   const [value, setValue] = useState('pro');
   return (
     <div className="grid grid-cols-2 gap-6">
@@ -146,11 +377,74 @@ export function Default() {
       <PixelRadioGroup label="Pink" tone="pink" value={value} options={PLANS} onChange={setValue} />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-vue';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+const value = ref('pro');
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-6">
+    <PixelRadioGroup v-model="value" label="Neutral" tone="neutral" :options="PLANS" />
+    <PixelRadioGroup v-model="value" label="Green" tone="green" :options="PLANS" />
+    <PixelRadioGroup v-model="value" label="Cyan" tone="cyan" :options="PLANS" />
+    <PixelRadioGroup v-model="value" label="Gold" tone="gold" :options="PLANS" />
+    <PixelRadioGroup v-model="value" label="Red" tone="red" :options="PLANS" />
+    <PixelRadioGroup v-model="value" label="Purple" tone="purple" :options="PLANS" />
+    <PixelRadioGroup v-model="value" label="Pink" tone="pink" :options="PLANS" />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-angular';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+@Component({
+  imports: [PixelRadioGroup],
+  template: \`
+    <div class="grid grid-cols-2 gap-6">
+      <fieldset pxlRadioGroup label="Neutral" tone="neutral" [options]="plans" [(value)]="value"></fieldset>
+      <fieldset pxlRadioGroup label="Green" tone="green" [options]="plans" [(value)]="value"></fieldset>
+      <fieldset pxlRadioGroup label="Cyan" tone="cyan" [options]="plans" [(value)]="value"></fieldset>
+      <fieldset pxlRadioGroup label="Gold" tone="gold" [options]="plans" [(value)]="value"></fieldset>
+      <fieldset pxlRadioGroup label="Red" tone="red" [options]="plans" [(value)]="value"></fieldset>
+      <fieldset pxlRadioGroup label="Purple" tone="purple" [options]="plans" [(value)]="value"></fieldset>
+      <fieldset pxlRadioGroup label="Pink" tone="pink" [options]="plans" [(value)]="value"></fieldset>
+    </div>
+  \`,
+})
+export class Tones {
+  readonly plans = PLANS;
+  readonly value = signal('pro');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { useState } from 'react';
+import { PixelRadioGroup } from '@pxlkit/ui-kit';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+export function Surfaces() {
   const [pixel, setPixel] = useState('pro');
   const [linear, setLinear] = useState('pro');
   return (
@@ -171,11 +465,65 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-vue';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+const pixel = ref('pro');
+const linear = ref('pro');
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-6">
+    <PixelRadioGroup v-model="pixel" label="Pixel surface" surface="pixel" :options="PLANS" />
+    <PixelRadioGroup v-model="linear" label="Linear surface" surface="linear" :options="PLANS" />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-angular';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+@Component({
+  imports: [PixelRadioGroup],
+  template: \`
+    <div class="grid grid-cols-2 gap-6">
+      <fieldset pxlRadioGroup label="Pixel surface" surface="pixel" [options]="plans" [(value)]="pixel"></fieldset>
+      <fieldset pxlRadioGroup label="Linear surface" surface="linear" [options]="plans" [(value)]="linear"></fieldset>
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly plans = PLANS;
+  readonly pixel = signal('pro');
+  readonly linear = signal('pro');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelRadioGroup } from '@pxlkit/ui-kit';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+export function Disabled() {
   return (
     <PixelRadioGroup
       label="Plan (locked)"
@@ -185,11 +533,53 @@ export function Default() {
       disabled
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelRadioGroup } from '@pxlkit/ui-kit-vue';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+</script>
+
+<template>
+  <PixelRadioGroup label="Plan (locked)" model-value="pro" :options="PLANS" disabled />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-angular';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+@Component({
+  imports: [PixelRadioGroup],
+  template: \`<fieldset pxlRadioGroup label="Plan (locked)" value="pro" [options]="plans" disabled></fieldset>\`,
+})
+export class Disabled {
+  readonly plans = PLANS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-required">
-        <h4>Required</h4>
-        <pre className="docs-code"><code>{`export function Required() {
+        <Subheading>Required</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Required code'}
+          react={`import { useState } from 'react';
+import { PixelRadioGroup } from '@pxlkit/ui-kit';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+export function Required() {
   const [value, setValue] = useState('');
   return (
     <PixelRadioGroup
@@ -200,11 +590,58 @@ export function Default() {
       required
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-vue';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+const value = ref('');
+</script>
+
+<template>
+  <PixelRadioGroup v-model="value" label="Pick a plan to continue" :options="PLANS" required />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-angular';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+@Component({
+  imports: [PixelRadioGroup],
+  template: \`
+    <fieldset pxlRadioGroup label="Pick a plan to continue" [options]="plans" [(value)]="value" required></fieldset>
+  \`,
+})
+export class Required {
+  readonly plans = PLANS;
+  readonly value = signal('');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-form-name">
-        <h4>With form name</h4>
-        <pre className="docs-code"><code>{`export function WithFormName() {
+        <Subheading>With form name</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With form name code'}
+          react={`import { useState } from 'react';
+import { PixelRadioGroup } from '@pxlkit/ui-kit';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+export function WithFormName() {
   const [value, setValue] = useState('pro');
   return (
     <form>
@@ -218,15 +655,54 @@ export function Default() {
       />
     </form>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-vue';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+const value = ref('pro');
+</script>
+
+<template>
+  <form>
+    <PixelRadioGroup v-model="value" label="Plan" name="plan" :options="PLANS" required />
+  </form>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelRadioGroup } from '@pxlkit/ui-kit-angular';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+@Component({
+  imports: [PixelRadioGroup],
+  template: \`
+    <form>
+      <fieldset pxlRadioGroup label="Plan" name="plan" [options]="plans" [(value)]="value" required></fieldset>
+    </form>
+  \`,
+})
+export class WithFormName {
+  readonly plans = PLANS;
+  readonly value = signal('pro');
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-checkbox">PixelCheckbox</a></li>
-        <li><a href="#pixel-segmented">PixelSegmented</a></li>
-        <li><a href="#pixel-toggle-group">PixelToggleGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-checkbox' : '#pixel-checkbox'}>PixelCheckbox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-segmented' : '#pixel-segmented'}>PixelSegmented</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toggle-group' : '#pixel-toggle-group'}>PixelToggleGroup</a></li>
       </ul>
     </section>
     </section>

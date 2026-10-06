@@ -2,14 +2,20 @@
 
 import React, { forwardRef, useCallback, useEffect, useId, useRef, useState } from 'react';
 import {
+  clampNumber,
+  fieldDescribedBy,
+  fieldMessageId,
+  formatNumberInput,
+  numberInputAtLimit,
+  numberInputClasses,
+  parseNumberInput,
+  settleNumberInput,
+  stepNumberInput,
+} from '@pxlkit/ui-kit-core';
+import {
   Surface,
   Tone,
   cn,
-  focusRing,
-  inputBase,
-  sizeHeight,
-  surfaceClasses,
-  toneMap,
   useEffectiveSurface,
   FieldShell,
 } from '../common';
@@ -22,73 +28,46 @@ export interface PixelNumberInputProps
     React.InputHTMLAttributes<HTMLInputElement>,
     'value' | 'defaultValue' | 'onChange' | 'type' | 'size'
   > {
+  /** Value; leave unset for an uncontrolled field. */
   value?: number;
+  /** Initial value while uncontrolled. */
   defaultValue?: number;
+  /**
+   * Called with the new number, after each step, edit that reads as a number, or settle on blur.
+   */
   onChange?: (next: number) => void;
+  /** Lowest value. */
   min?: number;
+  /** Highest value. */
   max?: number;
+  /** Amount each step adds or removes. */
   step?: number;
+  /** Decimals shown, and the value is rounded to. */
   precision?: number;
+  /** When a value outside `min` / `max` is pulled back: while typing, on blur, or never. */
   clampBehavior?: 'strict' | 'blur' | 'none';
+  /** Text inside the field on the left (`$`). */
   prefix?: string;
+  /** Text inside the field on the right (`USD`). */
   suffix?: string;
+  /** Groups the integer digits (`,` shows `1,500,000`). */
   thousandsSeparator?: string;
+  /** Accepts negative numbers. */
   allowNegative?: boolean;
+  /** Hides the stepper buttons. */
   hideControls?: boolean;
+  /** Field height. */
   size?: NumSize;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Tone of the focus ring. */
   tone?: Tone;
+  /** Label rendered above the field. */
   label?: string;
+  /** Helper text below the field; hidden while `error` is set. */
   hint?: string;
+  /** Error message below the field; marks the input invalid. */
   error?: string;
-}
-
-const NaNGuard = (n: number, fallback: number) => (Number.isFinite(n) ? n : fallback);
-
-function clampValue(value: number, min?: number, max?: number) {
-  let next = value;
-  if (typeof min === 'number' && next < min) next = min;
-  if (typeof max === 'number' && next > max) next = max;
-  return next;
-}
-
-function formatDisplay(
-  value: number | undefined,
-  precision: number | undefined,
-  thousandsSeparator: string | undefined,
-): string {
-  if (value === undefined || Number.isNaN(value as number)) return '';
-  let text =
-    typeof precision === 'number' ? value.toFixed(precision) : String(value);
-  if (thousandsSeparator) {
-    const [intPart, decPart] = text.split('.');
-    const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator);
-    text = decPart !== undefined ? `${grouped}.${decPart}` : grouped;
-  }
-  return text;
-}
-
-function parseRaw(
-  raw: string,
-  thousandsSeparator: string | undefined,
-  allowNegative: boolean,
-): { text: string; num: number | undefined } {
-  let text = raw;
-  if (thousandsSeparator) {
-    const sep = thousandsSeparator.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    text = text.replace(new RegExp(sep, 'g'), '');
-  }
-  if (!allowNegative) {
-    text = text.replace(/-/g, '');
-  }
-  // strip anything that isn't digit / minus / decimal point
-  text = text.replace(/[^0-9.\-]/g, '');
-  if (text === '' || text === '-' || text === '.' || text === '-.') {
-    return { text: raw, num: undefined };
-  }
-  const num = Number(text);
-  if (Number.isNaN(num)) return { text: raw, num: undefined };
-  return { text, num };
 }
 
 export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputProps>(
@@ -121,12 +100,12 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
       onBlur,
       onFocus,
       onKeyDown,
+      'aria-describedby': ariaDescribedBy,
       ...rest
     },
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
 
     const initial: number | undefined =
       value !== undefined ? value : defaultValue;
@@ -143,14 +122,14 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
     // Display string — what the user actually sees. Decoupled while focused
     // so partial inputs like "" or "-" don't snap back.
     const [display, setDisplay] = useState<string>(() =>
-      formatDisplay(current, precision, thousandsSeparator),
+      formatNumberInput(current, precision, thousandsSeparator),
     );
     const focusedRef = useRef(false);
 
     // Keep display in sync with controlled `current` when not focused.
     useEffect(() => {
       if (!focusedRef.current) {
-        setDisplay(formatDisplay(current, precision, thousandsSeparator));
+        setDisplay(formatNumberInput(current, precision, thousandsSeparator));
       }
     }, [current, precision, thousandsSeparator]);
 
@@ -164,22 +143,17 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
     const bump = useCallback(
       (direction: 1 | -1) => {
         if (disabled) return;
-        const base = typeof current === 'number' ? current : (min ?? 0);
-        let next = base + direction * step;
-        next = clampValue(next, min, max);
-        // round to precision when defined, to avoid 0.1 + 0.2 = 0.300...0004
-        if (typeof precision === 'number') {
-          const factor = Math.pow(10, precision);
-          next = Math.round(next * factor) / factor;
-        }
+        const next = stepNumberInput(current, direction, step, { min, max, precision });
         commit(next);
+        // The display does not follow the value while focused, so a step
+        // taken from the keyboard shows its result itself.
+        if (focusedRef.current) setDisplay(formatNumberInput(next, precision, thousandsSeparator));
       },
-      [current, disabled, step, min, max, precision, commit],
+      [current, disabled, step, min, max, precision, thousandsSeparator, commit],
     );
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const raw = e.target.value;
-      const { text, num } = parseRaw(raw, thousandsSeparator, allowNegative);
+      const { text, num } = parseNumberInput(e.target.value, thousandsSeparator, allowNegative);
       // Always reflect what the user typed (after minus-strip / separator-strip)
       setDisplay(text);
 
@@ -190,10 +164,10 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
 
       let next = num;
       if (clampBehavior === 'strict') {
-        next = clampValue(next, min, max);
+        next = clampNumber(next, min, max);
         // sync display if clamp actually moved the value
         if (next !== num) {
-          setDisplay(formatDisplay(next, precision, thousandsSeparator));
+          setDisplay(formatNumberInput(next, precision, thousandsSeparator));
         }
       }
       commit(next);
@@ -201,17 +175,10 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
       focusedRef.current = false;
-      let next = current;
-      if (typeof next === 'number') {
-        if (clampBehavior !== 'none') {
-          next = clampValue(next, min, max);
-        }
-        if (typeof precision === 'number') {
-          const factor = Math.pow(10, precision);
-          next = Math.round(NaNGuard(next, 0) * factor) / factor;
-        }
+      if (typeof current === 'number') {
+        const next = settleNumberInput(current, clampBehavior, { min, max, precision });
         if (next !== current) commit(next);
-        setDisplay(formatDisplay(next, precision, thousandsSeparator));
+        setDisplay(formatNumberInput(next, precision, thousandsSeparator));
       } else {
         setDisplay('');
       }
@@ -236,18 +203,20 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
 
     const reactId = useId();
     const inputId = id ?? `pxl-number-${reactId}`;
+    const c = numberInputClasses(surface, {
+      tone,
+      size,
+      invalid: !!error,
+      prefix: !!prefix,
+      suffix: !!suffix,
+      hideControls,
+    });
 
     return (
-      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
-        <span className="relative block">
+      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId} messageId={fieldMessageId(inputId)}>
+        <span className={c.shell}>
           {prefix && (
-            <span
-              aria-hidden
-              className={cn(
-                'pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-retro-muted shrink-0',
-                s.font,
-              )}
-            >
+            <span aria-hidden className={c.prefix}>
               {prefix}
             </span>
           )}
@@ -261,6 +230,7 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
             aria-valuemax={typeof max === 'number' ? max : undefined}
             aria-valuenow={typeof current === 'number' ? current : undefined}
             aria-invalid={error ? true : undefined}
+            aria-describedby={fieldDescribedBy(inputId, { hint, error }, ariaDescribedBy)}
             disabled={disabled}
             placeholder={placeholder}
             value={display}
@@ -268,48 +238,23 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
             onBlur={handleBlur}
             onFocus={handleFocus}
             onKeyDown={handleKeyDown}
-            className={cn(
-              inputBase,
-              s.font,
-              s.border,
-              s.radius,
-              s.transition,
-              sizeHeight[size],
-              focusRing,
-              toneMap[tone].ring,
-              error ? 'border-retro-red/60' : 'border-retro-border-strong',
-              prefix ? 'pl-8' : 'pl-3',
-              hideControls ? (suffix ? 'pr-10' : 'pr-3') : 'pr-16',
-              className,
-            )}
+            className={cn(c.input, className)}
             {...rest}
           />
           {suffix && (
-            <span
-              aria-hidden
-              className={cn(
-                'pointer-events-none absolute top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-retro-muted shrink-0',
-                s.font,
-                hideControls ? 'right-3' : 'right-16',
-              )}
-            >
+            <span aria-hidden className={c.suffix}>
               {suffix}
             </span>
           )}
           {!hideControls && (
-            <span className="absolute right-1.5 top-1/2 -translate-y-1/2 flex flex-col gap-0.5">
+            <span className={c.controls}>
               <button
                 type="button"
                 tabIndex={-1}
                 aria-label="Increment"
-                disabled={disabled || (typeof max === 'number' && typeof current === 'number' && current >= max)}
+                disabled={disabled || numberInputAtLimit(current, 1, { min, max })}
                 onClick={() => bump(1)}
-                className={cn(
-                  'border border-retro-border-strong bg-retro-surface/60 px-1.5 text-[10px] leading-none text-retro-muted hover:text-retro-text disabled:opacity-40 disabled:cursor-not-allowed',
-                  s.font,
-                  s.radius,
-                  'h-3.5 flex items-center justify-center',
-                )}
+                className={c.stepper}
               >
                 ▲
               </button>
@@ -317,14 +262,9 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
                 type="button"
                 tabIndex={-1}
                 aria-label="Decrement"
-                disabled={disabled || (typeof min === 'number' && typeof current === 'number' && current <= min)}
+                disabled={disabled || numberInputAtLimit(current, -1, { min, max })}
                 onClick={() => bump(-1)}
-                className={cn(
-                  'border border-retro-border-strong bg-retro-surface/60 px-1.5 text-[10px] leading-none text-retro-muted hover:text-retro-text disabled:opacity-40 disabled:cursor-not-allowed',
-                  s.font,
-                  s.radius,
-                  'h-3.5 flex items-center justify-center',
-                )}
+                className={c.stepper}
               >
                 ▼
               </button>

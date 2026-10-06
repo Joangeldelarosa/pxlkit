@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSectionDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSectionDocsMeta = {
@@ -17,13 +23,86 @@ export const PixelSectionDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionProps): React.ReactElement {
+/** PixelSection's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSection } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSection',
+        props: [
+          { name: 'title', type: 'string', description: 'Title rendered as an uppercase heading row at the top of the section.' },
+          { name: 'subtitle', type: 'string', description: 'Optional subtitle below the title.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Section content.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Falls back to nearest <PxlKitSurface>.' },
+          { name: 'container', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full' | false", default: "'5xl'", description: 'Inner container max-width. Pass `false` to skip the centered container wrapper.' },
+          { name: 'verticalPadding', type: "'none' | 'sm' | 'md' | 'lg' | 'xl'", default: "'xl'", description: 'Vertical padding token (margin between consecutive sections).' },
+          { name: 'horizontalGutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal gutter token (used only when `container` is `false`).' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSection } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSection',
+        props: [
+          { name: 'title', type: 'string', description: 'Heading row at the top of the section, upper-cased for the locale.' },
+          { name: 'subtitle', type: 'string', description: 'Line under the title.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'container', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full' | false", default: "'5xl'", description: 'Width of the centred column (`containerWidth`), or `false` for the full width.' },
+          { name: 'verticalPadding', type: "'none' | 'sm' | 'md' | 'lg' | 'xl'", default: "'xl'", description: 'Vertical padding (`sectionRhythm`).' },
+          { name: 'horizontalGutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal padding (`pageGutter`) of the column, or of the section without one.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border, radius and card tint.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Section content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<section>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSection } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSection',
+        selector: 'pxl-section',
+        props: [
+          { name: 'title', type: 'string', description: 'Heading row at the top of the section, upper-cased for the locale.' },
+          { name: 'subtitle', type: 'string', description: 'Line under the title.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'container', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full' | false", default: "'5xl'", description: 'Width of the centred column (`containerWidth`), or `false` for the full width.' },
+          { name: 'verticalPadding', type: "'none' | 'sm' | 'md' | 'lg' | 'xl'", default: "'xl'", description: 'Vertical padding (`sectionRhythm`).' },
+          { name: 'horizontalGutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal padding (`pageGutter`) of the column, or of the section without one.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border, radius and card tint.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelSectionDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSectionDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-section-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-section-heading'>PixelSection</h2>
+      <Title id='pixel-section-heading'>PixelSection</Title>
       <p className="docs-lead">Bordered section with optional uppercase title row, subtitle, and surface-aware container.</p>
       <ul className="docs-highlights">
-        <li>Surface-aware borders and typography via useEffectiveSurface</li>
+        <li>Surface-aware borders and typography</li>
         <li>Optional title (uppercased via locale) and subtitle row</li>
         <li>Configurable container max-width or full-bleed with page gutter</li>
         <li>Vertical rhythm token controls spacing between sections</li>
@@ -33,21 +112,24 @@ export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionPr
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-section-api">
+      <Heading id="pixel-section-api">API</Heading>
+      <FrameworkApi label={'PixelSection API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-section-a11y">
-      <h3 id="pixel-section-a11y">Accessibility</h3>
+      <Heading id="pixel-section-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>semantic-section</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders as a semantic &lt;section&gt;. When `title` is provided it becomes the section heading; consumers may add aria-labelledby externally when needed.</p>
+      <p className="docs-aria-notes">Renders as a semantic &lt;section&gt;. When <code>title</code> is provided it becomes the section heading; consumers may add aria-labelledby externally when needed.</p>
     </section>
     <section aria-labelledby="pixel-section-usage">
-      <h3 id="pixel-section-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelSection } from '@pxlkit/ui-kit';
+      <Heading id="pixel-section-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSection usage'}
+        react={`import { PixelSection } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -57,14 +139,44 @@ export function Default() {
       </p>
     </PixelSection>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSection title="Overview" subtitle="Key metrics for this period.">
+    <p class="text-sm text-retro-muted">
+      Section content goes here. Wrap any layout block.
+    </p>
+  </PixelSection>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSection],
+  template: \`
+    <pxl-section title="Overview" subtitle="Key metrics for this period.">
+      <p class="text-sm text-retro-muted">
+        Section content goes here. Wrap any layout block.
+      </p>
+    </pxl-section>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSection } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelSection title="Overview" subtitle="Key metrics for this period.">
       <p className="text-sm text-retro-muted">
@@ -72,43 +184,150 @@ export function Default() {
       </p>
     </PixelSection>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSection title="Overview" subtitle="Key metrics for this period.">
+    <p class="text-sm text-retro-muted">
+      Section content goes here. Wrap any layout block.
+    </p>
+  </PixelSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSection],
+  template: \`
+    <pxl-section title="Overview" subtitle="Key metrics for this period.">
+      <p class="text-sm text-retro-muted">
+        Section content goes here. Wrap any layout block.
+      </p>
+    </pxl-section>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-without-title">
-        <h4>Without Title</h4>
-        <pre className="docs-code"><code>{`export function WithoutTitle() {
+        <Subheading>Without Title</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Without Title code'}
+          react={`import { PixelSection } from '@pxlkit/ui-kit';
+
+export function WithoutTitle() {
   return (
     <PixelSection>
       <p className="text-sm text-retro-muted">A bare section without a title row.</p>
     </PixelSection>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSection>
+    <p class="text-sm text-retro-muted">A bare section without a title row.</p>
+  </PixelSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSection],
+  template: \`
+    <pxl-section>
+      <p class="text-sm text-retro-muted">A bare section without a title row.</p>
+    </pxl-section>
+  \`,
+})
+export class WithoutTitle {}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <Subheading>Pixel Surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel Surface code'}
+          react={`import { PixelSection } from '@pxlkit/ui-kit';
+
+export function PixelSurface() {
   return (
     <PixelSection surface="pixel" title="Pixel Surface" subtitle="8-bit aesthetic.">
       <p className="text-sm text-retro-muted">Renders with the pixel surface tokens.</p>
     </PixelSection>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSection surface="pixel" title="Pixel Surface" subtitle="8-bit aesthetic.">
+    <p class="text-sm text-retro-muted">Renders with the pixel surface tokens.</p>
+  </PixelSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSection],
+  template: \`
+    <pxl-section surface="pixel" title="Pixel Surface" subtitle="8-bit aesthetic.">
+      <p class="text-sm text-retro-muted">Renders with the pixel surface tokens.</p>
+    </pxl-section>
+  \`,
+})
+export class PixelSurface {}`}
+        />
       </article>
       <article className="docs-example" id="example-no-container">
-        <h4>No Container</h4>
-        <pre className="docs-code"><code>{`export function NoContainer() {
+        <Subheading>No Container</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'No Container code'}
+          react={`import { PixelSection } from '@pxlkit/ui-kit';
+
+export function NoContainer() {
   return (
     <PixelSection container={false} horizontalGutter="md" title="Full Width">
       <p className="text-sm text-retro-muted">No centered container; uses page gutters.</p>
     </PixelSection>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSection :container="false" horizontal-gutter="md" title="Full Width">
+    <p class="text-sm text-retro-muted">No centered container; uses page gutters.</p>
+  </PixelSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSection],
+  template: \`
+    <pxl-section [container]="false" horizontalGutter="md" title="Full Width">
+      <p class="text-sm text-retro-muted">No centered container; uses page gutters.</p>
+    </pxl-section>
+  \`,
+})
+export class NoContainer {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-center">PixelCenter</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-center' : '#pixel-center'}>PixelCenter</a></li>
       </ul>
     </section>
     </section>

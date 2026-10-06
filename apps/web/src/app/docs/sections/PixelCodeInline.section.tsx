@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCodeInlineDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCodeInlineDocsMeta = {
@@ -17,28 +23,83 @@ export const PixelCodeInlineDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelCodeInlineDocsSection({ className }: PixelCodeInlineDocsSectionProps): React.ReactElement {
+/** PixelCodeInline's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCodeInline } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCodeInline',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Code content.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: "Tone tint. Defaults to `'cyan'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCodeInline } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCodeInline',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone tint.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The code.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<code>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCodeInline } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCodeInline',
+        selector: 'code[pxlCodeInline]',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone tint.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        notes: [
+          'Goes on a native `<code>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelCodeInlineDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCodeInlineDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-code-inline-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-code-inline-heading'>PixelCodeInline</h2>
-      <p className="docs-lead">Inline &lt;code&gt; element with tone tinting and surface-aware framing for highlighting commands, identifiers, and short snippets in flowing prose.</p>
+      <Title id='pixel-code-inline-heading'>PixelCodeInline</Title>
+      <p className="docs-lead">Inline <code>&lt;code&gt;</code> element with tone tinting and surface-aware framing for highlighting commands, identifiers, and short snippets in flowing prose.</p>
       <ul className="docs-highlights">
         <li>Semantic &lt;code&gt; root so assistive tech announces the inline-code role.</li>
         <li>Tone-tinted border, background, and text for at-a-glance categorisation (neutral, cyan, green, gold, red, purple, pink).</li>
         <li>Surface-aware: pixel chamfered border + pixel font, or linear pill.</li>
-        <li>Composable inline — accepts any ReactNode children for icons or multi-token snippets.</li>
+        <li>Composable inline — takes any inline content, such as icons or multi-token snippets.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-code-inline-api">
+      <Heading id="pixel-code-inline-api">API</Heading>
+      <FrameworkApi label={'PixelCodeInline API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-code-inline-a11y">
-      <h3 id="pixel-code-inline-a11y">Accessibility</h3>
+      <Heading id="pixel-code-inline-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>code</code></li>
@@ -46,25 +107,69 @@ export function PixelCodeInlineDocsSection({ className }: PixelCodeInlineDocsSec
       <p className="docs-aria-notes">Renders as a native &lt;code&gt; element so screen readers convey the inline-code semantic. PixelCodeInline is presentational (not focusable, not actionable) — tone is purely decorative, so the surrounding prose must carry the meaning (e.g. mark error snippets with adjacent text, not tone alone). For multi-line code blocks use a block-level &lt;pre&gt;&lt;code&gt; primitive instead.</p>
     </section>
     <section aria-labelledby="pixel-code-inline-usage">
-      <h3 id="pixel-code-inline-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelCodeInline } from '@pxlkit/ui-kit';
+      <Heading id="pixel-code-inline-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCodeInline usage'}
+        react={`import { PixelCodeInline } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelCodeInline>npm install</PixelCodeInline>;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelCodeInline } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCodeInline>npm install</PixelCodeInline>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelCodeInline } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCodeInline],
+  template: \`<code pxlCodeInline>npm install</code>\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelCodeInline } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelCodeInline>npm install</PixelCodeInline>;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCodeInline } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCodeInline>npm install</PixelCodeInline>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCodeInline } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCodeInline],
+  template: \`<code pxlCodeInline>npm install</code>\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelCodeInline } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PixelCodeInline tone="neutral">neutral</PixelCodeInline>
@@ -76,37 +181,134 @@ export function Default() {
       <PixelCodeInline tone="pink">pink</PixelCodeInline>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCodeInline } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-2">
+    <PixelCodeInline tone="neutral">neutral</PixelCodeInline>
+    <PixelCodeInline tone="cyan">cyan</PixelCodeInline>
+    <PixelCodeInline tone="green">green</PixelCodeInline>
+    <PixelCodeInline tone="gold">gold</PixelCodeInline>
+    <PixelCodeInline tone="red">red</PixelCodeInline>
+    <PixelCodeInline tone="purple">purple</PixelCodeInline>
+    <PixelCodeInline tone="pink">pink</PixelCodeInline>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCodeInline } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCodeInline],
+  template: \`
+    <div class="flex flex-wrap items-center gap-2">
+      <code pxlCodeInline tone="neutral">neutral</code>
+      <code pxlCodeInline tone="cyan">cyan</code>
+      <code pxlCodeInline tone="green">green</code>
+      <code pxlCodeInline tone="gold">gold</code>
+      <code pxlCodeInline tone="red">red</code>
+      <code pxlCodeInline tone="purple">purple</code>
+      <code pxlCodeInline tone="pink">pink</code>
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelCodeInline } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <PixelCodeInline surface="pixel">surface=&quot;pixel&quot;</PixelCodeInline>
       <PixelCodeInline surface="linear">surface=&quot;linear&quot;</PixelCodeInline>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCodeInline } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-3">
+    <PixelCodeInline surface="pixel">surface=&quot;pixel&quot;</PixelCodeInline>
+    <PixelCodeInline surface="linear">surface=&quot;linear&quot;</PixelCodeInline>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCodeInline } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCodeInline],
+  template: \`
+    <div class="flex flex-wrap items-center gap-3">
+      <code pxlCodeInline surface="pixel">surface="pixel"</code>
+      <code pxlCodeInline surface="linear">surface="linear"</code>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-inline-in-prose">
-        <h4>Inline in Prose</h4>
-        <pre className="docs-code"><code>{`export function InlineInProse() {
+        <Subheading>Inline in Prose</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Inline in Prose code'}
+          react={`import { PixelCodeInline } from '@pxlkit/ui-kit';
+
+export function InlineInProse() {
   return (
     <p className="text-sm text-retro-text">
       Run <PixelCodeInline>pnpm dev</PixelCodeInline> to start the local server,
       then open <PixelCodeInline tone="green">http://localhost:3000</PixelCodeInline>.
     </p>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCodeInline } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <p class="text-sm text-retro-text">
+    Run <PixelCodeInline>pnpm dev</PixelCodeInline> to start the local server,
+    then open <PixelCodeInline tone="green">http://localhost:3000</PixelCodeInline>.
+  </p>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCodeInline } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCodeInline],
+  template: \`
+    <p class="text-sm text-retro-text">
+      Run <code pxlCodeInline>pnpm dev</code> to start the local server,
+      then open <code pxlCodeInline tone="green">http://localhost:3000</code>.
+    </p>
+  \`,
+})
+export class InlineInProse {}`}
+        />
       </article>
       <article className="docs-example" id="example-code-samples">
-        <h4>Code Samples</h4>
-        <pre className="docs-code"><code>{`export function CodeSamples() {
+        <Subheading>Code Samples</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Code Samples code'}
+          react={`import { PixelCodeInline } from '@pxlkit/ui-kit';
+
+export function CodeSamples() {
   return (
     <div className="flex flex-col gap-2">
       <div>
-        Import: <PixelCodeInline>{\`import { PixelCodeInline } from '@pxlkit/ui'\`}</PixelCodeInline>
+        Import: <PixelCodeInline>{\`import { PixelCodeInline } from '@pxlkit/ui-kit'\`}</PixelCodeInline>
       </div>
       <div>
         Hotkey: <PixelCodeInline tone="purple">Ctrl+K</PixelCodeInline>
@@ -116,13 +318,39 @@ export function Default() {
       </div>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCodeInline } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-2">
+    <div>Import: <PixelCodeInline>import { PixelCodeInline } from '@pxlkit/ui-kit'</PixelCodeInline></div>
+    <div>Hotkey: <PixelCodeInline tone="purple">Ctrl+K</PixelCodeInline></div>
+    <div>Error: <PixelCodeInline tone="red">EACCES</PixelCodeInline></div>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCodeInline } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCodeInline],
+  template: \`
+    <div class="flex flex-col gap-2">
+      <div>Import: <code pxlCodeInline>import &#123; PixelCodeInline &#125; from '&#64;pxlkit/ui-kit'</code></div>
+      <div>Hotkey: <code pxlCodeInline tone="purple">Ctrl+K</code></div>
+      <div>Error: <code pxlCodeInline tone="red">EACCES</code></div>
+    </div>
+  \`,
+})
+export class CodeSamples {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-kbd">PixelKbd</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-kbd' : '#pixel-kbd'}>PixelKbd</a></li>
       </ul>
     </section>
     </section>

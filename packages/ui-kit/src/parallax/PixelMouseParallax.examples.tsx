@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelMouseParallax } from './PixelMouseParallax';
 
 export function Default() {

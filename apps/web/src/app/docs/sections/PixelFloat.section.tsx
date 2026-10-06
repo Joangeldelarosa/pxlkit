@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFloatDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelFloatDocsMeta = {
@@ -17,15 +23,90 @@ export const PixelFloatDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelFloatDocsSection({ className }: PixelFloatDocsSectionProps): React.ReactElement {
+/** PixelFloat's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelFloat } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelFloat',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to float.' },
+          { name: 'duration', type: 'number', default: '2200', description: 'Animation duration in milliseconds. Default `2200`.' },
+          { name: 'distance', type: 'number', default: '6', description: 'Vertical travel distance in pixels. Default `6`.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", description: "Iteration count: a number or `'infinite'`. Default `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease-in-out'", description: "CSS `animation-timing-function`. Default `'ease-in-out'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelFloat } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelFloat',
+        props: [
+          { name: 'duration', type: 'number', default: '2200', description: 'Animation duration in milliseconds.' },
+          { name: 'distance', type: 'number', default: '6', description: 'Vertical travel distance in pixels.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease-in-out'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to float.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelFloat } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelFloat',
+        selector: 'pxl-float',
+        props: [
+          { name: 'duration', type: 'number', default: '2200', accepts: 'unknown', description: 'Animation duration in milliseconds.' },
+          { name: 'distance', type: 'number', default: '6', accepts: 'unknown', description: 'Vertical travel distance in pixels.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", accepts: "number | 'infinite' | `${number}`", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease-in-out'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelFloatDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelFloatDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-float-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-float-heading'>PixelFloat</h2>
+      <Title id='pixel-float-heading'>PixelFloat</Title>
       <p className="docs-lead">Gentle vertical sine loop, perfect for hero badges and floating accents.</p>
       <ul className="docs-highlights">
         <li>Configurable travel distance, duration, easing, and repeat count</li>
         <li>Trigger modes: mount, hover, focus, viewport</li>
-        <li>Forwards refs and merges with internal trigger observers</li>
+        <li>Signals the end of its last iteration: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
         <li>Respects prefers-reduced-motion automatically</li>
       </ul>
     <dl className="docs-meta">
@@ -33,12 +114,12 @@ export function PixelFloatDocsSection({ className }: PixelFloatDocsSectionProps)
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-float-api">
+      <Heading id="pixel-float-api">API</Heading>
+      <FrameworkApi label={'PixelFloat API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-float-a11y">
-      <h3 id="pixel-float-a11y">Accessibility</h3>
+      <Heading id="pixel-float-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -46,8 +127,11 @@ export function PixelFloatDocsSection({ className }: PixelFloatDocsSectionProps)
       <p className="docs-aria-notes">Animation is suppressed when the user has requested reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-float-usage">
-      <h3 id="pixel-float-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelFloat } from '@pxlkit/ui-kit';
+      <Heading id="pixel-float-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelFloat usage'}
+        react={`import { PixelFloat } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -55,48 +139,150 @@ export function Default() {
       <span>Float</span>
     </PixelFloat>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelFloat } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFloat>
+    <span>Float</span>
+  </PixelFloat>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelFloat } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFloat],
+  template: \`
+    <pxl-float>
+      <span>Float</span>
+    </pxl-float>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelFloat } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelFloat>
       <span>Float</span>
     </PixelFloat>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFloat } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFloat>
+    <span>Float</span>
+  </PixelFloat>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFloat } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFloat],
+  template: \`
+    <pxl-float>
+      <span>Float</span>
+    </pxl-float>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-farther-travel">
-        <h4>Farther Travel</h4>
-        <pre className="docs-code"><code>{`export function FartherTravel() {
+        <Subheading>Farther Travel</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Farther Travel code'}
+          react={`import { PixelFloat } from '@pxlkit/ui-kit';
+
+export function FartherTravel() {
   return (
     <PixelFloat distance={14} duration={2800}>
       <span>Drifting Higher</span>
     </PixelFloat>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFloat } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFloat :distance="14" :duration="2800">
+    <span>Drifting Higher</span>
+  </PixelFloat>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFloat } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFloat],
+  template: \`
+    <pxl-float [distance]="14" [duration]="2800">
+      <span>Drifting Higher</span>
+    </pxl-float>
+  \`,
+})
+export class FartherTravel {}`}
+        />
       </article>
       <article className="docs-example" id="example-hover-trigger">
-        <h4>Hover Trigger</h4>
-        <pre className="docs-code"><code>{`export function HoverTrigger() {
+        <Subheading>Hover Trigger</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Hover Trigger code'}
+          react={`import { PixelFloat } from '@pxlkit/ui-kit';
+
+export function HoverTrigger() {
   return (
     <PixelFloat trigger="hover" repeat={3}>
       <span>Hover me</span>
     </PixelFloat>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFloat } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFloat trigger="hover" :repeat="3">
+    <span>Hover me</span>
+  </PixelFloat>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFloat } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFloat],
+  template: \`
+    <pxl-float trigger="hover" [repeat]="3">
+      <span>Hover me</span>
+    </pxl-float>
+  \`,
+})
+export class HoverTrigger {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-bounce">PixelBounce</a></li>
-        <li><a href="#pixel-pulse">PixelPulse</a></li>
-        <li><a href="#pixel-fade-in">PixelFadeIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bounce' : '#pixel-bounce'}>PixelBounce</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pulse' : '#pixel-pulse'}>PixelPulse</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-fade-in' : '#pixel-fade-in'}>PixelFadeIn</a></li>
       </ul>
     </section>
     </section>

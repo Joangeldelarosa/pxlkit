@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBoxDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBoxDocsMeta = {
@@ -17,15 +23,87 @@ export const PixelBoxDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): React.ReactElement {
+/** PixelBox's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBox } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBox',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the fill and border.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: '`solid` and `soft` fill; `outline` and `ghost` stay transparent.' },
+          { name: 'padding', type: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Padding scale.' },
+          { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg' | 'full'", description: "Fixed radius; the surface's large radius when unset." },
+          { name: 'border', type: 'boolean', description: "Whether to render a border. Defaults to `true` when `variant === 'outline'` (outlines without a border are meaningless), `false` otherwise. Pass `true` to force a border on `solid`/`soft`/`ghost`; pass `false` to force-off on outline. Note: when polymorphic `as` is a landmark element (`section`, `nav`, `aside`, `main`), supply `aria-label` or `aria-labelledby` for a11y." },
+          { name: 'shadow', type: 'boolean', default: 'false', description: 'Surface drop shadow. On pixel it shows with a `radius` only: the default corners are cut, and a drop shadow cannot show past them.' },
+          { name: 'as', type: "'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'main' | 'nav'", description: 'Element to render.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `color`.',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBox } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBox',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the fill and border.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: '`solid` and `soft` fill; `outline` and `ghost` stay transparent.' },
+          { name: 'padding', type: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Padding scale.' },
+          { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg' | 'full'", description: "Fixed radius; the surface's large radius when unset." },
+          { name: 'border', type: 'boolean', description: 'Draw the tone border; on for `outline`, off otherwise, when unset.' },
+          { name: 'shadow', type: 'boolean', default: 'false', description: 'Surface drop shadow. On pixel it shows with a `radius` only: the default corners are cut, and a drop shadow cannot show past them.' },
+          { name: 'as', type: "'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'main' | 'nav'", default: "'div'", description: 'Element to render.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Box content.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBox } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBox',
+        selector: '[pxlBox]',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the fill and border.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: '`solid` and `soft` fill; `outline` and `ghost` stay transparent.' },
+          { name: 'padding', type: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Padding scale.' },
+          { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg' | 'full'", description: "Fixed radius; the surface's large radius when unset." },
+          { name: 'border', type: 'boolean', accepts: 'unknown', description: 'Draw the tone border; on for `outline`, off otherwise, when unset.' },
+          { name: 'shadow', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface drop shadow. On pixel it shows with a `radius` only: the default corners are cut, and a drop shadow cannot show past them.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelBoxDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBoxDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-box-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-box-heading'>PixelBox</h2>
+      <Title id='pixel-box-heading'>PixelBox</Title>
       <p className="docs-lead">Surface-aware polymorphic container with tone, variant, padding, radius, border, and shadow controls.</p>
       <ul className="docs-highlights">
-        <li>Surface-aware tokens via useEffectiveSurface (retro / pixel)</li>
+        <li>Surface-aware tokens (pixel / linear)</li>
         <li>Tone + variant matrix (solid / soft / outline / ghost)</li>
-        <li>Polymorphic `as` for semantic landmarks (section, nav, aside, main, header, footer, article)</li>
+        <li>Polymorphic <code>as</code> for semantic landmarks (section, nav, aside, main, header, footer, article); in Angular, the element you put <code>pxlBox</code> on</li>
         <li>Dev-time a11y warning when rendered as a landmark without an accessible name</li>
         <li>Padding and radius scale tokens with sensible defaults</li>
       </ul>
@@ -34,21 +112,24 @@ export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): Re
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-box-api">
+      <Heading id="pixel-box-api">API</Heading>
+      <FrameworkApi label={'PixelBox API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-box-a11y">
-      <h3 id="pixel-box-a11y">Accessibility</h3>
+      <Heading id="pixel-box-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>unopinionated-polymorphic-surface</code></li>
       </ul>
-      <p className="docs-aria-notes">Inherits semantics from the `as` element. When `as` is a landmark (section, nav, aside, main), provide aria-label or aria-labelledby for an accessible name.</p>
+      <p className="docs-aria-notes">Inherits semantics from the <code>as</code> element. When <code>as</code> is a landmark (section, nav, aside, main), provide aria-label or aria-labelledby for an accessible name.</p>
     </section>
     <section aria-labelledby="pixel-box-usage">
-      <h3 id="pixel-box-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelBox } from '@pxlkit/ui-kit';
+      <Heading id="pixel-box-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBox usage'}
+        react={`import { PixelBox } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -56,58 +137,187 @@ export function Default() {
       <p className="text-sm text-retro-muted">Surface-aware container box.</p>
     </PixelBox>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelBox } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBox tone="neutral" variant="solid" padding="md">
+    <p class="text-sm text-retro-muted">Surface-aware container box.</p>
+  </PixelBox>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBox],
+  template: \`
+    <div pxlBox tone="neutral" variant="solid" padding="md">
+      <p class="text-sm text-retro-muted">Surface-aware container box.</p>
+    </div>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBox } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelBox tone="neutral" variant="solid" padding="md">
       <p className="text-sm text-retro-muted">Surface-aware container box.</p>
     </PixelBox>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBox } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBox tone="neutral" variant="solid" padding="md">
+    <p class="text-sm text-retro-muted">Surface-aware container box.</p>
+  </PixelBox>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBox],
+  template: \`
+    <div pxlBox tone="neutral" variant="solid" padding="md">
+      <p class="text-sm text-retro-muted">Surface-aware container box.</p>
+    </div>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-outline">
-        <h4>Outline</h4>
-        <pre className="docs-code"><code>{`export function Outline() {
+        <Subheading>Outline</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Outline code'}
+          react={`import { PixelBox } from '@pxlkit/ui-kit';
+
+export function Outline() {
   return (
     <PixelBox tone="cyan" variant="outline" padding="lg">
       <p className="text-sm text-retro-muted">Outline variant with implicit border.</p>
     </PixelBox>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBox } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBox tone="cyan" variant="outline" padding="lg">
+    <p class="text-sm text-retro-muted">Outline variant with implicit border.</p>
+  </PixelBox>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBox],
+  template: \`
+    <div pxlBox tone="cyan" variant="outline" padding="lg">
+      <p class="text-sm text-retro-muted">Outline variant with implicit border.</p>
+    </div>
+  \`,
+})
+export class Outline {}`}
+        />
       </article>
       <article className="docs-example" id="example-soft">
-        <h4>Soft</h4>
-        <pre className="docs-code"><code>{`export function Soft() {
+        <Subheading>Soft</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Soft code'}
+          react={`import { PixelBox } from '@pxlkit/ui-kit';
+
+export function Soft() {
   return (
     <PixelBox tone="purple" variant="soft" padding="md" radius="md">
       <p className="text-sm text-retro-muted">Soft tonal background.</p>
     </PixelBox>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBox } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBox tone="purple" variant="soft" padding="md" radius="md">
+    <p class="text-sm text-retro-muted">Soft tonal background.</p>
+  </PixelBox>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBox],
+  template: \`
+    <div pxlBox tone="purple" variant="soft" padding="md" radius="md">
+      <p class="text-sm text-retro-muted">Soft tonal background.</p>
+    </div>
+  \`,
+})
+export class Soft {}`}
+        />
       </article>
       <article className="docs-example" id="example-as-section">
-        <h4>As Section</h4>
-        <pre className="docs-code"><code>{`export function AsSection() {
+        <Subheading>As Section</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'As Section code'}
+          react={`import { PixelBox } from '@pxlkit/ui-kit';
+
+export function AsSection() {
   return (
     <PixelBox as="section" aria-label="Stats" tone="green" variant="soft" padding="md" shadow>
       <p className="text-sm text-retro-muted">Rendered as a semantic section landmark.</p>
     </PixelBox>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBox } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBox as="section" aria-label="Stats" tone="green" variant="soft" padding="md" shadow>
+    <p class="text-sm text-retro-muted">Rendered as a semantic section landmark.</p>
+  </PixelBox>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBox],
+  template: \`
+    <section pxlBox aria-label="Stats" tone="green" variant="soft" padding="md" shadow>
+      <p class="text-sm text-retro-muted">Rendered as a semantic section landmark.</p>
+    </section>
+  \`,
+})
+export class AsSection {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-section">PixelSection</a></li>
-        <li><a href="#pixel-stack">PixelStack</a></li>
-        <li><a href="#pixel-cluster">PixelCluster</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-section' : '#pixel-section'}>PixelSection</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stack' : '#pixel-stack'}>PixelStack</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-cluster' : '#pixel-cluster'}>PixelCluster</a></li>
       </ul>
     </section>
     </section>

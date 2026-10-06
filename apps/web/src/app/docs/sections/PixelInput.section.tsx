@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelInputDocsMeta = {
@@ -17,35 +23,157 @@ export const PixelInputDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps): React.ReactElement {
+/** PixelInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelInput',
+        props: [
+          { name: 'label', type: 'string', description: 'Floating label rendered above the input shell.' },
+          { name: 'hint', type: 'string', description: 'Helper text shown below the field. Hidden when `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message shown below the field; flips visual state to invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: "Visual tone for focus ring + border emphasis. Default: `'neutral'`." },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Field height token. Default: `'md'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Legacy left-icon slot, rendered inside the input shell. Equivalent to `prefix`.' },
+          { name: 'prefix', type: 'React.ReactNode', description: 'Content rendered INSIDE the input shell on the left (icon or short text).' },
+          { name: 'suffix', type: 'React.ReactNode', description: 'Content rendered INSIDE the input shell on the right (icon or short text).' },
+          { name: 'addonLeft', type: 'React.ReactNode', description: 'Element rendered OUTSIDE the input shell and joined to its left edge (e.g. button/select).' },
+          { name: 'addonRight', type: 'React.ReactNode', description: 'Element rendered OUTSIDE the input shell and joined to its right edge.' },
+          { name: 'clearable', type: 'boolean', description: 'When true, shows a clear (×) button while the value is non-empty.' },
+          { name: 'onClear', type: '() => void', description: 'Callback fired when the clear button is clicked.' },
+          { name: 'showCount', type: 'boolean | { max?: number }', description: 'Render a character counter under the input. `true` shows `N`; `{ max }` shows `N/max`.' },
+          { name: 'loading', type: 'boolean', description: 'When true, replaces the suffix with a spinner and disables the input.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<input>` (`InputHTMLAttributes<HTMLInputElement>`).',
+          '`ref` points to `<input>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelInput',
+        props: [
+          { name: 'modelValue', type: 'string | number', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string | number', description: 'Initial value while uncontrolled.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the input shell.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows a clear (×) button while the value is not empty.' },
+          { name: 'showCount', type: 'boolean | { max?: number }', default: 'false', description: 'Character counter under the input: `true` shows `N`, `{ max }` shows `N/max` and caps the length.' },
+          { name: 'loading', type: 'boolean', default: 'false', description: 'Replaces the suffix with a spinner and disables the input.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the input.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The new value, on every edit and when cleared.' },
+          { name: 'clear', description: 'The clear button was pressed.' },
+        ],
+        slots: [
+          { name: 'prefix', description: 'Content inside the shell on the left (icon or short text).' },
+          { name: 'icon', description: 'Legacy alias of `#prefix`.' },
+          { name: 'suffix', description: 'Content inside the shell on the right; replaced by a spinner while `loading`.' },
+          { name: 'addon-left', description: 'Element outside the shell, joined to its left edge.' },
+          { name: 'addon-right', description: 'Element outside the shell, joined to its right edge.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<input>`.',
+          'Its template ref exposes `element`: the native input.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelInput',
+        selector: 'pxl-input',
+        props: [
+          { name: 'value', type: 'string | number', binding: '[(value)]', description: 'Value (`[(value)]`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string | number', description: 'Initial value while uncontrolled.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the input shell.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'prefix', type: 'string | TemplateRef<any>', description: 'Content inside the shell on the left (icon or short text).' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Legacy alias of `prefix`.' },
+          { name: 'suffix', type: 'string | TemplateRef<any>', description: 'Content inside the shell on the right; replaced by a spinner while `loading`.' },
+          { name: 'addonLeft', type: 'string | TemplateRef<any>', description: 'Element outside the shell, joined to its left edge.' },
+          { name: 'addonRight', type: 'string | TemplateRef<any>', description: 'Element outside the shell, joined to its right edge.' },
+          { name: 'clearable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows a clear (×) button while the value is not empty.' },
+          { name: 'showCount', type: 'boolean | { max?: number }', default: 'false', accepts: "boolean | { max?: number } | ''", description: 'Character counter under the input: `true` shows `N`, `{ max }` shows `N/max` and caps the length.' },
+          { name: 'loading', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Replaces the suffix with a spinner and disables the input.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the input.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+          { name: 'name', type: 'string', description: 'Native `name` of the input.' },
+          { name: 'type', type: 'string', description: 'Native `type` of the input (`text` when left out).' },
+          { name: 'placeholder', type: 'string', description: 'Native `placeholder`.' },
+          { name: 'autocomplete', type: 'string', description: 'Native `autocomplete` hint.' },
+          { name: 'pattern', type: 'string', description: 'Native `pattern` for validation.' },
+          { name: 'minlength', type: 'number', accepts: 'unknown', description: 'Native `minlength`.' },
+          { name: 'maxlength', type: 'number', accepts: 'unknown', description: 'Native `maxlength`; defaults to the `showCount` limit.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the input required.' },
+          { name: 'readonly', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the input read-only.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the input when no `label` is shown.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the input; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'clear', description: 'The clear button was pressed.' },
+          { name: 'valueChange', payload: 'string | number', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-input-heading'>PixelInput</h2>
+      <Title id='pixel-input-heading'>PixelInput</Title>
       <p className="docs-lead">Single-line text input with label, hint, error message, tone/size/surface variants, prefix/suffix slots, joinable addons, clearable button, char counter, and loading state.</p>
       <ul className="docs-highlights">
-        <li>Controlled or uncontrolled — works with `value`/`onChange` or `defaultValue`.</li>
-        <li>Inside-shell `prefix`/`suffix` slots plus outside-shell `addonLeft`/`addonRight` for joined groups.</li>
-        <li>Optional `clearable` × button, `loading` spinner, and `showCount` character counter.</li>
-        <li>`tone`, `size`, and `surface` follow the kit-wide design tokens.</li>
-        <li>Accessible: pairs `aria-invalid` + `aria-describedby` with hint/error text.</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code>.</li>
+        <li>Inside-shell <code>prefix</code>/<code>suffix</code> slots plus outside-shell <code>addonLeft</code>/<code>addonRight</code> for joined groups.</li>
+        <li>Optional <code>clearable</code> × button, <code>loading</code> spinner, and <code>showCount</code> character counter.</li>
+        <li><code>tone</code>, <code>size</code>, and <code>surface</code> follow the kit-wide design tokens.</li>
+        <li>Accessible: pairs <code>aria-invalid</code> + <code>aria-describedby</code> with hint/error text.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-input-api">
+      <Heading id="pixel-input-api">API</Heading>
+      <FrameworkApi label={'PixelInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-input-a11y">
-      <h3 id="pixel-input-a11y">Accessibility</h3>
+      <Heading id="pixel-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Sets `aria-invalid` when `error` is provided and links the hint/error text via `aria-describedby`. The clear button is `tabIndex=&#123;-1&#125;` so keyboard users edit the value directly instead of tabbing through it.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Sets <code>aria-invalid</code> when <code>error</code> is provided and links the hint/error text it shows via <code>aria-describedby</code>, after any ids you pass (none while neither shows). The clear button has <code>tabindex=&quot;-1&quot;</code> so keyboard users edit the value directly instead of tabbing through it.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -69,9 +197,11 @@ export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps)
       </table>
     </section>
     <section aria-labelledby="pixel-input-usage">
-      <h3 id="pixel-input-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelInput } from '@pxlkit/ui-kit';
+      <Heading id="pixel-input-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelInput usage'}
+        react={`import { PixelInput } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -81,14 +211,34 @@ export function Default() {
       hint="Your retro alias"
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInput label="Username" placeholder="hero@pxlkit.xyz" hint="Your retro alias" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`<pxl-input label="Username" placeholder="hero@pxlkit.xyz" hint="Your retro alias" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelInput } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelInput
       label="Username"
@@ -96,11 +246,33 @@ export function Default() {
       hint="Your retro alias"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInput label="Username" placeholder="hero@pxlkit.xyz" hint="Your retro alias" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`<pxl-input label="Username" placeholder="hero@pxlkit.xyz" hint="Your retro alias" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
+        <Subheading>Controlled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import { useState } from 'react';
+import { PixelInput } from '@pxlkit/ui-kit';
+
+export function Controlled() {
   const [value, setValue] = useState('');
   return (
     <PixelInput
@@ -112,11 +284,37 @@ export function Default() {
       tone="cyan"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelInput v-model="value" label="Email" type="email" placeholder="hero@pxlkit.xyz" tone="cyan" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`<pxl-input label="Email" type="email" placeholder="hero@pxlkit.xyz" [(value)]="value" tone="cyan" />\`,
+})
+export class Controlled {
+  readonly value = signal('');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
-        <pre className="docs-code"><code>{`export function Uncontrolled() {
+        <Subheading>Uncontrolled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Uncontrolled code'}
+          react={`import { PixelInput } from '@pxlkit/ui-kit';
+
+export function Uncontrolled() {
   return (
     <PixelInput
       label="Display name"
@@ -124,11 +322,32 @@ export function Default() {
       hint="Edit me — uncontrolled"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInput label="Display name" default-value="Pixel Hero" hint="Edit me — uncontrolled" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`<pxl-input label="Display name" defaultValue="Pixel Hero" hint="Edit me — uncontrolled" />\`,
+})
+export class Uncontrolled {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelInput } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-col gap-3">
       <PixelInput label="Neutral" tone="neutral" defaultValue="neutral" />
@@ -139,11 +358,48 @@ export function Default() {
       <PixelInput label="Pink" tone="pink" defaultValue="pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelInput label="Neutral" tone="neutral" default-value="neutral" />
+    <PixelInput label="Cyan" tone="cyan" default-value="cyan" />
+    <PixelInput label="Green" tone="green" default-value="green" />
+    <PixelInput label="Gold" tone="gold" default-value="gold" />
+    <PixelInput label="Purple" tone="purple" default-value="purple" />
+    <PixelInput label="Pink" tone="pink" default-value="pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-input label="Neutral" tone="neutral" defaultValue="neutral" />
+      <pxl-input label="Cyan" tone="cyan" defaultValue="cyan" />
+      <pxl-input label="Green" tone="green" defaultValue="green" />
+      <pxl-input label="Gold" tone="gold" defaultValue="gold" />
+      <pxl-input label="Purple" tone="purple" defaultValue="purple" />
+      <pxl-input label="Pink" tone="pink" defaultValue="pink" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelInput } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex flex-col gap-3">
       <PixelInput label="Small" size="sm" placeholder="sm" />
@@ -151,22 +407,181 @@ export function Default() {
       <PixelInput label="Large" size="lg" placeholder="lg" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelInput label="Small" size="sm" placeholder="sm" />
+    <PixelInput label="Medium" size="md" placeholder="md" />
+    <PixelInput label="Large" size="lg" placeholder="lg" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-input label="Small" size="sm" placeholder="sm" />
+      <pxl-input label="Medium" size="md" placeholder="md" />
+      <pxl-input label="Large" size="lg" placeholder="lg" />
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelInput } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelInput label="Pixel" surface="pixel" placeholder="pixel surface" />
       <PixelInput label="Linear" surface="linear" placeholder="linear surface" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelInput label="Pixel" surface="pixel" placeholder="pixel surface" />
+    <PixelInput label="Linear" surface="linear" placeholder="linear surface" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-input label="Pixel" surface="pixel" placeholder="pixel surface" />
+      <pxl-input label="Linear" surface="linear" placeholder="linear surface" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-prefix-suffix">
+        <Subheading>Prefix &amp; Suffix</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Prefix & Suffix code'}
+          react={`import { PixelInput } from '@pxlkit/ui-kit';
+
+export function WithPrefixSuffix() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelInput
+        label="Amount"
+        prefix={<span className="text-xs">$</span>}
+        suffix={<span className="text-xs">USD</span>}
+        defaultValue="42"
+      />
+      <PixelInput
+        label="Search"
+        prefix={<span aria-hidden>?</span>}
+        placeholder="Find anything"
+      />
+    </div>
+  );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelInput label="Amount" default-value="42">
+      <template #prefix><span class="text-xs">$</span></template>
+      <template #suffix><span class="text-xs">USD</span></template>
+    </PixelInput>
+    <PixelInput label="Search" placeholder="Find anything">
+      <template #prefix><span aria-hidden="true">?</span></template>
+    </PixelInput>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-input label="Amount" [prefix]="dollar" [suffix]="usd" defaultValue="42" />
+      <pxl-input label="Search" [prefix]="search" placeholder="Find anything" />
+    </div>
+    <ng-template #dollar><span class="text-xs">$</span></ng-template>
+    <ng-template #usd><span class="text-xs">USD</span></ng-template>
+    <ng-template #search><span aria-hidden="true">?</span></ng-template>
+  \`,
+})
+export class WithPrefixSuffix {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-addons">
+        <Subheading>Joined Addons</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Joined Addons code'}
+          react={`import { PixelInput } from '@pxlkit/ui-kit';
+
+export function WithAddons() {
+  return (
+    <PixelInput
+      label="Website"
+      addonLeft={<span className="text-xs">https://</span>}
+      addonRight={<span className="text-xs">.xyz</span>}
+      defaultValue="pxlkit"
+    />
+  );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInput label="Website" default-value="pxlkit">
+    <template #addon-left><span class="text-xs">https://</span></template>
+    <template #addon-right><span class="text-xs">.xyz</span></template>
+  </PixelInput>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`
+    <pxl-input label="Website" [addonLeft]="protocol" [addonRight]="tld" defaultValue="pxlkit" />
+    <ng-template #protocol><span class="text-xs">https://</span></ng-template>
+    <ng-template #tld><span class="text-xs">.xyz</span></ng-template>
+  \`,
+})
+export class WithAddons {}`}
+        />
       </article>
       <article className="docs-example" id="example-clearable">
-        <h4>Clearable</h4>
-        <pre className="docs-code"><code>{`export function Clearable() {
+        <Subheading>Clearable</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Clearable code'}
+          react={`import { useState } from 'react';
+import { PixelInput } from '@pxlkit/ui-kit';
+
+export function Clearable() {
   const [value, setValue] = useState('clear me');
   return (
     <PixelInput
@@ -177,11 +592,37 @@ export function Default() {
       onClear={() => setValue('')}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('clear me');
+</script>
+
+<template>
+  <PixelInput v-model="value" label="Clearable" clearable />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`<pxl-input label="Clearable" clearable [(value)]="value" />\`,
+})
+export class Clearable {
+  readonly value = signal('clear me');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-loading">
-        <h4>Loading</h4>
-        <pre className="docs-code"><code>{`export function Loading() {
+        <Subheading>Loading</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Loading code'}
+          react={`import { PixelInput } from '@pxlkit/ui-kit';
+
+export function Loading() {
   return (
     <PixelInput
       label="Verifying handle"
@@ -189,11 +630,32 @@ export function Default() {
       loading
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInput label="Verifying handle" default-value="pxlhero" loading />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`<pxl-input label="Verifying handle" defaultValue="pxlhero" loading />\`,
+})
+export class Loading {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelInput } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelInput
       label="Disabled"
@@ -201,17 +663,111 @@ export function Default() {
       disabled
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInput label="Disabled" default-value="cannot edit" disabled />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`<pxl-input label="Disabled" defaultValue="cannot edit" disabled />\`,
+})
+export class Disabled {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-error">
+        <Subheading>With Error</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Error code'}
+          react={`import { PixelInput } from '@pxlkit/ui-kit';
+
+export function WithError() {
+  return (
+    <PixelInput
+      label="Email"
+      defaultValue="not-an-email"
+      error="Please enter a valid email address"
+      tone="red"
+    />
+  );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInput label="Email" default-value="not-an-email" error="Please enter a valid email address" tone="red" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`
+    <pxl-input label="Email" defaultValue="not-an-email" error="Please enter a valid email address" tone="red" />
+  \`,
+})
+export class WithError {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-char-count">
+        <Subheading>Character Count</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Character Count code'}
+          react={`import { useState } from 'react';
+import { PixelInput } from '@pxlkit/ui-kit';
+
+export function WithCharCount() {
+  const [value, setValue] = useState('Hello');
+  return (
+    <PixelInput
+      label="Bio"
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      showCount={{ max: 80 }}
+      hint="Keep it short"
+    />
+  );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('Hello');
+</script>
+
+<template>
+  <PixelInput v-model="value" label="Bio" :show-count="{ max: 80 }" hint="Keep it short" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInput],
+  template: \`<pxl-input label="Bio" [(value)]="value" [showCount]="{ max: 80 }" hint="Keep it short" />\`,
+})
+export class WithCharCount {
+  readonly value = signal('Hello');
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-password-input">PixelPasswordInput</a></li>
-        <li><a href="#pixel-textarea">PixelTextarea</a></li>
-        <li><a href="#pixel-bare-input">PixelBareInput</a></li>
-        <li><a href="#pixel-input-group">PixelInputGroup</a></li>
-        <li><a href="#pixel-number-input">PixelNumberInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-password-input' : '#pixel-password-input'}>PixelPasswordInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-textarea' : '#pixel-textarea'}>PixelTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-input' : '#pixel-bare-input'}>PixelBareInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input-group' : '#pixel-input-group'}>PixelInputGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-number-input' : '#pixel-number-input'}>PixelNumberInput</a></li>
       </ul>
     </section>
     </section>

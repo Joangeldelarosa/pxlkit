@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelSkeleton } from '../feedback';
 
 export function Default() {

@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelKbdDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelKbdDocsMeta = {
@@ -17,28 +23,80 @@ export const PixelKbdDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): React.ReactElement {
+/** PixelKbd's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelKbd } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelKbd',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Key label (e.g. "⌘", "K", "Esc").' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelKbd } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelKbd',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Key label (`⌘`, `K`, `Esc`).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<kbd>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelKbd } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelKbd',
+        selector: 'kbd[pxlKbd]',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        notes: [
+          'Goes on a native `<kbd>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelKbdDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelKbdDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-kbd-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-kbd-heading'>PixelKbd</h2>
-      <p className="docs-lead">Styled keyboard shortcut indicator that renders a native &lt;kbd&gt; element with surface-aware framing for inline docs, hints, and command menus.</p>
+      <Title id='pixel-kbd-heading'>PixelKbd</Title>
+      <p className="docs-lead">Styled keyboard shortcut indicator that renders a native <code>&lt;kbd&gt;</code> element with surface-aware framing for inline docs, hints, and command menus.</p>
       <ul className="docs-highlights">
         <li>Semantic &lt;kbd&gt; root so assistive tech announces the key role correctly.</li>
         <li>Surface-aware: pixel chamfered border + pixel font, or linear pill.</li>
-        <li>Drop-shadow depth tuned per surface for a tactile keycap feel.</li>
-        <li>Composable inline — accepts any ReactNode children to support icons or multi-character keys.</li>
+        <li>Keycap depth per surface for a tactile feel: a thick bottom edge on pixel, a soft drop shadow on linear.</li>
+        <li>Composable inline — takes any inline content, such as icons or multi-character keys.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-kbd-api">
+      <Heading id="pixel-kbd-api">API</Heading>
+      <FrameworkApi label={'PixelKbd API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-kbd-a11y">
-      <h3 id="pixel-kbd-a11y">Accessibility</h3>
+      <Heading id="pixel-kbd-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>kbd</code></li>
@@ -46,25 +104,69 @@ export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): Re
       <p className="docs-aria-notes">Renders as a native &lt;kbd&gt; element so screen readers convey the keyboard-input semantic. PixelKbd is presentational (not focusable, not actionable) — pair it with descriptive prose (e.g. &quot;Press &lt;kbd&gt;Ctrl&lt;/kbd&gt; + &lt;kbd&gt;K&lt;/kbd&gt; to open the command palette&quot;) so the shortcut is meaningful when read out of context. For key combos, render multiple PixelKbd siblings with a literal &quot;+&quot; separator marked aria-hidden.</p>
     </section>
     <section aria-labelledby="pixel-kbd-usage">
-      <h3 id="pixel-kbd-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelKbd } from '@pxlkit/ui-kit';
+      <Heading id="pixel-kbd-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelKbd usage'}
+        react={`import { PixelKbd } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelKbd>Enter</PixelKbd>;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelKbd>Enter</PixelKbd>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`<kbd pxlKbd>Enter</kbd>\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelKbd } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelKbd>Enter</PixelKbd>;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelKbd>Enter</PixelKbd>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`<kbd pxlKbd>Enter</kbd>\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-common-keys">
-        <h4>Common Keys</h4>
-        <pre className="docs-code"><code>{`export function CommonKeys() {
+        <Subheading>Common Keys</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Common Keys code'}
+          react={`import { PixelKbd } from '@pxlkit/ui-kit';
+
+export function CommonKeys() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PixelKbd>Esc</PixelKbd>
@@ -74,11 +176,46 @@ export function Default() {
       <PixelKbd>Shift</PixelKbd>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-2">
+    <PixelKbd>Esc</PixelKbd>
+    <PixelKbd>Tab</PixelKbd>
+    <PixelKbd>Enter</PixelKbd>
+    <PixelKbd>Space</PixelKbd>
+    <PixelKbd>Shift</PixelKbd>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`
+    <div class="flex flex-wrap items-center gap-2">
+      <kbd pxlKbd>Esc</kbd>
+      <kbd pxlKbd>Tab</kbd>
+      <kbd pxlKbd>Enter</kbd>
+      <kbd pxlKbd>Space</kbd>
+      <kbd pxlKbd>Shift</kbd>
+    </div>
+  \`,
+})
+export class CommonKeys {}`}
+        />
       </article>
       <article className="docs-example" id="example-combo">
-        <h4>Combo (Ctrl + K)</h4>
-        <pre className="docs-code"><code>{`export function Combo() {
+        <Subheading>Combo (Ctrl + K)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Combo (Ctrl + K) code'}
+          react={`import { PixelKbd } from '@pxlkit/ui-kit';
+
+export function Combo() {
   return (
     <div className="flex items-center gap-1 text-xs">
       <PixelKbd>Ctrl</PixelKbd>
@@ -86,34 +223,116 @@ export function Default() {
       <PixelKbd>K</PixelKbd>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-1 text-xs">
+    <PixelKbd>Ctrl</PixelKbd>
+    <span aria-hidden="true">+</span>
+    <PixelKbd>K</PixelKbd>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`
+    <div class="flex items-center gap-1 text-xs">
+      <kbd pxlKbd>Ctrl</kbd>
+      <span aria-hidden="true">+</span>
+      <kbd pxlKbd>K</kbd>
+    </div>
+  \`,
+})
+export class Combo {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelKbd } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <PixelKbd surface="pixel">P</PixelKbd>
       <PixelKbd surface="linear">L</PixelKbd>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-3">
+    <PixelKbd surface="pixel">P</PixelKbd>
+    <PixelKbd surface="linear">L</PixelKbd>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`
+    <div class="flex flex-wrap items-center gap-3">
+      <kbd pxlKbd surface="pixel">P</kbd>
+      <kbd pxlKbd surface="linear">L</kbd>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-inline-in-prose">
-        <h4>Inline in Prose</h4>
-        <pre className="docs-code"><code>{`export function InlineInProse() {
+        <Subheading>Inline in Prose</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Inline in Prose code'}
+          react={`import { PixelKbd } from '@pxlkit/ui-kit';
+
+export function InlineInProse() {
   return (
     <p className="text-sm text-retro-text">
       Press <PixelKbd>/</PixelKbd> to focus the search bar, then <PixelKbd>Esc</PixelKbd> to dismiss it.
     </p>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <p class="text-sm text-retro-text">
+    Press <PixelKbd>/</PixelKbd> to focus the search bar, then <PixelKbd>Esc</PixelKbd> to dismiss it.
+  </p>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`
+    <p class="text-sm text-retro-text">
+      Press <kbd pxlKbd>/</kbd> to focus the search bar, then <kbd pxlKbd>Esc</kbd> to dismiss it.
+    </p>
+  \`,
+})
+export class InlineInProse {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-code-inline">PixelCodeInline</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-code-inline' : '#pixel-code-inline'}>PixelCodeInline</a></li>
       </ul>
     </section>
     </section>

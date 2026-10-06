@@ -1,4 +1,4 @@
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * 🛡️ Armor — a breastplate with a clear torso silhouette: shoulder pauldrons,

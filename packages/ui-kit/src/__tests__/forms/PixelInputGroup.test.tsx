@@ -66,4 +66,24 @@ describe('PixelInputGroup', () => {
     // lg height token (h-12) from sizeHeight scale
     expect(group.className).toMatch(/h-12/);
   });
+
+  // Regression: the shell clips its controls (`overflow-hidden`), so their
+  // focus rings were cut off.
+  it('shows keyboard focus inside each control, on both surfaces', () => {
+    const { getAllByRole } = render(
+      <>
+        <PixelInputGroup aria-label="Pixel" surface="pixel">
+          <input aria-label="Pixel query" />
+          <button>Go</button>
+        </PixelInputGroup>
+        <PixelInputGroup aria-label="Linear" surface="linear">
+          <input aria-label="Linear query" />
+          <button>Go</button>
+        </PixelInputGroup>
+      </>,
+    );
+    for (const control of [...getAllByRole('textbox'), ...getAllByRole('button')]) {
+      expect(control.className.split(' ')).toContain('focus-visible:pxl-focus-inset');
+    }
+  });
 });

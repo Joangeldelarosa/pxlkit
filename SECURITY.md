@@ -7,6 +7,8 @@ We provide security updates for the following versions of pxlkit packages:
 | Package | Supported Versions |
 |---------|-------------------|
 | `@pxlkit/core` | Latest major version |
+| `@pxlkit/vue` | Latest minor version (0.x) |
+| `@pxlkit/angular` | Latest minor version (0.x) |
 | `@pxlkit/ui-kit` | Latest major version |
 | `@pxlkit/ui` | Latest major version |
 | `@pxlkit/effects` | Latest major version |

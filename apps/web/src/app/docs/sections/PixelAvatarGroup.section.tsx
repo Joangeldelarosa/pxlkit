@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAvatarGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelAvatarGroupDocsMeta = {
@@ -17,10 +23,78 @@ export const PixelAvatarGroupDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsSectionProps): React.ReactElement {
+/** PixelAvatarGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelAvatarGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelAvatarGroup',
+        props: [
+          { name: 'max', type: 'number', default: '5', description: 'Most places the row shows; beyond it, the last place becomes a "+N" tile.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Slot size — match it to the avatars inside.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the "+N" tile.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name for the avatar landmark. Without one, role=group is dropped.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group, in place of `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The avatars.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelAvatarGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelAvatarGroup',
+        props: [
+          { name: 'max', type: 'number', default: '5', description: 'Most places the row shows; beyond it, the last place becomes a "+N" tile.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Slot size — match it to the avatars inside.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the "+N" tile.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The avatars.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelAvatarGroup, PixelAvatarGroupItem } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelAvatarGroup',
+        selector: 'pxl-avatar-group',
+        props: [
+          { name: 'max', type: 'number', default: '5', accepts: 'unknown', description: 'Most places the row shows; beyond it, the last place becomes a "+N" tile.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Slot size — match it to the avatars inside.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the "+N" tile.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+      {
+        name: 'PixelAvatarGroupItem',
+        selector: '[pxlAvatarGroupItem]',
+        notes: [
+          'Structural: write it as `*pxlAvatarGroupItem` on the content, or on an `<ng-template>`.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelAvatarGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelAvatarGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-avatar-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-avatar-group-heading'>PixelAvatarGroup</h2>
+      <Title id='pixel-avatar-group-heading'>PixelAvatarGroup</Title>
       <p className="docs-lead">Clusters PixelAvatar children into an overlapping row with a tone-aware &quot;+N&quot; overflow tile when the count exceeds max.</p>
       <ul className="docs-highlights">
         <li>Overlapping layout with surface-aware ring isolation against the page background</li>
@@ -34,22 +108,24 @@ export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsS
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-avatar-group-api">
+      <Heading id="pixel-avatar-group-api">API</Heading>
+      <FrameworkApi label={'PixelAvatarGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-avatar-group-a11y">
-      <h3 id="pixel-avatar-group-a11y">Accessibility</h3>
+      <Heading id="pixel-avatar-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
       </ul>
-      <p className="docs-aria-notes">Provide aria-label or aria-labelledby summarizing the count (e.g. &quot;5 team members&quot;); without one, role=group is dropped so the cluster is treated as presentational. The &quot;+N&quot; overflow tile carries its own aria-label (&quot;N more users&quot;) so assistive tech announces the hidden count.</p>
+      <p className="docs-aria-notes">Provide aria-label or aria-labelledby summarizing the count (e.g. &quot;5 team members&quot;); without one, role=group is dropped so the cluster is treated as presentational. The &quot;+N&quot; overflow tile hides its visible &quot;+N&quot; from assistive tech and announces &quot;N more users&quot; through screen-reader-only text.</p>
     </section>
     <section aria-labelledby="pixel-avatar-group-usage">
-      <h3 id="pixel-avatar-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelAvatarGroup } from '@pxlkit/ui-kit';
-import { PixelAvatar } from '@pxlkit/ui-kit';
+      <Heading id="pixel-avatar-group-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelAvatarGroup usage'}
+        react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -59,14 +135,44 @@ export function Default() {
       <PixelAvatar name="Carlos Diaz" />
     </PixelAvatarGroup>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelAvatar, PixelAvatarGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAvatarGroup aria-label="3 team members">
+    <PixelAvatar name="Joangel De La Rosa" />
+    <PixelAvatar name="Ana Lopez" />
+    <PixelAvatar name="Carlos Diaz" />
+  </PixelAvatarGroup>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem],
+  template: \`
+    <pxl-avatar-group aria-label="3 team members">
+      <pxl-avatar *pxlAvatarGroupItem name="Joangel De La Rosa" />
+      <pxl-avatar *pxlAvatarGroupItem name="Ana Lopez" />
+      <pxl-avatar *pxlAvatarGroupItem name="Carlos Diaz" />
+    </pxl-avatar-group>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelAvatarGroup aria-label="3 team members">
       <PixelAvatar name="Joangel De La Rosa" />
@@ -74,11 +180,42 @@ export function Default() {
       <PixelAvatar name="Carlos Diaz" />
     </PixelAvatarGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar, PixelAvatarGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAvatarGroup aria-label="3 team members">
+    <PixelAvatar name="Joangel De La Rosa" />
+    <PixelAvatar name="Ana Lopez" />
+    <PixelAvatar name="Carlos Diaz" />
+  </PixelAvatarGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem],
+  template: \`
+    <pxl-avatar-group aria-label="3 team members">
+      <pxl-avatar *pxlAvatarGroupItem name="Joangel De La Rosa" />
+      <pxl-avatar *pxlAvatarGroupItem name="Ana Lopez" />
+      <pxl-avatar *pxlAvatarGroupItem name="Carlos Diaz" />
+    </pxl-avatar-group>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-overflow">
-        <h4>With Overflow</h4>
-        <pre className="docs-code"><code>{`export function WithOverflow() {
+        <Subheading>With Overflow</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Overflow code'}
+          react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
+
+export function WithOverflow() {
   return (
     <PixelAvatarGroup aria-label="6 team members" max={4}>
       <PixelAvatar name="Joangel De La Rosa" />
@@ -89,11 +226,48 @@ export function Default() {
       <PixelAvatar name="Fabiola Garcia" />
     </PixelAvatarGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar, PixelAvatarGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAvatarGroup aria-label="6 team members" :max="4">
+    <PixelAvatar name="Joangel De La Rosa" />
+    <PixelAvatar name="Ana Lopez" />
+    <PixelAvatar name="Carlos Diaz" />
+    <PixelAvatar name="Diana Perez" />
+    <PixelAvatar name="Eduardo Ruiz" />
+    <PixelAvatar name="Fabiola Garcia" />
+  </PixelAvatarGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem],
+  template: \`
+    <pxl-avatar-group aria-label="6 team members" [max]="4">
+      <pxl-avatar *pxlAvatarGroupItem name="Joangel De La Rosa" />
+      <pxl-avatar *pxlAvatarGroupItem name="Ana Lopez" />
+      <pxl-avatar *pxlAvatarGroupItem name="Carlos Diaz" />
+      <pxl-avatar *pxlAvatarGroupItem name="Diana Perez" />
+      <pxl-avatar *pxlAvatarGroupItem name="Eduardo Ruiz" />
+      <pxl-avatar *pxlAvatarGroupItem name="Fabiola Garcia" />
+    </pxl-avatar-group>
+  \`,
+})
+export class WithOverflow {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex flex-col gap-3">
       <PixelAvatarGroup aria-label="Extra small group" size="xs">
@@ -113,11 +287,66 @@ export function Default() {
       </PixelAvatarGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar, PixelAvatarGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelAvatarGroup aria-label="Extra small group" size="xs">
+      <PixelAvatar name="Ana Lopez" size="xs" />
+      <PixelAvatar name="Bob Brown" size="xs" />
+      <PixelAvatar name="Carol Chen" size="xs" />
+    </PixelAvatarGroup>
+    <PixelAvatarGroup aria-label="Medium group" size="md">
+      <PixelAvatar name="Ana Lopez" size="md" />
+      <PixelAvatar name="Bob Brown" size="md" />
+      <PixelAvatar name="Carol Chen" size="md" />
+    </PixelAvatarGroup>
+    <PixelAvatarGroup aria-label="Extra large group" size="xl">
+      <PixelAvatar name="Ana Lopez" size="xl" />
+      <PixelAvatar name="Bob Brown" size="xl" />
+      <PixelAvatar name="Carol Chen" size="xl" />
+    </PixelAvatarGroup>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-avatar-group aria-label="Extra small group" size="xs">
+        <pxl-avatar *pxlAvatarGroupItem name="Ana Lopez" size="xs" />
+        <pxl-avatar *pxlAvatarGroupItem name="Bob Brown" size="xs" />
+        <pxl-avatar *pxlAvatarGroupItem name="Carol Chen" size="xs" />
+      </pxl-avatar-group>
+      <pxl-avatar-group aria-label="Medium group" size="md">
+        <pxl-avatar *pxlAvatarGroupItem name="Ana Lopez" size="md" />
+        <pxl-avatar *pxlAvatarGroupItem name="Bob Brown" size="md" />
+        <pxl-avatar *pxlAvatarGroupItem name="Carol Chen" size="md" />
+      </pxl-avatar-group>
+      <pxl-avatar-group aria-label="Extra large group" size="xl">
+        <pxl-avatar *pxlAvatarGroupItem name="Ana Lopez" size="xl" />
+        <pxl-avatar *pxlAvatarGroupItem name="Bob Brown" size="xl" />
+        <pxl-avatar *pxlAvatarGroupItem name="Carol Chen" size="xl" />
+      </pxl-avatar-group>
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-col gap-3">
       <PixelAvatarGroup aria-label="Cyan team" tone="cyan" max={3}>
@@ -140,11 +369,72 @@ export function Default() {
       </PixelAvatarGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar, PixelAvatarGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelAvatarGroup aria-label="Cyan team" tone="cyan" :max="3">
+      <PixelAvatar name="Ana Lopez" tone="cyan" />
+      <PixelAvatar name="Bob Brown" tone="cyan" />
+      <PixelAvatar name="Carol Chen" tone="cyan" />
+      <PixelAvatar name="Dave Diaz" tone="cyan" />
+    </PixelAvatarGroup>
+    <PixelAvatarGroup aria-label="Gold team" tone="gold" :max="3">
+      <PixelAvatar name="Ana Lopez" tone="gold" />
+      <PixelAvatar name="Bob Brown" tone="gold" />
+      <PixelAvatar name="Carol Chen" tone="gold" />
+      <PixelAvatar name="Dave Diaz" tone="gold" />
+    </PixelAvatarGroup>
+    <PixelAvatarGroup aria-label="Purple team" tone="purple" :max="3">
+      <PixelAvatar name="Ana Lopez" tone="purple" />
+      <PixelAvatar name="Bob Brown" tone="purple" />
+      <PixelAvatar name="Carol Chen" tone="purple" />
+      <PixelAvatar name="Dave Diaz" tone="purple" />
+    </PixelAvatarGroup>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-avatar-group aria-label="Cyan team" tone="cyan" [max]="3">
+        <pxl-avatar *pxlAvatarGroupItem name="Ana Lopez" tone="cyan" />
+        <pxl-avatar *pxlAvatarGroupItem name="Bob Brown" tone="cyan" />
+        <pxl-avatar *pxlAvatarGroupItem name="Carol Chen" tone="cyan" />
+        <pxl-avatar *pxlAvatarGroupItem name="Dave Diaz" tone="cyan" />
+      </pxl-avatar-group>
+      <pxl-avatar-group aria-label="Gold team" tone="gold" [max]="3">
+        <pxl-avatar *pxlAvatarGroupItem name="Ana Lopez" tone="gold" />
+        <pxl-avatar *pxlAvatarGroupItem name="Bob Brown" tone="gold" />
+        <pxl-avatar *pxlAvatarGroupItem name="Carol Chen" tone="gold" />
+        <pxl-avatar *pxlAvatarGroupItem name="Dave Diaz" tone="gold" />
+      </pxl-avatar-group>
+      <pxl-avatar-group aria-label="Purple team" tone="purple" [max]="3">
+        <pxl-avatar *pxlAvatarGroupItem name="Ana Lopez" tone="purple" />
+        <pxl-avatar *pxlAvatarGroupItem name="Bob Brown" tone="purple" />
+        <pxl-avatar *pxlAvatarGroupItem name="Carol Chen" tone="purple" />
+        <pxl-avatar *pxlAvatarGroupItem name="Dave Diaz" tone="purple" />
+      </pxl-avatar-group>
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelAvatarGroup aria-label="Pixel surface group" surface="pixel">
@@ -159,15 +449,55 @@ export function Default() {
       </PixelAvatarGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar, PixelAvatarGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelAvatarGroup aria-label="Pixel surface group" surface="pixel">
+      <PixelAvatar name="Ana Lopez" surface="pixel" />
+      <PixelAvatar name="Bob Brown" surface="pixel" />
+      <PixelAvatar name="Carol Chen" surface="pixel" />
+    </PixelAvatarGroup>
+    <PixelAvatarGroup aria-label="Linear surface group" surface="linear">
+      <PixelAvatar name="Ana Lopez" surface="linear" />
+      <PixelAvatar name="Bob Brown" surface="linear" />
+      <PixelAvatar name="Carol Chen" surface="linear" />
+    </PixelAvatarGroup>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar, PixelAvatarGroup, PixelAvatarGroupItem],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-avatar-group aria-label="Pixel surface group" surface="pixel">
+        <pxl-avatar *pxlAvatarGroupItem name="Ana Lopez" surface="pixel" />
+        <pxl-avatar *pxlAvatarGroupItem name="Bob Brown" surface="pixel" />
+        <pxl-avatar *pxlAvatarGroupItem name="Carol Chen" surface="pixel" />
+      </pxl-avatar-group>
+      <pxl-avatar-group aria-label="Linear surface group" surface="linear">
+        <pxl-avatar *pxlAvatarGroupItem name="Ana Lopez" surface="linear" />
+        <pxl-avatar *pxlAvatarGroupItem name="Bob Brown" surface="linear" />
+        <pxl-avatar *pxlAvatarGroupItem name="Carol Chen" surface="linear" />
+      </pxl-avatar-group>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-avatar">PixelAvatar</a></li>
-        <li><a href="#pixel-badge">PixelBadge</a></li>
-        <li><a href="#pixel-chip">PixelChip</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-avatar' : '#pixel-avatar'}>PixelAvatar</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge' : '#pixel-badge'}>PixelBadge</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-chip' : '#pixel-chip'}>PixelChip</a></li>
       </ul>
     </section>
     </section>

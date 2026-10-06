@@ -8,15 +8,26 @@ import React, {
   useRef,
 } from 'react';
 import {
+  toggleGroupClasses,
+  toggleGroupEmptyValue,
+  toggleGroupIsPressed,
+  toggleGroupKeyMove,
+  toggleGroupMoveTarget,
+  toggleGroupRole,
+  toggleGroupToggle,
+  type ToggleGroupMove,
+  type ToggleGroupSize,
+  type ToggleGroupVariant,
+} from '@pxlkit/ui-kit-core';
+import {
   Surface,
-  Variant,
   cn,
   useEffectiveSurface,
 } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
 
-export type GroupSize = 'sm' | 'md' | 'lg';
-export type GroupVariant = Extract<Variant, 'solid' | 'soft' | 'outline' | 'ghost'>;
+export type GroupSize = ToggleGroupSize;
+export type GroupVariant = ToggleGroupVariant;
 
 export interface ToggleGroupContextValue {
   type: 'single' | 'multiple';
@@ -44,27 +55,51 @@ export { PixelToggle, type PixelToggleProps } from './PixelToggle';
 /** Shared props (no value/onChange — those vary by discriminator). */
 interface PixelToggleGroupSharedProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  /** Only one toggle is in the tab order; the arrow keys, Home and End move between them. */
   rovingFocus?: boolean;
+  /** The arrow keys wrap from the last toggle to the first and back. */
   loop?: boolean;
+  /** Size of the toggles. */
   size?: GroupSize;
+  /** Variant of the toggles. */
   variant?: GroupVariant;
+  /** Surface of the toggles; defaults to the nearest provider. */
   surface?: Surface;
   /** Accessible label for the toolbar / radiogroup. */
   'aria-label'?: string;
+  /** The `PixelToggle`s. */
   children: React.ReactNode;
 }
 
 interface PixelToggleGroupSingleProps extends PixelToggleGroupSharedProps {
+  /**
+   * `single`: one value, a radiogroup of radios; `multiple`: any number of values, pressed buttons.
+   */
   type?: 'single';
+  /**
+   * Value: a string in single mode (`''` for none), an array in multiple mode; leave unset for an
+   * uncontrolled group.
+   */
   value?: string;
+  /** Initial value while uncontrolled; nothing pressed by default. */
   defaultValue?: string;
+  /** Called with the new value, after each press. */
   onChange?: (next: string) => void;
 }
 
 interface PixelToggleGroupMultipleProps extends PixelToggleGroupSharedProps {
+  /**
+   * `single`: one value, a radiogroup of radios; `multiple`: any number of values, pressed buttons.
+   */
   type: 'multiple';
+  /**
+   * Value: a string in single mode (`''` for none), an array in multiple mode; leave unset for an
+   * uncontrolled group.
+   */
   value?: string[];
+  /** Initial value while uncontrolled; nothing pressed by default. */
   defaultValue?: string[];
+  /** Called with the new value, after each press. */
   onChange?: (next: string[]) => void;
 }
 
@@ -114,8 +149,7 @@ export const PixelToggleGroup = forwardRef<HTMLDivElement, PixelToggleGroupProps
     } = props as _InternalToggleGroupProps;
     const surface = useEffectiveSurface(surfaceProp);
 
-    const resolvedDefault =
-      defaultValue !== undefined ? defaultValue : type === 'multiple' ? [] : '';
+    const resolvedDefault = defaultValue !== undefined ? defaultValue : toggleGroupEmptyValue(type);
 
     const [internalValue, setInternalValue] = useControllableState<string | string[]>({
       value,
@@ -150,52 +184,20 @@ export const PixelToggleGroup = forwardRef<HTMLDivElement, PixelToggleGroupProps
     }, []);
 
     const isPressed = useCallback(
-      (val: string) => {
-        if (type === 'multiple') {
-          return Array.isArray(internalValue) && internalValue.includes(val);
-        }
-        return internalValue === val;
-      },
+      (val: string) => toggleGroupIsPressed(type, internalValue, val),
       [type, internalValue],
     );
 
     const toggleValue = useCallback(
-      (val: string) => {
-        if (type === 'multiple') {
-          const current = Array.isArray(internalValue) ? internalValue : [];
-          const next = current.includes(val)
-            ? current.filter((v) => v !== val)
-            : [...current, val];
-          setInternalValue(next);
-        } else {
-          // Single mode: clicking pressed item unsets it
-          const next = internalValue === val ? '' : val;
-          setInternalValue(next);
-        }
-      },
+      // Single mode: clicking the pressed item unsets it.
+      (val: string) => setInternalValue(toggleGroupToggle(type, internalValue, val)),
       [type, internalValue, setInternalValue],
     );
 
     const moveFocus = useCallback(
-      (currentValue: string, direction: 1 | -1 | 'first' | 'last') => {
-        const order = orderRef.current;
-        if (order.length === 0) return;
-        let nextIndex: number;
-        if (direction === 'first') {
-          nextIndex = 0;
-        } else if (direction === 'last') {
-          nextIndex = order.length - 1;
-        } else {
-          const idx = order.indexOf(currentValue);
-          if (idx === -1) return;
-          nextIndex = idx + direction;
-          if (loop) {
-            nextIndex = (nextIndex + order.length) % order.length;
-          } else {
-            nextIndex = Math.max(0, Math.min(order.length - 1, nextIndex));
-          }
-        }
-        const nextValue = order[nextIndex];
+      (currentValue: string, direction: ToggleGroupMove) => {
+        const nextValue = toggleGroupMoveTarget(orderRef.current, currentValue, direction, loop);
+        if (nextValue === undefined) return;
         const nextEl = itemsRef.current.get(nextValue);
         if (nextEl) {
           focusedValueRef.current = nextValue;
@@ -208,28 +210,10 @@ export const PixelToggleGroup = forwardRef<HTMLDivElement, PixelToggleGroupProps
 
     const onItemKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLButtonElement>, val: string) => {
-        switch (e.key) {
-          case 'ArrowRight':
-          case 'ArrowDown':
-            e.preventDefault();
-            moveFocus(val, 1);
-            break;
-          case 'ArrowLeft':
-          case 'ArrowUp':
-            e.preventDefault();
-            moveFocus(val, -1);
-            break;
-          case 'Home':
-            e.preventDefault();
-            moveFocus(val, 'first');
-            break;
-          case 'End':
-            e.preventDefault();
-            moveFocus(val, 'last');
-            break;
-          default:
-            break;
-        }
+        const move = toggleGroupKeyMove(e.key);
+        if (move === undefined) return;
+        e.preventDefault();
+        moveFocus(val, move);
       },
       [moveFocus],
     );
@@ -267,17 +251,16 @@ export const PixelToggleGroup = forwardRef<HTMLDivElement, PixelToggleGroupProps
 
     const ariaLabel = (rest as { 'aria-label'?: string })['aria-label'];
     const ariaLabelledBy = (rest as { 'aria-labelledby'?: string })['aria-labelledby'];
-    const hasName = !!(ariaLabel || ariaLabelledBy);
     // Single mode = radiogroup; multi = toolbar group. Group needs an
     // accessible name to be exposed at all — fall back to no role if unnamed
     // and multi-select (keeps the SR tree clean instead of announcing "group").
-    const wrapperRole = type === 'single' ? 'radiogroup' : (hasName ? 'group' : undefined);
+    const wrapperRole = toggleGroupRole(type, !!(ariaLabel || ariaLabelledBy));
 
     return (
       <div
         ref={ref}
         role={wrapperRole}
-        className={cn('inline-flex items-center gap-1', className)}
+        className={cn(toggleGroupClasses, className)}
         {...rest}
       >
         <ToggleGroupContext.Provider value={ctxValue}>

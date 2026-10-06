@@ -57,10 +57,10 @@ export function CodeBlock({
         className={`absolute top-2 right-2 px-3 py-1 text-[10px] font-mono border transition-all z-10 ${
           copied
             ? 'bg-retro-green/20 text-retro-green border-retro-green/30'
-            : 'bg-retro-surface text-retro-muted border-retro-border hover:text-retro-green hover:border-retro-green/30 opacity-0 group-hover:opacity-100'
+            : 'bg-retro-surface text-retro-muted border-retro-border hover:text-retro-green hover:border-retro-green/30 opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
         }`}
       >
-        {copied ? <><PxlKitIcon icon={Check} size={10} className="inline-block mr-1" /> COPIED</> : 'COPY'}
+        {copied ? <><PxlKitIcon icon={Check} size={10} className="inline-block mr-1" decorative /> COPIED</> : 'COPY'}
       </button>
 
       {/* Code */}

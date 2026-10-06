@@ -11,9 +11,9 @@ export default defineManifest({
     'Dropzone + click-to-browse file uploader with accept/size/count validation, image thumbnails, and per-item removal.',
   highlights: [
     'Drag-and-drop or click/keyboard to open the native file picker',
-    'Validates against accept, maxSize, and maxFiles with onReject callback',
+    'Validates against accept, maxSize, and maxFiles and reports the rejected files (`onReject`, `@reject` in Vue, `(reject)` in Angular)',
     'Image previews via object URLs with automatic revoke on unmount',
-    'Controlled or uncontrolled file list via useControllableState',
+    'Controlled file list — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or uncontrolled with `defaultValue`',
     'Surface-aware styling with size, label, hint, and error props',
   ],
   examples: [
@@ -28,9 +28,10 @@ export default defineManifest({
     keyboard: [
       { key: 'Enter', does: 'Opens the native file picker', when: 'dropzone has focus' },
       { key: 'Space', does: 'Opens the native file picker', when: 'dropzone has focus' },
+      { key: 'Enter / Space', does: 'Opens the native file picker', when: 'file input has focus (no dropzone)' },
     ],
     notes:
-      'Dropzone exposes role="button" with tabIndex 0 (or -1 when disabled) and aria-describedby pointing at the hint/error message. The hidden <input type="file"> is aria-hidden while the dropzone is active.',
+      'Dropzone exposes role="button" with tabIndex 0 (or -1 when disabled) and, while a hint or error shows, aria-describedby pointing at it. The hidden <input type="file"> is aria-hidden while the dropzone is active. Without the dropzone the input is the one control and tab stop: the browse button is a second <label> of it, so the input is named by both labels, carries the aria-describedby, and the button shows its keyboard focus.',
   },
   related: ['PixelInput', 'PixelTextarea', 'PixelForm'],
   apiStability: 'stable',

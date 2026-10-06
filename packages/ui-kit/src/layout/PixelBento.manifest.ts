@@ -14,7 +14,7 @@ export default defineManifest({
     'PixelBentoCell with span presets (1x1, 2x1, 1x2, 2x2, 3x1, 1x3)',
     'Cell kinds for feature, stat, compact, and media layouts',
     'Tone- and surface-aware cell styling via tokens',
-    'forwardRef on both container and cell; SSR-safe div primitives',
+    'SSR-safe container and cells, with no client state',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

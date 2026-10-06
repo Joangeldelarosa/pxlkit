@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPasswordInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelPasswordInputDocsMeta = {
@@ -17,16 +23,110 @@ export const PixelPasswordInputDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputDocsSectionProps): React.ReactElement {
+/** PixelPasswordInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelPasswordInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelPasswordInput',
+        props: [
+          { name: 'label', type: 'string', description: 'Floating label rendered above the input shell.' },
+          { name: 'hint', type: 'string', description: 'Helper text shown below the field. Hidden when `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message shown below the field; flips visual state to invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: "Visual tone for focus ring + border emphasis. Default: `'neutral'`." },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Field height token. Default: `'md'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'toggleLabels', type: '[string, string]', default: "['Show', 'Hide']", description: 'Text for the visibility toggle, in `[showLabel, hideLabel]` form.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<input>` (`InputHTMLAttributes<HTMLInputElement>`), except `type`.',
+          '`ref` points to `<input>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelPasswordInput',
+        props: [
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the input.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'toggleLabels', type: '[string, string]', default: "['Show', 'Hide']", description: 'Text of the toggle, as `[showLabel, hideLabel]`.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the input and the toggle.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The new value, on every edit.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<input>`.',
+          'Its template ref exposes `element`: the native input.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelPasswordInput',
+        selector: 'pxl-password-input',
+        props: [
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Value (`[(value)]`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the input.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'toggleLabels', type: '[string, string]', default: "['Show', 'Hide']", description: 'Text of the toggle, as `[showLabel, hideLabel]`.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the input and the toggle.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+          { name: 'name', type: 'string', description: 'Native `name` of the input.' },
+          { name: 'placeholder', type: 'string', description: 'Native `placeholder`.' },
+          { name: 'autocomplete', type: 'string', description: 'Native `autocomplete` hint (`current-password`, `new-password`).' },
+          { name: 'minlength', type: 'number', accepts: 'unknown', description: 'Native `minlength`.' },
+          { name: 'maxlength', type: 'number', accepts: 'unknown', description: 'Native `maxlength`.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the input required.' },
+          { name: 'readonly', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the input read-only.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the input when no `label` is shown.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the input; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelPasswordInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelPasswordInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-password-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-password-input-heading'>PixelPasswordInput</h2>
+      <Title id='pixel-password-input-heading'>PixelPasswordInput</Title>
       <p className="docs-lead">Password text field with an inline show/hide toggle that swaps the input type between password and text.</p>
       <ul className="docs-highlights">
         <li>Inline visibility toggle with localizable labels via toggleLabels</li>
         <li>Label, hint, and error slots wired through the shared FieldShell</li>
         <li>Tone, size, and surface variants matched to PixelInput</li>
-        <li>Forwarded ref to the underlying &lt;input&gt; for form-library integration</li>
+        <li>Fits form libraries: a ref on the native &lt;input&gt; (React), <code>v-model</code> (Vue), <code>ngModel</code> or reactive forms (Angular)</li>
         <li>Toggle button reflects state via aria-pressed for assistive tech</li>
       </ul>
     <dl className="docs-meta">
@@ -34,19 +134,19 @@ export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputD
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-password-input-api">
+      <Heading id="pixel-password-input-api">API</Heading>
+      <FrameworkApi label={'PixelPasswordInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-password-input-a11y">
-      <h3 id="pixel-password-input-a11y">Accessibility</h3>
+      <Heading id="pixel-password-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">The visibility toggle is a real &lt;button type=&quot;button&quot;&gt; with an aria-label that mirrors the current state, and exposes aria-pressed so screen readers announce whether the password is currently visible. The input sets aria-invalid when an error is present and FieldShell wires aria-describedby to the hint/error message.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">The visibility toggle is a real &lt;button type=&quot;button&quot;&gt; with an aria-label that mirrors the current state, and exposes aria-pressed so screen readers announce whether the password is currently visible. The input sets aria-invalid when an error is present, and its aria-describedby points at the hint/error message while one shows, after any ids you pass.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -70,26 +170,69 @@ export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputD
       </table>
     </section>
     <section aria-labelledby="pixel-password-input-usage">
-      <h3 id="pixel-password-input-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelPasswordInput } from '@pxlkit/ui-kit';
+      <Heading id="pixel-password-input-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelPasswordInput usage'}
+        react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelPasswordInput label="Password" placeholder="Enter password" />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" placeholder="Enter password" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" placeholder="Enter password" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelPasswordInput label="Password" placeholder="Enter password" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" placeholder="Enter password" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" placeholder="Enter password" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-hint">
-        <h4>With hint</h4>
-        <pre className="docs-code"><code>{`export function WithHint() {
+        <Subheading>With hint</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With hint code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function WithHint() {
   return (
     <PixelPasswordInput
       label="Password"
@@ -97,11 +240,42 @@ export function Default() {
       placeholder="Enter password"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput
+    label="Password"
+    hint="At least 8 characters, mixing letters and numbers."
+    placeholder="Enter password"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`
+    <pxl-password-input
+      label="Password"
+      hint="At least 8 characters, mixing letters and numbers."
+      placeholder="Enter password"
+    />
+  \`,
+})
+export class WithHint {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-error">
-        <h4>With error</h4>
-        <pre className="docs-code"><code>{`export function WithError() {
+        <Subheading>With error</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With error code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function WithError() {
   return (
     <PixelPasswordInput
       label="Password"
@@ -109,11 +283,32 @@ export function Default() {
       defaultValue="abc"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" error="Password is too short." default-value="abc" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" error="Password is too short." defaultValue="abc" />\`,
+})
+export class WithError {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="space-y-3">
       <PixelPasswordInput label="Neutral" tone="neutral" placeholder="Password" />
@@ -125,11 +320,50 @@ export function Default() {
       <PixelPasswordInput label="Pink" tone="pink" placeholder="Password" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelPasswordInput label="Neutral" tone="neutral" placeholder="Password" />
+    <PixelPasswordInput label="Green" tone="green" placeholder="Password" />
+    <PixelPasswordInput label="Cyan" tone="cyan" placeholder="Password" />
+    <PixelPasswordInput label="Gold" tone="gold" placeholder="Password" />
+    <PixelPasswordInput label="Red" tone="red" placeholder="Password" />
+    <PixelPasswordInput label="Purple" tone="purple" placeholder="Password" />
+    <PixelPasswordInput label="Pink" tone="pink" placeholder="Password" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`
+    <div class="space-y-3">
+      <pxl-password-input label="Neutral" tone="neutral" placeholder="Password" />
+      <pxl-password-input label="Green" tone="green" placeholder="Password" />
+      <pxl-password-input label="Cyan" tone="cyan" placeholder="Password" />
+      <pxl-password-input label="Gold" tone="gold" placeholder="Password" />
+      <pxl-password-input label="Red" tone="red" placeholder="Password" />
+      <pxl-password-input label="Purple" tone="purple" placeholder="Password" />
+      <pxl-password-input label="Pink" tone="pink" placeholder="Password" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="space-y-3">
       <PixelPasswordInput label="Small" size="sm" placeholder="Password" />
@@ -137,22 +371,82 @@ export function Default() {
       <PixelPasswordInput label="Large" size="lg" placeholder="Password" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelPasswordInput label="Small" size="sm" placeholder="Password" />
+    <PixelPasswordInput label="Medium" size="md" placeholder="Password" />
+    <PixelPasswordInput label="Large" size="lg" placeholder="Password" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`
+    <div class="space-y-3">
+      <pxl-password-input label="Small" size="sm" placeholder="Password" />
+      <pxl-password-input label="Medium" size="md" placeholder="Password" />
+      <pxl-password-input label="Large" size="lg" placeholder="Password" />
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="space-y-3">
       <PixelPasswordInput label="Pixel surface" surface="pixel" placeholder="Password" />
       <PixelPasswordInput label="Linear surface" surface="linear" placeholder="Password" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelPasswordInput label="Pixel surface" surface="pixel" placeholder="Password" />
+    <PixelPasswordInput label="Linear surface" surface="linear" placeholder="Password" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`
+    <div class="space-y-3">
+      <pxl-password-input label="Pixel surface" surface="pixel" placeholder="Password" />
+      <pxl-password-input label="Linear surface" surface="linear" placeholder="Password" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelPasswordInput
       label="Password"
@@ -160,11 +454,32 @@ export function Default() {
       defaultValue="cannot-edit"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" disabled default-value="cannot-edit" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" disabled defaultValue="cannot-edit" />\`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-toggle-labels">
-        <h4>Custom toggle labels</h4>
-        <pre className="docs-code"><code>{`export function CustomToggleLabels() {
+        <Subheading>Custom toggle labels</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Custom toggle labels code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function CustomToggleLabels() {
   return (
     <PixelPasswordInput
       label="Password"
@@ -172,11 +487,33 @@ export function Default() {
       placeholder="Enter password"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" :toggle-labels="['View', 'Mask']" placeholder="Enter password" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" [toggleLabels]="['View', 'Mask']" placeholder="Enter password" />\`,
+})
+export class CustomToggleLabels {}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
+        <Subheading>Controlled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import { useState } from 'react';
+import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Controlled() {
   const [value, setValue] = useState('');
   return (
     <PixelPasswordInput
@@ -186,25 +523,67 @@ export function Default() {
       hint={\`Length: \${value.length}\`}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelPasswordInput v-model="value" label="Password" :hint="\`Length: \${value.length}\`" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" [(value)]="value" [hint]="'Length: ' + value().length" />\`,
+})
+export class Controlled {
+  readonly value = signal('');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
-        <pre className="docs-code"><code>{`export function Uncontrolled() {
+        <Subheading>Uncontrolled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Uncontrolled code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Uncontrolled() {
   return (
     <PixelPasswordInput
       label="Password"
       defaultValue="hunter2"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" default-value="hunter2" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" defaultValue="hunter2" />\`,
+})
+export class Uncontrolled {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-otp-input">PixelOTPInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-otp-input' : '#pixel-otp-input'}>PixelOTPInput</a></li>
       </ul>
     </section>
     </section>

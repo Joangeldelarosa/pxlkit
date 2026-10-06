@@ -1,4 +1,4 @@
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * 🏹 Bow — a recurve bow: curved wooden limb ("(" shape) on the left with a

@@ -12,8 +12,8 @@ export default defineManifest({
     'Centered dashed-border container that communicates absence without feeling like an error',
     'Optional icon slot rendered with cyan accent and aria-hidden so it stays decorative',
     'Action slot for a primary recovery CTA (create, refresh, retry)',
-    'Pixel + linear surface variants share identical API and inherit the surface from context',
-    'SSR-safe and tree-shakable; no client-only hooks beyond surface inheritance',
+    'Pixel + linear surface variants share identical API and follow the nearest PxlKitSurfaceProvider',
+    'SSR-safe and tree-shakable; no client state',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

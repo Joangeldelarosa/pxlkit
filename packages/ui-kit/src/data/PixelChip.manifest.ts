@@ -22,7 +22,7 @@ export default defineManifest({
     'Four visual variants (soft, solid, outline, ghost) across the full tone palette',
     'Three sizes (sm, md, lg) with consistent padding + typography rhythm',
     'Optional leading icon slot and built-in deletable X button with stop-propagation',
-    'Renders as <button> when onClick is set for native keyboard + screen reader semantics',
+    'Renders as a <button> when it handles clicks (`onClick` in React, `@click` in Vue, `<button pxlChip>` in Angular) for native keyboard + screen reader semantics',
     'Pixel + linear surface variants share identical API and chamfered/pill geometry',
   ],
   examples: [
@@ -50,7 +50,7 @@ export default defineManifest({
       { key: 'Enter', does: 'Removes the chip via the X button', when: 'delete button is focused' },
     ],
     notes:
-      'Renders as a <button> only when onClick is provided so non-interactive chips stay as <span>. The delete X is always a nested <button> with an aria-label "Remove <label>" and stops click propagation so the parent onClick does not double-fire.',
+      'Renders as a <button> only when it handles clicks (`onClick`, `@click` in Vue, `button[pxlChip]` or `clickable` in Angular), so non-interactive chips stay static. The delete X is a <button> with aria-label "Remove <label>" that never fires the chip click; a button cannot contain a button, so on a clickable chip the label and the X are sibling buttons inside a <span> frame. On a clickable deletable chip the frame shows the label button\'s keyboard focus; the X shows its own.',
   },
   related: ['PixelBadge', 'PixelChipGroup', 'PixelToggle'],
   apiStability: 'stable',

@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelGlitchDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelGlitchDocsMeta = {
@@ -17,39 +23,122 @@ export const PixelGlitchDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelGlitchDocsSection({ className }: PixelGlitchDocsSectionProps): React.ReactElement {
+/** PixelGlitch's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelGlitch } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelGlitch',
+        props: [
+          { name: 'children', type: 'React.ReactNode', description: 'Content to glitch: each colour copy repeats it.' },
+          { name: 'label', type: 'string', description: "Text to glitch, in place of `children`: it is in the document once — the stylesheet draws its colour copies — so a heading's text reads once to crawlers, copying and text extraction." },
+          { name: 'duration', type: 'number', default: '3000', description: 'Length of one full glitch loop in milliseconds. Default `3000`.' },
+          { name: 'intensity', type: 'number', default: '4', description: 'Maximum horizontal displacement (pixels) of the ghost layers. Default `4`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'as', type: "'div' | 'span'", default: "'div'", description: "Element of the wrapper and its layers. `'span'` puts the glitch inside phrasing content, such as a heading: wrap the heading around it, as the layers repeat whatever they hold. Default `'div'`." },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapper.' },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelGlitch } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelGlitch',
+        props: [
+          { name: 'label', type: 'string', description: "Text to glitch, in place of the default slot: it is in the document once — the stylesheet draws its colour copies — so a heading's text reads once to crawlers, copying and text extraction." },
+          { name: 'duration', type: 'number', default: '3000', description: 'Length of one full glitch loop in milliseconds.' },
+          { name: 'intensity', type: 'number', default: '4', description: 'Maximum horizontal displacement (pixels) of the layers.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+          { name: 'as', type: "'div' | 'span'", default: "'div'", description: "Element of the wrapper and its layers. `'span'` puts the glitch inside phrasing content, such as a heading: wrap the heading around it, as the layers repeat whatever they hold." },
+        ],
+        events: [
+          { name: 'complete', description: "After the final iteration of the content's layer." },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to glitch, rendered once per layer.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelGlitch',
+        selector: 'pxl-glitch, span[pxlGlitch]',
+        props: [
+          { name: 'duration', type: 'number', default: '3000', accepts: 'unknown', description: 'Length of one full glitch loop in milliseconds.' },
+          { name: 'intensity', type: 'number', default: '4', accepts: 'unknown', description: 'Maximum horizontal displacement (pixels) of the layers.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+          { name: 'label', type: 'string', description: "Text to glitch, in place of the content: it is in the document once — the stylesheet draws its colour copies — so a heading's text reads once to crawlers, copying and text extraction." },
+        ],
+        events: [
+          { name: 'complete', description: "After the final iteration of the content's layer." },
+        ],
+        notes: [
+          'As an attribute, it goes on a native `<span>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelGlitchContent',
+        selector: '[pxlGlitchContent]',
+        notes: [
+          'Structural: write it as `*pxlGlitchContent` on the content, or on an `<ng-template>`.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelGlitchDocsSection({ className, headingLevel = 2 }: PixelGlitchDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-glitch-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-glitch-heading'>PixelGlitch</h2>
+      <Title id='pixel-glitch-heading'>PixelGlitch</Title>
       <p className="docs-lead">Three-layer glitch effect (R/C ghost layers + main) with clip-path slices and color separation.</p>
       <ul className="docs-highlights">
         <li>Layered R/C color-separation ghosts for authentic CRT-glitch feel</li>
         <li>Configurable duration and horizontal displacement intensity</li>
-        <li>Animation trigger modes: mount, hover, in-view, manual</li>
-        <li>Respects prefers-reduced-motion via shared animation hooks</li>
-        <li>SSR-safe forwardRef wrapper around any children</li>
+        <li>Animation trigger modes: mount, hover, click, focus, in-view, manual</li>
+        <li>Holds still when the user prefers reduced motion, from the server-rendered first paint on</li>
+        <li>Glitches any content, or a label held once in the document for a heading: its copies are drawn by CSS</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-glitch-api">
+      <Heading id="pixel-glitch-api">API</Heading>
+      <FrameworkApi label={'PixelGlitch API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-glitch-a11y">
-      <h3 id="pixel-glitch-a11y">Accessibility</h3>
+      <Heading id="pixel-glitch-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>aria-hidden on decorative ghost layers</code></li>
+        <li><code>a label&#39;s copies drawn by CSS, without alternative text</code></li>
         <li><code>respects prefers-reduced-motion</code></li>
       </ul>
-      <p className="docs-aria-notes">Ghost layers are marked aria-hidden so assistive tech reads only the underlying content. Animation is suppressed when the user prefers reduced motion.</p>
+      <p className="docs-aria-notes">The copies of other content are layers marked aria-hidden, so assistive technology reads the content once, though it is in the document three times. A label is in the document once: its copies are drawn by the stylesheet, with no alternative text for assistive technology — use one for a heading. Animation is suppressed when the user prefers reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-glitch-usage">
-      <h3 id="pixel-glitch-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelGlitch } from '@pxlkit/ui-kit';
+      <Heading id="pixel-glitch-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelGlitch usage'}
+        react={`import { PixelGlitch } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -57,40 +146,180 @@ export function Default() {
       <span className="text-2xl font-bold">SYSTEM ONLINE</span>
     </PixelGlitch>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelGlitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelGlitch>
+    <span class="text-2xl font-bold">SYSTEM ONLINE</span>
+  </PixelGlitch>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGlitch, PixelGlitchContent],
+  template: \`
+    <pxl-glitch>
+      <span *pxlGlitchContent class="text-2xl font-bold">SYSTEM ONLINE</span>
+    </pxl-glitch>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelGlitch } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelGlitch>
       <span className="text-2xl font-bold">SYSTEM ONLINE</span>
     </PixelGlitch>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGlitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelGlitch>
+    <span class="text-2xl font-bold">SYSTEM ONLINE</span>
+  </PixelGlitch>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGlitch, PixelGlitchContent],
+  template: \`
+    <pxl-glitch>
+      <span *pxlGlitchContent class="text-2xl font-bold">SYSTEM ONLINE</span>
+    </pxl-glitch>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-high-intensity">
-        <h4>High intensity</h4>
-        <pre className="docs-code"><code>{`export function HighIntensity() {
+        <Subheading>High intensity</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'High intensity code'}
+          react={`import { PixelGlitch } from '@pxlkit/ui-kit';
+
+export function HighIntensity() {
   return (
     <PixelGlitch intensity={8} duration={2000}>
       <span className="text-2xl font-bold">CRITICAL ERROR</span>
     </PixelGlitch>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGlitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelGlitch :intensity="8" :duration="2000">
+    <span class="text-2xl font-bold">CRITICAL ERROR</span>
+  </PixelGlitch>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGlitch, PixelGlitchContent],
+  template: \`
+    <pxl-glitch [intensity]="8" [duration]="2000">
+      <span *pxlGlitchContent class="text-2xl font-bold">CRITICAL ERROR</span>
+    </pxl-glitch>
+  \`,
+})
+export class HighIntensity {}`}
+        />
       </article>
       <article className="docs-example" id="example-hover-trigger">
-        <h4>Hover trigger</h4>
-        <pre className="docs-code"><code>{`export function HoverTrigger() {
+        <Subheading>Hover trigger</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Hover trigger code'}
+          react={`import { PixelGlitch } from '@pxlkit/ui-kit';
+
+export function HoverTrigger() {
   return (
     <PixelGlitch trigger="hover">
       <span className="text-2xl font-bold">HOVER ME</span>
     </PixelGlitch>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGlitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelGlitch trigger="hover">
+    <span class="text-2xl font-bold">HOVER ME</span>
+  </PixelGlitch>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGlitch, PixelGlitchContent],
+  template: \`
+    <pxl-glitch trigger="hover">
+      <span *pxlGlitchContent class="text-2xl font-bold">HOVER ME</span>
+    </pxl-glitch>
+  \`,
+})
+export class HoverTrigger {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-heading-label">
+        <Subheading>Heading label</Subheading>
+        <p>A label glitches with its text once in the document: the copies are drawn by the stylesheet, so a heading reads once to crawlers, copying and screen readers. Put the heading around the glitch, as a span.</p>
+        <FrameworkCode
+          variant="docs"
+          label={'Heading label code'}
+          react={`import { PixelGlitch } from '@pxlkit/ui-kit';
+
+export function HeadingLabel() {
+  return (
+    <h2 className="text-2xl font-bold">
+      <PixelGlitch as="span" label="SIGNAL LOST" />
+    </h2>
+  );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGlitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <h2 class="text-2xl font-bold">
+    <PixelGlitch as="span" label="SIGNAL LOST" />
+  </h2>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGlitch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGlitch],
+  template: \`
+    <h2 class="text-2xl font-bold">
+      <span pxlGlitch label="SIGNAL LOST"></span>
+    </h2>
+  \`,
+})
+export class HeadingLabel {}`}
+        />
       </article>
     </section>
     </section>

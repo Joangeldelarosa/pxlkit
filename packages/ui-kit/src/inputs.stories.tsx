@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { PixelInput } from './forms/PixelInput';
 import { PixelPasswordInput } from './forms/PixelPasswordInput';

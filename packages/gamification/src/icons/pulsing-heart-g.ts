@@ -1,4 +1,4 @@
-import type { AnimatedPxlKitData } from '@pxlkit/core';
+import type { AnimatedPxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * 💛 HeartPulse — a golden life-heart that pulses (normal → big → normal →

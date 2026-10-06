@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelMenubarDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelMenubarDocsMeta = {
@@ -17,37 +23,89 @@ export const PixelMenubarDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelMenubarDocsSection({ className }: PixelMenubarDocsSectionProps): React.ReactElement {
+/** PixelMenubar's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelMenubar } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelMenubar',
+        props: [
+          { name: 'menus', type: 'PixelMenubarMenu[]', required: true, description: 'The menus, in order.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelMenubar } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelMenubar',
+        props: [
+          { name: 'menus', type: 'PixelMenubarMenu[]', required: true, description: 'The menus, in order.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelMenubar } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelMenubar',
+        selector: 'pxl-menubar',
+        props: [
+          { name: 'menus', type: 'PixelMenubarMenu[]', required: true, description: 'The menus, in order.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelMenubarDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelMenubarDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-menubar-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-menubar-heading'>PixelMenubar</h2>
+      <Title id='pixel-menubar-heading'>PixelMenubar</Title>
       <p className="docs-lead">Horizontal application menubar with nested submenus, keyboard navigation, and shortcut hints.</p>
       <ul className="docs-highlights">
         <li>Top-level menus with click + hover-to-switch behavior</li>
         <li>Nested submenus with right-arrow open / left-arrow close</li>
-        <li>Full arrow-key, Home/End, Enter/Space, and Escape support</li>
+        <li>WAI-ARIA menubar keyboard model: arrows, Home/End, Enter/Space, Escape and Tab</li>
         <li>Shortcut labels and disabled / separator items</li>
-        <li>Surface-aware (border, radius, font) via Surface context</li>
+        <li>Surface-aware (border, radius, font)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-menubar-api">
+      <Heading id="pixel-menubar-api">API</Heading>
+      <FrameworkApi label={'PixelMenubar API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-menubar-a11y">
-      <h3 id="pixel-menubar-a11y">Accessibility</h3>
+      <Heading id="pixel-menubar-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>menubar</code></li>
         <li><code>menu</code></li>
         <li><code>menuitem</code></li>
       </ul>
-      <p className="docs-aria-notes">Click-outside closes all open menus. Disabled and separator items are skipped during keyboard traversal. Triggers are role=menuitem with aria-haspopup/aria-expanded; submenus are role=menu labelled by their trigger.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">The menubar is one tab stop: the menu button that last had focus or a menu open. Menu buttons are <code>role=&quot;menuitem&quot;</code> with <code>aria-haspopup=&quot;menu&quot;</code>, <code>aria-expanded</code> and <code>aria-controls</code> wired to the open menu, which is <code>role=&quot;menu&quot;</code> labelled by its button. The open menu takes focus (<code>tabindex=&quot;-1&quot;</code>) and points <code>aria-activedescendant</code> at the highlighted item — in the menu or its submenu — so assistive technology follows the arrows and Home/End. Separators (<code>role=&quot;separator&quot;</code>) and disabled items (<code>aria-disabled</code>) are skipped; items with a submenu carry <code>aria-haspopup</code> and <code>aria-expanded</code>, and the submenu is named after its item. Choosing an item, Escape and Tab return focus to the menu button; a press outside closes every menu and leaves focus where the pointer put it.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -58,46 +116,79 @@ export function PixelMenubarDocsSection({ className }: PixelMenubarDocsSectionPr
         </thead>
         <tbody>
           <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Open its menu with focus in it, highlighting the first enabled item.</td>
+            <td>menu button focused</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowDown</kbd></td>
+            <td>Open its menu with focus in it, highlighting the first enabled item.</td>
+            <td>menu button focused</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowUp</kbd></td>
+            <td>Open its menu with focus in it, highlighting the last enabled item.</td>
+            <td>menu button focused</td>
+          </tr>
+          <tr>
             <td><kbd>ArrowRight / ArrowLeft</kbd></td>
-            <td>Move between top-level menus</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Open the next / previous menu, wrapping round, with focus in it.</td>
+            <td>menu button focused</td>
           </tr>
           <tr>
             <td><kbd>ArrowDown / ArrowUp</kbd></td>
-            <td>Move focus within an open menu</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Highlight the next / previous enabled item, wrapping round — in the submenu when the highlight is in one.</td>
+            <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>Home / End</kbd></td>
-            <td>Jump to first / last enabled item</td>
-            <td><span className="docs-muted">—</span></td>
-          </tr>
-          <tr>
-            <td><kbd>Enter / Space</kbd></td>
-            <td>Activate item or open its submenu</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Highlight the first / last enabled item — of the submenu when the highlight is in one.</td>
+            <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>ArrowRight</kbd></td>
-            <td>Open submenu of the active item</td>
-            <td>menu is open</td>
+            <td>Open the submenu, highlighting its first enabled item.</td>
+            <td>item with a submenu highlighted</td>
           </tr>
           <tr>
             <td><kbd>ArrowLeft</kbd></td>
-            <td>Close current submenu</td>
-            <td>submenu is open</td>
+            <td>Close the submenu; the highlight returns to its item.</td>
+            <td>submenu open</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowRight / ArrowLeft</kbd></td>
+            <td>Close the menu and open the next / previous one, wrapping round.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Choose the highlighted item, close the menu and return focus to its button — or open the highlighted item’s submenu on its first item.</td>
+            <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>Escape</kbd></td>
-            <td>Close any open menu</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Close the submenu; the highlight returns to its item.</td>
+            <td>submenu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Escape</kbd></td>
+            <td>Close the menu and return focus to its button.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Tab / Shift+Tab</kbd></td>
+            <td>Close the menu and move focus on from its button, out of the menubar.</td>
+            <td>menu open</td>
           </tr>
         </tbody>
       </table>
     </section>
     <section aria-labelledby="pixel-menubar-usage">
-      <h3 id="pixel-menubar-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelMenubar, type PixelMenubarMenu } from '@pxlkit/ui-kit';
+      <Heading id="pixel-menubar-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelMenubar usage'}
+        react={`import { PixelMenubar, type PixelMenubarMenu } from '@pxlkit/ui-kit';
 
 const menus: PixelMenubarMenu[] = [
   {
@@ -141,20 +232,261 @@ const menus: PixelMenubarMenu[] = [
 
 export function Default() {
   return <PixelMenubar menus={menus} />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelMenubar, type PixelMenubarMenu } from '@pxlkit/ui-kit-vue';
+
+const menus: PixelMenubarMenu[] = [
+  {
+    label: 'File',
+    items: [
+      { value: 'new', label: 'New', shortcut: 'Ctrl+N' },
+      { value: 'open', label: 'Open…', shortcut: 'Ctrl+O' },
+      { value: 'sep-1', label: '', separator: true },
+      {
+        value: 'recent',
+        label: 'Open Recent',
+        submenu: [
+          { value: 'r1', label: 'project-alpha.pxl' },
+          { value: 'r2', label: 'project-beta.pxl' },
+        ],
+      },
+      { value: 'sep-2', label: '', separator: true },
+      { value: 'save', label: 'Save', shortcut: 'Ctrl+S' },
+      { value: 'quit', label: 'Quit', shortcut: 'Ctrl+Q' },
+    ],
+  },
+  {
+    label: 'Edit',
+    items: [
+      { value: 'undo', label: 'Undo', shortcut: 'Ctrl+Z' },
+      { value: 'redo', label: 'Redo', shortcut: 'Ctrl+Y', disabled: true },
+      { value: 'sep-3', label: '', separator: true },
+      { value: 'cut', label: 'Cut', shortcut: 'Ctrl+X' },
+      { value: 'copy', label: 'Copy', shortcut: 'Ctrl+C' },
+      { value: 'paste', label: 'Paste', shortcut: 'Ctrl+V' },
+    ],
+  },
+  {
+    label: 'View',
+    items: [
+      { value: 'zoom-in', label: 'Zoom In', shortcut: 'Ctrl++' },
+      { value: 'zoom-out', label: 'Zoom Out', shortcut: 'Ctrl+-' },
+    ],
+  },
+];
+</script>
+
+<template>
+  <PixelMenubar :menus="menus" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelMenubar, type PixelMenubarMenu } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelMenubar],
+  template: \`<pxl-menubar [menus]="menus" />\`,
+})
+export class Default {
+  readonly menus: PixelMenubarMenu[] = [
+    {
+      label: 'File',
+      items: [
+        { value: 'new', label: 'New', shortcut: 'Ctrl+N' },
+        { value: 'open', label: 'Open…', shortcut: 'Ctrl+O' },
+        { value: 'sep-1', label: '', separator: true },
+        {
+          value: 'recent',
+          label: 'Open Recent',
+          submenu: [
+            { value: 'r1', label: 'project-alpha.pxl' },
+            { value: 'r2', label: 'project-beta.pxl' },
+          ],
+        },
+        { value: 'sep-2', label: '', separator: true },
+        { value: 'save', label: 'Save', shortcut: 'Ctrl+S' },
+        { value: 'quit', label: 'Quit', shortcut: 'Ctrl+Q' },
+      ],
+    },
+    {
+      label: 'Edit',
+      items: [
+        { value: 'undo', label: 'Undo', shortcut: 'Ctrl+Z' },
+        { value: 'redo', label: 'Redo', shortcut: 'Ctrl+Y', disabled: true },
+        { value: 'sep-3', label: '', separator: true },
+        { value: 'cut', label: 'Cut', shortcut: 'Ctrl+X' },
+        { value: 'copy', label: 'Copy', shortcut: 'Ctrl+C' },
+        { value: 'paste', label: 'Paste', shortcut: 'Ctrl+V' },
+      ],
+    },
+    {
+      label: 'View',
+      items: [
+        { value: 'zoom-in', label: 'Zoom In', shortcut: 'Ctrl++' },
+        { value: 'zoom-out', label: 'Zoom Out', shortcut: 'Ctrl+-' },
+      ],
+    },
+  ];
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelMenubar, type PixelMenubarMenu } from '@pxlkit/ui-kit';
+
+const menus: PixelMenubarMenu[] = [
+  {
+    label: 'File',
+    items: [
+      { value: 'new', label: 'New', shortcut: 'Ctrl+N' },
+      { value: 'open', label: 'Open…', shortcut: 'Ctrl+O' },
+      { value: 'sep-1', label: '', separator: true },
+      {
+        value: 'recent',
+        label: 'Open Recent',
+        submenu: [
+          { value: 'r1', label: 'project-alpha.pxl' },
+          { value: 'r2', label: 'project-beta.pxl' },
+        ],
+      },
+      { value: 'sep-2', label: '', separator: true },
+      { value: 'save', label: 'Save', shortcut: 'Ctrl+S' },
+      { value: 'quit', label: 'Quit', shortcut: 'Ctrl+Q' },
+    ],
+  },
+  {
+    label: 'Edit',
+    items: [
+      { value: 'undo', label: 'Undo', shortcut: 'Ctrl+Z' },
+      { value: 'redo', label: 'Redo', shortcut: 'Ctrl+Y', disabled: true },
+      { value: 'sep-3', label: '', separator: true },
+      { value: 'cut', label: 'Cut', shortcut: 'Ctrl+X' },
+      { value: 'copy', label: 'Copy', shortcut: 'Ctrl+C' },
+      { value: 'paste', label: 'Paste', shortcut: 'Ctrl+V' },
+    ],
+  },
+  {
+    label: 'View',
+    items: [
+      { value: 'zoom-in', label: 'Zoom In', shortcut: 'Ctrl++' },
+      { value: 'zoom-out', label: 'Zoom Out', shortcut: 'Ctrl+-' },
+    ],
+  },
+];
+
+export function Default() {
   return <PixelMenubar menus={menus} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelMenubar, type PixelMenubarMenu } from '@pxlkit/ui-kit-vue';
+
+const menus: PixelMenubarMenu[] = [
+  {
+    label: 'File',
+    items: [
+      { value: 'new', label: 'New', shortcut: 'Ctrl+N' },
+      { value: 'open', label: 'Open…', shortcut: 'Ctrl+O' },
+      { value: 'sep-1', label: '', separator: true },
+      {
+        value: 'recent',
+        label: 'Open Recent',
+        submenu: [
+          { value: 'r1', label: 'project-alpha.pxl' },
+          { value: 'r2', label: 'project-beta.pxl' },
+        ],
+      },
+      { value: 'sep-2', label: '', separator: true },
+      { value: 'save', label: 'Save', shortcut: 'Ctrl+S' },
+      { value: 'quit', label: 'Quit', shortcut: 'Ctrl+Q' },
+    ],
+  },
+  {
+    label: 'Edit',
+    items: [
+      { value: 'undo', label: 'Undo', shortcut: 'Ctrl+Z' },
+      { value: 'redo', label: 'Redo', shortcut: 'Ctrl+Y', disabled: true },
+      { value: 'sep-3', label: '', separator: true },
+      { value: 'cut', label: 'Cut', shortcut: 'Ctrl+X' },
+      { value: 'copy', label: 'Copy', shortcut: 'Ctrl+C' },
+      { value: 'paste', label: 'Paste', shortcut: 'Ctrl+V' },
+    ],
+  },
+  {
+    label: 'View',
+    items: [
+      { value: 'zoom-in', label: 'Zoom In', shortcut: 'Ctrl++' },
+      { value: 'zoom-out', label: 'Zoom Out', shortcut: 'Ctrl+-' },
+    ],
+  },
+];
+</script>
+
+<template>
+  <PixelMenubar :menus="menus" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelMenubar, type PixelMenubarMenu } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelMenubar],
+  template: \`<pxl-menubar [menus]="menus" />\`,
+})
+export class Default {
+  readonly menus: PixelMenubarMenu[] = [
+    {
+      label: 'File',
+      items: [
+        { value: 'new', label: 'New', shortcut: 'Ctrl+N' },
+        { value: 'open', label: 'Open…', shortcut: 'Ctrl+O' },
+        { value: 'sep-1', label: '', separator: true },
+        {
+          value: 'recent',
+          label: 'Open Recent',
+          submenu: [
+            { value: 'r1', label: 'project-alpha.pxl' },
+            { value: 'r2', label: 'project-beta.pxl' },
+          ],
+        },
+        { value: 'sep-2', label: '', separator: true },
+        { value: 'save', label: 'Save', shortcut: 'Ctrl+S' },
+        { value: 'quit', label: 'Quit', shortcut: 'Ctrl+Q' },
+      ],
+    },
+    {
+      label: 'Edit',
+      items: [
+        { value: 'undo', label: 'Undo', shortcut: 'Ctrl+Z' },
+        { value: 'redo', label: 'Redo', shortcut: 'Ctrl+Y', disabled: true },
+        { value: 'sep-3', label: '', separator: true },
+        { value: 'cut', label: 'Cut', shortcut: 'Ctrl+X' },
+        { value: 'copy', label: 'Copy', shortcut: 'Ctrl+C' },
+        { value: 'paste', label: 'Paste', shortcut: 'Ctrl+V' },
+      ],
+    },
+    {
+      label: 'View',
+      items: [
+        { value: 'zoom-in', label: 'Zoom In', shortcut: 'Ctrl++' },
+        { value: 'zoom-out', label: 'Zoom Out', shortcut: 'Ctrl+-' },
+      ],
+    },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-submenus">
-        <h4>With Submenus</h4>
-        <pre className="docs-code"><code>{`export function WithSubmenus() {
+        <Subheading>With Submenus</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Submenus code'}
+          react={`import { PixelMenubar, type PixelMenubarMenu } from '@pxlkit/ui-kit';
+
+export function WithSubmenus() {
   const nested: PixelMenubarMenu[] = [
     {
       label: 'Tools',
@@ -180,15 +512,81 @@ export function Default() {
     },
   ];
   return <PixelMenubar menus={nested} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelMenubar, type PixelMenubarMenu } from '@pxlkit/ui-kit-vue';
+
+const menus: PixelMenubarMenu[] = [
+  {
+    label: 'Tools',
+    items: [
+      {
+        value: 'export',
+        label: 'Export As',
+        submenu: [
+          { value: 'png', label: 'PNG' },
+          { value: 'svg', label: 'SVG' },
+          { value: 'gif', label: 'GIF' },
+        ],
+      },
+      {
+        value: 'convert',
+        label: 'Convert',
+        submenu: [
+          { value: 'palette', label: 'Reduce Palette' },
+          { value: 'grayscale', label: 'Grayscale' },
+        ],
+      },
+    ],
+  },
+];
+</script>
+
+<template>
+  <PixelMenubar :menus="menus" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelMenubar, type PixelMenubarMenu } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelMenubar],
+  template: \`<pxl-menubar [menus]="menus" />\`,
+})
+export class WithSubmenus {
+  readonly menus: PixelMenubarMenu[] = [
+    {
+      label: 'Tools',
+      items: [
+        {
+          value: 'export',
+          label: 'Export As',
+          submenu: [
+            { value: 'png', label: 'PNG' },
+            { value: 'svg', label: 'SVG' },
+            { value: 'gif', label: 'GIF' },
+          ],
+        },
+        {
+          value: 'convert',
+          label: 'Convert',
+          submenu: [
+            { value: 'palette', label: 'Reduce Palette' },
+            { value: 'grayscale', label: 'Grayscale' },
+          ],
+        },
+      ],
+    },
+  ];
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-dropdown">PixelDropdown</a></li>
-        <li><a href="#pixel-tabs">PixelTabs</a></li>
-        <li><a href="#pixel-breadcrumbs">PixelBreadcrumbs</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-dropdown' : '#pixel-dropdown'}>PixelDropdown</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tabs' : '#pixel-tabs'}>PixelTabs</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-breadcrumbs' : '#pixel-breadcrumbs'}>PixelBreadcrumbs</a></li>
       </ul>
     </section>
     </section>

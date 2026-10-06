@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFormDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelFormDocsMeta = {
@@ -17,36 +23,276 @@ export const PixelFormDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): React.ReactElement {
+/** PixelForm's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelForm } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelForm',
+        props: [
+          { name: 'form', type: 'UseFormReturn<T>', required: true, description: "The form: what React Hook Form's `useForm` returns." },
+          { name: 'onSubmit', type: '(data: T) => void | Promise<void>', required: true, description: "Called with the form's values, once a submission finds no error." },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The fields.' },
+          { name: 'className', type: 'string', description: 'Extra classes on the `<form>`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          '`ref` points to `<form>`.',
+          '`PixelForm.Root` is the same component.',
+        ],
+      },
+      {
+        name: 'PixelForm.Field',
+        props: [
+          { name: 'name', type: 'TName', required: true, description: "Path of the field in the form's values." },
+          { name: 'rules', type: "Omit<RegisterOptions<TFieldValues, TName>, 'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'>", description: "Validation rules: React Hook Form's `rules` (`required`, `min`, `max`, `minLength`, `maxLength`, `pattern`, `validate`)." },
+          { name: 'defaultValue', type: "UseControllerProps<TFieldValues, TName>['defaultValue']", description: "Initial value, where the form's `defaultValues` have none." },
+          { name: 'shouldUnregister', type: 'boolean', description: "Drops the field's value from the form when it unmounts; by default the value stays." },
+          { name: 'render', type: '(args: { field: ControllerRenderProps<TFieldValues, TName>; fieldState: ControllerFieldState }) => React.ReactElement', required: true, description: "Renders the control: gets the field's props (`field`: its value, change and blur handlers, name and ref) and its state (`fieldState`)." },
+        ],
+      },
+      {
+        name: 'PixelForm.Item',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: '`PixelForm.Label`, `PixelForm.Control`, `PixelForm.Description` and `PixelForm.Message`.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelForm.Label',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<label>` (`LabelHTMLAttributes<HTMLLabelElement>`).',
+          '`ref` points to `<label>`.',
+        ],
+      },
+      {
+        name: 'PixelForm.Control',
+        props: [
+          { name: 'children', type: 'React.ReactElement', required: true, description: "The control: one element, which gets the field's `id`, `aria-describedby` and `aria-invalid`." },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+      {
+        name: 'PixelForm.Description',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<p>` (`HTMLAttributes<HTMLParagraphElement>`).',
+          '`ref` points to `<p>`.',
+        ],
+      },
+      {
+        name: 'PixelForm.Message',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<p>` (`HTMLAttributes<HTMLParagraphElement>`).',
+          '`ref` points to `<p>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelForm, PixelFormControl, PixelFormDescription, PixelFormField, PixelFormItem, PixelFormLabel, PixelFormMessage } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelForm',
+        props: [
+          { name: 'form', type: 'FormContext<TValues>', required: true, description: "The form: what VeeValidate's `useForm` returns." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'submit', payload: 'values: TValues', description: "The form's values, once a submission finds no error." },
+        ],
+        slots: [
+          { name: 'default', description: 'The fields.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<form>`.',
+        ],
+      },
+      {
+        name: 'PixelFormControl',
+        slots: [
+          { name: 'default', description: 'The control: one element or component.' },
+        ],
+      },
+      {
+        name: 'PixelFormDescription',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The description text.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<p>`.',
+        ],
+      },
+      {
+        name: 'PixelFormField',
+        props: [
+          { name: 'name', type: 'string', required: true, description: "Path of the field in the form's values." },
+          { name: 'rules', type: 'RuleExpression<TValue>', description: 'VeeValidate rules: a function returning `true` or a message, an array of them, or a schema.' },
+          { name: 'defaultValue', type: 'TValue', description: "Initial value, where the form's `initialValues` have none." },
+          { name: 'shouldUnregister', type: 'boolean', default: 'false', description: "Drops the field's value from the form when it unmounts; by default the value stays." },
+        ],
+        slots: [
+          { name: 'default', props: '{ field: PixelFormFieldBinding<TValue>; fieldState: PixelFormFieldState }', description: "The field's item: bind `field` to its control." },
+        ],
+      },
+      {
+        name: 'PixelFormItem',
+        slots: [
+          { name: 'default', description: '`PixelFormLabel`, `PixelFormControl`, `PixelFormDescription` and `PixelFormMessage`.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelFormLabel',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The label text.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<label>`.',
+        ],
+      },
+      {
+        name: 'PixelFormMessage',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'A message to show in place of the error.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelForm, PixelFormControl, PixelFormDescription, PixelFormField, PixelFormItem, PixelFormLabel, PixelFormMessage } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelForm',
+        selector: 'form[pxlForm]',
+        props: [
+          { name: 'pxlForm', type: 'TGroup', required: true, description: "The form's model." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'submitted', payload: "TGroup['value']", description: "The form's value, once a submission finds no error (pending validators are waited for)." },
+        ],
+        notes: [
+          'Goes on a native `<form>`, which keeps its own attributes and events.',
+          'Exported as `pxlForm`: `#ref="pxlForm"` gives a template reference to it.',
+        ],
+      },
+      {
+        name: 'PixelFormControl',
+        selector: '[pxlFormControl]',
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+      {
+        name: 'PixelFormDescription',
+        selector: 'p[pxlFormDescription]',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on a native `<p>`, which keeps its own attributes and events.',
+        ],
+      },
+      {
+        name: 'PixelFormField',
+        selector: '[pxlFormField]',
+        props: [
+          { name: 'pxlFormField', type: 'string', required: true, description: "Name of the field's control in the form's group." },
+          { name: 'messages', type: 'Record<string, string>', description: "The message to show for each error key the control's validators report." },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+          'Exported as `pxlFormField`: `#ref="pxlFormField"` gives a template reference to it.',
+        ],
+      },
+      {
+        name: 'PixelFormItem',
+        selector: 'pxl-form-item',
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelFormLabel',
+        selector: 'label[pxlFormLabel]',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on a native `<label>`, which keeps its own attributes and events.',
+        ],
+      },
+      {
+        name: 'PixelFormMessage',
+        selector: 'pxl-form-message',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelFormDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelFormDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-form-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-form-heading'>PixelForm</h2>
-      <p className="docs-lead">shadcn-style compound wrapper around react-hook-form: Root / Field / Item / Label / Control / Description / Message auto-wire ids and aria-* across each field.</p>
+      <Title id='pixel-form-heading'>PixelForm</Title>
+      <p className="docs-lead">Validated form on each framework&#39;s form library (React Hook Form, VeeValidate, Angular reactive forms): its form, field, item, label, control, description and message parts auto-wire ids and aria-* across each field.</p>
       <ul className="docs-highlights">
-        <li>Compound API (`PixelForm.Root` + `.Field` + `.Item` + `.Label` + `.Control` + `.Description` + `.Message`) for composable forms.</li>
-        <li>Auto-generates linked ids and wires `aria-describedby` + `aria-invalid` on the controlled field.</li>
-        <li>Uses `react-hook-form` `Controller` under the hood — works with any input that accepts `value`/`onChange`/`ref`.</li>
-        <li>`Message` auto-renders the field error when present; falls back to children otherwise.</li>
-        <li>Surface-aware: `surface` prop on Root/Label/Description/Message follows kit-wide design tokens.</li>
+        <li>Compound API for composable forms: form, field, item, label, control, description and message (<code>PixelForm.Root</code> + <code>.Field</code> + … in React, <code>PixelForm</code> + <code>PixelFormField</code> + … in Vue, <code>form[pxlForm]</code> + <code>[pxlFormField]</code> + … in Angular).</li>
+        <li>Auto-generates linked ids and wires <code>aria-describedby</code> + <code>aria-invalid</code> on the controlled field.</li>
+        <li>Built on each framework&#39;s form library — React Hook Form, VeeValidate, Angular reactive forms — so any control it binds works: <code>value</code>/<code>onChange</code>/<code>ref</code> in React, <code>v-model</code> in Vue, a <code>ControlValueAccessor</code> in Angular.</li>
+        <li>The message shows the field error, as an alert, while there is one; in React and Vue, content you give it shows instead.</li>
+        <li>Surface-aware: a <code>surface</code> on the form, label, description or message follows kit-wide design tokens.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-form-api">
+      <Heading id="pixel-form-api">API</Heading>
+      <FrameworkApi label={'PixelForm API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-form-a11y">
-      <h3 id="pixel-form-a11y">Accessibility</h3>
+      <Heading id="pixel-form-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>form</code></li>
         <li><code>labelled-control</code></li>
       </ul>
-      <p className="docs-aria-notes">Each `PixelForm.Item` generates a stable `useId()` base and links the Label (htmlFor), Control (id + aria-describedby + aria-invalid), Description (id), and Message (id, role=&quot;alert&quot; on error) automatically — authors do not pass ids manually.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Each item generates a stable id base and links the label (<code>for</code>), the control (id + aria-describedby + aria-invalid), the description (id) and the message (id, role=&quot;alert&quot; on error) automatically — authors do not pass ids manually.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -70,12 +316,12 @@ export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): 
       </table>
     </section>
     <section aria-labelledby="pixel-form-usage">
-      <h3 id="pixel-form-usage">Usage</h3>
-      <pre className="docs-code"><code>{`'use client';
-
-import { useForm } from 'react-hook-form';
-import { PixelForm } from '@pxlkit/ui-kit';
-import { PixelInput } from '@pxlkit/ui-kit';
+      <Heading id="pixel-form-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelForm usage'}
+        react={`import { useForm } from 'react-hook-form';
+import { PixelForm, PixelInput } from '@pxlkit/ui-kit';
 
 type DefaultValues = {
   username: string;
@@ -128,14 +374,131 @@ export function Default() {
       />
     </PixelForm>
   );
+}`}
+        vue={`<script setup lang="ts">
+import { useForm } from 'vee-validate';
+import {
+  PixelForm,
+  PixelFormControl,
+  PixelFormDescription,
+  PixelFormField,
+  PixelFormItem,
+  PixelFormLabel,
+  PixelFormMessage,
+  PixelInput,
+} from '@pxlkit/ui-kit-vue';
+
+interface DefaultValues {
+  username: string;
+  email: string;
 }
-`}</code></pre>
+
+const form = useForm<DefaultValues>({
+  initialValues: { username: '', email: '' },
+});
+
+const rules = {
+  username: [(value: string) => !!value || 'Username is required'],
+  email: [
+    (value: string) => !!value || 'Email is required',
+    (value: string) => /.+@.+\\..+/.test(value) || 'Enter a valid email',
+  ],
+};
+
+function onSubmit(data: DefaultValues) {
+  console.log('submit', data);
+}
+</script>
+
+<template>
+  <PixelForm :form="form" @submit="onSubmit">
+    <PixelFormField v-slot="{ field }" name="username" :rules="rules.username">
+      <PixelFormItem>
+        <PixelFormLabel>Username</PixelFormLabel>
+        <PixelFormControl>
+          <PixelInput placeholder="pxlhero" v-bind="field" />
+        </PixelFormControl>
+        <PixelFormDescription>Your retro alias.</PixelFormDescription>
+        <PixelFormMessage />
+      </PixelFormItem>
+    </PixelFormField>
+
+    <PixelFormField v-slot="{ field }" name="email" :rules="rules.email">
+      <PixelFormItem>
+        <PixelFormLabel>Email</PixelFormLabel>
+        <PixelFormControl>
+          <PixelInput type="email" placeholder="hero@pxlkit.xyz" v-bind="field" />
+        </PixelFormControl>
+        <PixelFormMessage />
+      </PixelFormItem>
+    </PixelFormField>
+  </PixelForm>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { PixelForm, PixelFormControl, PixelFormDescription, PixelFormField, PixelFormItem, PixelFormLabel, PixelFormMessage, PixelInput } from '@pxlkit/ui-kit-angular';
+
+interface DefaultValues {
+  username: string;
+  email: string;
+}
+
+@Component({
+  imports: [
+    PixelForm,
+    PixelFormControl,
+    PixelFormDescription,
+    PixelFormField,
+    PixelFormItem,
+    PixelFormLabel,
+    PixelFormMessage,
+    PixelInput,
+  ],
+  template: \`
+    <form [pxlForm]="form" (submitted)="onSubmit($event)">
+      <pxl-form-item pxlFormField="username" [messages]="{ required: 'Username is required' }">
+        <label pxlFormLabel>Username</label>
+        <pxl-input pxlFormControl name="username" placeholder="pxlhero" />
+        <p pxlFormDescription>Your retro alias.</p>
+        <pxl-form-message />
+      </pxl-form-item>
+
+      <pxl-form-item pxlFormField="email" [messages]="{ required: 'Email is required', pattern: 'Enter a valid email' }">
+        <label pxlFormLabel>Email</label>
+        <pxl-input pxlFormControl name="email" type="email" placeholder="hero@pxlkit.xyz" />
+        <pxl-form-message />
+      </pxl-form-item>
+    </form>
+  \`,
+})
+export class Default {
+  readonly form = new FormGroup({
+    username: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(/.+@.+\\..+/)] }),
+  });
+
+  onSubmit(data: Partial<DefaultValues>) {
+    console.log('submit', data);
+  }
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useForm } from 'react-hook-form';
+import { PixelForm, PixelInput } from '@pxlkit/ui-kit';
+
+type DefaultValues = {
+  username: string;
+  email: string;
+};
+
+export function Default() {
   const form = useForm<DefaultValues>({
     defaultValues: { username: '', email: '' },
   });
@@ -181,17 +544,124 @@ export function Default() {
       />
     </PixelForm>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { useForm } from 'vee-validate';
+import {
+  PixelForm,
+  PixelFormControl,
+  PixelFormDescription,
+  PixelFormField,
+  PixelFormItem,
+  PixelFormLabel,
+  PixelFormMessage,
+  PixelInput,
+} from '@pxlkit/ui-kit-vue';
+
+interface DefaultValues {
+  username: string;
+  email: string;
+}
+
+const form = useForm<DefaultValues>({
+  initialValues: { username: '', email: '' },
+});
+
+const rules = {
+  username: [(value: string) => !!value || 'Username is required'],
+  email: [
+    (value: string) => !!value || 'Email is required',
+    (value: string) => /.+@.+\\..+/.test(value) || 'Enter a valid email',
+  ],
+};
+
+function onSubmit(data: DefaultValues) {
+  console.log('submit', data);
+}
+</script>
+
+<template>
+  <PixelForm :form="form" @submit="onSubmit">
+    <PixelFormField v-slot="{ field }" name="username" :rules="rules.username">
+      <PixelFormItem>
+        <PixelFormLabel>Username</PixelFormLabel>
+        <PixelFormControl>
+          <PixelInput placeholder="pxlhero" v-bind="field" />
+        </PixelFormControl>
+        <PixelFormDescription>Your retro alias.</PixelFormDescription>
+        <PixelFormMessage />
+      </PixelFormItem>
+    </PixelFormField>
+
+    <PixelFormField v-slot="{ field }" name="email" :rules="rules.email">
+      <PixelFormItem>
+        <PixelFormLabel>Email</PixelFormLabel>
+        <PixelFormControl>
+          <PixelInput type="email" placeholder="hero@pxlkit.xyz" v-bind="field" />
+        </PixelFormControl>
+        <PixelFormMessage />
+      </PixelFormItem>
+    </PixelFormField>
+  </PixelForm>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { PixelForm, PixelFormControl, PixelFormDescription, PixelFormField, PixelFormItem, PixelFormLabel, PixelFormMessage, PixelInput } from '@pxlkit/ui-kit-angular';
+
+interface DefaultValues {
+  username: string;
+  email: string;
+}
+
+@Component({
+  imports: [
+    PixelForm,
+    PixelFormControl,
+    PixelFormDescription,
+    PixelFormField,
+    PixelFormItem,
+    PixelFormLabel,
+    PixelFormMessage,
+    PixelInput,
+  ],
+  template: \`
+    <form [pxlForm]="form" (submitted)="onSubmit($event)">
+      <pxl-form-item pxlFormField="username" [messages]="{ required: 'Username is required' }">
+        <label pxlFormLabel>Username</label>
+        <pxl-input pxlFormControl name="username" placeholder="pxlhero" />
+        <p pxlFormDescription>Your retro alias.</p>
+        <pxl-form-message />
+      </pxl-form-item>
+
+      <pxl-form-item pxlFormField="email" [messages]="{ required: 'Email is required', pattern: 'Enter a valid email' }">
+        <label pxlFormLabel>Email</label>
+        <pxl-input pxlFormControl name="email" type="email" placeholder="hero@pxlkit.xyz" />
+        <pxl-form-message />
+      </pxl-form-item>
+    </form>
+  \`,
+})
+export class Default {
+  readonly form = new FormGroup({
+    username: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(/.+@.+\\..+/)] }),
+  });
+
+  onSubmit(data: Partial<DefaultValues>) {
+    console.log('submit', data);
+  }
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-textarea">PixelTextarea</a></li>
-        <li><a href="#pixel-select">PixelSelect</a></li>
-        <li><a href="#pixel-checkbox">PixelCheckbox</a></li>
-        <li><a href="#pixel-radio-group">PixelRadioGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-textarea' : '#pixel-textarea'}>PixelTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-select' : '#pixel-select'}>PixelSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-checkbox' : '#pixel-checkbox'}>PixelCheckbox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-radio-group' : '#pixel-radio-group'}>PixelRadioGroup</a></li>
       </ul>
     </section>
     </section>

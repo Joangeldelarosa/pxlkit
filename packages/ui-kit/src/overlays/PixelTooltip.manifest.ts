@@ -25,7 +25,7 @@ export default defineManifest({
     'Auto-flip and shift via floating-ui — stays inside the viewport across all four positions.',
     'Three trigger modes (hover, focus, click) — click variant accepts pointer events and dismisses on outside click or Escape.',
     'Portal-rendered so it escapes overflow/transform ancestors without z-index gymnastics.',
-    'Controlled (`open` + `onOpenChange`) or uncontrolled (`defaultOpen`) — uses useControllableState internally.',
+    'Controlled — `open` + `onOpenChange` (React), `v-model:open` (Vue), `[(open)]` (Angular) — or uncontrolled (`defaultOpen`).',
     'Surface-aware (pixel/linear) and inherits from PxlKitSurfaceProvider when no surface prop is passed.',
   ],
   examples: [
@@ -47,10 +47,14 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus to the trigger; hover and focus triggers open the tooltip on focus' },
       { key: 'Enter', does: 'Toggles the tooltip', when: 'trigger="click" and the anchor child is interactive (e.g. a button)' },
       { key: 'Space', does: 'Toggles the tooltip', when: 'trigger="click" and the anchor child is interactive (e.g. a button)' },
-      { key: 'Escape', does: 'Closes the tooltip', when: 'trigger="click" and open' },
+      {
+        key: 'Escape',
+        does: 'Closes the tooltip, or cancels one about to open; with the hover and focus triggers it then stays closed until the pointer leaves and re-enters or focus leaves and returns',
+        when: 'open or opening, any trigger',
+      },
     ],
     notes:
-      'Floating panel has role="tooltip" and is wired to the trigger via aria-describedby when open. Hover and focus triggers render a non-interactive panel (pointer-events: none) so the cursor stays on the anchor. Click triggers listen for clicks bubbling from the anchor child — the wrapper itself stays non-interactive so an interactive child (the common case) is not nested inside another control; anchor click tooltips to a button or link for keyboard support. Outside pointerdown and Escape close a click tooltip. Use focus or click trigger when the tooltip must be reachable without a pointer device.',
+      'Floating panel has role="tooltip". While it is open, its id joins the aria-describedby of the first focusable element inside the anchor — the element a screen reader announces on focus — next to that element\'s own references; with nothing focusable inside, the wrapper carries it. Hover and focus triggers render a non-interactive panel (pointer-events: none) so the cursor stays on the anchor. Click triggers listen for clicks bubbling from the anchor child — the wrapper itself stays non-interactive so an interactive child (the common case) is not nested inside another control; anchor click tooltips to a button or link for keyboard support. Escape dismisses the tooltip in every trigger mode without moving the pointer or focus (WCAG 1.4.13); outside pointerdown also closes a click tooltip. Use focus or click trigger when the tooltip must be reachable without a pointer device.',
   },
   related: ['PixelPopover', 'PixelDropdown'],
   apiStability: 'stable',

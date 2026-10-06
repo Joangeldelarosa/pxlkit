@@ -68,8 +68,8 @@ export const SKILLS: SkillEntry[] = [
     tone: 'cyan',
     steps: [
       'Classifies the project as ready, repairable or incompatible',
-      'Detects the framework and package manager, because the setup genuinely differs',
-      'Applies the matching recipe: stylesheet, @source directive, providers, fonts, dark mode',
+      'Detects the React setup (Next.js App or Pages Router, Vite) and package manager, because the setup genuinely differs',
+      'Applies the matching recipe: stylesheet, providers, fonts, dark mode',
       'Introduces the other four commands',
     ],
     args: [{ flag: '[project directory]', description: 'Defaults to the working directory.' }],
@@ -212,7 +212,8 @@ export const OUT_OF_SCOPE = [
   'The voxel engine and anything 3D',
   'The web icon builder',
   'Storybook generation',
-  'Frameworks without React (Vue, Svelte, Astro without React)',
+  'Vue and Angular projects — the skills write React with @pxlkit/ui-kit; use @pxlkit/ui-kit-vue or @pxlkit/ui-kit-angular directly (pxlkit.xyz/docs)',
+  'Svelte, and Astro without React',
 ];
 
 export const REQUIREMENTS = [

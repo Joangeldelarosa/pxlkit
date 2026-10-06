@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCarouselDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCarouselDocsMeta = {
@@ -17,10 +23,112 @@ export const PixelCarouselDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSectionProps): React.ReactElement {
+/** PixelCarousel's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCarousel } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCarousel',
+        props: [
+          { name: 'opts', type: "Omit<EmblaOptionsType, 'axis'>", description: 'Full embla options surface (see embla-carousel docs). Common subset: `loop`, `align`, `slidesToScroll`, `startIndex`, `dragFree`, `containScroll`, `inViewThreshold`. `axis` is set internally from `orientation`.' },
+          { name: 'plugins', type: 'EmblaPluginType[]', description: 'Optional embla plugins (autoplay, autoScroll, etc.).' },
+          { name: 'setApi', type: '(api: EmblaCarouselType | undefined) => void', description: 'Receives the embla API once ready; called again with `undefined` on unmount.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Slides side by side, or stacked.' },
+          { name: 'showArrows', type: 'boolean', default: 'true', description: 'Previous and next buttons.' },
+          { name: 'showDots', type: 'boolean', default: 'false', description: 'A dot per slide, to go to it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name for the carousel region (required for landmark navigation).' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The slides (`PixelCarousel.Item`).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelCarousel.Item',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: "The slide's content." },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCarousel',
+        props: [
+          { name: 'opts', type: 'PixelCarouselOptions', description: 'Embla options (see the embla-carousel docs): `loop`, `align`, `slidesToScroll`, `startIndex`, `dragFree`, `containScroll`, … The axis follows `orientation`.' },
+          { name: 'plugins', type: 'PixelCarouselPlugin[]', description: 'Embla plugins (autoplay, auto scroll, …).' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Slides side by side, or stacked.' },
+          { name: 'showArrows', type: 'boolean', default: 'true', description: 'Previous and next buttons.' },
+          { name: 'showDots', type: 'boolean', default: 'false', description: 'A dot per slide, to go to it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'api', payload: 'api: EmblaCarouselType | undefined', description: "Embla's API once it runs, then `undefined` when the carousel unmounts." },
+        ],
+        slots: [
+          { name: 'default', description: 'The slides (`PixelCarouselItem`).' },
+        ],
+      },
+      {
+        name: 'PixelCarouselItem',
+        slots: [
+          { name: 'default', description: "The slide's content." },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCarousel',
+        selector: 'pxl-carousel',
+        props: [
+          { name: 'opts', type: 'PixelCarouselOptions', description: 'Embla options (see the embla-carousel docs): `loop`, `align`, `slidesToScroll`, `startIndex`, `dragFree`, `containScroll`, … The axis follows `orientation`.' },
+          { name: 'plugins', type: 'PixelCarouselPlugin[]', description: 'Embla plugins (autoplay, auto scroll, …).' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Slides side by side, or stacked.' },
+          { name: 'showArrows', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Previous and next buttons.' },
+          { name: 'showDots', type: 'boolean', default: 'false', accepts: 'unknown', description: 'A dot per slide, to go to it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'api', payload: 'EmblaCarouselType | undefined', description: "Embla's API once it runs, then `undefined` when the carousel is destroyed." },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelCarouselItem',
+        selector: 'pxl-carousel-item',
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelCarouselDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCarouselDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-carousel-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-carousel-heading'>PixelCarousel</h2>
+      <Title id='pixel-carousel-heading'>PixelCarousel</Title>
       <p className="docs-lead">Embla-powered surface-aware carousel with horizontal or vertical orientation, optional arrows and dot pagination, keyboard navigation and reduced-motion support.</p>
       <ul className="docs-highlights">
         <li>Built on embla-carousel with full opts and plugins pass-through</li>
@@ -34,18 +142,18 @@ export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSection
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-carousel-api">
+      <Heading id="pixel-carousel-api">API</Heading>
+      <FrameworkApi label={'PixelCarousel API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-carousel-a11y">
-      <h3 id="pixel-carousel-a11y">Accessibility</h3>
+      <Heading id="pixel-carousel-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>carousel</code></li>
       </ul>
       <p className="docs-aria-notes">Root element is role=&quot;region&quot; with aria-roledescription=&quot;carousel&quot; and a focusable tabIndex. Each item is role=&quot;group&quot; with aria-roledescription=&quot;slide&quot; and aria-label &quot;Slide N of M&quot;. Previous/Next buttons declare aria-label and aria-controls pointing to the viewport id. A polite live region announces the current slide index without reading slide content (per APG carousel pattern). Dots expose aria-current=&quot;true&quot; on the active slide.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -84,8 +192,11 @@ export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSection
       </table>
     </section>
     <section aria-labelledby="pixel-carousel-usage">
-      <h3 id="pixel-carousel-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelCarousel } from '@pxlkit/ui-kit';
+      <Heading id="pixel-carousel-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCarousel usage'}
+        react={`import { PixelCarousel } from '@pxlkit/ui-kit';
 
 function Slide({ label, tone }: { label: string; tone: string }) {
   return (
@@ -112,14 +223,73 @@ export function Default() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+  { label: 'Slide 3', tone: 'rgba(34,197,94,0.15)' },
+];
+</script>
+
+<template>
+  <PixelCarousel aria-label="Featured items">
+    <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+      <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+        <span class="text-xs">{{ slide.label }}</span>
+      </div>
+    </PixelCarouselItem>
+  </PixelCarousel>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <pxl-carousel aria-label="Featured items">
+      @for (slide of slides; track slide.label) {
+        <pxl-carousel-item>
+          <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+            <span class="text-xs">{{ slide.label }}</span>
+          </div>
+        </pxl-carousel-item>
+      }
+    </pxl-carousel>
+  \`,
+})
+export class Default {
+  readonly slides = [
+    { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+    { label: 'Slide 3', tone: 'rgba(34,197,94,0.15)' },
+  ];
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelCarousel } from '@pxlkit/ui-kit';
+
+function Slide({ label, tone }: { label: string; tone: string }) {
+  return (
+    <div
+      className="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text"
+      style={{ background: tone }}
+    >
+      <span className="text-xs">{label}</span>
+    </div>
+  );
+}
+
+export function Default() {
   return (
     <PixelCarousel aria-label="Featured items">
       <PixelCarousel.Item>
@@ -133,11 +303,71 @@ export function Default() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+  { label: 'Slide 3', tone: 'rgba(34,197,94,0.15)' },
+];
+</script>
+
+<template>
+  <PixelCarousel aria-label="Featured items">
+    <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+      <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+        <span class="text-xs">{{ slide.label }}</span>
+      </div>
+    </PixelCarouselItem>
+  </PixelCarousel>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <pxl-carousel aria-label="Featured items">
+      @for (slide of slides; track slide.label) {
+        <pxl-carousel-item>
+          <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+            <span class="text-xs">{{ slide.label }}</span>
+          </div>
+        </pxl-carousel-item>
+      }
+    </pxl-carousel>
+  \`,
+})
+export class Default {
+  readonly slides = [
+    { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+    { label: 'Slide 3', tone: 'rgba(34,197,94,0.15)' },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-dots">
-        <h4>With dots</h4>
-        <pre className="docs-code"><code>{`export function WithDots() {
+        <Subheading>With dots</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With dots code'}
+          react={`import { PixelCarousel } from '@pxlkit/ui-kit';
+
+function Slide({ label, tone }: { label: string; tone: string }) {
+  return (
+    <div
+      className="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text"
+      style={{ background: tone }}
+    >
+      <span className="text-xs">{label}</span>
+    </div>
+  );
+}
+
+export function WithDots() {
   return (
     <PixelCarousel aria-label="Featured items with dots" showDots>
       <PixelCarousel.Item>
@@ -151,11 +381,71 @@ export function Default() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'One', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Two', tone: 'rgba(168,85,247,0.15)' },
+  { label: 'Three', tone: 'rgba(34,197,94,0.15)' },
+];
+</script>
+
+<template>
+  <PixelCarousel aria-label="Featured items with dots" show-dots>
+    <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+      <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+        <span class="text-xs">{{ slide.label }}</span>
+      </div>
+    </PixelCarouselItem>
+  </PixelCarousel>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <pxl-carousel aria-label="Featured items with dots" showDots>
+      @for (slide of slides; track slide.label) {
+        <pxl-carousel-item>
+          <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+            <span class="text-xs">{{ slide.label }}</span>
+          </div>
+        </pxl-carousel-item>
+      }
+    </pxl-carousel>
+  \`,
+})
+export class WithDots {
+  readonly slides = [
+    { label: 'One', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Two', tone: 'rgba(168,85,247,0.15)' },
+    { label: 'Three', tone: 'rgba(34,197,94,0.15)' },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-looping">
-        <h4>Looping</h4>
-        <pre className="docs-code"><code>{`export function Looping() {
+        <Subheading>Looping</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Looping code'}
+          react={`import { PixelCarousel } from '@pxlkit/ui-kit';
+
+function Slide({ label, tone }: { label: string; tone: string }) {
+  return (
+    <div
+      className="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text"
+      style={{ background: tone }}
+    >
+      <span className="text-xs">{label}</span>
+    </div>
+  );
+}
+
+export function Looping() {
   return (
     <PixelCarousel aria-label="Looping carousel" opts={{ loop: true }} showDots>
       <PixelCarousel.Item>
@@ -169,11 +459,71 @@ export function Default() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'Alpha', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Beta', tone: 'rgba(168,85,247,0.15)' },
+  { label: 'Gamma', tone: 'rgba(34,197,94,0.15)' },
+];
+</script>
+
+<template>
+  <PixelCarousel aria-label="Looping carousel" :opts="{ loop: true }" show-dots>
+    <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+      <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+        <span class="text-xs">{{ slide.label }}</span>
+      </div>
+    </PixelCarouselItem>
+  </PixelCarousel>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <pxl-carousel aria-label="Looping carousel" [opts]="{ loop: true }" showDots>
+      @for (slide of slides; track slide.label) {
+        <pxl-carousel-item>
+          <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+            <span class="text-xs">{{ slide.label }}</span>
+          </div>
+        </pxl-carousel-item>
+      }
+    </pxl-carousel>
+  \`,
+})
+export class Looping {
+  readonly slides = [
+    { label: 'Alpha', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Beta', tone: 'rgba(168,85,247,0.15)' },
+    { label: 'Gamma', tone: 'rgba(34,197,94,0.15)' },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-vertical">
-        <h4>Vertical</h4>
-        <pre className="docs-code"><code>{`export function Vertical() {
+        <Subheading>Vertical</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Vertical code'}
+          react={`import { PixelCarousel } from '@pxlkit/ui-kit';
+
+function Slide({ label, tone }: { label: string; tone: string }) {
+  return (
+    <div
+      className="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text"
+      style={{ background: tone }}
+    >
+      <span className="text-xs">{label}</span>
+    </div>
+  );
+}
+
+export function Vertical() {
   return (
     <div style={{ height: 240 }}>
       <PixelCarousel aria-label="Vertical carousel" orientation="vertical" showDots>
@@ -189,11 +539,75 @@ export function Default() {
       </PixelCarousel>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'Top', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Middle', tone: 'rgba(168,85,247,0.15)' },
+  { label: 'Bottom', tone: 'rgba(34,197,94,0.15)' },
+];
+</script>
+
+<template>
+  <div style="height: 240px">
+    <PixelCarousel aria-label="Vertical carousel" orientation="vertical" show-dots>
+      <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+        <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+          <span class="text-xs">{{ slide.label }}</span>
+        </div>
+      </PixelCarouselItem>
+    </PixelCarousel>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <div style="height: 240px">
+      <pxl-carousel aria-label="Vertical carousel" orientation="vertical" showDots>
+        @for (slide of slides; track slide.label) {
+          <pxl-carousel-item>
+            <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+              <span class="text-xs">{{ slide.label }}</span>
+            </div>
+          </pxl-carousel-item>
+        }
+      </pxl-carousel>
+    </div>
+  \`,
+})
+export class Vertical {
+  readonly slides = [
+    { label: 'Top', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Middle', tone: 'rgba(168,85,247,0.15)' },
+    { label: 'Bottom', tone: 'rgba(34,197,94,0.15)' },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-linear-surface">
-        <h4>Linear surface</h4>
-        <pre className="docs-code"><code>{`export function LinearSurface() {
+        <Subheading>Linear surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Linear surface code'}
+          react={`import { PixelCarousel } from '@pxlkit/ui-kit';
+
+function Slide({ label, tone }: { label: string; tone: string }) {
+  return (
+    <div
+      className="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text"
+      style={{ background: tone }}
+    >
+      <span className="text-xs">{label}</span>
+    </div>
+  );
+}
+
+export function LinearSurface() {
   return (
     <PixelCarousel aria-label="Linear surface carousel" surface="linear" showDots>
       <PixelCarousel.Item>
@@ -204,14 +618,56 @@ export function Default() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+];
+</script>
+
+<template>
+  <PixelCarousel aria-label="Linear surface carousel" surface="linear" show-dots>
+    <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+      <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+        <span class="text-xs">{{ slide.label }}</span>
+      </div>
+    </PixelCarouselItem>
+  </PixelCarousel>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <pxl-carousel aria-label="Linear surface carousel" surface="linear" showDots>
+      @for (slide of slides; track slide.label) {
+        <pxl-carousel-item>
+          <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+            <span class="text-xs">{{ slide.label }}</span>
+          </div>
+        </pxl-carousel-item>
+      }
+    </pxl-carousel>
+  \`,
+})
+export class LinearSurface {
+  readonly slides = [
+    { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+  ];
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-tabs">PixelTabs</a></li>
-        <li><a href="#pixel-pagination">PixelPagination</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tabs' : '#pixel-tabs'}>PixelTabs</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pagination' : '#pixel-pagination'}>PixelPagination</a></li>
       </ul>
     </section>
     </section>

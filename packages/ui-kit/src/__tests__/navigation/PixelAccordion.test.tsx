@@ -63,7 +63,7 @@ describe('PixelAccordion', () => {
     expect(queryByText('Third body')).toBeTruthy();
   });
 
-  it('wires aria-controls on the header to the panel id, and aria-labelledby back', () => {
+  it('wires aria-controls on the header to the panel id, and leaves the panel unnamed', () => {
     const { getByRole, getByText } = render(<PixelAccordion items={ITEMS} />);
     const header = getByRole('button', { name: 'First' });
     const panelId = header.getAttribute('aria-controls');
@@ -71,9 +71,10 @@ describe('PixelAccordion', () => {
     const panel = document.getElementById(panelId!)!;
     expect(panel).toBeTruthy();
     expect(panel.textContent).toContain('First body');
-    expect(panel.getAttribute('aria-labelledby')).toBe(header.id);
-    // No role="region" on the panel (intentional — avoids landmark proliferation).
+    // No role="region" on the panel (intentional — avoids landmark proliferation),
+    // so no name either: ARIA prohibits aria-labelledby on an element without a role.
     expect(panel.getAttribute('role')).toBeNull();
+    expect(panel.hasAttribute('aria-labelledby')).toBe(false);
     expect(getByText('First body')).toBeTruthy();
   });
 
@@ -81,5 +82,20 @@ describe('PixelAccordion', () => {
     const ref = React.createRef<HTMLDivElement>();
     render(<PixelAccordion ref={ref} items={ITEMS} />);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
+  });
+
+  it("lights up a focused header inside its item on the pixel surface, whose cut corners clip a ring, and rings it on the linear one", () => {
+    const { getAllByRole } = render(
+      <>
+        <PixelAccordion items={ITEMS} surface="pixel" />
+        <PixelAccordion items={ITEMS} surface="linear" />
+      </>,
+    );
+    const headers = getAllByRole('button').map((header) => header.className.split(' '));
+    for (const pixel of headers.slice(0, 3)) {
+      expect(pixel).toContain('focus-visible:pxl-focus-inset');
+      expect(pixel.filter((c) => c.includes('ring'))).toEqual([]);
+    }
+    for (const linear of headers.slice(3)) expect(linear).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:ring-retro-cyan/30']));
   });
 });

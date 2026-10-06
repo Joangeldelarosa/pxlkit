@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAreaChartDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelAreaChartDocsMeta = {
@@ -17,10 +23,79 @@ export const PixelAreaChartDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelAreaChartDocsSection({ className }: PixelAreaChartDocsSectionProps): React.ReactElement {
+/** PixelAreaChart's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelAreaChart } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelAreaChart',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series. Points are spread evenly; `x` only labels them, and one whose `y` is not finite is left out.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the outline and the fill.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '120×32, 240×60 or 360×96 px.' },
+          { name: 'smooth', type: 'boolean', default: 'false', description: "Rounds the outline's joins (linear surface only)." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<svg>` (`SVGAttributes<SVGSVGElement>`).',
+          '`ref` points to `<svg>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelAreaChart } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelAreaChart',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series. Points are spread evenly; `x` only labels them, and one whose `y` is not finite is left out.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the outline and the fill.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '120×32, 240×60 or 360×96 px.' },
+          { name: 'smooth', type: 'boolean', default: 'false', description: "Rounds the outline's joins (linear surface only)." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius around the chart.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name; a summary of the series when unset.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<svg>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelAreaChart } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelAreaChart',
+        selector: 'svg[pxlAreaChart]',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series. Points are spread evenly; `x` only labels them, and one whose `y` is not finite is left out.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the outline and the fill.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '120×32, 240×60 or 360×96 px.' },
+          { name: 'smooth', type: 'boolean', default: 'false', accepts: 'unknown', description: "Rounds the outline's joins (linear surface only)." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border and radius around the chart.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name; a summary of the series when unset.' },
+        ],
+        notes: [
+          'Goes on a native `<svg>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelAreaChartDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelAreaChartDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-area-chart-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-area-chart-heading'>PixelAreaChart</h2>
+      <Title id='pixel-area-chart-heading'>PixelAreaChart</Title>
       <p className="docs-lead">Pure-SVG filled area chart that closes the trend polyline down to the baseline, with crisp pixel edges or smoothed linear joins.</p>
       <ul className="docs-highlights">
         <li>Tone-aware stroke + fill via retro-* token classes — matches the rest of the kit.</li>
@@ -34,21 +109,24 @@ export function PixelAreaChartDocsSection({ className }: PixelAreaChartDocsSecti
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-area-chart-api">
+      <Heading id="pixel-area-chart-api">API</Heading>
+      <FrameworkApi label={'PixelAreaChart API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-area-chart-a11y">
-      <h3 id="pixel-area-chart-a11y">Accessibility</h3>
+      <Heading id="pixel-area-chart-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>img</code></li>
       </ul>
-      <p className="docs-aria-notes">The SVG renders as role=&quot;img&quot; with an auto-derived aria-label summarizing the series (kind, count, min..max range). Pass a custom aria-label for richer context. For full data accessibility, render a visually-hidden &lt;table&gt; sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.</p>
+      <p className="docs-aria-notes">The SVG renders as role=&quot;img&quot; with an auto-derived aria-label summarizing the series (kind, point count and min..max range of its finite values — a point whose y is NaN or ±Infinity is left out of the chart and of the summary, which reads &quot;area chart, no data&quot; when no value is finite). Pass a custom aria-label for richer context. For full data accessibility, render a visually-hidden &lt;table&gt; sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.</p>
     </section>
     <section aria-labelledby="pixel-area-chart-usage">
-      <h3 id="pixel-area-chart-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelAreaChart } from '@pxlkit/ui-kit';
+      <Heading id="pixel-area-chart-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelAreaChart usage'}
+        react={`import { PixelAreaChart } from '@pxlkit/ui-kit';
 
 const sample = [
   { x: 'Mon', y: 12 },
@@ -62,20 +140,125 @@ const sample = [
 
 export function Default() {
   return <PixelAreaChart data={sample} />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelAreaChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelAreaChart :data="sample" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelAreaChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelAreaChart],
+  template: \`<svg pxlAreaChart [data]="sample"></svg>\`,
+})
+export class Default {
+  readonly sample = SAMPLE;
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelAreaChart } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Default() {
   return <PixelAreaChart data={sample} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAreaChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelAreaChart :data="sample" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAreaChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelAreaChart],
+  template: \`<svg pxlAreaChart [data]="sample"></svg>\`,
+})
+export class Default {
+  readonly sample = SAMPLE;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelAreaChart } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Tones() {
   return (
     <div className="flex flex-wrap items-end gap-4">
       <PixelAreaChart data={sample} tone="cyan" />
@@ -86,11 +269,80 @@ export function Default() {
       <PixelAreaChart data={sample} tone="pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAreaChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-end gap-4">
+    <PixelAreaChart :data="sample" tone="cyan" />
+    <PixelAreaChart :data="sample" tone="green" />
+    <PixelAreaChart :data="sample" tone="gold" />
+    <PixelAreaChart :data="sample" tone="red" />
+    <PixelAreaChart :data="sample" tone="purple" />
+    <PixelAreaChart :data="sample" tone="pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAreaChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelAreaChart],
+  template: \`
+    <div class="flex flex-wrap items-end gap-4">
+      <svg pxlAreaChart [data]="sample" tone="cyan"></svg>
+      <svg pxlAreaChart [data]="sample" tone="green"></svg>
+      <svg pxlAreaChart [data]="sample" tone="gold"></svg>
+      <svg pxlAreaChart [data]="sample" tone="red"></svg>
+      <svg pxlAreaChart [data]="sample" tone="purple"></svg>
+      <svg pxlAreaChart [data]="sample" tone="pink"></svg>
+    </div>
+  \`,
+})
+export class Tones {
+  readonly sample = SAMPLE;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelAreaChart } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Sizes() {
   return (
     <div className="flex flex-wrap items-end gap-4">
       <PixelAreaChart data={sample} size="sm" tone="cyan" />
@@ -98,33 +350,195 @@ export function Default() {
       <PixelAreaChart data={sample} size="lg" tone="cyan" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAreaChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-end gap-4">
+    <PixelAreaChart :data="sample" size="sm" tone="cyan" />
+    <PixelAreaChart :data="sample" size="md" tone="cyan" />
+    <PixelAreaChart :data="sample" size="lg" tone="cyan" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAreaChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelAreaChart],
+  template: \`
+    <div class="flex flex-wrap items-end gap-4">
+      <svg pxlAreaChart [data]="sample" size="sm" tone="cyan"></svg>
+      <svg pxlAreaChart [data]="sample" size="md" tone="cyan"></svg>
+      <svg pxlAreaChart [data]="sample" size="lg" tone="cyan"></svg>
+    </div>
+  \`,
+})
+export class Sizes {
+  readonly sample = SAMPLE;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-smooth">
-        <h4>Smooth</h4>
-        <pre className="docs-code"><code>{`export function Smooth() {
+        <Subheading>Smooth</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Smooth code'}
+          react={`import { PixelAreaChart } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Smooth() {
   return <PixelAreaChart data={sample} smooth tone="green" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAreaChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelAreaChart :data="sample" smooth tone="green" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAreaChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelAreaChart],
+  template: \`<svg pxlAreaChart [data]="sample" smooth tone="green"></svg>\`,
+})
+export class Smooth {
+  readonly sample = SAMPLE;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelAreaChart } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap items-end gap-4">
       <PixelAreaChart data={sample} surface="pixel" tone="purple" />
       <PixelAreaChart data={sample} surface="linear" tone="purple" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAreaChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-end gap-4">
+    <PixelAreaChart :data="sample" surface="pixel" tone="purple" />
+    <PixelAreaChart :data="sample" surface="linear" tone="purple" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAreaChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelAreaChart],
+  template: \`
+    <div class="flex flex-wrap items-end gap-4">
+      <svg pxlAreaChart [data]="sample" surface="pixel" tone="purple"></svg>
+      <svg pxlAreaChart [data]="sample" surface="linear" tone="purple"></svg>
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly sample = SAMPLE;
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-sparkline">PixelSparkline</a></li>
-        <li><a href="#pixel-bar-chart">PixelBarChart</a></li>
-        <li><a href="#pixel-stat-group">PixelStatGroup</a></li>
-        <li><a href="#pixel-data-table">PixelDataTable</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-sparkline' : '#pixel-sparkline'}>PixelSparkline</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bar-chart' : '#pixel-bar-chart'}>PixelBarChart</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stat-group' : '#pixel-stat-group'}>PixelStatGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-data-table' : '#pixel-data-table'}>PixelDataTable</a></li>
       </ul>
     </section>
     </section>

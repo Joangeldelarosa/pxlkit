@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelKbd } from './PixelKbd';
 
 export function Default() {

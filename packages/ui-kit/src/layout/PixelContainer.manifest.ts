@@ -10,11 +10,11 @@ export default defineManifest({
   description:
     'Surface-aware page section wrapper with token-driven max-width, page gutter, and vertical rhythm.',
   highlights: [
-    'Surface-aware tokens via useEffectiveSurface (retro / pixel)',
+    'Surface-aware tokens (pixel / linear)',
     'Token-driven maxWidth, padding x (gutter), and padding y (section rhythm)',
-    'Polymorphic `as` for semantic landmarks (section, main, header, footer, article, aside, div)',
+    'Polymorphic `as` for semantic landmarks (section, main, header, footer, article, aside, div); in Angular, the element you put `pxlContainer` on',
     'Composes PixelCenter internally for consistent horizontal centering',
-    'SSR-safe and forwards refs to the underlying element',
+    'SSR-safe, with no client state',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

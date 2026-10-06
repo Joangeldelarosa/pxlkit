@@ -1,19 +1,14 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import { BENTO_AUTO_ROWS, bentoClasses, type BentoColumns } from '@pxlkit/ui-kit-core';
 import { cn } from '../common';
-import { stackGap, StackGapKey } from '../tokens';
-
-type BentoColumns = 3 | 4 | 6;
-
-const columnsMap: Record<BentoColumns, string> = {
-  3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-  4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
-  6: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6',
-};
+import { StackGapKey } from '../tokens';
 
 export interface PixelBentoProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Column count from `lg` up. */
   columns?: BentoColumns;
+  /** Gap token (`stackGap`). */
   gap?: StackGapKey;
 }
 
@@ -23,14 +18,14 @@ export const PixelBento = forwardRef<HTMLDivElement, PixelBentoProps>(function P
 ) {
   const Comp = 'div' as 'div';
   const inlineStyle: React.CSSProperties = {
-    gridAutoRows: 'minmax(160px, 1fr)',
+    gridAutoRows: BENTO_AUTO_ROWS,
     ...style,
   };
   return (
     <Comp
       ref={ref}
       data-columns={columns}
-      className={cn('grid', columnsMap[columns], stackGap[gap], className)}
+      className={cn(bentoClasses(columns, gap), className)}
       style={inlineStyle}
       {...rest}
     >

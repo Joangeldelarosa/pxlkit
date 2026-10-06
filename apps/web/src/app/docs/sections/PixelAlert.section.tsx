@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAlertDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelAlertDocsMeta = {
@@ -17,29 +23,100 @@ export const PixelAlertDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps): React.ReactElement {
+/** PixelAlert's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelAlert } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelAlert',
+        props: [
+          { name: 'label', type: 'string', description: 'Short label shown in tone color (canonical name for the title).' },
+          { name: 'title', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'message', type: 'string', required: true, description: 'Body message under the label.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'red'", description: "Tone determines border, fill, text colors. Defaults to `'red'`." },
+          { name: 'icon', type: 'React.ReactNode', description: 'Optional leading icon (rendered in tone color).' },
+          { name: 'action', type: 'React.ReactNode', description: 'Optional action node rendered under the message.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; falls back to nearest provider.' },
+          { name: 'live', type: "'polite' | 'assertive' | 'off'", description: 'Optional `aria-live` override. Status banners ("info") should usually use `"polite"`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelAlert } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelAlert',
+        props: [
+          { name: 'label', type: 'string', description: 'Short label shown in the tone colour (canonical name for the title).' },
+          { name: 'title', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'message', type: 'string', required: true, description: 'Body message under the label.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'red'", description: 'Tone of the border, fill and texts.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'live', type: "'polite' | 'assertive' | 'off'", description: '`aria-live` override. Status banners ("info") should usually use `"polite"`.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'Leading icon, in the tone colour.' },
+          { name: 'action', description: 'Action under the message (Retry, Dismiss, …).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelAlert } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelAlert',
+        selector: 'pxl-alert',
+        props: [
+          { name: 'label', type: 'string', description: 'Short label shown in the tone colour (canonical name for the title).' },
+          { name: 'title', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'message', type: 'string', required: true, description: 'Body message under the label.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'red'", description: 'Tone of the border, fill and texts.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Leading icon, in the tone colour.' },
+          { name: 'action', type: 'string | TemplateRef<any>', description: 'Action under the message (Retry, Dismiss, …).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'live', type: "'polite' | 'assertive' | 'off'", description: '`aria-live` override. Status banners ("info") should usually use `"polite"`.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelAlertDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelAlertDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-alert-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-alert-heading'>PixelAlert</h2>
+      <Title id='pixel-alert-heading'>PixelAlert</Title>
       <p className="docs-lead">Inline status banner with title, message, tone, optional icon, and action — announces itself to screen readers via role=&quot;alert&quot;.</p>
       <ul className="docs-highlights">
         <li>Seven tones (neutral, green, cyan, gold, red, purple, pink) with soft tint + matching border.</li>
         <li>Surface-aware: pixel adds a left HP-bar accent stripe and chamfered border; linear stays rounded.</li>
         <li>Smart aria-live default — red/gold use &quot;assertive&quot;, everything else &quot;polite&quot;. Overridable via live prop.</li>
         <li>Optional icon and action slots for quick triage (e.g. Retry, Dismiss).</li>
-        <li>SSR-safe, ref-forwarded, no client state.</li>
+        <li>SSR-safe, no client state.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-alert-api">
+      <Heading id="pixel-alert-api">API</Heading>
+      <FrameworkApi label={'PixelAlert API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-alert-a11y">
-      <h3 id="pixel-alert-a11y">Accessibility</h3>
+      <Heading id="pixel-alert-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>alert</code></li>
@@ -47,9 +124,11 @@ export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps)
       <p className="docs-aria-notes">Root carries role=&quot;alert&quot; and a calculated aria-live (assertive for red/gold, polite otherwise). Icon slot is wrapped purely for layout — meaning must come from the title/message text, not the glyph. For non-urgent status (e.g. &quot;saved&quot;), pass live=&quot;polite&quot; to prevent screen-reader interruption. Action buttons are exposed as siblings of the message and receive their own focus order.</p>
     </section>
     <section aria-labelledby="pixel-alert-usage">
-      <h3 id="pixel-alert-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelAlert } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+      <Heading id="pixel-alert-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelAlert usage'}
+        react={`import { PixelAlert } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,25 +137,66 @@ export function Default() {
       message="Your session expired. Please sign in again to continue."
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelAlert } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAlert title="Something went wrong" message="Your session expired. Please sign in again to continue." />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelAlert } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlert],
+  template: \`<pxl-alert title="Something went wrong" message="Your session expired. Please sign in again to continue." />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelAlert } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelAlert
       title="Something went wrong"
       message="Your session expired. Please sign in again to continue."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAlert } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAlert title="Something went wrong" message="Your session expired. Please sign in again to continue." />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAlert } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlert],
+  template: \`<pxl-alert title="Something went wrong" message="Your session expired. Please sign in again to continue." />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelAlert } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-col gap-3">
       <PixelAlert tone="neutral" title="Heads up" message="Neutral informational banner." />
@@ -88,11 +208,50 @@ export function Default() {
       <PixelAlert tone="pink" title="Highlight" message="You unlocked a new badge." />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAlert } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelAlert tone="neutral" title="Heads up" message="Neutral informational banner." />
+    <PixelAlert tone="green" title="Saved" message="Your changes have been persisted." />
+    <PixelAlert tone="cyan" title="New feature" message="Try the redesigned inbox." />
+    <PixelAlert tone="gold" title="Warning" message="Storage is almost full." />
+    <PixelAlert tone="red" title="Error" message="Failed to upload the file." />
+    <PixelAlert tone="purple" title="Tip" message="Use ⌘K to jump anywhere." />
+    <PixelAlert tone="pink" title="Highlight" message="You unlocked a new badge." />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAlert } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlert],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-alert tone="neutral" title="Heads up" message="Neutral informational banner." />
+      <pxl-alert tone="green" title="Saved" message="Your changes have been persisted." />
+      <pxl-alert tone="cyan" title="New feature" message="Try the redesigned inbox." />
+      <pxl-alert tone="gold" title="Warning" message="Storage is almost full." />
+      <pxl-alert tone="red" title="Error" message="Failed to upload the file." />
+      <pxl-alert tone="purple" title="Tip" message="Use ⌘K to jump anywhere." />
+      <pxl-alert tone="pink" title="Highlight" message="You unlocked a new badge." />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelAlert } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelAlert
@@ -109,11 +268,53 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAlert } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelAlert surface="linear" tone="cyan" title="Linear surface" message="Soft border with rounded corners." />
+    <PixelAlert surface="pixel" tone="cyan" title="Pixel surface" message="Chamfered border with a left accent stripe." />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAlert } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlert],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-alert surface="linear" tone="cyan" title="Linear surface" message="Soft border with rounded corners." />
+      <pxl-alert surface="pixel" tone="cyan" title="Pixel surface" message="Chamfered border with a left accent stripe." />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icon">
-        <h4>With Icon</h4>
-        <pre className="docs-code"><code>{`export function WithIcon() {
+        <Subheading>With Icon</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Icon code'}
+          react={`import { PixelAlert } from '@pxlkit/ui-kit';
+
+const InfoIcon = () => (
+  <span
+    aria-hidden
+    style={{
+      width: 14,
+      height: 14,
+      borderRadius: 9999,
+      background: 'currentColor',
+      display: 'inline-block',
+    }}
+  />
+);
+
+export function WithIcon() {
   return (
     <PixelAlert
       tone="cyan"
@@ -122,11 +323,60 @@ export function Default() {
       icon={<InfoIcon />}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAlert } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAlert tone="cyan" title="Pro tip" message="You can drag-and-drop files anywhere on the page.">
+    <template #icon>
+      <span
+        aria-hidden="true"
+        style="width: 14px; height: 14px; border-radius: 9999px; background: currentColor; display: inline-block"
+      />
+    </template>
+  </PixelAlert>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAlert } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlert],
+  template: \`
+    <pxl-alert tone="cyan" title="Pro tip" message="You can drag-and-drop files anywhere on the page." [icon]="info" />
+    <ng-template #info>
+      <span
+        aria-hidden="true"
+        style="width: 14px; height: 14px; border-radius: 9999px; background: currentColor; display: inline-block"
+      ></span>
+    </ng-template>
+  \`,
+})
+export class WithIcon {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-action">
-        <h4>With Action</h4>
-        <pre className="docs-code"><code>{`export function WithAction() {
+        <Subheading>With Action</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Action code'}
+          react={`import { PixelAlert, PixelButton } from '@pxlkit/ui-kit';
+
+const InfoIcon = () => (
+  <span
+    aria-hidden
+    style={{
+      width: 14,
+      height: 14,
+      borderRadius: 9999,
+      background: 'currentColor',
+      display: 'inline-block',
+    }}
+  />
+);
+
+export function WithAction() {
   return (
     <PixelAlert
       tone="red"
@@ -140,11 +390,57 @@ export function Default() {
       }
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAlert, PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAlert tone="red" title="Connection lost" message="We couldn't reach the server. Check your network and retry.">
+    <template #icon>
+      <span
+        aria-hidden="true"
+        style="width: 14px; height: 14px; border-radius: 9999px; background: currentColor; display: inline-block"
+      />
+    </template>
+    <template #action>
+      <PixelButton size="sm" tone="red" variant="outline">Retry</PixelButton>
+    </template>
+  </PixelAlert>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAlert, PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlert, PixelButton],
+  template: \`
+    <pxl-alert
+      tone="red"
+      title="Connection lost"
+      message="We couldn't reach the server. Check your network and retry."
+      [icon]="info"
+      [action]="retry"
+    />
+    <ng-template #info>
+      <span
+        aria-hidden="true"
+        style="width: 14px; height: 14px; border-radius: 9999px; background: currentColor; display: inline-block"
+      ></span>
+    </ng-template>
+    <ng-template #retry><button pxlButton size="sm" tone="red" variant="outline">Retry</button></ng-template>
+  \`,
+})
+export class WithAction {}`}
+        />
       </article>
       <article className="docs-example" id="example-polite-live">
-        <h4>Polite Live Region</h4>
-        <pre className="docs-code"><code>{`export function PoliteLive() {
+        <Subheading>Polite Live Region</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Polite Live Region code'}
+          react={`import { PixelAlert } from '@pxlkit/ui-kit';
+
+export function PoliteLive() {
   return (
     <PixelAlert
       tone="green"
@@ -153,15 +449,31 @@ export function Default() {
       message="Drafts are saved every few seconds."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAlert } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAlert tone="green" live="polite" title="Auto-saved" message="Drafts are saved every few seconds." />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAlert } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlert],
+  template: \`<pxl-alert tone="green" live="polite" title="Auto-saved" message="Drafts are saved every few seconds." />\`,
+})
+export class PoliteLive {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-toast">PixelToast</a></li>
-        <li><a href="#pixel-alert-dialog">PixelAlertDialog</a></li>
-        <li><a href="#pixel-empty-state">PixelEmptyState</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toast' : '#pixel-toast'}>PixelToast</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert-dialog' : '#pixel-alert-dialog'}>PixelAlertDialog</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-empty-state' : '#pixel-empty-state'}>PixelEmptyState</a></li>
       </ul>
     </section>
     </section>

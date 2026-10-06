@@ -345,6 +345,19 @@ describe('PixelCard — DOM prop pass-through', () => {
     expect(article.getAttribute('aria-label')).toBe('A card');
   });
 
+  // Regression: the link card dropped onKeyDown, which the article and the
+  // interactive card both receive.
+  it('forwards onKeyDown to the anchor when href is set', () => {
+    const onKeyDown = vi.fn();
+    const { container } = render(
+      <PixelCard title="Card" href="/x" onKeyDown={onKeyDown}>
+        body
+      </PixelCard>,
+    );
+    fireEvent.keyDown(container.querySelector('a')!, { key: 'Enter' });
+    expect(onKeyDown).toHaveBeenCalledTimes(1);
+  });
+
   it('forwards anchor-specific attributes when href is set', () => {
     const { container } = render(
       <PixelCard title="Card" href="/x" target="_blank" rel="noopener">

@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
 import { PixelDashboardTemplate } from '@/components/templates/dashboard-template';
+import { TemplatePageHeader } from '@/components/TemplatePageHeader';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Admin Dashboard Template | Pxlkit',
+export const metadata: Metadata = pageMetadata({
+  path: '/templates/dashboards',
+  title: 'Retro React Admin Dashboard Template',
   description:
-    'Drop-in retro admin dashboard: sidebar, KPI cards with sparklines, area chart, sortable data table, slide-over drawer, ⌘K palette. Pxlkit.',
+    'Drop-in retro React admin dashboard: sidebar, KPI cards with sparklines, area chart, sortable data table, slide-over drawer and a ⌘K command palette.',
+  imageAlt: 'Pxlkit admin dashboard template — sidebar, KPIs, charts, data table, command palette',
   keywords: [
     'admin dashboard template react',
     'next.js dashboard template',
@@ -16,35 +20,14 @@ export const metadata: Metadata = {
     'sparkline kpi cards',
     'pxlkit templates',
     'pxlkit dashboard',
-    'pxlkit ui-kit v1.9',
   ],
-  openGraph: {
-    type: 'website',
-    title: 'Admin Dashboard Template | Pxlkit',
-    description:
-      'Drop-in retro admin dashboard: sidebar, KPI cards with sparklines, area chart, sortable data table, slide-over drawer, ⌘K palette.',
-    url: 'https://pxlkit.xyz/templates/dashboards',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1280,
-        height: 640,
-        alt: 'Pxlkit admin dashboard template — sidebar, KPIs, charts, data table, command palette',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Admin Dashboard Template | Pxlkit',
-    description:
-      'Drop-in retro admin dashboard: sidebar, charts, sortable data table, slide-over drawer, ⌘K palette.',
-    images: ['/og-twitter.png'],
-  },
-  alternates: {
-    canonical: 'https://pxlkit.xyz/templates/dashboards',
-  },
-};
+});
 
 export default function DashboardsTemplatePage() {
-  return <PixelDashboardTemplate />;
+  return (
+    <>
+      <TemplatePageHeader name="Admin dashboard" path="/templates/dashboards" title="Retro React admin dashboard template" />
+      <PixelDashboardTemplate />
+    </>
+  );
 }

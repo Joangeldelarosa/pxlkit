@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCollapsibleDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCollapsibleDocsMeta = {
@@ -17,35 +23,99 @@ export const PixelCollapsibleDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelCollapsibleDocsSection({ className }: PixelCollapsibleDocsSectionProps): React.ReactElement {
+/** PixelCollapsible's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCollapsible } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCollapsible',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Trigger label.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Body content rendered when open.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Initial open state. Defaults to `false`.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: "Tone tint for the trigger button. Defaults to `'neutral'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCollapsible } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCollapsible',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label of the header button.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Open on first render.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the header button.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface-aware border and radius around the collapsible.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The body, rendered while open.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCollapsible } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCollapsible',
+        selector: 'pxl-collapsible',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label of the header button.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Open on first render.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the header button.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface-aware border and radius around the collapsible.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelCollapsibleDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCollapsibleDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-collapsible-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-collapsible-heading'>PixelCollapsible</h2>
+      <Title id='pixel-collapsible-heading'>PixelCollapsible</Title>
       <p className="docs-lead">Toggleable disclosure block with a tone-coloured chevron header that reveals or hides arbitrary content.</p>
       <ul className="docs-highlights">
         <li>Single-section disclosure pattern with animated chevron rotation</li>
         <li>Seven brand tones applied to the header button (neutral default)</li>
-        <li>Surface-aware typography (pixel vs linear) via shared surface context</li>
-        <li>Uncontrolled state with `defaultOpen` for SSR-friendly initial render</li>
-        <li>SSR-safe and tree-shakable; renders children only when expanded</li>
+        <li>Surface-aware typography (pixel vs linear)</li>
+        <li>Uncontrolled state with <code>defaultOpen</code> for SSR-friendly initial render</li>
+        <li>SSR-safe and tree-shakable; renders its content only when expanded</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-collapsible-api">
+      <Heading id="pixel-collapsible-api">API</Heading>
+      <FrameworkApi label={'PixelCollapsible API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-collapsible-a11y">
-      <h3 id="pixel-collapsible-a11y">Accessibility</h3>
+      <Heading id="pixel-collapsible-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>disclosure</code></li>
       </ul>
-      <p className="docs-aria-notes">Header is a native &lt;button&gt; so assistive tech announces it as a button trigger. The trigger exposes aria-expanded reflecting the open state and aria-controls pointing at the content region (a stable generated id); the content region is labelled by the trigger via aria-labelledby — the same wiring PixelAccordion uses.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Header is a native &lt;button&gt; so assistive tech announces it as a button trigger. The trigger exposes aria-expanded reflecting the open state and aria-controls pointing at the content region (a stable generated id); the content container follows the trigger in reading order and takes no name, which ARIA does not allow on an element without a role — the same wiring PixelAccordion uses.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -74,8 +144,11 @@ export function PixelCollapsibleDocsSection({ className }: PixelCollapsibleDocsS
       </table>
     </section>
     <section aria-labelledby="pixel-collapsible-usage">
-      <h3 id="pixel-collapsible-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelCollapsible } from '@pxlkit/ui-kit';
+      <Heading id="pixel-collapsible-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCollapsible usage'}
+        react={`import { PixelCollapsible } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -85,14 +158,40 @@ export function Default() {
       </p>
     </PixelCollapsible>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelCollapsible } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCollapsible label="Show details">
+    <p class="text-xs text-retro-muted">Hidden content revealed when the header is toggled.</p>
+  </PixelCollapsible>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelCollapsible } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCollapsible],
+  template: \`
+    <pxl-collapsible label="Show details">
+      <p class="text-xs text-retro-muted">Hidden content revealed when the header is toggled.</p>
+    </pxl-collapsible>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelCollapsible } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelCollapsible label="Show details">
       <p className="text-xs text-retro-muted">
@@ -100,11 +199,38 @@ export function Default() {
       </p>
     </PixelCollapsible>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCollapsible } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCollapsible label="Show details">
+    <p class="text-xs text-retro-muted">Hidden content revealed when the header is toggled.</p>
+  </PixelCollapsible>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCollapsible } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCollapsible],
+  template: \`
+    <pxl-collapsible label="Show details">
+      <p class="text-xs text-retro-muted">Hidden content revealed when the header is toggled.</p>
+    </pxl-collapsible>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-default-open">
-        <h4>Default open</h4>
-        <pre className="docs-code"><code>{`export function DefaultOpen() {
+        <Subheading>Default open</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default open code'}
+          react={`import { PixelCollapsible } from '@pxlkit/ui-kit';
+
+export function DefaultOpen() {
   return (
     <PixelCollapsible label="Already expanded" defaultOpen>
       <p className="text-xs text-retro-muted">
@@ -112,11 +238,38 @@ export function Default() {
       </p>
     </PixelCollapsible>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCollapsible } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCollapsible label="Already expanded" default-open>
+    <p class="text-xs text-retro-muted">Renders open on first mount; click the header to collapse.</p>
+  </PixelCollapsible>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCollapsible } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCollapsible],
+  template: \`
+    <pxl-collapsible label="Already expanded" defaultOpen>
+      <p class="text-xs text-retro-muted">Renders open on first mount; click the header to collapse.</p>
+    </pxl-collapsible>
+  \`,
+})
+export class DefaultOpen {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelCollapsible } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-col gap-3">
       <PixelCollapsible label="Cyan section" tone="cyan">
@@ -142,11 +295,78 @@ export function Default() {
       </PixelCollapsible>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCollapsible } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelCollapsible label="Cyan section" tone="cyan">
+      <p class="text-xs text-retro-muted">Cyan-tinted toggle.</p>
+    </PixelCollapsible>
+    <PixelCollapsible label="Green section" tone="green">
+      <p class="text-xs text-retro-muted">Green-tinted toggle.</p>
+    </PixelCollapsible>
+    <PixelCollapsible label="Gold section" tone="gold">
+      <p class="text-xs text-retro-muted">Gold-tinted toggle.</p>
+    </PixelCollapsible>
+    <PixelCollapsible label="Red section" tone="red">
+      <p class="text-xs text-retro-muted">Red-tinted toggle.</p>
+    </PixelCollapsible>
+    <PixelCollapsible label="Purple section" tone="purple">
+      <p class="text-xs text-retro-muted">Purple-tinted toggle.</p>
+    </PixelCollapsible>
+    <PixelCollapsible label="Pink section" tone="pink">
+      <p class="text-xs text-retro-muted">Pink-tinted toggle.</p>
+    </PixelCollapsible>
+    <PixelCollapsible label="Neutral section" tone="neutral">
+      <p class="text-xs text-retro-muted">Neutral-tinted toggle.</p>
+    </PixelCollapsible>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCollapsible } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCollapsible],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-collapsible label="Cyan section" tone="cyan">
+        <p class="text-xs text-retro-muted">Cyan-tinted toggle.</p>
+      </pxl-collapsible>
+      <pxl-collapsible label="Green section" tone="green">
+        <p class="text-xs text-retro-muted">Green-tinted toggle.</p>
+      </pxl-collapsible>
+      <pxl-collapsible label="Gold section" tone="gold">
+        <p class="text-xs text-retro-muted">Gold-tinted toggle.</p>
+      </pxl-collapsible>
+      <pxl-collapsible label="Red section" tone="red">
+        <p class="text-xs text-retro-muted">Red-tinted toggle.</p>
+      </pxl-collapsible>
+      <pxl-collapsible label="Purple section" tone="purple">
+        <p class="text-xs text-retro-muted">Purple-tinted toggle.</p>
+      </pxl-collapsible>
+      <pxl-collapsible label="Pink section" tone="pink">
+        <p class="text-xs text-retro-muted">Pink-tinted toggle.</p>
+      </pxl-collapsible>
+      <pxl-collapsible label="Neutral section" tone="neutral">
+        <p class="text-xs text-retro-muted">Neutral-tinted toggle.</p>
+      </pxl-collapsible>
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelCollapsible } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelCollapsible label="Pixel surface" surface="pixel">
@@ -157,11 +377,48 @@ export function Default() {
       </PixelCollapsible>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCollapsible } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelCollapsible label="Pixel surface" surface="pixel">
+      <p class="text-xs text-retro-muted">Retro pixel typography.</p>
+    </PixelCollapsible>
+    <PixelCollapsible label="Linear surface" surface="linear">
+      <p class="text-xs text-retro-muted">Smoother linear surface.</p>
+    </PixelCollapsible>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCollapsible } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCollapsible],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-collapsible label="Pixel surface" surface="pixel">
+        <p class="text-xs text-retro-muted">Retro pixel typography.</p>
+      </pxl-collapsible>
+      <pxl-collapsible label="Linear surface" surface="linear">
+        <p class="text-xs text-retro-muted">Smoother linear surface.</p>
+      </pxl-collapsible>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-rich-content">
-        <h4>Rich content</h4>
-        <pre className="docs-code"><code>{`export function RichContent() {
+        <Subheading>Rich content</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Rich content code'}
+          react={`import { PixelCollapsible } from '@pxlkit/ui-kit';
+
+export function RichContent() {
   return (
     <PixelCollapsible label="Release notes" tone="cyan" defaultOpen>
       <ul className="list-disc pl-4 text-xs text-retro-muted">
@@ -171,14 +428,44 @@ export function Default() {
       </ul>
     </PixelCollapsible>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCollapsible } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCollapsible label="Release notes" tone="cyan" default-open>
+    <ul class="list-disc pl-4 text-xs text-retro-muted">
+      <li>Added tone-aware chevron header</li>
+      <li>Surface-aware typography (pixel vs linear)</li>
+      <li>Toggle state preserved on re-render</li>
+    </ul>
+  </PixelCollapsible>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCollapsible } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCollapsible],
+  template: \`
+    <pxl-collapsible label="Release notes" tone="cyan" defaultOpen>
+      <ul class="list-disc pl-4 text-xs text-retro-muted">
+        <li>Added tone-aware chevron header</li>
+        <li>Surface-aware typography (pixel vs linear)</li>
+        <li>Toggle state preserved on re-render</li>
+      </ul>
+    </pxl-collapsible>
+  \`,
+})
+export class RichContent {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-accordion">PixelAccordion</a></li>
-        <li><a href="#pixel-tabs">PixelTabs</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-accordion' : '#pixel-accordion'}>PixelAccordion</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tabs' : '#pixel-tabs'}>PixelTabs</a></li>
       </ul>
     </section>
     </section>

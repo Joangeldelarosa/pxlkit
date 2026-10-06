@@ -1,13 +1,21 @@
 {
   "name": "@pxlkit/gamification",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Gamification icon pack \u2014 51 pixel art icons for RPG games, achievements, rewards, trophies, swords, potions, coins, stars, and gaming UI",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
   "license": "SEE LICENSE IN LICENSE",
-  "repository": "https://github.com/Joangeldelarosa/pxlkit",
+  "homepage": "https://pxlkit.xyz/icons",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/gamification"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -29,7 +37,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.2.3"
+    "@pxlkit/core": "^1.4.0"
   },
   "devDependencies": {
     "tsup": "^8.3.0",
@@ -57,6 +65,9 @@
     "react-icons",
     "pxlkit",
     "source-available-icons",
-    "free-game-icons"
+    "free-game-icons",
+    "pixel-icons",
+    "vue-icons",
+    "angular-icons"
   ]
 }

@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelCarousel } from './PixelCarousel';
 
 function Slide({ label, tone }: { label: string; tone: string }) {

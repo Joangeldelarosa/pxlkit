@@ -16,12 +16,12 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Styled keyboard shortcut indicator that renders a native <kbd> element with surface-aware framing for inline docs, hints, and command menus.',
+    'Styled keyboard shortcut indicator that renders a native `<kbd>` element with surface-aware framing for inline docs, hints, and command menus.',
   highlights: [
     'Semantic <kbd> root so assistive tech announces the key role correctly.',
     'Surface-aware: pixel chamfered border + pixel font, or linear pill.',
-    'Drop-shadow depth tuned per surface for a tactile keycap feel.',
-    'Composable inline — accepts any ReactNode children to support icons or multi-character keys.',
+    'Keycap depth per surface for a tactile feel: a thick bottom edge on pixel, a soft drop shadow on linear.',
+    'Composable inline — takes any inline content, such as icons or multi-character keys.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

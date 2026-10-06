@@ -1,3 +1,7 @@
+# Changelog — @pxlkit/web
+
+> From 1.3.0 on, the site's changes are recorded in the repository's [CHANGELOG.md](../../CHANGELOG.md), in the section of the release they shipped with (the "Site:" entries). This file keeps the earlier history.
+
 ## 1.2.1 — 2026-06-01 (Ola 5a — Templates coherence pass)
 
 ### Changed

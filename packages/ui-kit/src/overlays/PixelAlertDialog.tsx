@@ -1,8 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useId, useRef, useState } from 'react';
-import {
-  Surface, cn,
-  toneMap, surfaceClasses, useEffectiveSurface,
-} from '../common';
+import { alertDialogClasses, alertDialogLayerClasses } from '@pxlkit/ui-kit-core';
+import { Surface, useEffectiveSurface } from '../common';
 import { PixelPortal } from '../overlay-foundation/PixelPortal';
 import { OverlayBackdrop } from './_internal/OverlayBackdrop';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -11,12 +9,25 @@ import { useScrollLock } from '../hooks/useScrollLock';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 export interface PixelAlertDialogProps {
+  /** Whether the dialog is visible; set it from `onOpenChange`. */
   open: boolean;
+  /**
+   * Called with `false` when the dialog asks to close (Cancel, Escape, the backdrop, a completed
+   * action).
+   */
   onOpenChange: (open: boolean) => void;
+  /** Title; it names the dialog. */
   title: string;
+  /** Text under the title, wired via `aria-describedby`. */
   description?: string;
+  /** Label of the button that dismisses the dialog. */
   cancelLabel?: string;
+  /** Label of the button that confirms. */
   actionLabel?: string;
+  /**
+   * The confirmed action. Its result matters: the dialog closes once it returns, or once the
+   * promise it returns resolves — and stays open, busy, until then.
+   */
   onAction: () => void | Promise<void>;
   /**
    * Called when `onAction` throws / rejects. Receives the thrown value.
@@ -24,7 +35,9 @@ export interface PixelAlertDialogProps {
    * an inline error. When unset, errors are silently swallowed (back-compat).
    */
   onError?: (error: unknown) => void;
+  /** Red accent for a destructive action (cyan otherwise). */
   destructive?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 
@@ -44,14 +57,12 @@ export const PixelAlertDialog = forwardRef<HTMLDivElement, PixelAlertDialogProps
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const titleId = useId();
   const descId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
   const cancelBtnRef = useRef<HTMLButtonElement>(null);
   const [pending, setPending] = useState(false);
   const reducedMotion = useReducedMotion();
-  const spinClass = reducedMotion ? '' : 'animate-spin';
 
   const setRefs = (node: HTMLDivElement | null) => {
     (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
@@ -117,14 +128,34 @@ export const PixelAlertDialog = forwardRef<HTMLDivElement, PixelAlertDialogProps
 
   if (!open) return null;
 
-  const accentTone = destructive ? 'red' : 'cyan';
-  const t = toneMap[accentTone];
+  const c = alertDialogClasses(surface, { destructive, reducedMotion });
+  const descriptionNode = description && <p id={descId} className={c.description}>{description}</p>;
+  const actions = (
+    <div className={c.actions}>
+      <button
+        ref={cancelBtnRef}
+        type="button"
+        onClick={handleCancel}
+        disabled={pending}
+        className={c.cancel}
+      >
+        {cancelLabel}
+      </button>
+      <button
+        type="button"
+        onClick={handleAction}
+        disabled={pending}
+        className={c.action}
+      >
+        {pending && <span aria-hidden className={c.spinner} />}
+        <span>{actionLabel}</span>
+      </button>
+    </div>
+  );
 
   return (
     <PixelPortal>
-      <div
-        className="fixed inset-0 z-[80] flex items-center justify-center p-4"
-      >
+      <div className={alertDialogLayerClasses}>
         <OverlayBackdrop
           position="fixed"
           onClick={handleCancel}
@@ -135,108 +166,29 @@ export const PixelAlertDialog = forwardRef<HTMLDivElement, PixelAlertDialogProps
           aria-modal="true"
           aria-labelledby={titleId}
           aria-describedby={description ? descId : undefined}
-          className={cn(
-            'relative w-full max-w-sm bg-retro-bg shadow-2xl',
-            s.border, s.radiusLg, 'border-retro-border',
-            surface === 'pixel' ? 'p-0' : 'p-5',
-          )}
+          className={c.panel}
         >
           {surface === 'pixel' ? (
             <>
-              <div className={cn('flex items-center gap-2 border-b-2 border-retro-border bg-retro-surface/60 px-3 py-2')}>
-                <span aria-hidden className={cn('inline-block h-2 w-2', t.fill)} />
-                <h2 id={titleId} className="font-pixel text-[11px] text-retro-green">{title}</h2>
+              <div className={c.header}>
+                <span aria-hidden className={c.accent} />
+                <h2 id={titleId} className={c.title}>{title}</h2>
               </div>
-              <div className="p-5">
-                {description && (
-                  <p id={descId} className={cn('text-sm text-retro-muted', s.font)}>{description}</p>
-                )}
-                <div className="mt-5 flex items-center justify-end gap-2">
-                  <button
-                    ref={cancelBtnRef}
-                    type="button"
-                    onClick={handleCancel}
-                    disabled={pending}
-                    className={cn(
-                      'inline-flex items-center justify-center px-4 h-9 text-xs font-medium outline-none disabled:opacity-50 disabled:cursor-not-allowed',
-                      s.border, s.radius, s.font, s.transition,
-                      'border-retro-border text-retro-muted hover:bg-retro-surface/70 hover:text-retro-text',
-                      'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-border',
-                    )}
-                  >
-                    {cancelLabel}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleAction}
-                    disabled={pending}
-                    className={cn(
-                      'inline-flex items-center justify-center gap-2 px-4 h-9 text-xs font-medium outline-none disabled:opacity-50 disabled:cursor-not-allowed',
-                      s.border, s.radius, s.font, s.transition,
-                      t.border, t.bg, t.text, t.hover,
-                      'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg', t.ring,
-                    )}
-                  >
-                    {pending && (
-                      <span
-                        aria-hidden
-                        className={cn(
-                          'inline-block h-3 w-3 rounded-full border-2 border-current border-r-transparent',
-                          spinClass,
-                        )}
-                      />
-                    )}
-                    <span>{actionLabel}</span>
-                  </button>
-                </div>
+              <div className={c.body}>
+                {descriptionNode}
+                {actions}
               </div>
             </>
           ) : (
             <>
-              <div className="flex items-start gap-3">
-                <span aria-hidden className={cn('mt-1 inline-block h-2 w-2 rounded-full', t.fill)} />
-                <div className="flex-1">
-                  <h2 id={titleId} className={cn('text-base font-semibold text-retro-text', s.fontDisplay)}>{title}</h2>
-                  {description && (
-                    <p id={descId} className={cn('mt-2 text-sm text-retro-muted', s.font)}>{description}</p>
-                  )}
+              <div className={c.header}>
+                <span aria-hidden className={c.accent} />
+                <div className={c.texts}>
+                  <h2 id={titleId} className={c.title}>{title}</h2>
+                  {descriptionNode}
                 </div>
               </div>
-              <div className="mt-5 flex items-center justify-end gap-2">
-                <button
-                  ref={cancelBtnRef}
-                  type="button"
-                  onClick={handleCancel}
-                  disabled={pending}
-                  className={cn(
-                    'inline-flex items-center justify-center px-4 h-9 text-sm font-medium outline-none disabled:opacity-50 disabled:cursor-not-allowed',
-                    s.border, s.radius, s.font, s.transition,
-                    'border-retro-border text-retro-muted hover:bg-retro-surface/70 hover:text-retro-text',
-                    'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-border',
-                  )}
-                >
-                  {cancelLabel}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAction}
-                  disabled={pending}
-                  className={cn(
-                    'inline-flex items-center justify-center gap-2 px-4 h-9 text-sm font-medium outline-none disabled:opacity-50 disabled:cursor-not-allowed',
-                    s.border, s.radius, s.font, s.transition,
-                    t.border, t.bg, t.text, t.hover,
-                    'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg', t.ring,
-                  )}
-                >
-                  {pending && (
-                    <span
-                      aria-hidden
-                      className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-r-transparent"
-                    />
-                  )}
-                  <span>{actionLabel}</span>
-                </button>
-              </div>
+              {actions}
             </>
           )}
         </div>

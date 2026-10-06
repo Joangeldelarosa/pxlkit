@@ -20,6 +20,59 @@ describe('PixelGlitch', () => {
     expect(getAllByText('glitchy')).toHaveLength(3);
   });
 
+  it('renders its wrapper and layers as spans with as="span", the content\'s layer a block', () => {
+    const { container } = render(
+      <h2>
+        <PixelGlitch as="span">Signal</PixelGlitch>
+      </h2>,
+    );
+    const wrapper = container.querySelector('h2')!.firstElementChild as HTMLElement;
+    expect(wrapper.tagName).toBe('SPAN');
+    expect([...wrapper.children].map((layer) => layer.tagName)).toEqual(['SPAN', 'SPAN', 'SPAN']);
+    expect(wrapper.querySelectorAll('[aria-hidden]')).toHaveLength(2);
+    expect(wrapper.lastElementChild!.className).toBe('block');
+    expect(container.querySelectorAll('div')).toHaveLength(0);
+  });
+
+  it('holds a label once and has the stylesheet draw its copies while it plays', () => {
+    const { container } = render(
+      <h2>
+        <PixelGlitch as="span" label="Signal" intensity={6} duration={2000} />
+      </h2>,
+    );
+    const heading = container.querySelector('h2')!;
+    expect(heading.textContent).toBe('Signal');
+    expect(heading.querySelectorAll('[aria-hidden]')).toHaveLength(0);
+    const wrapper = heading.firstElementChild as HTMLElement;
+    expect(wrapper.tagName).toBe('SPAN');
+    expect(wrapper.dataset.text).toBe('Signal');
+    expect(wrapper.className.split(' ')).toEqual(['relative', 'inline-block', 'overflow-visible', 'pxl-glitch-copies']);
+    expect(wrapper.style.getPropertyValue('--pxl-glitch-x')).toBe('6px');
+    expect(wrapper.style.getPropertyValue('--pxl-glitch-duration')).toBe('2000ms');
+    const main = wrapper.firstElementChild as HTMLElement;
+    expect(wrapper.children).toHaveLength(1);
+    expect(main.className).toBe('block');
+    expect(main.style.animation).toContain('pxl-glitch 2000ms');
+  });
+
+  it('draws no copies of a label while still: trigger off, or the user prefers reduced motion', () => {
+    const { container } = render(<PixelGlitch label="idle" trigger={false} />);
+    const idle = container.firstElementChild as HTMLElement;
+    expect(idle.classList.contains('pxl-glitch-copies')).toBe(false);
+    expect(idle.getAttribute('style')).toBeNull();
+    expect(idle.dataset.text).toBe('idle');
+    const ctl = mockMatchMedia(true);
+    try {
+      const { container: calm } = render(<PixelGlitch label="calm" />);
+      const wrapper = calm.firstElementChild as HTMLElement;
+      expect(wrapper.classList.contains('pxl-glitch-copies')).toBe(false);
+      expect((wrapper.firstElementChild as HTMLElement).style.animation).toBe('');
+      expect(wrapper.textContent).toBe('calm');
+    } finally {
+      ctl.restore();
+    }
+  });
+
   it('ghost layers are aria-hidden and run the R/C ghost keyframes', () => {
     const { container } = render(<PixelGlitch>x</PixelGlitch>);
     const ghosts = container.querySelectorAll('[aria-hidden]');

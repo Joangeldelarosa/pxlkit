@@ -24,7 +24,7 @@ function ThemeToggleButton({ isDark, onToggleTheme }: ThemeToggleProps) {
         className="p-2 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
         aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       >
-        <PxlKitIcon icon={isDark ? Sun : Moon} size={16} colorful />
+        <PxlKitIcon icon={isDark ? Sun : Moon} size={16} colorful decorative />
       </button>
     </PixelTooltip>
   );
@@ -45,7 +45,7 @@ export function HeaderSimplePreview({ isDark, onToggleTheme }: ThemeToggleProps)
     <div className="bg-retro-bg">
       <header className="flex items-center justify-between px-6 h-16 border-b border-retro-border">
         <div className="flex items-center gap-2.5">
-          <PxlKitIcon icon={Lightning} size={22} colorful />
+          <PxlKitIcon icon={Lightning} size={22} colorful decorative />
           <span className="font-pixel text-sm text-retro-text">VoltApp</span>
         </div>
 
@@ -60,7 +60,7 @@ export function HeaderSimplePreview({ isDark, onToggleTheme }: ThemeToggleProps)
                   : 'text-retro-muted hover:text-retro-green'
               }`}
             >
-              <PxlKitIcon icon={item.icon} size={14} colorful />
+              <PxlKitIcon icon={item.icon} size={14} colorful decorative />
               <span className="relative">
                 {item.label}
                 <span
@@ -80,7 +80,7 @@ export function HeaderSimplePreview({ isDark, onToggleTheme }: ThemeToggleProps)
               className="p-2 rounded text-retro-muted hover:text-retro-green hover:bg-retro-surface/40 transition-colors"
               aria-label="Search"
             >
-              <PxlKitIcon icon={Search} size={16} colorful />
+              <PxlKitIcon icon={Search} size={16} colorful decorative />
             </button>
           </PixelTooltip>
           <PixelButton tone="green" size="sm">Sign Up</PixelButton>
@@ -143,7 +143,7 @@ export function HeaderDropdownPreview({ isDark, onToggleTheme }: ThemeToggleProp
       >
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2.5">
-            <PxlKitIcon icon={Crown} size={22} colorful />
+            <PxlKitIcon icon={Crown} size={22} colorful decorative />
             <span className="font-pixel text-sm text-retro-text">DevKit</span>
             <PixelBadge tone="cyan">v2</PixelBadge>
           </div>
@@ -194,6 +194,7 @@ export function HeaderDropdownPreview({ isDark, onToggleTheme }: ThemeToggleProp
                             icon={menuItem.icon}
                             size={18}
                             colorful
+                            decorative
                           />
                         </span>
                         <span>
@@ -227,9 +228,9 @@ export function HeaderDropdownPreview({ isDark, onToggleTheme }: ThemeToggleProp
           <ThemeToggleButton isDark={isDark} onToggleTheme={onToggleTheme} />
           <button
             className="relative p-2 rounded text-retro-muted hover:text-retro-cyan hover:bg-retro-surface/40 transition-colors"
-            aria-label="Notifications"
+            aria-label="Notifications, 3 unread"
           >
-            <PxlKitIcon icon={Bell} size={16} colorful />
+            <PxlKitIcon icon={Bell} size={16} colorful decorative />
             <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full bg-retro-red text-white font-mono text-[9px] flex items-center justify-center px-1">
               3
             </span>
@@ -268,7 +269,7 @@ export function HeaderCenteredLogoPreview({ isDark, onToggleTheme }: ThemeToggle
                     : 'text-retro-muted hover:text-retro-gold'
                 }`}
               >
-                <PxlKitIcon icon={item.icon} size={14} colorful />
+                <PxlKitIcon icon={item.icon} size={14} colorful decorative />
                 <span className="relative">
                   {item.label}
                   <span
@@ -282,7 +283,7 @@ export function HeaderCenteredLogoPreview({ isDark, onToggleTheme }: ThemeToggle
           </nav>
 
           <div className="flex items-center gap-2.5 mx-auto">
-            <PxlKitIcon icon={Crown} size={24} colorful />
+            <PxlKitIcon icon={Crown} size={24} colorful decorative />
             <span className="font-pixel text-base text-retro-text tracking-wide">
               PIXEL
             </span>
@@ -303,7 +304,7 @@ export function HeaderCenteredLogoPreview({ isDark, onToggleTheme }: ThemeToggle
                     : 'text-retro-muted hover:text-retro-gold'
                 }`}
               >
-                <PxlKitIcon icon={item.icon} size={14} colorful />
+                <PxlKitIcon icon={item.icon} size={14} colorful decorative />
                 <span className="relative">
                   {item.label}
                   <span
@@ -320,7 +321,7 @@ export function HeaderCenteredLogoPreview({ isDark, onToggleTheme }: ThemeToggle
                 className="p-2 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
                 aria-label="Settings"
               >
-                <PxlKitIcon icon={Settings} size={16} colorful />
+                <PxlKitIcon icon={Settings} size={16} colorful decorative />
               </button>
             </PixelTooltip>
           </nav>

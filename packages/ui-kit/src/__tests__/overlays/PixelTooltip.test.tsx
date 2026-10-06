@@ -145,15 +145,39 @@ describe('PixelTooltip — floating-ui upgrade', () => {
     expect(document.querySelector('[role="tooltip"]')).toBeTruthy();
   });
 
-  it('backwards-compat: aria-describedby is wired to tooltip id when open', () => {
+  // The wrapper carried the reference, so focusing the trigger announced nothing.
+  it('backwards-compat: aria-describedby is wired to tooltip id when open — on the trigger that takes focus', () => {
     render(
       <PixelTooltip content="hi" defaultOpen>
         <button data-testid="trg">trigger</button>
       </PixelTooltip>,
     );
-    const wrapper = document.querySelector('[data-testid="trg"]')!.parentElement!;
+    const trigger = document.querySelector('[data-testid="trg"]')!;
     const tip = document.querySelector('[role="tooltip"]')!;
-    expect(wrapper.getAttribute('aria-describedby')).toBe(tip.id);
+    expect(trigger.getAttribute('aria-describedby')).toBe(tip.id);
+    expect(trigger.parentElement!.hasAttribute('aria-describedby')).toBe(false);
+  });
+
+  it("keeps the trigger's own aria-describedby, and falls back to the wrapper when nothing inside takes focus", () => {
+    const tree = (open: boolean) => (
+      <>
+        <PixelTooltip content="hi" open={open}>
+          <button data-testid="trg" aria-describedby="hint">trigger</button>
+        </PixelTooltip>
+        <PixelTooltip content="plain" open={open}>
+          <span data-testid="text">text</span>
+        </PixelTooltip>
+      </>
+    );
+    const { rerender } = render(tree(true));
+    const [tip, plainTip] = Array.from(document.querySelectorAll('[role="tooltip"]'));
+    const trigger = document.querySelector('[data-testid="trg"]')!;
+    const textWrapper = document.querySelector('[data-testid="text"]')!.parentElement!;
+    expect(trigger.getAttribute('aria-describedby')).toBe(`hint ${tip!.id}`);
+    expect(textWrapper.getAttribute('aria-describedby')).toBe(plainTip!.id);
+    rerender(tree(false));
+    expect(trigger.getAttribute('aria-describedby')).toBe('hint');
+    expect(textWrapper.hasAttribute('aria-describedby')).toBe(false);
   });
 
   /* ──────────────────────────────────────────────────────────────────────
@@ -187,5 +211,85 @@ describe('PixelTooltip — floating-ui upgrade', () => {
     expect(onOpenChange).toHaveBeenCalledWith(true);
     act(() => { fireEvent.click(wrapper); });
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
+
+  /* ──────────────────────────────────────────────────────────────────────
+     Regressions: Escape dismisses every tooltip (WCAG 1.4.13).
+     ────────────────────────────────────────────────────────────────────── */
+
+  const tooltip = () => document.querySelector('[role="tooltip"]');
+
+  // Escape closed click tooltips only.
+  it('closes a hover tooltip on Escape, which stays closed until the pointer leaves and comes back', () => {
+    render(
+      <PixelTooltip content="hi" delay={{ open: 0, close: 0 }}>
+        <button data-testid="trg">trigger</button>
+      </PixelTooltip>,
+    );
+    const wrapper = document.querySelector('[data-testid="trg"]')!.parentElement!;
+    act(() => { fireEvent.mouseEnter(wrapper); });
+    expect(tooltip()).toBeTruthy();
+    act(() => { fireEvent.keyDown(document.body, { key: 'Escape' }); });
+    expect(tooltip()).toBeNull();
+    act(() => { fireEvent.mouseEnter(wrapper); });
+    expect(tooltip()).toBeNull();
+    act(() => { fireEvent.mouseLeave(wrapper); });
+    act(() => { fireEvent.mouseEnter(wrapper); });
+    expect(tooltip()).toBeTruthy();
+  });
+
+  it('closes a focus tooltip on Escape, which stays closed until focus leaves and comes back', () => {
+    render(
+      <PixelTooltip content="hi" trigger="focus" delay={{ open: 0, close: 0 }}>
+        <button data-testid="trg">trigger</button>
+      </PixelTooltip>,
+    );
+    const trigger = document.querySelector<HTMLButtonElement>('[data-testid="trg"]')!;
+    act(() => { trigger.focus(); });
+    expect(tooltip()).toBeTruthy();
+    act(() => { fireEvent.keyDown(trigger, { key: 'Escape' }); });
+    expect(tooltip()).toBeNull();
+    expect(trigger.hasAttribute('aria-describedby')).toBe(false);
+    act(() => { fireEvent.focus(trigger.parentElement!); });
+    expect(tooltip()).toBeNull();
+    act(() => { trigger.blur(); });
+    act(() => { trigger.focus(); });
+    expect(tooltip()).toBeTruthy();
+  });
+
+  it('drops a pending open on Escape, and ignores Escape while closed', () => {
+    const onOpenChange = vi.fn();
+    render(
+      <PixelTooltip content="hi" onOpenChange={onOpenChange}>
+        <button data-testid="trg">trigger</button>
+      </PixelTooltip>,
+    );
+    act(() => { fireEvent.keyDown(document.body, { key: 'Escape' }); });
+    expect(onOpenChange).not.toHaveBeenCalled();
+    const wrapper = document.querySelector('[data-testid="trg"]')!.parentElement!;
+    act(() => { fireEvent.mouseEnter(wrapper); });
+    act(() => { fireEvent.keyDown(document.body, { key: 'Escape' }); });
+    act(() => { vi.advanceTimersByTime(300); });
+    expect(tooltip()).toBeNull();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it('shows what its parent passes: a click, Escape and a press outside only ask, and it asks again after a refusal', () => {
+    const onOpenChange = vi.fn();
+    const tip = (open: boolean) => (
+      <PixelTooltip open={open} onOpenChange={onOpenChange} trigger="click" label="Tip">
+        <button type="button">trigger</button>
+      </PixelTooltip>
+    );
+    const { rerender, getByRole } = render(tip(false));
+    fireEvent.click(getByRole('button', { name: 'trigger' }));
+    fireEvent.click(getByRole('button', { name: 'trigger' }));
+    expect(onOpenChange.mock.calls).toEqual([[true], [true]]);
+    expect(document.querySelector('[role="tooltip"]')).toBeNull();
+    rerender(tip(true));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.pointerDown(document.body);
+    expect(onOpenChange.mock.calls).toEqual([[true], [true], [false], [false]]);
+    expect(document.querySelector('[role="tooltip"]')).toBeTruthy();
   });
 });

@@ -187,7 +187,7 @@ export default function SkillsPage() {
               </div>
 
               <p className="flex items-center gap-1.5 whitespace-nowrap pt-3 text-retro-gold">
-                <PxlKitIcon icon={Sparkles} size={12} /> pixel-perfect
+                <PxlKitIcon icon={Sparkles} size={12} decorative /> pixel-perfect
               </p>
             </div>
           </PixelHeroMedia>
@@ -247,11 +247,16 @@ export default function SkillsPage() {
                     <PixelStack gap={2}>
                       {REQUIREMENTS.map((requirement) => (
                         <PixelCluster key={requirement} gap={2} align="center">
-                          <PxlKitIcon icon={ShieldCheck} size={16} />
+                          <PxlKitIcon icon={ShieldCheck} size={16} decorative />
                           <span className="font-mono text-sm">{requirement}</span>
                         </PixelCluster>
                       ))}
                     </PixelStack>
+                    <PixelAlert
+                      tone="cyan"
+                      title="React projects"
+                      message="The skills write React with @pxlkit/ui-kit. The same kit ships for Vue (@pxlkit/ui-kit-vue) and Angular (@pxlkit/ui-kit-angular), with every component's code in both on /docs — the skills do not write it yet."
+                    />
                     <PixelAlert
                       tone="gold"
                       title="Tailwind v4 is not optional"
@@ -277,7 +282,7 @@ export default function SkillsPage() {
           <PixelBento columns={3} gap={4}>
             <PixelBentoCell span="2x2" tone="green" variant="feature">
               <PixelStack gap={4}>
-                <PxlKitIcon icon={Sparkles} size={40} />
+                <PxlKitIcon icon={Sparkles} size={40} decorative />
                 <span className="font-pixel text-xs text-retro-green">/PXLKIT:IMAGINE</span>
                 <p className="font-mono text-sm text-retro-muted">
                   Describe a page and get one built from the real component API — planned as a
@@ -295,7 +300,7 @@ export default function SkillsPage() {
             {SKILLS.filter((s) => s.slug !== 'imagine').map((skill) => (
               <PixelBentoCell key={skill.slug} tone={skill.tone === 'red' ? 'red' : skill.tone}>
                 <PixelStack gap={2}>
-                  <PxlKitIcon icon={SKILL_ICONS[skill.slug as keyof typeof SKILL_ICONS]} size={24} />
+                  <PxlKitIcon icon={SKILL_ICONS[skill.slug as keyof typeof SKILL_ICONS]} size={24} decorative />
                   <span className="font-mono text-sm text-retro-text">{skill.command}</span>
                   <span className="font-mono text-xs text-retro-muted">{skill.tagline}</span>
                 </PixelStack>
@@ -372,7 +377,7 @@ export default function SkillsPage() {
             <PixelTimelineItem title="/pxlkit:start" time="1 min">
               <span className="font-mono text-xs text-retro-muted">
                 Checks compatibility and wires up the stylesheet, providers, fonts and dark mode
-                for your framework.
+                for your React setup.
               </span>
             </PixelTimelineItem>
             <PixelTimelineItem title="/pxlkit:imagine …" time="first result">
@@ -439,7 +444,7 @@ export default function SkillsPage() {
 
           <div className="py-10 text-center">
             <PixelStack gap={4} align="center">
-              <PxlKitIcon icon={Search} size={40} />
+              <PxlKitIcon icon={Search} size={40} decorative />
               <span className="font-pixel text-sm text-retro-green">TRY IT</span>
               <div className="w-full max-w-2xl">
                 <CodeBlock code={INSTALL_COMMAND} language="bash" />

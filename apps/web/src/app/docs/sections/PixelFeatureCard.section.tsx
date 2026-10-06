@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFeatureCardDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelFeatureCardDocsMeta = {
@@ -17,11 +23,116 @@ export const PixelFeatureCardDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelFeatureCardDocsSection({ className }: PixelFeatureCardDocsSectionProps): React.ReactElement {
+/** PixelFeatureCard's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelFeatureCard } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelFeatureCard',
+        props: [
+          { name: 'icon', type: 'React.ReactNode', description: 'Icon in the toned frame.' },
+          { name: 'iconSize', type: '48 | 56 | 64 | 80', default: '56', description: 'Width of the icon frame, in px.' },
+          { name: 'badge', type: '{ label: string; tone?: ToneKey }', description: 'Badge above the icon: its label and tone (cyan by default).' },
+          { name: 'title', type: 'string', required: true, description: 'The heading, clamped to two lines.' },
+          { name: 'description', type: 'string', description: 'Muted paragraph rendered under the title.' },
+          { name: 'descriptionLines', type: '2 | 3 | 4', description: 'Apply `line-clamp-N` + `min-h-[N lh]` to the description.' },
+          { name: 'desc', type: 'string', deprecated: 'Use `description` for consistency with PixelCard / PixelPricingCard.' },
+          { name: 'descLines', type: '2 | 3 | 4', deprecated: 'Use `descriptionLines` for consistency with PixelCard / PixelPricingCard.' },
+          { name: 'footer', type: 'React.ReactNode', description: 'Footer under the description.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the icon frame.' },
+          { name: 'interactive', type: 'boolean', default: 'false', description: 'Hover lift and focus ring; without an `href` the card is a button: give it an `onClick`.' },
+          { name: 'href', type: 'string', description: 'When provided, the card renders as `<a href>` and accepts anchor-specific attributes via the spread. Nesting interactive children inside the card (e.g. PixelButton, PixelTextLink) is invalid HTML in this mode.' },
+          { name: 'target', type: "'_self' | '_blank' | '_parent' | '_top' | (string & {})", description: 'Anchor target — only meaningful when `href` is set.' },
+          { name: 'rel', type: 'string', description: 'Anchor rel — only meaningful when `href` is set.' },
+          { name: 'download', type: 'any', description: 'Anchor download — only meaningful when `href` is set.' },
+          { name: 'onClick', type: 'React.MouseEventHandler<HTMLElement>', description: 'When `interactive=true` without `href`, an onClick is REQUIRED for accessibility.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Icon above the text, or beside it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Render with surface-aware border + radius chrome. Defaults to true — a feature card needs visible chrome.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelFeatureCard',
+        props: [
+          { name: 'title', type: 'string', required: true, description: 'The heading, clamped to two lines.' },
+          { name: 'description', type: 'string', description: 'Muted paragraph under the title.' },
+          { name: 'descriptionLines', type: '2 | 3 | 4', description: 'Lines the description is clamped to; 3 when unset.' },
+          { name: 'desc', type: 'string', deprecated: 'Use `description`.' },
+          { name: 'descLines', type: '2 | 3 | 4', deprecated: 'Use `descriptionLines`.' },
+          { name: 'iconSize', type: '48 | 56 | 64 | 80', default: '56', description: 'Width of the icon frame, in px.' },
+          { name: 'badge', type: 'CardBadge', description: 'Badge above the icon: its label and tone (cyan by default).' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the icon frame.' },
+          { name: 'interactive', type: 'boolean', default: 'false', description: 'Hover lift and focus ring; without an `href` the card is a button: give it a `click` listener.' },
+          { name: 'href', type: 'string', description: 'Makes the card a link.' },
+          { name: 'target', type: 'string', description: 'Link target, with `href`.' },
+          { name: 'rel', type: 'string', description: 'Link relationship, with `href`.' },
+          { name: 'download', type: 'string', description: 'Downloads the link target, with `href`.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Icon above the text, or beside it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Surface border, radius and background.' },
+          { name: 'onClick', type: '(event: MouseEvent | KeyboardEvent) => void', binding: '@click', description: 'Click handler (`@click`). Declared as a prop because an interactive card calls it on Enter and Space too, with the keyboard event.' },
+        ],
+        slots: [
+          { name: 'default', description: "Content after the card's own, inside the card." },
+          { name: 'icon', description: 'Icon in the toned frame.' },
+          { name: 'footer', description: 'Footer under the description.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<component>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelFeatureCard',
+        selector: 'pxl-feature-card, a[pxlFeatureCard], div[pxlFeatureCard]',
+        props: [
+          { name: 'title', type: 'string', required: true, description: 'The heading, clamped to two lines.' },
+          { name: 'description', type: 'string', description: 'Muted paragraph under the title.' },
+          { name: 'descriptionLines', type: '2 | 3 | 4', accepts: "2 | 3 | 4 | '2' | '3' | '4'", description: 'Lines the description is clamped to; 3 when unset.' },
+          { name: 'desc', type: 'string', deprecated: 'Use `description`.' },
+          { name: 'descLines', type: '2 | 3 | 4', accepts: "2 | 3 | 4 | '2' | '3' | '4'", deprecated: 'Use `descriptionLines`.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Icon in the toned frame.' },
+          { name: 'iconSize', type: '48 | 56 | 64 | 80', default: '56', accepts: "48 | 56 | 64 | 80 | '48' | '56' | '64' | '80'", description: 'Width of the icon frame, in px.' },
+          { name: 'badge', type: 'CardBadge', description: 'Badge above the icon: its label and tone (cyan by default).' },
+          { name: 'footer', type: 'string | TemplateRef<any>', description: 'Footer under the description.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the icon frame.' },
+          { name: 'interactive', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Hover lift and focus ring; a card that is not a link becomes a button.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Icon above the text, or beside it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Surface border, radius and background.' },
+        ],
+        notes: [
+          'As an attribute, it goes on a native `<a>` or `<div>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelFeatureCardDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelFeatureCardDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-feature-card-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-feature-card-heading'>PixelFeatureCard</h2>
-      <p className="docs-lead">Feature highlight card with toned icon frame, optional badge, title, clamped description, and footer — renders as &lt;article&gt;, role=&quot;button&quot;, or &lt;a href&gt; with full-card click target.</p>
+      <Title id='pixel-feature-card-heading'>PixelFeatureCard</Title>
+      <p className="docs-lead">Feature highlight card with toned icon frame, optional badge, title, clamped description, and footer — renders as <code>&lt;article&gt;</code>, <code>role=&quot;button&quot;</code>, or <code>&lt;a href&gt;</code> with full-card click target.</p>
       <ul className="docs-highlights">
         <li>Toned icon frame (48/56/64/80px) with surface-aware border and soft background</li>
         <li>Optional badge slot above the icon with independent tone</li>
@@ -34,19 +145,19 @@ export function PixelFeatureCardDocsSection({ className }: PixelFeatureCardDocsS
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-feature-card-api">
+      <Heading id="pixel-feature-card-api">API</Heading>
+      <FrameworkApi label={'PixelFeatureCard API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-feature-card-a11y">
-      <h3 id="pixel-feature-card-a11y">Accessibility</h3>
+      <Heading id="pixel-feature-card-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
         <li><code>link</code></li>
       </ul>
-      <p className="docs-aria-notes">Semantic &lt;article&gt; by default. When interactive without href, the root becomes &lt;div role=&quot;button&quot; tabIndex=&#123;0&#125;&gt; with Enter/Space activation parity (&lt;article&gt; does not permit role=&quot;button&quot;). When href is set, the root renders as a native &lt;a&gt; with the entire card as the click target — nesting interactive children (PixelButton, PixelTextLink) inside footer is invalid HTML in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Semantic &lt;article&gt; by default. When interactive without href, the root becomes &lt;div role=&quot;button&quot; tabindex=&quot;0&quot;&gt; with Enter/Space activation parity (&lt;article&gt; does not permit role=&quot;button&quot;). When href is set, the root renders as a native &lt;a&gt; with the entire card as the click target — nesting interactive children (PixelButton, PixelTextLink) inside footer is invalid HTML in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -75,15 +186,11 @@ export function PixelFeatureCardDocsSection({ className }: PixelFeatureCardDocsS
       </table>
     </section>
     <section aria-labelledby="pixel-feature-card-usage">
-      <h3 id="pixel-feature-card-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelFeatureCard } from '@pxlkit/ui-kit';
-
-const PixelIcon = (
-  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
-    <rect x="3" y="0" width="2" height="8" />
-    <rect x="0" y="3" width="8" height="2" />
-  </svg>
-);
+      <Heading id="pixel-feature-card-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelFeatureCard usage'}
+        react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -92,25 +199,89 @@ export function Default() {
       description="Push every keystroke to peers via WebSockets — under 50ms p95."
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    title="Realtime sync"
+    description="Push every keystroke to peers via WebSockets — under 50ms p95."
+  />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      title="Realtime sync"
+      description="Push every keystroke to peers via WebSockets — under 50ms p95."
+    />
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelFeatureCard
       title="Realtime sync"
       description="Push every keystroke to peers via WebSockets — under 50ms p95."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    title="Realtime sync"
+    description="Push every keystroke to peers via WebSockets — under 50ms p95."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      title="Realtime sync"
+      description="Push every keystroke to peers via WebSockets — under 50ms p95."
+    />
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icon">
-        <h4>With Icon</h4>
-        <pre className="docs-code"><code>{`export function WithIcon() {
+        <Subheading>With Icon</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Icon code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function WithIcon() {
   return (
     <PixelFeatureCard
       icon={PixelIcon}
@@ -118,11 +289,61 @@ export function Default() {
       description="Crisp edges on every retina ratio thanks to shape-rendering: crispEdges."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    title="Pixel-perfect"
+    description="Crisp edges on every retina ratio thanks to shape-rendering: crispEdges."
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      [icon]="icon"
+      title="Pixel-perfect"
+      description="Crisp edges on every retina ratio thanks to shape-rendering: crispEdges."
+    />
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class WithIcon {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-badge">
-        <h4>With Badge</h4>
-        <pre className="docs-code"><code>{`export function WithBadge() {
+        <Subheading>With Badge</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Badge code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function WithBadge() {
   return (
     <PixelFeatureCard
       icon={PixelIcon}
@@ -131,11 +352,63 @@ export function Default() {
       description="A built-in copilot that learns your codebase as you ship it."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    :badge="{ label: 'NEW', tone: 'gold' }"
+    title="AI Companion"
+    description="A built-in copilot that learns your codebase as you ship it."
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      [icon]="icon"
+      [badge]="{ label: 'NEW', tone: 'gold' }"
+      title="AI Companion"
+      description="A built-in copilot that learns your codebase as you ship it."
+    />
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class WithBadge {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function Tones() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelFeatureCard icon={PixelIcon} tone="cyan" title="Cyan" description="Tinted icon frame." />
@@ -144,22 +417,144 @@ export function Default() {
       <PixelFeatureCard icon={PixelIcon} tone="purple" title="Purple" description="Tinted icon frame." />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard, type ToneKey } from '@pxlkit/ui-kit-vue';
+
+const cards: { tone: ToneKey; title: string }[] = [
+  { tone: 'cyan', title: 'Cyan' },
+  { tone: 'green', title: 'Green' },
+  { tone: 'gold', title: 'Gold' },
+  { tone: 'purple', title: 'Purple' },
+];
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelFeatureCard
+      v-for="card in cards"
+      :key="card.tone"
+      :tone="card.tone"
+      :title="card.title"
+      description="Tinted icon frame."
+    >
+      <template #icon>
+        <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+          <rect x="3" y="0" width="2" height="8" />
+          <rect x="0" y="3" width="8" height="2" />
+        </svg>
+      </template>
+    </PixelFeatureCard>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-feature-card [icon]="icon" tone="cyan" title="Cyan" description="Tinted icon frame." />
+      <pxl-feature-card [icon]="icon" tone="green" title="Green" description="Tinted icon frame." />
+      <pxl-feature-card [icon]="icon" tone="gold" title="Gold" description="Tinted icon frame." />
+      <pxl-feature-card [icon]="icon" tone="purple" title="Purple" description="Tinted icon frame." />
+    </div>
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function Surfaces() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelFeatureCard surface="pixel" icon={PixelIcon} title="Pixel" description="Thick border + offset shadow." />
       <PixelFeatureCard surface="linear" icon={PixelIcon} title="Linear" description="Soft border + smooth radius." />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard, type Surface } from '@pxlkit/ui-kit-vue';
+
+const cards: { surface: Surface; title: string; description: string }[] = [
+  { surface: 'pixel', title: 'Pixel', description: 'Thick border + offset shadow.' },
+  { surface: 'linear', title: 'Linear', description: 'Soft border + smooth radius.' },
+];
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelFeatureCard
+      v-for="card in cards"
+      :key="card.surface"
+      :surface="card.surface"
+      :title="card.title"
+      :description="card.description"
+    >
+      <template #icon>
+        <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+          <rect x="3" y="0" width="2" height="8" />
+          <rect x="0" y="3" width="8" height="2" />
+        </svg>
+      </template>
+    </PixelFeatureCard>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-feature-card surface="pixel" [icon]="icon" title="Pixel" description="Thick border + offset shadow." />
+      <pxl-feature-card surface="linear" [icon]="icon" title="Linear" description="Soft border + smooth radius." />
+    </div>
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-horizontal">
-        <h4>Horizontal</h4>
-        <pre className="docs-code"><code>{`export function Horizontal() {
+        <Subheading>Horizontal</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Horizontal code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function Horizontal() {
   return (
     <PixelFeatureCard
       orientation="horizontal"
@@ -168,11 +563,63 @@ export function Default() {
       description="Icon sits to the left of the title and description."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    orientation="horizontal"
+    title="Horizontal layout"
+    description="Icon sits to the left of the title and description."
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      orientation="horizontal"
+      [icon]="icon"
+      title="Horizontal layout"
+      description="Icon sits to the left of the title and description."
+    />
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Horizontal {}`}
+        />
       </article>
       <article className="docs-example" id="example-interactive">
-        <h4>Interactive</h4>
-        <pre className="docs-code"><code>{`export function Interactive() {
+        <Subheading>Interactive</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Interactive code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function Interactive() {
   return (
     <PixelFeatureCard
       interactive
@@ -182,11 +629,74 @@ export function Default() {
       description="Press Enter or Space to activate via keyboard."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+
+function activate() {
+  alert('feature clicked');
+}
+</script>
+
+<template>
+  <PixelFeatureCard
+    interactive
+    title="Click me"
+    description="Press Enter or Space to activate via keyboard."
+    @click="activate"
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <div
+      pxlFeatureCard
+      interactive
+      [icon]="icon"
+      title="Click me"
+      description="Press Enter or Space to activate via keyboard."
+      (click)="activate()"
+    ></div>
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Interactive {
+  activate(): void {
+    alert('feature clicked');
+  }
+}`}
+        />
       </article>
       <article className="docs-example" id="example-as-link">
-        <h4>As Link</h4>
-        <pre className="docs-code"><code>{`export function AsLink() {
+        <Subheading>As Link</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'As Link code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function AsLink() {
   return (
     <PixelFeatureCard
       href="https://example.com"
@@ -197,11 +707,68 @@ export function Default() {
       description="Root renders as <a href> when href is provided."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    href="https://example.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    title="Read the docs"
+    description="Root renders as <a href> when href is provided."
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <a
+      pxlFeatureCard
+      href="https://example.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      [icon]="icon"
+      title="Read the docs"
+      description="Root renders as <a href> when href is provided."
+    ></a>
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class AsLink {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-footer">
-        <h4>With Footer</h4>
-        <pre className="docs-code"><code>{`export function WithFooter() {
+        <Subheading>With Footer</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Footer code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function WithFooter() {
   return (
     <PixelFeatureCard
       icon={PixelIcon}
@@ -210,11 +777,63 @@ export function Default() {
       footer={<span className="text-xs text-retro-muted">Learn more →</span>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard title="Realtime sync" description="Push every keystroke to peers via WebSockets.">
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+    <template #footer>
+      <span class="text-xs text-retro-muted">Learn more →</span>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      [icon]="icon"
+      title="Realtime sync"
+      description="Push every keystroke to peers via WebSockets."
+      [footer]="more"
+    />
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+    <ng-template #more><span class="text-xs text-retro-muted">Learn more →</span></ng-template>
+  \`,
+})
+export class WithFooter {}`}
+        />
       </article>
       <article className="docs-example" id="example-clamped-description">
-        <h4>Clamped Description</h4>
-        <pre className="docs-code"><code>{`export function ClampedDescription() {
+        <Subheading>Clamped Description</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Clamped Description code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function ClampedDescription() {
   return (
     <PixelFeatureCard
       icon={PixelIcon}
@@ -223,27 +842,126 @@ export function Default() {
       descriptionLines={2}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    title="Long Description"
+    description="This description is intentionally long to demonstrate the line-clamp behavior. It will be truncated to the configured number of lines with an ellipsis, while maintaining a minimum height so cards stay aligned in a grid."
+    :description-lines="2"
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      [icon]="icon"
+      title="Long Description"
+      description="This description is intentionally long to demonstrate the line-clamp behavior. It will be truncated to the configured number of lines with an ellipsis, while maintaining a minimum height so cards stay aligned in a grid."
+      [descriptionLines]="2"
+    />
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class ClampedDescription {}`}
+        />
       </article>
       <article className="docs-example" id="example-icon-sizes">
-        <h4>Icon Sizes</h4>
-        <pre className="docs-code"><code>{`export function IconSizes() {
+        <Subheading>Icon Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Icon Sizes code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function IconSizes() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelFeatureCard icon={PixelIcon} iconSize={48} title="Small" description="48px icon frame." />
       <PixelFeatureCard icon={PixelIcon} iconSize={80} title="Large" description="80px icon frame." />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+
+const cards = [
+  { iconSize: 48, title: 'Small', description: '48px icon frame.' },
+  { iconSize: 80, title: 'Large', description: '80px icon frame.' },
+] as const;
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelFeatureCard
+      v-for="card in cards"
+      :key="card.iconSize"
+      :icon-size="card.iconSize"
+      :title="card.title"
+      :description="card.description"
+    >
+      <template #icon>
+        <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+          <rect x="3" y="0" width="2" height="8" />
+          <rect x="0" y="3" width="8" height="2" />
+        </svg>
+      </template>
+    </PixelFeatureCard>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-feature-card [icon]="icon" [iconSize]="48" title="Small" description="48px icon frame." />
+      <pxl-feature-card [icon]="icon" [iconSize]="80" title="Large" description="80px icon frame." />
+    </div>
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class IconSizes {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-card">PixelCard</a></li>
-        <li><a href="#pixel-stat-card">PixelStatCard</a></li>
-        <li><a href="#pixel-pricing-card">PixelPricingCard</a></li>
-        <li><a href="#pixel-testimonial-card">PixelTestimonialCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-card' : '#pixel-card'}>PixelCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stat-card' : '#pixel-stat-card'}>PixelStatCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pricing-card' : '#pixel-pricing-card'}>PixelPricingCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-testimonial-card' : '#pixel-testimonial-card'}>PixelTestimonialCard</a></li>
       </ul>
     </section>
     </section>

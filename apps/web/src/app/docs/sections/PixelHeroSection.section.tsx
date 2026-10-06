@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelHeroSectionDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelHeroSectionDocsMeta = {
@@ -17,39 +23,134 @@ export const PixelHeroSectionDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsSectionProps): React.ReactElement {
+/** PixelHeroSection's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelHeroSection } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelHeroSection',
+        props: [
+          { name: 'variant', type: "'centered' | 'split' | 'parallax'", default: "'centered'", description: "`'centered'` and `'parallax'` centre the text; `'split'` puts the `media` in a column beside it. Default `'centered'`." },
+          { name: 'eyebrow', type: 'string', description: 'Small upper-cased line above the headline, in the tone.' },
+          { name: 'headline', type: 'string', required: true, description: "The headline: the page's `<h1>`, unless `as` sets another level." },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h1'", description: "Element of the headline. Default `'h1'`, the page's heading: a hero embedded under the page's own `<h1>` (a demo, a template) takes a lower level." },
+          { name: 'headlineEffect', type: "'typewriter' | 'glitch' | 'none'", default: "'none'", description: "Animates the headline: `'typewriter'` types it out once — screen readers get the whole headline from the start — and `'glitch'` plays PixelGlitch over it. Both hold still when the user prefers reduced motion. Default `'none'`." },
+          { name: 'subline', type: 'string', description: 'Paragraph under the headline.' },
+          { name: 'primaryCta', type: 'React.ReactNode', description: 'First call to action.' },
+          { name: 'secondaryCta', type: 'React.ReactNode', description: 'Second call to action, after the first.' },
+          { name: 'install', type: 'React.ReactNode', description: 'Install snippet under the calls to action.' },
+          { name: 'meta', type: 'React.ReactNode', description: 'Meta line at the end of the text.' },
+          { name: 'media', type: 'React.ReactNode', description: 'Media, placed by the `variant`: beside the text, behind it or below it.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: "Tone of the eyebrow. Default `'neutral'`." },
+          { name: 'density', type: "'compact' | 'comfortable'", default: "'comfortable'", description: "Type sizes and vertical rhythm. Default `'comfortable'`." },
+          { name: 'minHeight', type: "'sm' | 'md' | 'lg' | 'fullscreen'", default: "'md'", description: "Minimum height of the section. Default `'md'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelHeroSection } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelHeroSection',
+        props: [
+          { name: 'headline', type: 'string', required: true, description: "The headline: the page's `<h1>`, unless `as` sets another level." },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h1'", description: "Element of the headline. A hero embedded under the page's own `<h1>` (a demo, a template) takes a lower level." },
+          { name: 'variant', type: "'centered' | 'split' | 'parallax'", default: "'centered'", description: '`centered` and `parallax` centre the text; `split` puts the `media` slot in a column beside it.' },
+          { name: 'eyebrow', type: 'string', description: 'Small upper-cased line above the headline, in the tone.' },
+          { name: 'headlineEffect', type: "'typewriter' | 'glitch' | 'none'", default: "'none'", description: "Animates the headline: `'typewriter'` types it out once — screen readers get the whole headline from the start — and `'glitch'` plays PixelGlitch over it. Both hold still when the user prefers reduced motion." },
+          { name: 'subline', type: 'string', description: 'Paragraph under the headline.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the eyebrow.' },
+          { name: 'density', type: "'compact' | 'comfortable'", default: "'comfortable'", description: 'Type sizes and vertical rhythm.' },
+          { name: 'minHeight', type: "'sm' | 'md' | 'lg' | 'fullscreen'", default: "'md'", description: 'Minimum height of the section.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'primary-cta', description: 'First call to action.' },
+          { name: 'secondary-cta', description: 'Second call to action, after the first.' },
+          { name: 'install', description: 'Install snippet under the calls to action.' },
+          { name: 'meta', description: 'Meta line at the end of the text.' },
+          { name: 'media', description: 'Media, placed by the `variant`.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelHeroSection } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelHeroSection',
+        selector: 'section[pxlHeroSection]',
+        props: [
+          { name: 'headline', type: 'string', required: true, description: "The headline: the page's `<h1>`, unless `as` sets another level." },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h1'", description: "Element of the headline. A hero embedded under the page's own `<h1>` (a demo, a template) takes a lower level." },
+          { name: 'variant', type: "'centered' | 'split' | 'parallax'", default: "'centered'", description: '`centered` and `parallax` centre the text; `split` puts the `media` in a column beside it.' },
+          { name: 'eyebrow', type: 'string', description: 'Small upper-cased line above the headline, in the tone.' },
+          { name: 'headlineEffect', type: "'typewriter' | 'glitch' | 'none'", default: "'none'", description: "Animates the headline: `'typewriter'` types it out once — screen readers get the whole headline from the start — and `'glitch'` plays the glitch over it. Both hold still when the user prefers reduced motion." },
+          { name: 'subline', type: 'string', description: 'Paragraph under the headline.' },
+          { name: 'primaryCta', type: 'string | TemplateRef<any>', description: 'First call to action.' },
+          { name: 'secondaryCta', type: 'string | TemplateRef<any>', description: 'Second call to action, after the first.' },
+          { name: 'install', type: 'string | TemplateRef<any>', description: 'Install snippet under the calls to action.' },
+          { name: 'meta', type: 'string | TemplateRef<any>', description: 'Meta line at the end of the text.' },
+          { name: 'media', type: 'string | TemplateRef<any>', description: 'Media, placed by the `variant`.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the eyebrow.' },
+          { name: 'density', type: "'compact' | 'comfortable'", default: "'comfortable'", description: 'Type sizes and vertical rhythm.' },
+          { name: 'minHeight', type: "'sm' | 'md' | 'lg' | 'fullscreen'", default: "'md'", description: 'Minimum height of the section.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on a native `<section>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelHeroSectionDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelHeroSectionDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-hero-section-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-hero-section-heading'>PixelHeroSection</h2>
+      <Title id='pixel-hero-section-heading'>PixelHeroSection</Title>
       <p className="docs-lead">Surface-aware hero section with eyebrow, headline, subline, CTA cluster, install snippet, meta and optional media in centered, split or parallax variants.</p>
       <ul className="docs-highlights">
         <li>Three variants: centered, split (with media column) and parallax (media behind text)</li>
         <li>Density-aware vertical rhythm (compact / comfortable) and tunable min-height</li>
         <li>Tone tokens for eyebrow accent + surface-aware typography and transitions</li>
         <li>Composable slots: eyebrow, primary/secondary CTA, install, meta and media</li>
-        <li>Semantic &lt;section&gt; with forwarded ref to HTMLElement</li>
+        <li>Semantic &lt;section&gt; whose headline level is yours to set (<code>as</code>, h1 by default)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>hero</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-hero-section-api">
+      <Heading id="pixel-hero-section-api">API</Heading>
+      <FrameworkApi label={'PixelHeroSection API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-hero-section-a11y">
-      <h3 id="pixel-hero-section-a11y">Accessibility</h3>
+      <Heading id="pixel-hero-section-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>semantic &lt;section&gt; with aria-labelledby pointing at headline</code></li>
+        <li><code>region</code></li>
       </ul>
-      <p className="docs-aria-notes">Author should set id on the headline and aria-labelledby on the section when the hero acts as a labelled landmark.</p>
+      <p className="docs-aria-notes">Renders a <code>&lt;section&gt;</code> whose headline is the page&#39;s <code>&lt;h1&gt;</code>, or the level <code>as</code> sets for a hero embedded under the page&#39;s own <code>&lt;h1&gt;</code>. The headline is one heading with every effect: the glitch&#39;s colour copies are <code>aria-hidden</code> spans inside it. A section is a landmark only once it has an accessible name: give the hero an <code>aria-label</code> (it reaches the <code>&lt;section&gt;</code>) when it should be one, for instance on a page with several landmarks.</p>
     </section>
     <section aria-labelledby="pixel-hero-section-usage">
-      <h3 id="pixel-hero-section-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react'
-import { PixelHeroSection } from '@pxlkit/ui-kit'
+      <Heading id="pixel-hero-section-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelHeroSection usage'}
+        react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -61,14 +162,52 @@ export function Default() {
       secondaryCta={<button type="button">View docs</button>}
     />
   )
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    eyebrow="Introducing"
+    headline="Pixel-perfect retro UI for modern web"
+    subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+  >
+    <template #primary-cta><button type="button">Get started</button></template>
+    <template #secondary-cta><button type="button">View docs</button></template>
+  </PixelHeroSection>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      eyebrow="Introducing"
+      headline="Pixel-perfect retro UI for modern web"
+      subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+      [primaryCta]="getStarted"
+      [secondaryCta]="viewDocs"
+    ></section>
+    <ng-template #getStarted><button type="button">Get started</button></ng-template>
+    <ng-template #viewDocs><button type="button">View docs</button></ng-template>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelHeroSection
       eyebrow="Introducing"
@@ -78,11 +217,50 @@ export function Default() {
       secondaryCta={<button type="button">View docs</button>}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    eyebrow="Introducing"
+    headline="Pixel-perfect retro UI for modern web"
+    subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+  >
+    <template #primary-cta><button type="button">Get started</button></template>
+    <template #secondary-cta><button type="button">View docs</button></template>
+  </PixelHeroSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      eyebrow="Introducing"
+      headline="Pixel-perfect retro UI for modern web"
+      subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+      [primaryCta]="getStarted"
+      [secondaryCta]="viewDocs"
+    ></section>
+    <ng-template #getStarted><button type="button">Get started</button></ng-template>
+    <ng-template #viewDocs><button type="button">View docs</button></ng-template>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-split">
-        <h4>Split with media</h4>
-        <pre className="docs-code"><code>{`export function Split() {
+        <Subheading>Split with media</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Split with media code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function Split() {
   return (
     <PixelHeroSection
       variant="split"
@@ -94,11 +272,58 @@ export function Default() {
       tone="cyan"
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    variant="split"
+    eyebrow="New in v2"
+    headline="Compose richer hero sections"
+    subline="Pair a tagline with media on the side using the split variant."
+    tone="cyan"
+  >
+    <template #primary-cta><button type="button">Try it</button></template>
+    <template #media>
+      <div style="width: 100%; height: 240px; background: #111; border: 1px solid #333" />
+    </template>
+  </PixelHeroSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      variant="split"
+      eyebrow="New in v2"
+      headline="Compose richer hero sections"
+      subline="Pair a tagline with media on the side using the split variant."
+      [primaryCta]="tryIt"
+      [media]="media"
+      tone="cyan"
+    ></section>
+    <ng-template #tryIt><button type="button">Try it</button></ng-template>
+    <ng-template #media>
+      <div style="width: 100%; height: 240px; background: #111; border: 1px solid #333"></div>
+    </ng-template>
+  \`,
+})
+export class Split {}`}
+        />
       </article>
       <article className="docs-example" id="example-compact">
-        <h4>Compact density</h4>
-        <pre className="docs-code"><code>{`export function Compact() {
+        <Subheading>Compact density</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Compact density code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function Compact() {
   return (
     <PixelHeroSection
       density="compact"
@@ -107,16 +332,198 @@ export function Default() {
       subline="Tighter rhythm for denser layouts."
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    density="compact"
+    min-height="sm"
+    headline="Compact density"
+    subline="Tighter rhythm for denser layouts."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      density="compact"
+      minHeight="sm"
+      headline="Compact density"
+      subline="Tighter rhythm for denser layouts."
+    ></section>
+  \`,
+})
+export class Compact {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-typewriter-headline">
+        <Subheading>Typewriter headline</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Typewriter headline code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function TypewriterHeadline() {
+  return (
+    <PixelHeroSection
+      eyebrow="Boot sequence"
+      headline="Loading retro interfaces"
+      headlineEffect="typewriter"
+      subline="The headline types itself out; screen readers get it whole from the start."
+    />
+  )
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    eyebrow="Boot sequence"
+    headline="Loading retro interfaces"
+    headline-effect="typewriter"
+    subline="The headline types itself out; screen readers get it whole from the start."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      eyebrow="Boot sequence"
+      headline="Loading retro interfaces"
+      headlineEffect="typewriter"
+      subline="The headline types itself out; screen readers get it whole from the start."
+    ></section>
+  \`,
+})
+export class TypewriterHeadline {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-glitch-headline">
+        <Subheading>Glitch headline</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Glitch headline code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function GlitchHeadline() {
+  return (
+    <PixelHeroSection
+      density="compact"
+      minHeight="sm"
+      headline="Signal lost"
+      headlineEffect="glitch"
+      subline="The headline glitches, and holds still for readers who prefer reduced motion."
+      tone="red"
+    />
+  )
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    density="compact"
+    min-height="sm"
+    headline="Signal lost"
+    headline-effect="glitch"
+    subline="The headline glitches, and holds still for readers who prefer reduced motion."
+    tone="red"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      density="compact"
+      minHeight="sm"
+      headline="Signal lost"
+      headlineEffect="glitch"
+      subline="The headline glitches, and holds still for readers who prefer reduced motion."
+      tone="red"
+    ></section>
+  \`,
+})
+export class GlitchHeadline {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-heading-level">
+        <Subheading>Heading level</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Heading level code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function HeadingLevel() {
+  return (
+    <PixelHeroSection
+      as="h2"
+      density="compact"
+      minHeight="sm"
+      eyebrow="Embedded"
+      headline="A hero inside a page"
+      subline="Its headline is an h2, under the page's own h1."
+    />
+  )
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    as="h2"
+    density="compact"
+    min-height="sm"
+    eyebrow="Embedded"
+    headline="A hero inside a page"
+    subline="Its headline is an h2, under the page's own h1."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      as="h2"
+      density="compact"
+      minHeight="sm"
+      eyebrow="Embedded"
+      headline="A hero inside a page"
+      subline="Its headline is an h2, under the page's own h1."
+    ></section>
+  \`,
+})
+export class HeadingLevel {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-hero-media">PixelHeroMedia</a></li>
-        <li><a href="#pixel-container">PixelContainer</a></li>
-        <li><a href="#pixel-two-column">PixelTwoColumn</a></li>
-        <li><a href="#pixel-cluster">PixelCluster</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-hero-media' : '#pixel-hero-media'}>PixelHeroMedia</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-container' : '#pixel-container'}>PixelContainer</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-two-column' : '#pixel-two-column'}>PixelTwoColumn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-cluster' : '#pixel-cluster'}>PixelCluster</a></li>
       </ul>
     </section>
     </section>

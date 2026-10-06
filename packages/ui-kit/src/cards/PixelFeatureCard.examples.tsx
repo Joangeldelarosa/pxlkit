@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelFeatureCard } from './PixelFeatureCard';
 
 const PixelIcon = (

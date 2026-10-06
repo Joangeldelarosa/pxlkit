@@ -6,10 +6,12 @@
  *   npm run dev   # in another terminal — http://localhost:3333
  *   npm run og:capture
  *
- * Output (in apps/web/public/):
- *   - og-image.png      1280×640   (OG meta image)
+ * Output (in apps/web/public/), each file at exactly its target's pixel size —
+ * the sizes the site's metadata (`lib/seo.ts`) and `site.webmanifest` declare:
+ *   - og-image.png      1200×630   (OG meta image)
  *   - og-twitter.png    1200×630   (Twitter card)
  *   - readme-hero.png   1920×1080  (README hero image, larger framing)
+ *   - the app icons and favicons, at their named sizes
  *
  * The script:
  *   1. opens the homepage at the target viewport
@@ -36,7 +38,7 @@ type Target = {
 
 const TARGETS: Target[] = [
   // OG / Twitter / README hero — curated full-bleed brand frame
-  { name: 'og-image',    width: 1280, height: 640,  out: 'public/og-image.png',    waitFor: '[data-testid="og-frame"]' },
+  { name: 'og-image',    width: 1200, height: 630,  out: 'public/og-image.png',    waitFor: '[data-testid="og-frame"]' },
   { name: 'og-twitter',  width: 1200, height: 630,  out: 'public/og-twitter.png',  waitFor: '[data-testid="og-frame"]' },
   { name: 'readme-hero', width: 1920, height: 1080, out: 'public/readme-hero.png', waitFor: '[data-testid="og-frame"]' },
   // App icons rendered from the /og/icon route. `any` = standard fill (icon
@@ -57,9 +59,10 @@ async function main() {
   try {
     for (const t of TARGETS) {
       const url = BASE_URL.replace(/\/$/, '') + (t.path ?? '/og');
+      // One device pixel per CSS pixel: the PNG comes out at the target's size.
       const ctx = await browser.newContext({
         viewport: { width: t.width, height: t.height },
-        deviceScaleFactor: 2,
+        deviceScaleFactor: 1,
       });
       const page = await ctx.newPage();
       console.log(`→ ${t.name} (${t.width}×${t.height}) ${url}`);

@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitSurfaceProviderDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PxlKitSurfaceProviderDocsMeta = {
@@ -17,28 +23,77 @@ export const PxlKitSurfaceProviderDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfaceProviderDocsSectionProps): React.ReactElement {
+/** PxlKitSurfaceProvider's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PxlKitSurfaceProvider',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", default: "'pixel'", description: 'Surface of every nested component that does not set its own.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The part of the app the surface applies to.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PxlKitSurfaceProvider',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", default: "'pixel'", description: 'Surface of every nested component that does not set its own.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The part of the app the surface applies to.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PxlKitSurfaceProvider',
+        selector: '[pxlKitSurface]',
+        props: [
+          { name: 'pxlKitSurface', type: "'pixel' | 'linear'", default: "'pixel'", accepts: "'pixel' | 'linear' | ''", description: 'Surface of the components inside.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PxlKitSurfaceProviderDocsSection({ className, headingLevel = 2 }: PxlKitSurfaceProviderDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pxl-kit-surface-provider-heading'} className={className} data-status='stable'>
-      <h2 id='pxl-kit-surface-provider-heading'>PxlKitSurfaceProvider</h2>
-      <p className="docs-lead">Sets the default surface (pixel | linear) for every nested PxlKit component via React context.</p>
+      <Title id='pxl-kit-surface-provider-heading'>PxlKitSurfaceProvider</Title>
+      <p className="docs-lead">Sets the default surface (pixel | linear) for every nested PxlKit component — React context, Vue provide/inject or Angular dependency injection.</p>
       <ul className="docs-highlights">
         <li>Switches the entire subtree between the pixel and linear aesthetics in one line</li>
         <li>Per-component surface prop still overrides the provider for one-off variants</li>
         <li>Defaults to &quot;pixel&quot; so consumers without a provider keep the brand look</li>
-        <li>SSR-safe context provider with zero runtime cost when value is unchanged</li>
+        <li>Renders no element of its own and is safe for server rendering</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>overlay-foundation</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pxl-kit-surface-provider-api">
+      <Heading id="pxl-kit-surface-provider-api">API</Heading>
+      <FrameworkApi label={'PxlKitSurfaceProvider API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-surface-provider-a11y">
-      <h3 id="pxl-kit-surface-provider-a11y">Accessibility</h3>
+      <Heading id="pxl-kit-surface-provider-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>theme/surface context provider; respects color-scheme via theme tokens</code></li>
@@ -46,39 +101,190 @@ export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfacePro
       <p className="docs-aria-notes">Visual-only context provider — does not render interactive DOM and does not affect focus order or ARIA semantics of descendants.</p>
     </section>
     <section aria-labelledby="pxl-kit-surface-provider-usage">
-      <h3 id="pxl-kit-surface-provider-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+      <Heading id="pxl-kit-surface-provider-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PxlKitSurfaceProvider usage'}
+        react={`import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
     <PxlKitSurfaceProvider surface="pixel">
-      <p>Nested PxlKit components default to the pixel surface.</p>
+      <div className="flex flex-wrap gap-2">
+        <PixelButton>Pixel</PixelButton>
+        <PixelButton variant="outline" tone="cyan">Pixel outline</PixelButton>
+      </div>
     </PxlKitSurfaceProvider>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitSurfaceProvider surface="pixel">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton>Pixel</PixelButton>
+      <PixelButton variant="outline" tone="cyan">Pixel outline</PixelButton>
+    </div>
+  </PxlKitSurfaceProvider>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitSurfaceProvider],
+  template: \`
+    <ng-container pxlKitSurface="pixel">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton>Pixel</button>
+        <button pxlButton variant="outline" tone="cyan">Pixel outline</button>
+      </div>
+    </ng-container>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default (Pixel)</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default (Pixel)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default (Pixel) code'}
+          react={`import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PxlKitSurfaceProvider surface="pixel">
-      <p>Nested PxlKit components default to the pixel surface.</p>
+      <div className="flex flex-wrap gap-2">
+        <PixelButton>Pixel</PixelButton>
+        <PixelButton variant="outline" tone="cyan">Pixel outline</PixelButton>
+      </div>
     </PxlKitSurfaceProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitSurfaceProvider surface="pixel">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton>Pixel</PixelButton>
+      <PixelButton variant="outline" tone="cyan">Pixel outline</PixelButton>
+    </div>
+  </PxlKitSurfaceProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitSurfaceProvider],
+  template: \`
+    <ng-container pxlKitSurface="pixel">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton>Pixel</button>
+        <button pxlButton variant="outline" tone="cyan">Pixel outline</button>
+      </div>
+    </ng-container>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-linear">
-        <h4>Linear</h4>
-        <pre className="docs-code"><code>{`export function Linear() {
+        <Subheading>Linear</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Linear code'}
+          react={`import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+
+export function Linear() {
   return (
     <PxlKitSurfaceProvider surface="linear">
-      <p>Nested PxlKit components default to the linear surface.</p>
+      <div className="flex flex-wrap gap-2">
+        <PixelButton>Linear</PixelButton>
+        <PixelButton variant="outline" tone="cyan">Linear outline</PixelButton>
+      </div>
     </PxlKitSurfaceProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitSurfaceProvider surface="linear">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton>Linear</PixelButton>
+      <PixelButton variant="outline" tone="cyan">Linear outline</PixelButton>
+    </div>
+  </PxlKitSurfaceProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitSurfaceProvider],
+  template: \`
+    <ng-container pxlKitSurface="linear">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton>Linear</button>
+        <button pxlButton variant="outline" tone="cyan">Linear outline</button>
+      </div>
+    </ng-container>
+  \`,
+})
+export class Linear {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-override">
+        <Subheading>Per-component override</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Per-component override code'}
+          react={`import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+
+export function Override() {
+  return (
+    <PxlKitSurfaceProvider surface="linear">
+      <div className="flex flex-wrap gap-2">
+        <PixelButton>From the provider</PixelButton>
+        <PixelButton surface="pixel">Own surface prop</PixelButton>
+      </div>
+    </PxlKitSurfaceProvider>
+  );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitSurfaceProvider surface="linear">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton>From the provider</PixelButton>
+      <PixelButton surface="pixel">Own surface prop</PixelButton>
+    </div>
+  </PxlKitSurfaceProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitSurfaceProvider],
+  template: \`
+    <ng-container pxlKitSurface="linear">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton>From the provider</button>
+        <button pxlButton surface="pixel">Own surface prop</button>
+      </div>
+    </ng-container>
+  \`,
+})
+export class Override {}`}
+        />
       </article>
     </section>
     </section>

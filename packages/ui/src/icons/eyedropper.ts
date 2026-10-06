@@ -1,4 +1,4 @@
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * 💉 Eyedropper — 16×16 pixel art eyedropper/color picker icon

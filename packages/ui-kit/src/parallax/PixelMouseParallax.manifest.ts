@@ -11,9 +11,8 @@ export default defineManifest({
     'Cursor-tracking parallax layer that translates children based on mouse position with smooth lerp.',
   highlights: [
     'Smoothed translate3d follow with configurable strength',
-    'Invert mode to repel children from the cursor',
+    'Invert mode to repel its content from the cursor',
     'GPU-accelerated via will-change-transform',
-    'Forwards ref to the underlying div',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
@@ -25,7 +24,7 @@ export default defineManifest({
     patterns: ['decorative-motion'],
     keyboard: [],
     notes:
-      'Pointer-only effect with no keyboard or assistive impact. Honor prefers-reduced-motion at the page level when wrapping critical content.',
+      'Pointer-only effect with no keyboard or assistive impact. The layer holds still when the user prefers reduced motion (`prefers-reduced-motion: reduce`), and stops where it is if the preference turns on while it moves.',
   },
   related: ['PixelParallaxGroup', 'PixelParallaxLayer', 'PixelScrollParallax'],
   apiStability: 'stable',

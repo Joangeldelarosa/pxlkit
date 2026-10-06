@@ -14,7 +14,7 @@ export default defineManifest({
     'Focus trap, scroll lock and Escape-to-close out of the box',
     'Optional drag handle affordance for touch dismissal',
     'WCAG 4.1.2 compliant: requires `title` or `aria-label` for accessible name',
-    'Surface-aware borders inherited from theme context',
+    'Surface-aware borders from the nearest PxlKitSurfaceProvider',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

@@ -91,7 +91,9 @@ describe('PixelCollapsible — aria wiring (disclosure pattern)', () => {
     const content = document.getElementById(controls!);
     expect(content).not.toBeNull();
     expect(content!.textContent).toContain('linked body');
-    expect(content!.getAttribute('aria-labelledby')).toBe(trigger.id);
+    // A container without a role takes no name: ARIA prohibits aria-labelledby on it.
+    expect(content!.getAttribute('role')).toBeNull();
+    expect(content!.hasAttribute('aria-labelledby')).toBe(false);
     expect(trigger.id).toBeTruthy();
   });
 
@@ -131,6 +133,20 @@ describe('PixelCollapsible — chrome props', () => {
     );
     const root = container.firstElementChild as HTMLElement;
     expect(root.className).not.toContain('border-2');
+  });
+
+  // Regression: the header was a small PixelButton with `px-1.5` added, and
+  // Tailwind emits the button's own `px-3` after it, so it kept its padding.
+  it('keeps the trigger compact, with no button size left over', () => {
+    render(
+      <PixelCollapsible label="L">
+        <p>body</p>
+      </PixelCollapsible>,
+    );
+    const classes = screen.getByRole('button', { name: /L/ }).className.split(' ');
+    expect(classes).toEqual(expect.arrayContaining(['px-1.5', 'py-0.5', 'text-xs']));
+    expect(classes).not.toContain('px-3');
+    expect(classes).not.toContain('h-8');
   });
 
   it('tone tints the trigger button', () => {

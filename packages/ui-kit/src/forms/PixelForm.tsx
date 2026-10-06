@@ -14,9 +14,20 @@ import {
   type UseFormReturn,
 } from 'react-hook-form';
 import {
+  formClasses,
+  formControlDescribedBy,
+  formDescriptionClasses,
+  formItemClasses,
+  formItemIds,
+  formLabelClasses,
+  formMessageClasses,
+  type FormItemIds,
+} from '@pxlkit/ui-kit-core';
+import {
   Surface, cn,
-  surfaceClasses, useEffectiveSurface,
+  useEffectiveSurface,
 } from '../common';
+import { elementRef } from '../utils/element-ref';
 
 export type { UseFormReturn, FieldValues } from 'react-hook-form';
 export type { FieldPath as Path } from 'react-hook-form';
@@ -27,14 +38,8 @@ export type { FieldPath as Path } from 'react-hook-form';
    Item generates linked ids + aria-* automatically.
    ────────────────────────────────────────────────────────────────────────── */
 
-interface PixelFormItemCtxValue {
-  /** id of the Control element */
-  id: string;
-  /** id of the Description element (may not be rendered) */
-  descriptionId: string;
-  /** id of the Message element (may not be rendered) */
-  messageId: string;
-}
+/** The ids of the Control, the Description and the Message (the latter two may not be rendered). */
+type PixelFormItemCtxValue = FormItemIds;
 const PixelFormItemContext = createContext<PixelFormItemCtxValue | null>(null);
 
 function useItemCtx(): PixelFormItemCtxValue {
@@ -58,10 +63,15 @@ function useFieldName(): string | null {
 
 /** Public prop bag for {@link PixelFormRoot}. */
 export interface PixelFormRootProps<T extends FieldValues> {
+  /** The form: what React Hook Form's `useForm` returns. */
   form: UseFormReturn<T>;
+  /** Called with the form's values, once a submission finds no error. */
   onSubmit: (data: T) => void | Promise<void>;
+  /** The fields. */
   children: React.ReactNode;
+  /** Extra classes on the `<form>`. */
   className?: string;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 
@@ -70,14 +80,13 @@ function PixelFormRootInner<T extends FieldValues>(
   ref: React.Ref<HTMLFormElement>,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   return (
     <FormProvider {...form}>
       <form
         ref={ref}
         noValidate
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('space-y-4', s.font, className)}
+        className={cn(formClasses(surface), className)}
       >
         {children}
       </form>
@@ -97,10 +106,21 @@ export interface PixelFormFieldProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > {
+  /** Path of the field in the form's values. */
   name: TName;
+  /**
+   * Validation rules: React Hook Form's `rules` (`required`, `min`, `max`, `minLength`,
+   * `maxLength`, `pattern`, `validate`).
+   */
   rules?: Omit<RegisterOptions<TFieldValues, TName>, 'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'>;
+  /** Initial value, where the form's `defaultValues` have none. */
   defaultValue?: UseControllerProps<TFieldValues, TName>['defaultValue'];
+  /** Drops the field's value from the form when it unmounts; by default the value stays. */
   shouldUnregister?: boolean;
+  /**
+   * Renders the control: gets the field's props (`field`: its value, change and blur handlers, name
+   * and ref) and its state (`fieldState`).
+   */
   render: (args: {
     field: ControllerRenderProps<TFieldValues, TName>;
     fieldState: ControllerFieldState;
@@ -130,6 +150,7 @@ export function PixelFormField<
 
 /** Public prop bag for {@link PixelFormItem}. */
 export interface PixelFormItemProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** `PixelForm.Label`, `PixelForm.Control`, `PixelForm.Description` and `PixelForm.Message`. */
   children: React.ReactNode;
 }
 
@@ -138,17 +159,10 @@ export const PixelFormItem = forwardRef<HTMLDivElement, PixelFormItemProps>(func
   ref,
 ) {
   const baseId = useId();
-  const value = useMemo<PixelFormItemCtxValue>(
-    () => ({
-      id: `${baseId}-control`,
-      descriptionId: `${baseId}-description`,
-      messageId: `${baseId}-message`,
-    }),
-    [baseId],
-  );
+  const value = useMemo<PixelFormItemCtxValue>(() => formItemIds(baseId), [baseId]);
   return (
     <PixelFormItemContext.Provider value={value}>
-      <div ref={ref} className={cn('space-y-1.5', className)} {...rest}>
+      <div ref={ref} className={cn(formItemClasses, className)} {...rest}>
         {children}
       </div>
     </PixelFormItemContext.Provider>
@@ -160,6 +174,7 @@ PixelFormItem.displayName = 'PixelForm.Item';
 
 /** Public prop bag for {@link PixelFormLabel}. */
 export interface PixelFormLabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 
@@ -169,12 +184,11 @@ export const PixelFormLabel = forwardRef<HTMLLabelElement, PixelFormLabelProps>(
 ) {
   const { id } = useItemCtx();
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   return (
     <label
       ref={ref}
       htmlFor={id}
-      className={cn('block text-xs text-retro-muted', s.font, className)}
+      className={cn(formLabelClasses(surface), className)}
       {...rest}
     >
       {children}
@@ -187,6 +201,9 @@ PixelFormLabel.displayName = 'PixelForm.Label';
 
 /** Public prop bag for {@link PixelFormControl}. Wraps a single child and clones aria-*/
 export interface PixelFormControlProps {
+  /**
+   * The control: one element, which gets the field's `id`, `aria-describedby` and `aria-invalid`.
+   */
   children: React.ReactElement;
 }
 
@@ -196,23 +213,37 @@ interface ControlChildProps {
   'aria-invalid'?: boolean | 'true' | 'false';
 }
 
+function mergeRefs<T>(...refs: Array<React.Ref<T> | undefined>): React.RefCallback<T> {
+  return (node) => {
+    for (const r of refs) {
+      if (typeof r === 'function') r(node);
+      else if (r) (r as React.MutableRefObject<T | null>).current = node;
+    }
+  };
+}
+
 export const PixelFormControl = forwardRef<HTMLElement, PixelFormControlProps>(function PixelFormControl(
   { children },
   ref,
 ) {
-  const { id, descriptionId, messageId } = useItemCtx();
+  const ids = useItemCtx();
   const name = useFieldName();
   const formCtx = useFormContext();
   const error = name && formCtx ? (formCtx.getFieldState(name, formCtx.formState).error ?? undefined) : undefined;
   const hasError = !!error;
-  const describedBy = [descriptionId, hasError ? messageId : null].filter(Boolean).join(' ');
 
   const child = React.Children.only(children) as React.ReactElement<ControlChildProps>;
+  // The child keeps its own ref beside the Control's: with `{...field}` it is
+  // React Hook Form's `field.ref`, through which the form focuses the first
+  // invalid field on submit and serves `setFocus`. A Control given no ref
+  // receives `null`, which alone would replace it.
+  const childRef = elementRef<HTMLElement>(child);
+  const mergedRef = React.useMemo(() => mergeRefs(ref as React.Ref<HTMLElement>, childRef), [ref, childRef]);
   return React.cloneElement(child, {
-    id,
-    'aria-describedby': describedBy || undefined,
+    id: ids.id,
+    'aria-describedby': formControlDescribedBy(ids, hasError),
     'aria-invalid': hasError ? 'true' : undefined,
-    ref: ref as React.Ref<HTMLElement>,
+    ref: mergedRef,
   } as ControlChildProps & { ref?: React.Ref<HTMLElement> });
 });
 PixelFormControl.displayName = 'PixelForm.Control';
@@ -221,6 +252,7 @@ PixelFormControl.displayName = 'PixelForm.Control';
 
 /** Public prop bag for {@link PixelFormDescription}. */
 export interface PixelFormDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 
@@ -230,12 +262,11 @@ export const PixelFormDescription = forwardRef<HTMLParagraphElement, PixelFormDe
 ) {
   const { descriptionId } = useItemCtx();
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   return (
     <p
       ref={ref}
       id={descriptionId}
-      className={cn('text-xs text-retro-muted', s.font, className)}
+      className={cn(formDescriptionClasses(surface), className)}
       {...rest}
     >
       {children}
@@ -248,6 +279,7 @@ PixelFormDescription.displayName = 'PixelForm.Description';
 
 /** Public prop bag for {@link PixelFormMessage}. */
 export interface PixelFormMessageProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 
@@ -261,14 +293,13 @@ export const PixelFormMessage = forwardRef<HTMLParagraphElement, PixelFormMessag
   const error = name && formCtx ? (formCtx.getFieldState(name, formCtx.formState).error ?? undefined) : undefined;
   const body = children ?? error?.message;
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   if (body == null || body === false || body === '') return null;
   return (
     <p
       ref={ref}
       id={messageId}
       role={error ? 'alert' : undefined}
-      className={cn('text-xs', error ? 'text-retro-red' : 'text-retro-muted', s.font, className)}
+      className={cn(formMessageClasses(surface, !!error), className)}
       {...rest}
     >
       {body}

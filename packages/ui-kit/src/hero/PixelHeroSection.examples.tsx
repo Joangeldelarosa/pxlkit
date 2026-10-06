@@ -1,4 +1,3 @@
-import React from 'react'
 import { PixelHeroSection } from './PixelHeroSection'
 
 export function Default() {
@@ -34,6 +33,43 @@ export function Compact() {
       minHeight="sm"
       headline="Compact density"
       subline="Tighter rhythm for denser layouts."
+    />
+  )
+}
+
+export function TypewriterHeadline() {
+  return (
+    <PixelHeroSection
+      eyebrow="Boot sequence"
+      headline="Loading retro interfaces"
+      headlineEffect="typewriter"
+      subline="The headline types itself out; screen readers get it whole from the start."
+    />
+  )
+}
+
+export function GlitchHeadline() {
+  return (
+    <PixelHeroSection
+      density="compact"
+      minHeight="sm"
+      headline="Signal lost"
+      headlineEffect="glitch"
+      subline="The headline glitches, and holds still for readers who prefer reduced motion."
+      tone="red"
+    />
+  )
+}
+
+export function HeadingLevel() {
+  return (
+    <PixelHeroSection
+      as="h2"
+      density="compact"
+      minHeight="sm"
+      eyebrow="Embedded"
+      headline="A hero inside a page"
+      subline="Its headline is an h2, under the page's own h1."
     />
   )
 }

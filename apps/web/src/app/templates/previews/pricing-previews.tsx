@@ -115,7 +115,7 @@ export function PricingCardsPreview() {
                   tone={plan.tone}
                   highlight={plan.popular}
                   popular={plan.popular ? { label: 'MOST POPULAR', tone: 'gold' } : undefined}
-                  icon={<PxlKitIcon icon={plan.icon} size={32} colorful />}
+                  icon={<PxlKitIcon icon={plan.icon} size={32} colorful decorative />}
                   name={plan.name}
                   description={plan.description}
                   price={{ amount: plan.price, period: plan.period }}
@@ -125,7 +125,7 @@ export function PricingCardsPreview() {
                       tone={plan.tone}
                       size="md"
                       className="w-full justify-center"
-                      iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                      iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
                     >
                       {plan.cta}
                     </PixelButton>
@@ -139,7 +139,7 @@ export function PricingCardsPreview() {
 
       <div className="text-center mt-10 space-y-3">
         <p className="inline-flex items-center gap-2 font-mono text-xs text-retro-muted">
-          <PxlKitIcon icon={ShieldCheck} size={14} colorful />
+          <PxlKitIcon icon={ShieldCheck} size={14} colorful decorative />
           30-day money-back guarantee · Cancel anytime
         </p>
         <div>
@@ -222,7 +222,7 @@ export function PricingTablePreview() {
                       className={`text-center px-6 py-4 font-semibold ${tier.tone} ${tier.recommended ? 'bg-retro-green/5' : ''}`}
                     >
                       <div className="flex flex-col items-center gap-1.5">
-                        <PxlKitIcon icon={tier.icon} size={20} colorful />
+                        <PxlKitIcon icon={tier.icon} size={20} colorful decorative />
                         <span>{tier.name}</span>
                         {tier.recommended && (
                           <PixelBadge tone="green">
@@ -268,7 +268,7 @@ export function PricingTablePreview() {
                         tone={cta.tone}
                         size="sm"
                         className="w-full justify-center"
-                        iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                        iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
                       >
                         {cta.label}
                       </PixelButton>
@@ -375,7 +375,7 @@ export function PricingTogglePreview() {
           <PixelBounce trigger={isYearly}>
             <PixelBadge tone="gold">
               <span className="inline-flex items-center gap-1">
-                <PxlKitIcon icon={Lightning} size={10} colorful />
+                <PxlKitIcon icon={Lightning} size={10} colorful decorative />
                 Save 20%
               </span>
             </PixelBadge>
@@ -397,7 +397,7 @@ export function PricingTogglePreview() {
                 tone={plan.tone}
                 highlight={plan.popular}
                 popular={plan.popular ? { label: 'BEST VALUE', tone: 'gold' } : undefined}
-                icon={<PxlKitIcon icon={plan.icon} size={28} colorful />}
+                icon={<PxlKitIcon icon={plan.icon} size={28} colorful decorative />}
                 name={plan.name}
                 description={plan.description}
                 price={{ amount: displayAmount, period: displayPeriod }}
@@ -407,7 +407,7 @@ export function PricingTogglePreview() {
                     tone={plan.tone}
                     size="md"
                     className="w-full justify-center"
-                    iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                    iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
                   >
                     Select {plan.name}
                   </PixelButton>
@@ -427,7 +427,7 @@ export function PricingTogglePreview() {
 
       <div className="text-center mt-10">
         <p className="inline-flex items-center gap-2 font-mono text-xs text-retro-muted">
-          <PxlKitIcon icon={ShieldCheck} size={14} colorful />
+          <PxlKitIcon icon={ShieldCheck} size={14} colorful decorative />
           30-day money-back guarantee · No questions asked
         </p>
       </div>

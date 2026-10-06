@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSheetDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSheetDocsMeta = {
@@ -17,29 +23,112 @@ export const PixelSheetDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps): React.ReactElement {
+/** PixelSheet's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSheet } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSheet',
+        props: [
+          { name: 'open', type: 'boolean', required: true, description: 'Whether the sheet is visible; set it from `onOpenChange`.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', required: true, description: 'Called with `false` when the sheet asks to close (Escape, the backdrop).' },
+          { name: 'side', type: "'bottom' | 'top'", default: "'bottom'", description: 'Edge of the viewport the sheet is docked to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'full'", default: "'md'", description: 'Height preset.' },
+          { name: 'dragHandle', type: 'boolean', default: 'false', description: 'Draw a drag handle affordance (decorative).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'title', type: 'string', description: 'Title shown at the top; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name fallback when `title` is omitted. WCAG 4.1.2 requires every `role="dialog"` to expose a name; supply `title` OR `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Body content.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSheet } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSheet',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: 'v-model:open', description: 'Whether the sheet is visible (`v-model:open`).' },
+          { name: 'side', type: "'bottom' | 'top'", default: "'bottom'", description: 'Edge of the viewport the sheet is docked to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'full'", default: "'md'", description: 'Height preset.' },
+          { name: 'dragHandle', type: 'boolean', default: 'false', description: 'Draw a drag handle affordance (decorative).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'title', type: 'string', description: 'Title shown at the top; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name when there is no `title` — every dialog needs one (WCAG 4.1.2).' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: '`false` when the sheet asks to close (Escape, backdrop), for `v-model:open`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Body content.' },
+        ],
+        notes: [
+          'Its template ref exposes `element`: the sheet panel while it is open.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSheet } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSheet',
+        selector: 'pxl-sheet',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: '[(open)]', description: 'Whether the sheet is visible (`[(open)]`).' },
+          { name: 'side', type: "'bottom' | 'top'", default: "'bottom'", description: 'Edge of the viewport the sheet is docked to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'full'", default: "'md'", description: 'Height preset.' },
+          { name: 'dragHandle', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Draw a drag handle affordance (decorative).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'title', type: 'string', description: 'Title shown at the top; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name when there is no `title` — every dialog needs one (WCAG 4.1.2).' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: '`false` when the sheet asks to close (Escape, backdrop), for `[(open)]`.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelSheetDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSheetDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-sheet-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-sheet-heading'>PixelSheet</h2>
+      <Title id='pixel-sheet-heading'>PixelSheet</Title>
       <p className="docs-lead">Mobile-first bottom/top sheet with focus trap, scroll lock, Escape-to-close and optional drag handle.</p>
       <ul className="docs-highlights">
         <li>Bottom or top anchored, four sizes (sm/md/lg/full)</li>
         <li>Focus trap, scroll lock and Escape-to-close out of the box</li>
         <li>Optional drag handle affordance for touch dismissal</li>
-        <li>WCAG 4.1.2 compliant: requires `title` or `aria-label` for accessible name</li>
-        <li>Surface-aware borders inherited from theme context</li>
+        <li>WCAG 4.1.2 compliant: requires <code>title</code> or <code>aria-label</code> for accessible name</li>
+        <li>Surface-aware borders from the nearest PxlKitSurfaceProvider</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-sheet-api">
+      <Heading id="pixel-sheet-api">API</Heading>
+      <FrameworkApi label={'PixelSheet API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-sheet-a11y">
-      <h3 id="pixel-sheet-a11y">Accessibility</h3>
+      <Heading id="pixel-sheet-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>role=&quot;dialog&quot; with aria-modal=&quot;true&quot;</code></li>
@@ -48,8 +137,8 @@ export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps)
         <li><code>Escape key closes the sheet</code></li>
         <li><code>Accessible name via `title` (aria-labelledby) or `aria-label`</code></li>
       </ul>
-      <p className="docs-aria-notes">Dev-only warning fires when neither `title` nor `aria-label` is provided to enforce WCAG 4.1.2. Drag handle is decorative (aria-hidden) and intended as a visual affordance only.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Dev-only warning fires when neither <code>title</code> nor <code>aria-label</code> is provided to enforce WCAG 4.1.2. Drag handle is decorative (aria-hidden) and intended as a visual affordance only.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -78,8 +167,11 @@ export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps)
       </table>
     </section>
     <section aria-labelledby="pixel-sheet-usage">
-      <h3 id="pixel-sheet-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-sheet-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSheet usage'}
+        react={`import { useState } from 'react';
 import { PixelSheet } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -102,14 +194,50 @@ export function Default() {
       </PixelSheet>
     </>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSheet } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open sheet</button>
+  <PixelSheet v-model:open="open" title="Quick actions" description="Pick an action below">
+    <p>Sheet content goes here.</p>
+    <button type="button" @click="open = false">Close</button>
+  </PixelSheet>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelSheet } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSheet],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open sheet</button>
+    <pxl-sheet [(open)]="open" title="Quick actions" description="Pick an action below">
+      <p>Sheet content goes here.</p>
+      <button type="button" (click)="open.set(false)">Close</button>
+    </pxl-sheet>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelSheet } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -129,11 +257,48 @@ export function Default() {
       </PixelSheet>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSheet } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open sheet</button>
+  <PixelSheet v-model:open="open" title="Quick actions" description="Pick an action below">
+    <p>Sheet content goes here.</p>
+    <button type="button" @click="open = false">Close</button>
+  </PixelSheet>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSheet } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSheet],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open sheet</button>
+    <pxl-sheet [(open)]="open" title="Quick actions" description="Pick an action below">
+      <p>Sheet content goes here.</p>
+      <button type="button" (click)="open.set(false)">Close</button>
+    </pxl-sheet>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-drag-handle">
-        <h4>With drag handle</h4>
-        <pre className="docs-code"><code>{`export function WithDragHandle() {
+        <Subheading>With drag handle</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With drag handle code'}
+          react={`import { useState } from 'react';
+import { PixelSheet } from '@pxlkit/ui-kit';
+
+export function WithDragHandle() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -151,11 +316,46 @@ export function Default() {
       </PixelSheet>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSheet } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open sheet</button>
+  <PixelSheet v-model:open="open" size="lg" drag-handle title="Drag handle">
+    <p>Bottom sheet with a drag handle affordance.</p>
+  </PixelSheet>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSheet } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSheet],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open sheet</button>
+    <pxl-sheet [(open)]="open" size="lg" dragHandle title="Drag handle">
+      <p>Bottom sheet with a drag handle affordance.</p>
+    </pxl-sheet>
+  \`,
+})
+export class WithDragHandle {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-top-full">
-        <h4>Top side, full height</h4>
-        <pre className="docs-code"><code>{`export function TopFull() {
+        <Subheading>Top side, full height</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Top side, full height code'}
+          react={`import { useState } from 'react';
+import { PixelSheet } from '@pxlkit/ui-kit';
+
+export function TopFull() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -176,15 +376,46 @@ export function Default() {
       </PixelSheet>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSheet } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open top sheet</button>
+  <PixelSheet v-model:open="open" side="top" size="full" aria-label="Top full-screen sheet">
+    <p>Top-anchored full-height sheet.</p>
+    <button type="button" @click="open = false">Close</button>
+  </PixelSheet>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSheet } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSheet],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open top sheet</button>
+    <pxl-sheet [(open)]="open" side="top" size="full" ariaLabel="Top full-screen sheet">
+      <p>Top-anchored full-height sheet.</p>
+      <button type="button" (click)="open.set(false)">Close</button>
+    </pxl-sheet>
+  \`,
+})
+export class TopFull {
+  readonly open = signal(false);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-drawer">PixelDrawer</a></li>
-        <li><a href="#pixel-modal">PixelModal</a></li>
-        <li><a href="#pixel-portal">PixelPortal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-drawer' : '#pixel-drawer'}>PixelDrawer</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-modal' : '#pixel-modal'}>PixelModal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-portal' : '#pixel-portal'}>PixelPortal</a></li>
       </ul>
     </section>
     </section>

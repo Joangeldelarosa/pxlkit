@@ -17,6 +17,7 @@ import gate, {
   collectManifestSinceVersions,
   compareSemver,
   extractTopChangelogVersion,
+  packVersionSource,
   parseSemver,
   pickLargest,
 } from '../../gates/06-consistency-version.js';
@@ -62,6 +63,30 @@ async function makePackage(opts: MakePackageOpts): Promise<{
   }
 
   return { packageDir: pkgDir, packageJsonPath, changelogPath };
+}
+
+/** An icon pack's entry (src/index.ts) whose pack exports `version` as given. */
+function iconPackEntry(version: string, imports = ''): string {
+  return [
+    "import type { IconPack } from '@pxlkit/core/vanilla';",
+    imports,
+    '',
+    'export const DemoPack: IconPack = {',
+    "  id: 'demo',",
+    "  name: 'Demo',",
+    "  description: 'Demo icons',",
+    '  icons: [],',
+    `  version: ${version},`,
+    "  author: 'pxlkit',",
+    '};',
+    '',
+  ].join('\n');
+}
+
+async function writeEntry(packageDir: string, source: string): Promise<string> {
+  const entry = path.join(packageDir, 'src', 'index.ts');
+  await fs.outputFile(entry, source, 'utf8');
+  return entry;
 }
 
 function mkManifest(packageDir: string, component: string, since: string): ManifestRecord {
@@ -203,6 +228,35 @@ describe('collectManifestSinceVersions', () => {
   });
 });
 
+describe('packVersionSource', () => {
+  it('reads the version from package.json when the entry imports it', () => {
+    expect(packVersionSource(iconPackEntry('packageJson.version', "import packageJson from '../package.json';"))).toEqual({
+      kind: 'package-json',
+    });
+    expect(packVersionSource(iconPackEntry('pkg.version', "import pkg from '../package.json';"))).toEqual({
+      kind: 'package-json',
+    });
+    // Read once outside the pack, which keeps the pack itself droppable.
+    const destructured = iconPackEntry('version', "import packageJson from '../package.json';\nconst { version } = packageJson;")
+      .replace('  version: version,', '  version,');
+    expect(destructured).toContain('\n  version,\n');
+    expect(packVersionSource(destructured)).toEqual({ kind: 'package-json' });
+  });
+
+  it('returns a version written out', () => {
+    expect(packVersionSource(iconPackEntry("'1.2.4'"))).toEqual({ kind: 'literal', version: '1.2.4' });
+    // An import of package.json the version does not read leaves it written out.
+    expect(packVersionSource(iconPackEntry("'1.2.4'", "import packageJson from '../package.json';"))).toEqual({
+      kind: 'literal',
+      version: '1.2.4',
+    });
+  });
+
+  it('returns null for an entry that declares no icon pack', () => {
+    expect(packVersionSource("export const version = '1.0.0';\nexport * from './vanilla';\n")).toBeNull();
+  });
+});
+
 // ---------------------------------------------------------------------------
 // Gate.run() end-to-end against mocked AuditContext
 // ---------------------------------------------------------------------------
@@ -322,6 +376,75 @@ describe('ConsistencyVersionGate.run', () => {
           f.component === 'PixelBroken',
       ),
     ).toBe(true);
+  });
+
+  it('passes an icon pack that exports the version read from its package.json', async () => {
+    const { packageDir, packageJsonPath, changelogPath } = await makePackage({
+      name: '@pxlkit/demo',
+      version: '1.2.5',
+      changelogTopVersion: '1.2.5',
+    });
+    await writeEntry(
+      packageDir,
+      iconPackEntry('version', "import packageJson from '../package.json';\nconst { version } = packageJson;").replace(
+        '  version: version,',
+        '  version,',
+      ),
+    );
+    const ctx = mockCtx({
+      packageJsons: [{ package: '@pxlkit/demo', path: packageJsonPath }],
+      changelogFiles: [{ package: '@pxlkit/demo', path: changelogPath! }],
+      manifests: [],
+    });
+
+    const r = await gate.run(ctx);
+    expect(r.findings).toEqual([]);
+    expect(r.passed).toBe(true);
+  });
+
+  it("fails (blocker) when an icon pack's written-out version lags package.json", async () => {
+    const { packageDir, packageJsonPath, changelogPath } = await makePackage({
+      name: '@pxlkit/demo',
+      version: '1.2.5',
+      changelogTopVersion: '1.2.5',
+    });
+    const entry = await writeEntry(packageDir, iconPackEntry("'1.2.4'"));
+    const ctx = mockCtx({
+      packageJsons: [{ package: '@pxlkit/demo', path: packageJsonPath }],
+      changelogFiles: [{ package: '@pxlkit/demo', path: changelogPath! }],
+      manifests: [],
+    });
+
+    const r = await gate.run(ctx);
+    expect(r.passed).toBe(false);
+    expect(r.findings).toEqual([
+      expect.objectContaining({
+        severity: 'blocker',
+        file: entry,
+        component: '@pxlkit/demo',
+        message: `version mismatch: package.json="1.2.5" vs the icon pack's exported version="1.2.4"`,
+      }),
+    ]);
+  });
+
+  it('flags (major) a written-out version that matches, which the next release leaves behind', async () => {
+    const { packageDir, packageJsonPath, changelogPath } = await makePackage({
+      name: '@pxlkit/demo',
+      version: '1.2.5',
+      changelogTopVersion: '1.2.5',
+    });
+    await writeEntry(packageDir, iconPackEntry("'1.2.5'"));
+    const ctx = mockCtx({
+      packageJsons: [{ package: '@pxlkit/demo', path: packageJsonPath }],
+      changelogFiles: [{ package: '@pxlkit/demo', path: changelogPath! }],
+      manifests: [],
+    });
+
+    const r = await gate.run(ctx);
+    expect(r.passed).toBe(false);
+    expect(r.findings).toHaveLength(1);
+    expect(r.findings[0]!.severity).toBe('major');
+    expect(r.findings[0]!.suggestion).toContain('const { version } = packageJson;');
   });
 
   it('returns info (and passes) when no packages are present', async () => {

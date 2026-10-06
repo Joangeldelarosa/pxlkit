@@ -1,13 +1,21 @@
 {
   "name": "@pxlkit/social",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Social and media pixel art icon pack \u2014 43 icons for community, emojis, messaging, hearts, shares, users, reactions, and social media UI",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
   "license": "SEE LICENSE IN LICENSE",
-  "repository": "https://github.com/Joangeldelarosa/pxlkit",
+  "homepage": "https://pxlkit.xyz/icons",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/social"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -29,7 +37,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.2.3"
+    "@pxlkit/core": "^1.4.0"
   },
   "devDependencies": {
     "tsup": "^8.3.0",
@@ -55,6 +63,9 @@
     "source-available-icons",
     "free-social-icons",
     "8-bit-icons",
-    "retro-icons"
+    "retro-icons",
+    "pixel-icons",
+    "vue-icons",
+    "angular-icons"
   ]
 }

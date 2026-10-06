@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { PixelAlert, PixelProgress, PixelSkeleton, PixelEmptyState } from './feedback';
 import { PixelButton } from './actions';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';

@@ -1,7 +1,7 @@
 import { PixelTextLink } from './PixelTextLink';
 
 export function Default() {
-  return <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>;
+  return <PixelTextLink href="https://pxlkit.xyz">Read the docs</PixelTextLink>;
 }
 
 export function Tones() {
@@ -38,7 +38,7 @@ export function Surfaces() {
 export function ExternalLink() {
   return (
     <PixelTextLink
-      href="https://pxlkit.dev"
+      href="https://pxlkit.xyz"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -51,7 +51,7 @@ export function InlineInProse() {
   return (
     <p className="max-w-md">
       Built with{' '}
-      <PixelTextLink href="https://pxlkit.dev" tone="green">
+      <PixelTextLink href="https://pxlkit.xyz" tone="green">
         pxlkit
       </PixelTextLink>
       , a tone-coloured component library for retro interfaces.

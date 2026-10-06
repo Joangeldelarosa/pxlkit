@@ -15,11 +15,11 @@ export default defineManifest({
   description:
     'Two-state toggle button with aria-pressed semantics. Works standalone or as a child of PixelToggleGroup for single/multi-select toolbars.',
   highlights: [
-    'Standalone controlled (pressed + onPressedChange) or composed inside PixelToggleGroup',
-    'Inherits size, variant, and surface from a parent PixelToggleGroup context',
+    'Standalone — `pressed` + `onPressedChange` (React), `v-model:pressed` (Vue), `[(pressed)]` (Angular) — or composed inside PixelToggleGroup',
+    'Inherits size, variant, and surface from a parent PixelToggleGroup',
     'Cyan tone pressed state with surface-aware borders, radius, and transitions',
     'Renders as role="radio" with aria-checked inside a single-select group, aria-pressed otherwise',
-    'Forwards refs and registers with the group for roving-tabindex keyboard navigation',
+    'Registers with the group for roving-tabindex keyboard navigation',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

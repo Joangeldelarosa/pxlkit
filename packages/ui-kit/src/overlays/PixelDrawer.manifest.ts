@@ -13,8 +13,8 @@ export default defineManifest({
     'Four anchor sides (right/left/top/bottom) and five sizes (sm/md/lg/xl/full)',
     'Focus trap, scroll lock and Escape-to-close out of the box',
     'WCAG 4.1.2 compliant: requires `title` or `aria-label` for accessible name',
-    'Surface-aware borders inherited from theme context',
-    'Composable subparts: PixelDrawer.Header / Body / Footer',
+    'Surface-aware borders from the nearest PxlKitSurfaceProvider',
+    'Composable subparts: header, body and footer (`PixelDrawer.Header` in React, `PixelDrawerHeader` in Vue, `pxl-drawer-header` in Angular, and so on)',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

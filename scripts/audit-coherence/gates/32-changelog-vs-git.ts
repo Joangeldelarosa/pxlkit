@@ -27,10 +27,11 @@ const RELEASE_HEADING_REGEX = /^##\s+\[([^\]]+)\]\s*-\s*(\d{4}-\d{2}-\d{2})/gm;
 
 /**
  * Matches inline PR references like (#123) or commit shas like (abc1234)
- * inside a CHANGELOG bullet body.
+ * inside a CHANGELOG bullet body. The digits of a decimal number (the
+ * `30000000000000004` of `0.30000000000000004`) are not a sha.
  */
 const PR_REF_REGEX = /\(#(\d+)\)/g;
-const SHA_REF_REGEX = /\b([0-9a-f]{7,40})\b/g;
+const SHA_REF_REGEX = /(?<!\d\.)\b([0-9a-f]{7,40})\b(?!\.\d)/g;
 
 /**
  * Conventional-commit types that signal a release-policy-relevant change.

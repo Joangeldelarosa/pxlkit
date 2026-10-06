@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelGlitch } from './PixelGlitch';
 
 export function Default() {
@@ -22,5 +21,13 @@ export function HoverTrigger() {
     <PixelGlitch trigger="hover">
       <span className="text-2xl font-bold">HOVER ME</span>
     </PixelGlitch>
+  );
+}
+
+export function HeadingLabel() {
+  return (
+    <h2 className="text-2xl font-bold">
+      <PixelGlitch as="span" label="SIGNAL LOST" />
+    </h2>
   );
 }

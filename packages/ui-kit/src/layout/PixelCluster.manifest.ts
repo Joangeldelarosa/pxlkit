@@ -11,8 +11,8 @@ export default defineManifest({
     'Horizontal wrap container for clustering inline items (chips, tags, actions) with consistent gap, alignment, and justification.',
   highlights: [
     'Flex row with wrap and configurable stack gap token',
-    'Surface-aware via useEffectiveSurface for transitions',
-    'Polymorphic via `as` to render as any intrinsic element',
+    'Surface-aware transitions',
+    'Polymorphic via `as` to render as any intrinsic element (in Angular, the element you put `pxlCluster` on)',
     'Align and justify props mirror flexbox semantics',
   ],
   examples: [

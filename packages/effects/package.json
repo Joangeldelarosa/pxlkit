@@ -1,13 +1,21 @@
 {
   "name": "@pxlkit/effects",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Animated visual effect pixel art icons \u2014 12 icons for explosions, radar ping, flame, shockwave, signals, particles, glows, and VFX animations",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
-  "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://pxlkit.xyz/icons",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/effects"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -32,7 +40,7 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.2.3"
+    "@pxlkit/core": "^1.4.0"
   },
   "devDependencies": {
     "tsup": "^8.5.0",
@@ -58,6 +66,9 @@
     "source-available-icons",
     "free-animated-icons",
     "game-effects",
-    "retro-effects"
+    "retro-effects",
+    "pixel-icons",
+    "vue-icons",
+    "angular-icons"
   ]
 }

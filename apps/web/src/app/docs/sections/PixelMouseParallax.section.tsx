@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelMouseParallaxDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelMouseParallaxDocsMeta = {
@@ -17,37 +23,99 @@ export const PixelMouseParallaxDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelMouseParallaxDocsSection({ className }: PixelMouseParallaxDocsSectionProps): React.ReactElement {
+/** PixelMouseParallax's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelMouseParallax } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelMouseParallax',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The content that moves with the pointer.' },
+          { name: 'strength', type: 'number', default: '20', description: 'Max travel distance in px.' },
+          { name: 'invert', type: 'boolean', default: 'false', description: 'If true, moves away from cursor instead of towards.' },
+          { name: 'className', type: 'string', description: 'Extra classes on the wrapper.' },
+          { name: 'style', type: 'React.CSSProperties', description: 'Inline styles of the wrapper.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelMouseParallax } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelMouseParallax',
+        props: [
+          { name: 'strength', type: 'number', default: '20', description: 'Farthest the layer travels from its place on each axis, in px.' },
+          { name: 'invert', type: 'boolean', default: 'false', description: 'Move away from the cursor instead of towards it.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The content that moves with the pointer.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelMouseParallax } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelMouseParallax',
+        selector: 'pxl-mouse-parallax',
+        props: [
+          { name: 'strength', type: 'number', default: '20', accepts: 'unknown', description: 'Farthest the layer travels from its place on each axis, in px.' },
+          { name: 'invert', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Move away from the cursor instead of towards it.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelMouseParallaxDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelMouseParallaxDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-mouse-parallax-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-mouse-parallax-heading'>PixelMouseParallax</h2>
+      <Title id='pixel-mouse-parallax-heading'>PixelMouseParallax</Title>
       <p className="docs-lead">Cursor-tracking parallax layer that translates children based on mouse position with smooth lerp.</p>
       <ul className="docs-highlights">
         <li>Smoothed translate3d follow with configurable strength</li>
-        <li>Invert mode to repel children from the cursor</li>
+        <li>Invert mode to repel its content from the cursor</li>
         <li>GPU-accelerated via will-change-transform</li>
-        <li>Forwards ref to the underlying div</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>parallax</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-mouse-parallax-api">
+      <Heading id="pixel-mouse-parallax-api">API</Heading>
+      <FrameworkApi label={'PixelMouseParallax API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-mouse-parallax-a11y">
-      <h3 id="pixel-mouse-parallax-a11y">Accessibility</h3>
+      <Heading id="pixel-mouse-parallax-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>decorative-motion</code></li>
       </ul>
-      <p className="docs-aria-notes">Pointer-only effect with no keyboard or assistive impact. Honor prefers-reduced-motion at the page level when wrapping critical content.</p>
+      <p className="docs-aria-notes">Pointer-only effect with no keyboard or assistive impact. The layer holds still when the user prefers reduced motion (<code>prefers-reduced-motion: reduce</code>), and stops where it is if the preference turns on while it moves.</p>
     </section>
     <section aria-labelledby="pixel-mouse-parallax-usage">
-      <h3 id="pixel-mouse-parallax-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelMouseParallax } from '@pxlkit/ui-kit';
+      <Heading id="pixel-mouse-parallax-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelMouseParallax usage'}
+        react={`import { PixelMouseParallax } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -59,14 +127,52 @@ export function Default() {
       </PixelMouseParallax>
     </div>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelMouseParallax } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+    <PixelMouseParallax :strength="20">
+      <div
+        class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan"
+      >
+        Follows the cursor
+      </div>
+    </PixelMouseParallax>
+  </div>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelMouseParallax } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelMouseParallax],
+  template: \`
+    <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+      <pxl-mouse-parallax [strength]="20">
+        <div
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan"
+        >
+          Follows the cursor
+        </div>
+      </pxl-mouse-parallax>
+    </div>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelMouseParallax } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <div className="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
       <PixelMouseParallax strength={20}>
@@ -76,11 +182,50 @@ export function Default() {
       </PixelMouseParallax>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelMouseParallax } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+    <PixelMouseParallax :strength="20">
+      <div
+        class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan"
+      >
+        Follows the cursor
+      </div>
+    </PixelMouseParallax>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelMouseParallax } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelMouseParallax],
+  template: \`
+    <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+      <pxl-mouse-parallax [strength]="20">
+        <div
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan"
+        >
+          Follows the cursor
+        </div>
+      </pxl-mouse-parallax>
+    </div>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-inverted">
-        <h4>Inverted</h4>
-        <pre className="docs-code"><code>{`export function Inverted() {
+        <Subheading>Inverted</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Inverted code'}
+          react={`import { PixelMouseParallax } from '@pxlkit/ui-kit';
+
+export function Inverted() {
   return (
     <div className="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
       <PixelMouseParallax strength={30} invert>
@@ -90,15 +235,49 @@ export function Default() {
       </PixelMouseParallax>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelMouseParallax } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+    <PixelMouseParallax :strength="30" invert>
+      <div
+        class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-purple/20 px-4 py-2 text-sm text-retro-purple"
+      >
+        Repels from the cursor
+      </div>
+    </PixelMouseParallax>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelMouseParallax } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelMouseParallax],
+  template: \`
+    <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+      <pxl-mouse-parallax [strength]="30" invert>
+        <div
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-purple/20 px-4 py-2 text-sm text-retro-purple"
+        >
+          Repels from the cursor
+        </div>
+      </pxl-mouse-parallax>
+    </div>
+  \`,
+})
+export class Inverted {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-parallax-group">PixelParallaxGroup</a></li>
-        <li><a href="#pixel-parallax-layer">PixelParallaxLayer</a></li>
-        <li><a href="#pixel-scroll-parallax">PixelScrollParallax</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-parallax-group' : '#pixel-parallax-group'}>PixelParallaxGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-parallax-layer' : '#pixel-parallax-layer'}>PixelParallaxLayer</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-scroll-parallax' : '#pixel-scroll-parallax'}>PixelScrollParallax</a></li>
       </ul>
     </section>
     </section>

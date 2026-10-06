@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStatGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelStatGroupDocsMeta = {
@@ -17,29 +23,101 @@ export const PixelStatGroupDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSectionProps): React.ReactElement {
+/** PixelStatGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelStatGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelStatGroup',
+        props: [
+          { name: 'layout', type: "'row' | 'grid'", default: "'row'", description: 'A divided row, or a grid.' },
+          { name: 'columns', type: 'number', default: '3', description: 'Grid columns, 1 to 6.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between grid cells (stackGap scale). Only applies to layout="grid"; omit for flush cells.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: "Tone of the frame and the row's dividers." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Render with surface-aware border + radius chrome. Defaults to true — group needs visible chrome.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name for the group landmark. Without it, role=group is dropped.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group, in place of `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The stat tiles.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelStatGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelStatGroup',
+        props: [
+          { name: 'layout', type: "'row' | 'grid'", default: "'row'", description: 'A divided row, or a grid.' },
+          { name: 'columns', type: 'number', default: '3', description: 'Grid columns, 1 to 6.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between grid cells (`stackGap`); flush cells when unset.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: "Tone of the frame and the row's dividers." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Surface border, radius and background.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The stat tiles.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelStatGroup } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelStatGroup',
+        selector: 'pxl-stat-group',
+        props: [
+          { name: 'layout', type: "'row' | 'grid'", default: "'row'", description: 'A divided row, or a grid.' },
+          { name: 'columns', type: 'number', default: '3', accepts: 'unknown', description: 'Grid columns, 1 to 6.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap between grid cells (`stackGap`); flush cells when unset.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: "Tone of the frame and the row's dividers." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Surface border, radius and background.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelStatGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelStatGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-stat-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-stat-group-heading'>PixelStatGroup</h2>
+      <Title id='pixel-stat-group-heading'>PixelStatGroup</Title>
       <p className="docs-lead">Surface-aware container that groups PixelStatCard tiles in a row with dividers or a responsive grid, with shared tone and accessible group labeling.</p>
       <ul className="docs-highlights">
         <li>Row layout with vertical dividers or grid layout with configurable columns (1–6).</li>
         <li>Tone-driven border color shared by the container and inter-cell dividers.</li>
         <li>Surface-aware: pixel chamfered border + pixel radius, or linear rounded corners.</li>
         <li>Adopts role=&quot;group&quot; automatically when aria-label or aria-labelledby is provided.</li>
-        <li>Forwards ref to the underlying div and spreads native HTMLAttributes.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-stat-group-api">
+      <Heading id="pixel-stat-group-api">API</Heading>
+      <FrameworkApi label={'PixelStatGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stat-group-a11y">
-      <h3 id="pixel-stat-group-a11y">Accessibility</h3>
+      <Heading id="pixel-stat-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
@@ -47,9 +125,11 @@ export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSecti
       <p className="docs-aria-notes">Renders as a plain &lt;div&gt; by default. When aria-label or aria-labelledby is provided, the root gains role=&quot;group&quot; to expose the collection as a named landmark to assistive tech. Without an accessible name the role is intentionally dropped to avoid an unlabeled group node. The inner stat tiles (PixelStatCard) carry their own label/value semantics.</p>
     </section>
     <section aria-labelledby="pixel-stat-group-usage">
-      <h3 id="pixel-stat-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelStatGroup } from '@pxlkit/ui-kit';
-import { PixelStatCard } from '@pxlkit/ui-kit';
+      <Heading id="pixel-stat-group-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelStatGroup usage'}
+        react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -59,14 +139,44 @@ export function Default() {
       <PixelStatCard label="Active" value="312" />
     </PixelStatGroup>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatGroup aria-label="Key metrics">
+    <PixelStatCard label="Users" value="1,284" />
+    <PixelStatCard label="Revenue" value="$12.4k" />
+    <PixelStatCard label="Active" value="312" />
+  </PixelStatGroup>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard, PixelStatGroup],
+  template: \`
+    <pxl-stat-group aria-label="Key metrics">
+      <pxl-stat-card label="Users" value="1,284" />
+      <pxl-stat-card label="Revenue" value="$12.4k" />
+      <pxl-stat-card label="Active" value="312" />
+    </pxl-stat-group>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelStatGroup aria-label="Key metrics">
       <PixelStatCard label="Users" value="1,284" />
@@ -74,11 +184,42 @@ export function Default() {
       <PixelStatCard label="Active" value="312" />
     </PixelStatGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatGroup aria-label="Key metrics">
+    <PixelStatCard label="Users" value="1,284" />
+    <PixelStatCard label="Revenue" value="$12.4k" />
+    <PixelStatCard label="Active" value="312" />
+  </PixelStatGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard, PixelStatGroup],
+  template: \`
+    <pxl-stat-group aria-label="Key metrics">
+      <pxl-stat-card label="Users" value="1,284" />
+      <pxl-stat-card label="Revenue" value="$12.4k" />
+      <pxl-stat-card label="Active" value="312" />
+    </pxl-stat-group>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-row-layout">
-        <h4>Row layout</h4>
-        <pre className="docs-code"><code>{`export function RowLayout() {
+        <Subheading>Row layout</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Row layout code'}
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
+
+export function RowLayout() {
   return (
     <PixelStatGroup layout="row" aria-label="Row metrics">
       <PixelStatCard label="Sessions" value="842" />
@@ -86,11 +227,42 @@ export function Default() {
       <PixelStatCard label="Bounce" value="24%" />
     </PixelStatGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatGroup layout="row" aria-label="Row metrics">
+    <PixelStatCard label="Sessions" value="842" />
+    <PixelStatCard label="Conversions" value="56" />
+    <PixelStatCard label="Bounce" value="24%" />
+  </PixelStatGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard, PixelStatGroup],
+  template: \`
+    <pxl-stat-group layout="row" aria-label="Row metrics">
+      <pxl-stat-card label="Sessions" value="842" />
+      <pxl-stat-card label="Conversions" value="56" />
+      <pxl-stat-card label="Bounce" value="24%" />
+    </pxl-stat-group>
+  \`,
+})
+export class RowLayout {}`}
+        />
       </article>
       <article className="docs-example" id="example-grid-layout">
-        <h4>Grid layout</h4>
-        <pre className="docs-code"><code>{`export function GridLayout() {
+        <Subheading>Grid layout</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Grid layout code'}
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
+
+export function GridLayout() {
   return (
     <PixelStatGroup layout="grid" columns={4} aria-label="Grid metrics">
       <PixelStatCard label="A" value="10" />
@@ -99,11 +271,44 @@ export function Default() {
       <PixelStatCard label="D" value="40" />
     </PixelStatGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatGroup layout="grid" :columns="4" aria-label="Grid metrics">
+    <PixelStatCard label="A" value="10" />
+    <PixelStatCard label="B" value="20" />
+    <PixelStatCard label="C" value="30" />
+    <PixelStatCard label="D" value="40" />
+  </PixelStatGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard, PixelStatGroup],
+  template: \`
+    <pxl-stat-group layout="grid" [columns]="4" aria-label="Grid metrics">
+      <pxl-stat-card label="A" value="10" />
+      <pxl-stat-card label="B" value="20" />
+      <pxl-stat-card label="C" value="30" />
+      <pxl-stat-card label="D" value="40" />
+    </pxl-stat-group>
+  \`,
+})
+export class GridLayout {}`}
+        />
       </article>
       <article className="docs-example" id="example-grid-with-gap">
-        <h4>Grid with gap</h4>
-        <pre className="docs-code"><code>{`export function GridWithGap() {
+        <Subheading>Grid with gap</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Grid with gap code'}
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
+
+export function GridWithGap() {
   return (
     <PixelStatGroup layout="grid" columns={3} gap={3} aria-label="Spaced grid metrics">
       <PixelStatCard label="Users" value="1,284" />
@@ -111,11 +316,42 @@ export function Default() {
       <PixelStatCard label="Active" value="312" />
     </PixelStatGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatGroup layout="grid" :columns="3" :gap="3" aria-label="Spaced grid metrics">
+    <PixelStatCard label="Users" value="1,284" />
+    <PixelStatCard label="Revenue" value="$12.4k" />
+    <PixelStatCard label="Active" value="312" />
+  </PixelStatGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard, PixelStatGroup],
+  template: \`
+    <pxl-stat-group layout="grid" [columns]="3" [gap]="3" aria-label="Spaced grid metrics">
+      <pxl-stat-card label="Users" value="1,284" />
+      <pxl-stat-card label="Revenue" value="$12.4k" />
+      <pxl-stat-card label="Active" value="312" />
+    </pxl-stat-group>
+  \`,
+})
+export class GridWithGap {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-col gap-3">
       <PixelStatGroup tone="cyan" aria-label="Cyan group">
@@ -128,11 +364,52 @@ export function Default() {
       </PixelStatGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelStatGroup tone="cyan" aria-label="Cyan group">
+      <PixelStatCard label="Cyan" value="1" tone="cyan" />
+      <PixelStatCard label="Cyan" value="2" tone="cyan" />
+    </PixelStatGroup>
+    <PixelStatGroup tone="green" aria-label="Green group">
+      <PixelStatCard label="Green" value="1" tone="green" />
+      <PixelStatCard label="Green" value="2" tone="green" />
+    </PixelStatGroup>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard, PixelStatGroup],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-stat-group tone="cyan" aria-label="Cyan group">
+        <pxl-stat-card label="Cyan" value="1" tone="cyan" />
+        <pxl-stat-card label="Cyan" value="2" tone="cyan" />
+      </pxl-stat-group>
+      <pxl-stat-group tone="green" aria-label="Green group">
+        <pxl-stat-card label="Green" value="1" tone="green" />
+        <pxl-stat-card label="Green" value="2" tone="green" />
+      </pxl-stat-group>
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelStatGroup surface="pixel" aria-label="Pixel surface">
@@ -145,15 +422,51 @@ export function Default() {
       </PixelStatGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelStatGroup surface="pixel" aria-label="Pixel surface">
+      <PixelStatCard label="Pixel" value="42" />
+      <PixelStatCard label="Pixel" value="84" />
+    </PixelStatGroup>
+    <PixelStatGroup surface="linear" aria-label="Linear surface">
+      <PixelStatCard label="Linear" value="42" />
+      <PixelStatCard label="Linear" value="84" />
+    </PixelStatGroup>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard, PixelStatGroup],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-stat-group surface="pixel" aria-label="Pixel surface">
+        <pxl-stat-card label="Pixel" value="42" />
+        <pxl-stat-card label="Pixel" value="84" />
+      </pxl-stat-group>
+      <pxl-stat-group surface="linear" aria-label="Linear surface">
+        <pxl-stat-card label="Linear" value="42" />
+        <pxl-stat-card label="Linear" value="84" />
+      </pxl-stat-group>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-stat-card">PixelStatCard</a></li>
-        <li><a href="#pixel-badge-group">PixelBadgeGroup</a></li>
-        <li><a href="#pixel-avatar-group">PixelAvatarGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stat-card' : '#pixel-stat-card'}>PixelStatCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge-group' : '#pixel-badge-group'}>PixelBadgeGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-avatar-group' : '#pixel-avatar-group'}>PixelAvatarGroup</a></li>
       </ul>
     </section>
     </section>

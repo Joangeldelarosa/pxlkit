@@ -1,8 +1,9 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import { zoomInStyle } from '@pxlkit/ui-kit-core';
 import type { AnimationRepeat, AnimationTrigger } from './types';
-import { mergeRefs, repeatToCss, useAnimationTrigger, usePixelAnimations } from './_internal/animation-hooks';
+import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelZoomIn — scales children from `startScale` to `1` with fade-in.
@@ -46,20 +47,12 @@ export const PixelZoomIn = forwardRef<HTMLDivElement, PixelZoomInProps>(function
   },
   forwardedRef,
 ) {
-  usePixelAnimations();
   const { ref, active, handlers, handleAnimEnd } = useAnimationTrigger(trigger, onComplete);
   return (
     <div
       ref={mergeRefs(ref, forwardedRef)}
       className={className}
-      style={
-        active
-          ? {
-              animation: `pxl-zoom-in ${duration}ms ${easing} ${delay}ms ${repeatToCss(repeat)} ${fillMode}`,
-              ['--pxl-zoom-start' as string]: String(startScale),
-            }
-          : undefined
-      }
+      style={active ? zoomInStyle({ duration, delay, startScale, repeat, easing, fillMode }) : undefined}
       {...handlers}
       onAnimationEnd={handleAnimEnd}
     >

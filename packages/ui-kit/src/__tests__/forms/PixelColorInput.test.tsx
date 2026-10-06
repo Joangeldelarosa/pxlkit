@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import { PixelColorInput } from '../../forms/PixelColorInput';
 
 describe('PixelColorInput', () => {
@@ -82,5 +82,29 @@ describe('PixelColorInput', () => {
     ) as HTMLInputElement;
     expect(hidden).toBeTruthy();
     expect(hidden.value).toBe('#112233');
+  });
+});
+
+describe('PixelColorInput — hint / error description', () => {
+  it('describes the trigger with the hint, then with the error, only while one shows', () => {
+    const { getByRole, rerender } = render(<PixelColorInput label="Accent" hint="Used for links" />);
+    const trigger = getByRole('button', { name: 'Accent' });
+    expect(trigger).toHaveAccessibleDescription('Used for links');
+    rerender(<PixelColorInput label="Accent" hint="Used for links" error="Too little contrast" />);
+    expect(trigger).toHaveAccessibleDescription('Too little contrast');
+    rerender(<PixelColorInput label="Accent" />);
+    expect(trigger).not.toHaveAttribute('aria-describedby');
+  });
+});
+
+describe('PixelColorInput — picker dialog', () => {
+  it('moves focus into the dialog as it opens, and back to the trigger on Escape', async () => {
+    render(<PixelColorInput label="Brand" defaultValue="#06b6d4" />);
+    const trigger = screen.getByRole('button', { name: 'Brand' });
+    fireEvent.click(trigger);
+    expect(screen.getByRole('dialog', { name: 'Color picker' })).toBeInTheDocument();
+    expect(document.activeElement).toBe(screen.getByLabelText('Native color picker'));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 });

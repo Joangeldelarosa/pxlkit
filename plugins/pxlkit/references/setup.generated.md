@@ -1,19 +1,19 @@
-<!-- GENERATED from @pxlkit/ui-kit v2.1.1 — do not edit; run npm run docs:build -->
+<!-- GENERATED from @pxlkit/ui-kit v2.2.0 — do not edit; run npm run docs:build -->
 
 # Setup
 
-Wiring `@pxlkit/ui-kit` v2.1.1 into a real app. Three framework variants and
-three package-manager variants for the Tailwind directive — pick one of each.
+Wiring `@pxlkit/ui-kit` v2.2.0 into a real app: one stylesheet import, the
+providers, and three framework variants — pick the one that matches your app.
 
-Read the Tailwind `@source` section even if the rest looks obvious: it is the
-one step that fails silently, and it fails differently per package manager.
+Read the Tailwind section even if the rest looks obvious: a stylesheet Tailwind
+never processes is the one setup mistake that fails silently.
 
 ## Install
 
 ```bash
-npm  install @pxlkit/ui-kit@2.1.1
-pnpm add     @pxlkit/ui-kit@2.1.1
-yarn add     @pxlkit/ui-kit@2.1.1
+npm  install @pxlkit/ui-kit@2.2.0
+pnpm add     @pxlkit/ui-kit@2.2.0
+yarn add     @pxlkit/ui-kit@2.2.0
 ```
 
 Peer dependencies: `react` and `react-dom` at `^18.2.0 || ^19.0.0`. Tailwind CSS
@@ -30,95 +30,74 @@ Easy to skip, and the failure is loud but misleading: without them the first
 `TS7016: Could not find a declaration file for module 'react'` and
 `TS7026: JSX element implicitly has type 'any'`.
 
-Icon packs are separate packages, installed only when used:
-`@pxlkit/ui`, `@pxlkit/gamification`, `@pxlkit/social`, `@pxlkit/weather`,
-`@pxlkit/feedback`, `@pxlkit/effects`, `@pxlkit/parallax`. `@pxlkit/core` (the
-icon renderer) ships as a dependency of the kit already.
+The kit installs what it needs with it: `@pxlkit/ui-kit-core` (the theme and the
+behaviour shared with the Vue and Angular kits), `@pxlkit/core` (the icon
+renderer) and the `@pxlkit/ui` and `@pxlkit/gamification` icon packs. The other
+packs are installed only when used: `@pxlkit/social`, `@pxlkit/weather`,
+`@pxlkit/feedback`, `@pxlkit/effects`, `@pxlkit/parallax`.
 
-## Tailwind v4 — the `@source` directive (the #1 failure)
+## Tailwind CSS v4 — one import
 
-Tailwind v4 discovers utility classes by scanning source files, and it **ignores
-`node_modules` by default**. The pxlkit components carry their classes in their
-own compiled source, so without an explicit `@source` line Tailwind emits none
-of them: the components render, the markup is right, and everything is
-unstyled — with no warning anywhere.
-
-`@source` paths are resolved **relative to the CSS file that declares them**.
-All examples below assume the CSS lives at `src/app/globals.css` (adjust the
-`../` depth to your own layout).
-
-### npm, or Yarn 1 / Yarn with `nodeLinker: node-modules`
-
-Flat `node_modules`, so the real directory is the plain package path:
+The kit's stylesheet is a Tailwind v4 entry point of its own: it imports
+`tailwindcss`, defines the `--retro-*` tokens and the pixel utilities, and
+registers the kit's compiled files with `@source` — Tailwind skips
+`node_modules` unless told otherwise, and those directives tell it. So it
+**takes the place of** `@import "tailwindcss"` in the stylesheet your build
+hands to Tailwind:
 
 ```css
-@source "../../../node_modules/@pxlkit/ui-kit";
+@import "@pxlkit/ui-kit/styles.css";
 ```
 
-### pnpm
+Tailwind itself has to run in the build — the kit's stylesheet is its input.
+`create-next-app --tailwind` sets that up; otherwise:
 
-pnpm keeps the package in its content-addressable store and symlinks it, so the
-plain path is a symlink Tailwind's scanner will not follow. Point at the real
-`.pnpm` directory and glob the version so a bump does not silently break it:
+- **Next.js** — `npm install -D tailwindcss @tailwindcss/postcss postcss`, and
+  `export default { plugins: { '@tailwindcss/postcss': {} } };` in
+  `postcss.config.mjs`.
+- **Vite** — `npm install -D tailwindcss @tailwindcss/vite`, and
+  `plugins: [react(), tailwindcss()]` in `vite.config.ts`.
 
-```css
-@source "../../../node_modules/.pnpm/@pxlkit+ui-kit@*/node_modules/@pxlkit/ui-kit";
-```
+Without it the build still succeeds, but the CSS keeps `@theme`, `@source` and
+`@apply` as written and the components render unstyled.
 
-The `@` scope becomes `+` in `.pnpm` directory names (`@pxlkit/ui-kit` →
-`@pxlkit+ui-kit`). If styles are still missing, `ls node_modules/.pnpm | grep ui-kit`
-prints the actual directory name to match.
+With Tailwind in the build, that one import is the whole integration — with npm,
+pnpm or Yarn's `node_modules` linker, in a standalone app or a monorepo: the
+`@source` paths resolve from the stylesheet itself, wherever the package manager
+put it. Two mistakes to avoid:
 
-### Yarn Plug'n'Play
+- **Importing `tailwindcss` as well.** The kit's stylesheet already does; a
+  second import ships Tailwind's base styles twice.
+- **Yarn Plug'n'Play.** PnP keeps packages in zip archives that Tailwind's file
+  scanner cannot read, so the kit's classes are never generated. Set
+  `nodeLinker: node-modules` in `.yarnrc.yml`, or unplug the kit and its
+  core: `yarn unplug @pxlkit/ui-kit @pxlkit/ui-kit-core`.
 
-PnP has no `node_modules` at all — packages stay inside zip archives that a file
-scanner cannot walk. Two options, in order of preference:
-
-1. Opt this project out of PnP, then use the npm path above:
-   ```yaml
-   # .yarnrc.yml
-   nodeLinker: node-modules
-   ```
-2. Keep PnP and unplug just this package so it exists on disk:
-   ```bash
-   yarn unplug @pxlkit/ui-kit
-   ```
-   ```css
-   @source "../../../.yarn/unplugged/@pxlkit-ui-kit-npm-*/node_modules/@pxlkit/ui-kit";
-   ```
-
-### Monorepo / workspace
-
-When the kit is a workspace sibling rather than an installed dependency, point
-straight at the package directory — this is the line `apps/web` really uses:
-
-```css
-@source "../../../../packages/ui-kit";
-```
+Your own `@source` lines are only for your own files outside Tailwind's
+automatic detection — the kit needs none.
 
 ### Verifying it worked
 
 Do not eyeball it. Render `<PixelButton tone="green">Test</PixelButton>` and
 check that the computed background is a retro green, not transparent — or grep
-the built CSS for a class only pxlkit uses:
+the built CSS for a utility Tailwind generates only from the kit's files:
 
 ```bash
-grep -c "retro-green" .next/static/css/*.css   # 0 means @source is wrong
+grep -l '\.bg-retro-green' .next/static/chunks/*.css .next/static/css/*.css 2>/dev/null   # no file listed: the kit's classes were never generated
 ```
+
+(Next.js 16 writes the CSS to `.next/static/chunks`, earlier versions to
+`.next/static/css`; with Vite, grep `dist/assets/*.css`.)
 
 ## The CSS entry file
 
-Order matters: `tailwindcss` first, the kit's tokens second (they define the
-`--retro-*` variables every utility resolves against), your `@source` lines
-next, your own overrides last.
+The kit's stylesheet comes first — it brings Tailwind and defines the
+`--retro-*` variables every utility resolves against — and your own rules and
+overrides follow it.
 
 ```css
-/* app/globals.css — the shape apps/web actually ships */
-@import "tailwindcss";
+/* app/globals.css */
 @import "@pxlkit/ui-kit/styles.css";
-
-/* Tailwind must be told to scan the package — see the section above */
-@source "../../../node_modules/@pxlkit/ui-kit";
 
 @layer base {
   :root {
@@ -149,6 +128,12 @@ next, your own overrides last.
 }
 ```
 
+The kit styles the components, not the page: the `body` rule above is yours to
+keep. Remove a starter template's own theme rules — create-next-app's
+`globals.css` sets a white `body` background, `font-family: Arial` and an
+`@theme inline` that remaps `--font-sans` / `--font-mono` to Geist, all of which
+override the kit's.
+
 `image-rendering: pixelated` on `*` is deliberate and load-bearing: without it
 every icon and border blurs the moment the browser scales it, and the whole
 aesthetic collapses into "slightly wrong flat design".
@@ -165,26 +150,25 @@ Re-skinning is a variable override, never a component fork — redefine any
 
 | Provider | Props (real signature) | Notes |
 | --- | --- | --- |
-| `PxlKitLocaleProvider` | `locale?: 'en' \| 'tr'` (default `'en'`), `children` | Renders a wrapper `<div lang={locale}>` and injects the Google Fonts `<link>`. Turkish needs it for correct `i → İ` casing. |
-| `PxlKitToastProvider` | `position?: ToastPosition` (default `'top-right'`), `max?: number` (default `5`), `surface?: 'pixel' \| 'linear'`, `stacked?: boolean` (default `true`), `stackVisible?: number` (default `2`), `children` | `ToastPosition` = `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left' \| 'top-center' \| 'bottom-center'`. Required before any `useToast()` call. |
+| `PxlKitLocaleProvider` | `locale?: 'en' \| 'tr'` (default `'en'`), `children` | Renders a layout-neutral wrapper `<div lang={locale}>` (`display: contents`) and exposes `upper` / `lower` and `fontsUrl` through `usePxlKitLocale()`. Turkish needs it for correct `i → İ` casing. Loads no fonts — see Fonts. |
+| `PxlKitToastProvider` | `position?: ToastPosition` (default `'top-right'`), `max?: number` (default `5`), `duration?: number` (default `4500`; `0` keeps toasts until dismissed), `hotkey?: string \| false` (default `'F8'`), `surface?: 'pixel' \| 'linear'`, `stacked?: boolean` (default `true`), `stackVisible?: number` (default `2`), `children` | `ToastPosition` = `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left' \| 'top-center' \| 'bottom-center'`. Required before any `useToast()` call. |
 | `PxlKitSurfaceProvider` | `surface?: 'pixel' \| 'linear'` (default `'pixel'`), `children` | Sets the default surface for every descendant. Per-component `surface` props still win. |
 
 The props are **not** `defaultPosition` / `maxToasts` — those belong to the
 site-local wrapper in `apps/web/src/components/ToastProvider.tsx`, not to the
 published package. Use `position` and `max`.
 
-Nesting order that works: locale outermost (it owns `lang` and fonts), then
-surface, then toasts (its portal should inherit both).
+Nesting order that works: locale outermost (it owns `lang`), then surface,
+then toasts (its portal should inherit both).
 
 ## Framework wire-up
 
 ### Next.js — App Router
 
-Every pxlkit provider is a client component (`'use client'` at the top of each
-provider source). A Server Component may not render one directly with children
-coming from the server tree, so wrap them once in your own client boundary and
-keep `layout.tsx` a Server Component — that way pages and children stay server
-components and only the provider shell ships to the browser.
+The kit's components hold state, effects and context, so they run as Client
+Components. Wrap the providers once in a `'use client'` file of your own and keep
+`layout.tsx` a Server Component — pages and children stay Server Components and
+only the provider shell ships to the browser.
 
 ```tsx
 // app/providers.tsx
@@ -214,13 +198,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
 import './globals.css';
 import { Providers } from './providers';
 
-const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('pxlkit-theme');
-if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}
-else{document.documentElement.classList.add('dark');document.documentElement.classList.remove('light');}}catch(e){}})();`;
+// Same key and default as useDarkMode() — see "Dark mode without the flash"
+const THEME_INIT_SCRIPT = `(function () { try { var raw = localStorage.getItem('pxlkit:dark-mode'); var mode = raw; try { mode = JSON.parse(raw); } catch (e) {} var dark = mode === 'dark' || (mode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches); document.documentElement.classList.toggle('dark', dark); document.documentElement.classList.toggle('light', !dark); } catch (e) {} })();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
@@ -232,11 +215,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-Any page or component of your own that calls a pxlkit hook (`useToast`,
-`usePxlKitLocale`, `usePxlKitSurface`) or passes an event handler to a pxlkit component needs its
-own `'use client'`. Rendering a pxlkit component with only static props from a
-Server Component is fine — the `'use client'` inside the package marks the
-boundary for you.
+Put `'use client'` at the top of every file of your own that imports from
+`@pxlkit/ui-kit` — to render a component or to call a hook (`useToast`,
+`usePxlKitLocale`, `usePxlKitSurface`, `useDarkMode`): that works with every
+version of the kit. A Server Component imports the server-safe helpers
+(`buildGoogleFontsUrl`, `toLocaleUpper`, `cn`, the tokens) from
+`@pxlkit/ui-kit-core` — with pnpm's strict layout, add it to the dependencies to
+import it. From `@pxlkit/core`, `PxlKitIcon` renders in a Server Component;
+`AnimatedPxlKitIcon`, `ParallaxPxlKitIcon` and `PixelToast` need a Client
+Component.
 
 ### Next.js — Pages Router
 
@@ -272,13 +259,12 @@ export default function App({ Component, pageProps }: AppProps) {
 // pages/_document.tsx
 import { Html, Head, Main, NextScript } from 'next/document';
 
-const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('pxlkit-theme');
-if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}
-else{document.documentElement.classList.add('dark');document.documentElement.classList.remove('light');}}catch(e){}})();`;
+// Same key and default as useDarkMode() — see "Dark mode without the flash"
+const THEME_INIT_SCRIPT = `(function () { try { var raw = localStorage.getItem('pxlkit:dark-mode'); var mode = raw; try { mode = JSON.parse(raw); } catch (e) {} var dark = mode === 'dark' || (mode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches); document.documentElement.classList.toggle('dark', dark); document.documentElement.classList.toggle('light', !dark); } catch (e) {} })();`;
 
 export default function Document() {
   return (
-    <Html lang="en" className="dark">
+    <Html lang="en">
       <Head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </Head>
@@ -299,12 +285,11 @@ module script tag, which is deferred by definition.
 
 ```html
 <!-- index.html -->
-<html lang="en" class="dark">
+<html lang="en">
   <head>
+    <!-- Same key and default as useDarkMode() — see "Dark mode without the flash" -->
     <script>
-      (function(){try{var t=localStorage.getItem('pxlkit-theme');
-      if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}
-      else{document.documentElement.classList.add('dark');document.documentElement.classList.remove('light');}}catch(e){}})();
+      (function () { try { var raw = localStorage.getItem('pxlkit:dark-mode'); var mode = raw; try { mode = JSON.parse(raw); } catch (e) {} var dark = mode === 'dark' || (mode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches); document.documentElement.classList.toggle('dark', dark); document.documentElement.classList.toggle('light', !dark); } catch (e) {} })();
     </script>
   </head>
   <body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body>
@@ -344,43 +329,63 @@ against your entry CSS and import the compiled output instead.
 
 Dark mode is a `.dark` class on `<html>`, not a media query, so the class must
 be on the element **before first paint** or the page flashes the wrong theme.
-This is the exact script `apps/web` ships:
+`useDarkMode()` stores the reader's choice in `localStorage` under
+`pxlkit:dark-mode`, JSON-encoded (`"light"`, `"dark"` or `"system"`), and
+`'system'` — the default — follows `prefers-color-scheme`. The hook reads the
+stored choice only after mounting, so this script sets the class first. It
+reads the same key and default as the kit's `useDarkMode()`:
 
 ```js
-(function(){
+(function () {
   try {
-    var t = localStorage.getItem('pxlkit-theme');
-    if (t === 'light') {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.classList.add('light');
-    } else {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    }
-  } catch(e){}
+    var raw = localStorage.getItem('pxlkit:dark-mode');
+    var mode = raw;
+    try { mode = JSON.parse(raw); } catch (e) {}
+    var dark = mode === 'dark' || (mode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', dark);
+    document.documentElement.classList.toggle('light', !dark);
+  } catch (e) {}
 })();
 ```
 
 It must run **synchronously in `<head>`, before any stylesheet-dependent
 paint** — a `<script defer>`, a `useEffect`, or a Next `<Script>` with the
 default `afterInteractive` strategy all run too late and reintroduce the flash.
-Pair it with `className="dark"` + `suppressHydrationWarning` on `<html>` so the
-server markup matches the default branch and React does not warn when the
-script has already flipped the class.
+In the App Router, put `suppressHydrationWarning` on `<html>` and leave its
+`className` unset: the script changes the class before React hydrates.
+
+A theme toggle calls the hook — `setMode()` stores the choice and sets the class:
+
+```tsx
+'use client';
+import { PixelButton, useDarkMode } from '@pxlkit/ui-kit';
+
+export function ThemeToggle() {
+  const { resolved, setMode } = useDarkMode();
+  return (
+    <PixelButton onClick={() => setMode(resolved === 'dark' ? 'light' : 'dark')}>
+      {resolved === 'dark' ? 'Light theme' : 'Dark theme'}
+    </PixelButton>
+  );
+}
+```
 
 ## Fonts
 
-Three families: `Press Start 2P` (pixel display), `Inter` (body), `JetBrains Mono`
-(mono). `PxlKitLocaleProvider` injects the `<link>` for you at runtime, which
-costs a round trip after hydration. For a server-rendered app, emit the tag in
-the initial HTML and let the provider's injection dedupe against it.
+Three families: `Press Start 2P` (pixel display, `font-pixel`), `Inter` (body,
+`font-sans`), `JetBrains Mono` (mono, `font-mono`). The theme names them but
+the kit loads no font files: add the Google Fonts stylesheet to the document
+`<head>` — in the initial HTML of a server-rendered app — or self-host the three
+families.
 
-`buildGoogleFontsUrl(locale)` is exported from `@pxlkit/ui-kit` and is the SSoT
+`buildGoogleFontsUrl(locale)` is exported from `@pxlkit/ui-kit` and `@pxlkit/ui-kit-core` — import it from the core in a Server Component — and is the SSoT
 for that URL — it picks the subsets per locale (`en` → `latin`, `tr` →
-`latin,latin-ext`, because Turkish `ğ ı İ ş` live outside basic latin):
+`latin,latin-ext`, because Turkish `ğ ı İ ş` live outside basic latin). Under a
+`PxlKitLocaleProvider`, `usePxlKitLocale().fontsUrl` is the same URL for the
+current locale:
 
 ```ts
-import { buildGoogleFontsUrl } from '@pxlkit/ui-kit';
+import { buildGoogleFontsUrl } from '@pxlkit/ui-kit-core';
 
 buildGoogleFontsUrl('en');
 // https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700
@@ -388,8 +393,8 @@ buildGoogleFontsUrl('en');
 ```
 
 ```tsx
-// Next App Router — app/layout.tsx <head>
-import { buildGoogleFontsUrl } from '@pxlkit/ui-kit';
+// Next App Router — app/layout.tsx <head> (a Server Component: the helper comes from the core)
+import { buildGoogleFontsUrl } from '@pxlkit/ui-kit-core';
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -404,10 +409,13 @@ font weight. Call the builder.
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Components render unstyled, no errors | Tailwind never scanned the package | Add the right `@source` line for your package manager |
-| Colors are wrong / `--retro-*` undefined | `@pxlkit/ui-kit/styles.css` missing or imported before `tailwindcss` | Import `tailwindcss` first, then the kit's stylesheet |
-| Theme flashes light then dark on load | Anti-FOUC script deferred or in `useEffect` | Inline synchronous `<script>` in `<head>` |
+| Components render unstyled, no errors | The kit's stylesheet never reached Tailwind, or Yarn PnP hides the package from its scanner | `@import "@pxlkit/ui-kit/styles.css"` in the CSS Tailwind processes; with PnP, unplug the kit and its core |
+| Colors are wrong / `--retro-*` undefined | `@pxlkit/ui-kit/styles.css` not imported | Import it at the top of your entry CSS |
+| Tailwind's base styles appear twice in the built CSS | `tailwindcss` imported next to the kit's stylesheet | Drop `@import "tailwindcss"` — the kit's stylesheet includes it |
+| Text renders in system fonts, not the pixel, Inter and JetBrains Mono families | The fonts are not loaded — the kit names them but loads none | Add the `buildGoogleFontsUrl()` stylesheet to `<head>`, or self-host the families |
+| Theme flashes light then dark on load | Anti-FOUC script deferred, in `useEffect`, or reading another key than `useDarkMode()` | Inline synchronous `<script>` in `<head>` reading `pxlkit:dark-mode` |
 | `useToast` throws / toasts never appear | No `PxlKitToastProvider` above the caller | Mount it in the provider shell |
 | Turkish text uppercases `i` as `I` | Locale provider missing or `lang` unset | Wrap in `PxlKitLocaleProvider locale="tr"` and set `lang` on `<html>` |
 | `useState`/context error from a pxlkit import | Client component rendered inside a Server Component boundary | Move the providers into a `'use client'` shell |
+| Build error `Export Controller doesn't exist in target module` / `'FormProvider' is not exported from 'react-hook-form'`, or `useRef is not a function` at prerender | `@pxlkit/ui-kit` imported in a Server Component from a kit version whose bundle has no `'use client'`, or an animated or parallax icon from `@pxlkit/core` rendered in one | Add `'use client'` to that file; keep the providers in a `'use client'` shell; import server helpers from `@pxlkit/ui-kit-core` |
 | Icons look blurry when scaled | `image-rendering: pixelated` missing | Add the `*` base rule shown above |

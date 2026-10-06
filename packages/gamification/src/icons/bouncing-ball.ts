@@ -1,4 +1,4 @@
-import type { AnimatedPxlKitData } from '@pxlkit/core';
+import type { AnimatedPxlKitData } from '@pxlkit/core/vanilla';
 
 // ─── Bouncing Ball (8 frames) ──────────────
 // A ball bouncing up and down with squash and stretch.

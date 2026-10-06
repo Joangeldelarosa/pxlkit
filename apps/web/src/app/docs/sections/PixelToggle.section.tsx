@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelToggleDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelToggleDocsMeta = {
@@ -17,35 +23,108 @@ export const PixelToggleDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProps): React.ReactElement {
+/** PixelToggle's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelToggle } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelToggle',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Identifies the toggle within its group; also exposed as `data-pxl-toggle-value`.' },
+          { name: 'pressed', type: 'boolean', description: 'Standalone (uncontrolled) toggle: pressed state.' },
+          { name: 'onPressedChange', type: '(next: boolean) => void', description: 'Standalone (uncontrolled) toggle: notified on press change.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: "Surface override; defaults to the group's, then to the nearest provider." },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`).',
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelToggle } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelToggle',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Identifies the toggle within its group; also exposed as `data-pxl-toggle-value`.' },
+          { name: 'pressed', type: 'boolean', binding: 'v-model:pressed', description: 'Pressed state of a standalone toggle (`v-model:pressed`); leave unset for an uncontrolled one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: "Surface override; defaults to the group's, then to the nearest provider." },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Native `disabled`.' },
+        ],
+        events: [
+          { name: 'update:pressed', payload: 'pressed: boolean', description: 'The new pressed state of a standalone toggle, after each press.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Toggle label.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<button>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelToggle } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelToggle',
+        selector: 'button[pxlToggle]',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Identifies the toggle within its group; also exposed as `data-pxl-toggle-value`.' },
+          { name: 'pressed', type: 'boolean', binding: '[(pressed)]', description: 'Pressed state of a standalone toggle (`[(pressed)]`); leave unset for an uncontrolled one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: "Surface override; defaults to the group's, then to the nearest provider." },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Native `disabled`.' },
+          { name: 'type', type: 'string', default: "'button'", description: 'Native `type`.' },
+        ],
+        events: [
+          { name: 'pressedChange', payload: 'boolean', description: 'The new `pressed`: the event half of `[(pressed)]`.' },
+        ],
+        notes: [
+          'Goes on a native `<button>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `pressed` (`boolean`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelToggleDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelToggleDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-toggle-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-toggle-heading'>PixelToggle</h2>
+      <Title id='pixel-toggle-heading'>PixelToggle</Title>
       <p className="docs-lead">Two-state toggle button with aria-pressed semantics. Works standalone or as a child of PixelToggleGroup for single/multi-select toolbars.</p>
       <ul className="docs-highlights">
-        <li>Standalone controlled (pressed + onPressedChange) or composed inside PixelToggleGroup</li>
-        <li>Inherits size, variant, and surface from a parent PixelToggleGroup context</li>
+        <li>Standalone — <code>pressed</code> + <code>onPressedChange</code> (React), <code>v-model:pressed</code> (Vue), <code>[(pressed)]</code> (Angular) — or composed inside PixelToggleGroup</li>
+        <li>Inherits size, variant, and surface from a parent PixelToggleGroup</li>
         <li>Cyan tone pressed state with surface-aware borders, radius, and transitions</li>
         <li>Renders as role=&quot;radio&quot; with aria-checked inside a single-select group, aria-pressed otherwise</li>
-        <li>Forwards refs and registers with the group for roving-tabindex keyboard navigation</li>
+        <li>Registers with the group for roving-tabindex keyboard navigation</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-toggle-api">
+      <Heading id="pixel-toggle-api">API</Heading>
+      <FrameworkApi label={'PixelToggle API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-toggle-a11y">
-      <h3 id="pixel-toggle-a11y">Accessibility</h3>
+      <Heading id="pixel-toggle-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">Standalone toggle exposes aria-pressed reflecting the boolean state. When wrapped by a single-select PixelToggleGroup the role is overridden to &quot;radio&quot; with aria-checked so screen readers announce &quot;one of N&quot; semantics. Data attributes data-state and data-pxl-toggle-value support styling and testing hooks.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -84,8 +163,11 @@ export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProp
       </table>
     </section>
     <section aria-labelledby="pixel-toggle-usage">
-      <h3 id="pixel-toggle-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-toggle-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelToggle usage'}
+        react={`import { useState } from 'react';
 import { PixelToggle } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -95,36 +177,116 @@ export function Default() {
       Bold
     </PixelToggle>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle } from '@pxlkit/ui-kit-vue';
+
+const pressed = ref(false);
+</script>
+
+<template>
+  <PixelToggle v-model:pressed="pressed" value="bold">Bold</PixelToggle>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle],
+  template: \`<button pxlToggle value="bold" [(pressed)]="pressed">Bold</button>\`,
+})
+export class Default {
+  readonly pressed = signal(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelToggle } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [pressed, setPressed] = useState(false);
   return (
     <PixelToggle value="bold" pressed={pressed} onPressedChange={setPressed}>
       Bold
     </PixelToggle>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle } from '@pxlkit/ui-kit-vue';
+
+const pressed = ref(false);
+</script>
+
+<template>
+  <PixelToggle v-model:pressed="pressed" value="bold">Bold</PixelToggle>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle],
+  template: \`<button pxlToggle value="bold" [(pressed)]="pressed">Bold</button>\`,
+})
+export class Default {
+  readonly pressed = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-pressed">
-        <h4>Pressed</h4>
-        <pre className="docs-code"><code>{`export function Pressed() {
+        <Subheading>Pressed</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Pressed code'}
+          react={`import { useState } from 'react';
+import { PixelToggle } from '@pxlkit/ui-kit';
+
+export function Pressed() {
   const [pressed, setPressed] = useState(true);
   return (
     <PixelToggle value="italic" pressed={pressed} onPressedChange={setPressed}>
       Italic
     </PixelToggle>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle } from '@pxlkit/ui-kit-vue';
+
+const pressed = ref(true);
+</script>
+
+<template>
+  <PixelToggle v-model:pressed="pressed" value="italic">Italic</PixelToggle>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle],
+  template: \`<button pxlToggle value="italic" [(pressed)]="pressed">Italic</button>\`,
+})
+export class Pressed {
+  readonly pressed = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { useState } from 'react';
+import { PixelToggle } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   const [pixel, setPixel] = useState(true);
   const [linear, setLinear] = useState(true);
   return (
@@ -147,11 +309,47 @@ export function Default() {
       </PixelToggle>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle } from '@pxlkit/ui-kit-vue';
+
+const pixel = ref(true);
+const linear = ref(true);
+</script>
+
+<template>
+  <div class="flex items-center gap-2">
+    <PixelToggle v-model:pressed="pixel" value="pixel" surface="pixel">Pixel</PixelToggle>
+    <PixelToggle v-model:pressed="linear" value="linear" surface="linear">Linear</PixelToggle>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle],
+  template: \`
+    <div class="flex items-center gap-2">
+      <button pxlToggle value="pixel" surface="pixel" [(pressed)]="pixel">Pixel</button>
+      <button pxlToggle value="linear" surface="linear" [(pressed)]="linear">Linear</button>
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly pixel = signal(true);
+  readonly linear = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelToggle } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <div className="flex items-center gap-2">
       <PixelToggle value="off" disabled pressed={false} onPressedChange={() => {}}>
@@ -162,15 +360,39 @@ export function Default() {
       </PixelToggle>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelToggle } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-2">
+    <PixelToggle value="off" disabled :pressed="false">Disabled off</PixelToggle>
+    <PixelToggle value="on" disabled pressed>Disabled on</PixelToggle>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelToggle } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle],
+  template: \`
+    <div class="flex items-center gap-2">
+      <button pxlToggle value="off" disabled [pressed]="false">Disabled off</button>
+      <button pxlToggle value="on" disabled [pressed]="true">Disabled on</button>
+    </div>
+  \`,
+})
+export class Disabled {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-toggle-group">PixelToggleGroup</a></li>
-        <li><a href="#pixel-switch">PixelSwitch</a></li>
-        <li><a href="#pixel-checkbox">PixelCheckbox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toggle-group' : '#pixel-toggle-group'}>PixelToggleGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-switch' : '#pixel-switch'}>PixelSwitch</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-checkbox' : '#pixel-checkbox'}>PixelCheckbox</a></li>
       </ul>
     </section>
     </section>

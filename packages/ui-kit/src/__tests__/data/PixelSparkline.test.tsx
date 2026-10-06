@@ -57,4 +57,22 @@ describe('PixelSparkline', () => {
     expect(svg?.getAttribute('role')).toBe('img');
     expect(svg?.getAttribute('aria-label')).toBeTruthy();
   });
+
+  it('leaves out values that are not finite: they draw nothing and the summary skips them', () => {
+    const data = [
+      { x: 0, y: 10 },
+      { x: 1, y: Number.NaN },
+      { x: 2, y: 30 },
+      { x: 3, y: Infinity },
+    ];
+    const { container, rerender } = render(<PixelSparkline data={data} showArea />);
+    const svg = container.querySelector('svg')!;
+    expect(container.querySelector('polyline')!.getAttribute('points')).toBe('2.00,56.00 159.33,4.00');
+    expect(container.querySelector('polygon')!.getAttribute('points')).toBe('2.00,56.00 2.00,56.00 159.33,4.00 159.33,56.00');
+    expect(svg.getAttribute('aria-label')).toBe('sparkline with 2 points, range 10 to 30');
+    rerender(<PixelSparkline data={[{ x: 0, y: Number.NaN }]} showArea />);
+    expect(container.querySelector('polyline')!.getAttribute('points')).toBe('');
+    expect(container.querySelector('polygon')).toBeNull();
+    expect(svg.getAttribute('aria-label')).toBe('sparkline, no data');
+  });
 });

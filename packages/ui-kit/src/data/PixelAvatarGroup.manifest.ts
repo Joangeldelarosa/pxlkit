@@ -33,7 +33,7 @@ export default defineManifest({
     wcag: '2.1 AA',
     patterns: ['group'],
     notes:
-      'Provide aria-label or aria-labelledby summarizing the count (e.g. "5 team members"); without one, role=group is dropped so the cluster is treated as presentational. The "+N" overflow tile carries its own aria-label ("N more users") so assistive tech announces the hidden count.',
+      'Provide aria-label or aria-labelledby summarizing the count (e.g. "5 team members"); without one, role=group is dropped so the cluster is treated as presentational. The "+N" overflow tile hides its visible "+N" from assistive tech and announces "N more users" through screen-reader-only text.',
   },
   related: ['PixelAvatar', 'PixelBadge', 'PixelChip'],
   apiStability: 'stable',

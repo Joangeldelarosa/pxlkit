@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBareTextareaDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBareTextareaDocsMeta = {
@@ -17,16 +23,74 @@ export const PixelBareTextareaDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDocsSectionProps): React.ReactElement {
+/** PixelBareTextarea's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBareTextarea } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBareTextarea',
+        notes: [
+          'Also takes the native attributes and event handlers of `<textarea>` (`TextareaHTMLAttributes<HTMLTextAreaElement>`).',
+          '`ref` points to `<textarea>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBareTextarea } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBareTextarea',
+        props: [
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled textarea.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The new value, on every edit.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<textarea>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBareTextarea } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBareTextarea',
+        selector: 'textarea[pxlBareTextarea]',
+        props: [
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Value (`[(value)]`); leave unset for an uncontrolled textarea.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'Goes on a native `<textarea>`, which keeps its own attributes and events.',
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelBareTextareaDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBareTextareaDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-bare-textarea-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-bare-textarea-heading'>PixelBareTextarea</h2>
-      <p className="docs-lead">Unstyled escape-hatch &lt;textarea&gt; passthrough for building custom multi-line inputs without the opinionated PixelTextarea chrome.</p>
+      <Title id='pixel-bare-textarea-heading'>PixelBareTextarea</Title>
+      <p className="docs-lead">Unstyled escape-hatch <code>&lt;textarea&gt;</code> passthrough for building custom multi-line inputs without the opinionated PixelTextarea chrome.</p>
       <ul className="docs-highlights">
         <li>Zero styling — pure passthrough to the native &lt;textarea&gt; element</li>
-        <li>Forwards every standard TextareaHTMLAttributes prop (value, rows, maxLength, etc.)</li>
-        <li>forwardRef-friendly: refs land on the underlying HTMLTextAreaElement</li>
-        <li>SSR-safe and tree-shakable; no runtime state or context</li>
+        <li>Takes every native textarea attribute (value, rows, maxlength, etc.)</li>
+        <li>Its element is the native &lt;textarea&gt;: a ref in React, <code>$el</code> in Vue, the <code>textarea[pxlBareTextarea]</code> element in Angular</li>
+        <li>SSR-safe and tree-shakable; no runtime state</li>
         <li>Ideal for composing bespoke field chrome while keeping native form semantics</li>
       </ul>
     <dl className="docs-meta">
@@ -34,18 +98,18 @@ export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDoc
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-bare-textarea-api">
+      <Heading id="pixel-bare-textarea-api">API</Heading>
+      <FrameworkApi label={'PixelBareTextarea API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bare-textarea-a11y">
-      <h3 id="pixel-bare-textarea-a11y">Accessibility</h3>
+      <Heading id="pixel-bare-textarea-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders a native &lt;textarea&gt; so screen readers announce the textbox role with multiline semantics automatically. Because no chrome is applied, callers MUST supply a visible &lt;label&gt; (htmlFor) or an aria-label so the field has an accessible name. Pair with aria-required, aria-invalid, and aria-describedby for validation flows.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Renders a native &lt;textarea&gt; so screen readers announce the textbox role with multiline semantics automatically. Because no chrome is applied, callers MUST supply a visible &lt;label&gt; (<code>for</code>) or an aria-label so the field has an accessible name. Pair with aria-required, aria-invalid, and aria-describedby for validation flows.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -74,26 +138,69 @@ export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDoc
       </table>
     </section>
     <section aria-labelledby="pixel-bare-textarea-usage">
-      <h3 id="pixel-bare-textarea-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelBareTextarea } from '@pxlkit/ui-kit';
+      <Heading id="pixel-bare-textarea-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBareTextarea usage'}
+        react={`import { PixelBareTextarea } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelBareTextarea placeholder="Write something..." rows={4} />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelBareTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareTextarea placeholder="Write something..." :rows="4" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBareTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareTextarea],
+  template: \`<textarea pxlBareTextarea placeholder="Write something..." rows="4"></textarea>\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBareTextarea } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelBareTextarea placeholder="Write something..." rows={4} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareTextarea placeholder="Write something..." :rows="4" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareTextarea],
+  template: \`<textarea pxlBareTextarea placeholder="Write something..." rows="4"></textarea>\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
-        <pre className="docs-code"><code>{`export function Uncontrolled() {
+        <Subheading>Uncontrolled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Uncontrolled code'}
+          react={`import { PixelBareTextarea } from '@pxlkit/ui-kit';
+
+export function Uncontrolled() {
   return (
     <PixelBareTextarea
       defaultValue="Initial draft text"
@@ -101,11 +208,33 @@ export function Default() {
       aria-label="Notes"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareTextarea default-value="Initial draft text" :rows="4" aria-label="Notes" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareTextarea],
+  template: \`<textarea pxlBareTextarea defaultValue="Initial draft text" rows="4" aria-label="Notes"></textarea>\`,
+})
+export class Uncontrolled {}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
+        <Subheading>Controlled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import { useState } from 'react';
+import { PixelBareTextarea } from '@pxlkit/ui-kit';
+
+export function Controlled() {
   const [value, setValue] = useState('');
   return (
     <div className="flex flex-col gap-2">
@@ -119,11 +248,51 @@ export function Default() {
       <span className="text-xs text-retro-muted">{value.length} chars</span>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelBareTextarea } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <div class="flex flex-col gap-2">
+    <PixelBareTextarea v-model="value" placeholder="Type to see live updates" :rows="4" aria-label="Message" />
+    <span class="text-xs text-retro-muted">{{ value.length }} chars</span>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelBareTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareTextarea],
+  template: \`
+    <div class="flex flex-col gap-2">
+      <textarea
+        pxlBareTextarea
+        [(value)]="value"
+        placeholder="Type to see live updates"
+        rows="4"
+        aria-label="Message"
+      ></textarea>
+      <span class="text-xs text-retro-muted">{{ value().length }} chars</span>
+    </div>
+  \`,
+})
+export class Controlled {
+  readonly value = signal('');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelBareTextarea } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelBareTextarea
       disabled
@@ -132,11 +301,34 @@ export function Default() {
       aria-label="Disabled textarea"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareTextarea disabled default-value="Cannot edit this field" :rows="3" aria-label="Disabled textarea" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareTextarea],
+  template: \`
+    <textarea pxlBareTextarea disabled defaultValue="Cannot edit this field" rows="3" aria-label="Disabled textarea"></textarea>
+  \`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-read-only">
-        <h4>Read only</h4>
-        <pre className="docs-code"><code>{`export function ReadOnly() {
+        <Subheading>Read only</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Read only code'}
+          react={`import { PixelBareTextarea } from '@pxlkit/ui-kit';
+
+export function ReadOnly() {
   return (
     <PixelBareTextarea
       readOnly
@@ -145,24 +337,87 @@ export function Default() {
       aria-label="Read-only textarea"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareTextarea readonly default-value="Read-only content for reference" :rows="3" aria-label="Read-only textarea" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareTextarea],
+  template: \`
+    <textarea
+      pxlBareTextarea
+      readonly
+      defaultValue="Read-only content for reference"
+      rows="3"
+      aria-label="Read-only textarea"
+    ></textarea>
+  \`,
+})
+export class ReadOnly {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-custom-styling">
-        <h4>With custom styling</h4>
-        <pre className="docs-code"><code>{`export function WithCustomStyling() {
+        <Subheading>With custom styling</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With custom styling code'}
+          react={`import { PixelBareTextarea } from '@pxlkit/ui-kit';
+
+export function WithCustomStyling() {
   return (
     <PixelBareTextarea
-      className="w-full rounded border border-retro-line bg-retro-elev p-3 font-mono text-sm text-retro-text"
+      className="w-full rounded border border-retro-border bg-retro-card p-3 font-mono text-sm text-retro-text"
       placeholder="Escape-hatch: bring your own styles"
       rows={5}
       aria-label="Custom styled textarea"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareTextarea
+    class="w-full rounded border border-retro-border bg-retro-card p-3 font-mono text-sm text-retro-text"
+    placeholder="Escape-hatch: bring your own styles"
+    :rows="5"
+    aria-label="Custom styled textarea"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareTextarea],
+  template: \`
+    <textarea
+      pxlBareTextarea
+      class="w-full rounded border border-retro-border bg-retro-card p-3 font-mono text-sm text-retro-text"
+      placeholder="Escape-hatch: bring your own styles"
+      rows="5"
+      aria-label="Custom styled textarea"
+    ></textarea>
+  \`,
+})
+export class WithCustomStyling {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-max-length">
-        <h4>With max length</h4>
-        <pre className="docs-code"><code>{`export function WithMaxLength() {
+        <Subheading>With max length</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With max length code'}
+          react={`import { PixelBareTextarea } from '@pxlkit/ui-kit';
+
+export function WithMaxLength() {
   return (
     <PixelBareTextarea
       maxLength={140}
@@ -171,11 +426,34 @@ export function Default() {
       aria-label="Short bio"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareTextarea :maxlength="140" placeholder="Up to 140 characters" :rows="3" aria-label="Short bio" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareTextarea],
+  template: \`
+    <textarea pxlBareTextarea maxlength="140" placeholder="Up to 140 characters" rows="3" aria-label="Short bio"></textarea>
+  \`,
+})
+export class WithMaxLength {}`}
+        />
       </article>
       <article className="docs-example" id="example-required">
-        <h4>Required</h4>
-        <pre className="docs-code"><code>{`export function Required() {
+        <Subheading>Required</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Required code'}
+          react={`import { PixelBareTextarea } from '@pxlkit/ui-kit';
+
+export function Required() {
   return (
     <PixelBareTextarea
       required
@@ -185,15 +463,46 @@ export function Default() {
       aria-required="true"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareTextarea
+    required
+    placeholder="This field is required"
+    :rows="3"
+    aria-label="Required textarea"
+    aria-required="true"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareTextarea],
+  template: \`
+    <textarea
+      pxlBareTextarea
+      required
+      placeholder="This field is required"
+      rows="3"
+      aria-label="Required textarea"
+      aria-required="true"
+    ></textarea>
+  \`,
+})
+export class Required {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-textarea">PixelTextarea</a></li>
-        <li><a href="#pixel-bare-input">PixelBareInput</a></li>
-        <li><a href="#pixel-bare-button">PixelBareButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-textarea' : '#pixel-textarea'}>PixelTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-input' : '#pixel-bare-input'}>PixelBareInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-button' : '#pixel-bare-button'}>PixelBareButton</a></li>
       </ul>
     </section>
     </section>

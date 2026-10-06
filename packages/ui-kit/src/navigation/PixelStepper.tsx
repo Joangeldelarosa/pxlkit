@@ -1,31 +1,43 @@
 'use client';
 
-import React, { forwardRef, useCallback, useMemo, useRef } from 'react';
+import React, { forwardRef, useCallback, useId, useMemo, useRef } from 'react';
+import {
+  stepAriaLabel,
+  stepClasses,
+  stepClickable,
+  stepConnectorClasses,
+  stepConnectorCompleted,
+  stepHiddenText,
+  stepIndicator,
+  stepSpinner,
+  stepState,
+  stepperClasses,
+  stepperFocusTarget,
+  stepperKeyAction,
+  stepperSlotClasses,
+  type StepperMove,
+  type StepperOrientation,
+  type StepperSize,
+} from '@pxlkit/ui-kit-core';
 import {
   Surface,
   cn,
-  focusRing,
-  surfaceClasses,
-  toneMap,
   useEffectiveSurface,
   CheckIcon,
   CloseIcon,
 } from '../common';
 
-type Size = 'sm' | 'md' | 'lg';
-type StepState = 'pending' | 'active' | 'completed' | 'error';
-
 interface StepperCtx {
   active: number;
-  orientation: 'horizontal' | 'vertical';
+  orientation: StepperOrientation;
   allowNextStepsSelect: boolean;
   onStepClick?: (idx: number) => void;
-  size: Size;
+  size: StepperSize;
   surface: Surface;
   total: number;
   registerStep: (idx: number, el: HTMLDivElement | null) => void;
-  focusByOffset: (currentIdx: number, offset: number) => void;
-  focusEdge: (edge: 'first' | 'last') => void;
+  /** Focuses the clickable step a key moves to from step `from`, if any. */
+  moveFocus: (from: number, move: StepperMove) => void;
 }
 
 const StepperContext = React.createContext<StepperCtx | null>(null);
@@ -39,42 +51,19 @@ function useStepperCtx(): StepperCtx {
   return ctx;
 }
 
-const indicatorSize: Record<Size, string> = {
-  sm: 'h-6 w-6 text-[10px]',
-  md: 'h-8 w-8 text-xs',
-  lg: 'h-10 w-10 text-sm',
-};
-
-const labelSize: Record<Size, string> = {
-  sm: 'text-[11px]',
-  md: 'text-xs',
-  lg: 'text-sm',
-};
-
-const descSize: Record<Size, string> = {
-  sm: 'text-[10px]',
-  md: 'text-[11px]',
-  lg: 'text-xs',
-};
-
 function Spinner({ className }: { className?: string }) {
   return (
     <svg
-      className={cn('animate-spin', className)}
-      viewBox="0 0 16 16"
+      className={className}
+      viewBox={stepSpinner.viewBox}
       fill="none"
       shapeRendering="crispEdges"
       aria-hidden
       data-pxl-step-icon="loading"
     >
-      <rect x="7" y="1" width="2" height="3" fill="currentColor" opacity="0.9" />
-      <rect x="11" y="2" width="2" height="2" fill="currentColor" opacity="0.7" />
-      <rect x="12" y="7" width="3" height="2" fill="currentColor" opacity="0.55" />
-      <rect x="11" y="12" width="2" height="2" fill="currentColor" opacity="0.4" />
-      <rect x="7" y="12" width="2" height="3" fill="currentColor" opacity="0.3" />
-      <rect x="3" y="12" width="2" height="2" fill="currentColor" opacity="0.25" />
-      <rect x="1" y="7" width="3" height="2" fill="currentColor" opacity="0.2" />
-      <rect x="3" y="2" width="2" height="2" fill="currentColor" opacity="0.15" />
+      {stepSpinner.rects.map(([x, y, width, height, opacity]) => (
+        <rect key={`${x}-${y}`} x={x} y={y} width={width} height={height} fill="currentColor" opacity={opacity} />
+      ))}
     </svg>
   );
 }
@@ -85,13 +74,18 @@ function Spinner({ className }: { className?: string }) {
 
 export interface PixelStepperStepProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+  /** Label under (or beside) the indicator. */
   label: string;
+  /** Smaller text below the label. */
   description?: string;
+  /** Custom icon in the indicator, shown while the step is neither completed nor in error. */
   icon?: React.ReactNode;
+  /** Shows a spinner in the indicator. */
   loading?: boolean;
+  /** Marks the step done, with a check mark. */
   completed?: boolean;
+  /** Marks the step failed, with a cross; wins over `completed`. */
   error?: boolean;
-  children?: React.ReactNode;
 }
 
 export const PixelStepperStep = forwardRef<HTMLDivElement, PixelStepperStepProps>(
@@ -103,7 +97,6 @@ export const PixelStepperStep = forwardRef<HTMLDivElement, PixelStepperStepProps
       loading = false,
       completed = false,
       error = false,
-      children: _children,
       className,
       onClick,
       ...rest
@@ -112,22 +105,14 @@ export const PixelStepperStep = forwardRef<HTMLDivElement, PixelStepperStepProps
   ) {
     const ctx = useStepperCtx();
     const index = React.useContext(StepIndexContext);
-    const s = surfaceClasses(ctx.surface);
 
     const isActive = index === ctx.active;
-    const state: StepState = error
-      ? 'error'
-      : completed
-        ? 'completed'
-        : isActive
-          ? 'active'
-          : 'pending';
-
-    const clickable = !!ctx.onStepClick && (ctx.allowNextStepsSelect || index <= ctx.active);
-
-    const tone =
-      state === 'error' ? 'red' : state === 'completed' ? 'green' : state === 'active' ? 'cyan' : 'neutral';
-    const t = toneMap[tone];
+    const state = stepState(index, ctx.active, { completed, error });
+    const clickable = stepClickable(index, ctx.active, {
+      handler: !!ctx.onStepClick,
+      allowNextStepsSelect: ctx.allowNextStepsSelect,
+    });
+    const classes = stepClasses(ctx.surface, { orientation: ctx.orientation, size: ctx.size, state, clickable });
 
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
       onClick?.(e);
@@ -136,70 +121,47 @@ export const PixelStepperStep = forwardRef<HTMLDivElement, PixelStepperStepProps
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-      const isVertical = ctx.orientation === 'vertical';
-      const nextKey = isVertical ? 'ArrowDown' : 'ArrowRight';
-      const prevKey = isVertical ? 'ArrowUp' : 'ArrowLeft';
-      switch (e.key) {
-        case nextKey:
-          e.preventDefault();
-          ctx.focusByOffset(index, 1);
-          return;
-        case prevKey:
-          e.preventDefault();
-          ctx.focusByOffset(index, -1);
-          return;
-        case 'Home':
-          e.preventDefault();
-          ctx.focusEdge('first');
-          return;
-        case 'End':
-          e.preventDefault();
-          ctx.focusEdge('last');
-          return;
-        case 'Enter':
-        case ' ':
-          if (!clickable) return;
-          e.preventDefault();
-          ctx.onStepClick?.(index);
-          return;
-        default:
-          return;
+      const action = stepperKeyAction(e.key, ctx.orientation);
+      if (action === undefined) return;
+      if (action === 'select') {
+        if (!clickable) return;
+        e.preventDefault();
+        ctx.onStepClick?.(index);
+        return;
       }
+      e.preventDefault();
+      ctx.moveFocus(index, action);
     };
 
     const indicatorContent: React.ReactNode = (() => {
-      if (loading) {
-        return <Spinner className={cn('h-3.5 w-3.5', t.text)} />;
+      switch (stepIndicator(state, { loading, icon: !!icon })) {
+        case 'loading':
+          return <Spinner className={classes.spinner} />;
+        case 'check':
+          return (
+            <span data-pxl-step-icon="check" className={classes.icon}>
+              <CheckIcon />
+            </span>
+          );
+        case 'error':
+          return (
+            <span data-pxl-step-icon="error" className={classes.icon}>
+              <CloseIcon />
+            </span>
+          );
+        case 'custom':
+          return (
+            <span data-pxl-step-icon="custom" className={classes.icon} aria-hidden>
+              {icon}
+            </span>
+          );
+        default:
+          return <span className={classes.number}>{index + 1}</span>;
       }
-      if (state === 'completed') {
-        return (
-          <span data-pxl-step-icon="check" className={cn('inline-flex', t.text)}>
-            <CheckIcon />
-          </span>
-        );
-      }
-      if (state === 'error') {
-        return (
-          <span data-pxl-step-icon="error" className={cn('inline-flex', t.text)}>
-            <CloseIcon />
-          </span>
-        );
-      }
-      if (icon) {
-        return (
-          <span data-pxl-step-icon="custom" className={cn('inline-flex', t.text)} aria-hidden>
-            {icon}
-          </span>
-        );
-      }
-      return <span className={cn('font-semibold', s.font, t.text)}>{index + 1}</span>;
     })();
 
-    const ariaLabel = `Step ${index + 1} of ${ctx.total}: ${label}${
-      state === 'completed' ? ' (completed)' : state === 'error' ? ' (error)' : state === 'active' ? ' (current)' : ''
-    }`;
-
-    const isVertical = ctx.orientation === 'vertical';
+    const hidden = stepHiddenText(index, ctx.total, state);
+    const descriptionId = useId();
 
     const setRefs = useCallback(
       (node: HTMLDivElement | null) => {
@@ -216,58 +178,40 @@ export const PixelStepperStep = forwardRef<HTMLDivElement, PixelStepperStepProps
         data-pxl-step="true"
         data-pxl-step-index={index}
         data-pxl-step-state={state}
+        // A clickable step is a button named by its position, label and
+        // state; any other step reads them as visually hidden text, since an
+        // element without a role cannot take a name.
+        role={clickable ? 'button' : undefined}
         aria-current={isActive ? 'step' : undefined}
-        aria-label={ariaLabel}
-        tabIndex={clickable ? 0 : -1}
+        aria-label={clickable ? stepAriaLabel(index, ctx.total, label, state) : undefined}
+        aria-describedby={clickable && description ? descriptionId : undefined}
+        tabIndex={clickable ? 0 : undefined}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
-        className={cn(
-          'group relative flex',
-          isVertical ? 'flex-row items-start gap-3' : 'flex-1 flex-col items-center text-center gap-1.5',
-          clickable && cn('cursor-pointer outline-none', focusRing, t.ring, 'rounded-[2px]'),
-          !clickable && 'cursor-default',
-          className,
-        )}
+        className={cn(classes.root, className)}
         {...rest}
       >
         <span
           aria-hidden
           data-pxl-step-indicator="true"
-          className={cn(
-            'inline-flex items-center justify-center shrink-0',
-            indicatorSize[ctx.size],
-            s.border,
-            s.radius,
-            s.transition,
-            t.border,
-            state === 'pending' ? 'bg-retro-surface/40' : t.bg,
-            state === 'active' && 'ring-2 ring-offset-1 ring-offset-retro-bg',
-            state === 'active' && t.ring.replace('focus-visible:', ''),
-          )}
+          className={classes.indicator}
         >
           {indicatorContent}
         </span>
-        <div
-          className={cn(
-            'flex flex-col',
-            isVertical ? 'items-start pt-0.5' : 'items-center',
-          )}
-        >
+        <div className={classes.body}>
+          {!clickable && <span className={classes.hidden}>{hidden.before}</span>}
           <span
             data-pxl-step-label="true"
-            className={cn(
-              labelSize[ctx.size],
-              s.font,
-              'font-semibold leading-tight',
-              state === 'pending' ? 'text-retro-muted' : t.text,
-            )}
+            className={classes.label}
           >
             {label}
           </span>
+          {!clickable && hidden.after && <span className={classes.hidden}>{hidden.after}</span>}
           {description ? (
             <span
+              id={clickable ? descriptionId : undefined}
               data-pxl-step-description="true"
-              className={cn(descSize[ctx.size], s.font, 'mt-0.5 text-retro-muted leading-snug')}
+              className={classes.description}
             >
               {description}
             </span>
@@ -284,14 +228,25 @@ PixelStepperStep.displayName = 'PixelStepper.Step';
    ────────────────────────────────────────────────────────────────────────── */
 
 export interface PixelStepperProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+  /** Index of the current step, from 0. */
   active: number;
+  /**
+   * Called with the index of a step that is clicked, or activated with Enter or Space. With it, the
+   * steps up to the active one — every step with `allowNextStepsSelect` — are clickable and in the
+   * tab order.
+   */
   onStepClick?: (idx: number) => void;
-  orientation?: 'horizontal' | 'vertical';
+  /** Steps in a row or a column; also the arrow keys that move between them. */
+  orientation?: StepperOrientation;
+  /** With `onStepClick`, makes the steps after the active one clickable too. */
   allowNextStepsSelect?: boolean;
-  size?: Size;
+  /** Size of the indicators and labels. */
+  size?: StepperSize;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Accessible name for the steps landmark. Defaults to "Progress steps". */
   ariaLabel?: string;
+  /** The steps (`PixelStepper.Step`). */
   children: React.ReactNode;
 }
 
@@ -311,7 +266,6 @@ const PixelStepperRoot = forwardRef<HTMLDivElement, PixelStepperProps>(function 
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
 
   const childArray = useMemo(
     () => React.Children.toArray(children).filter(React.isValidElement),
@@ -326,42 +280,14 @@ const PixelStepperRoot = forwardRef<HTMLDivElement, PixelStepperProps>(function 
     else stepRefs.current.delete(idx);
   }, []);
 
-  const isClickableIdx = useCallback(
-    (idx: number) => !!onStepClick && (allowNextStepsSelect || idx <= active),
-    [onStepClick, allowNextStepsSelect, active],
-  );
-
-  const focusByOffset = useCallback(
-    (currentIdx: number, offset: number) => {
-      if (total === 0) return;
-      const direction = offset > 0 ? 1 : -1;
-      // Find next clickable in the requested direction, skipping non-focusables.
-      let next = currentIdx + direction;
-      while (next >= 0 && next < total) {
-        if (isClickableIdx(next)) {
-          stepRefs.current.get(next)?.focus();
-          return;
-        }
-        next += direction;
-      }
+  const moveFocus = useCallback(
+    (from: number, move: StepperMove) => {
+      const isClickable = (idx: number) =>
+        stepClickable(idx, active, { handler: !!onStepClick, allowNextStepsSelect });
+      const target = stepperFocusTarget(from, move, total, isClickable);
+      if (target !== undefined) stepRefs.current.get(target)?.focus();
     },
-    [total, isClickableIdx],
-  );
-
-  const focusEdge = useCallback(
-    (edge: 'first' | 'last') => {
-      if (total === 0) return;
-      const range = edge === 'first'
-        ? Array.from({ length: total }, (_, i) => i)
-        : Array.from({ length: total }, (_, i) => total - 1 - i);
-      for (const idx of range) {
-        if (isClickableIdx(idx)) {
-          stepRefs.current.get(idx)?.focus();
-          return;
-        }
-      }
-    },
-    [total, isClickableIdx],
+    [total, onStepClick, allowNextStepsSelect, active],
   );
 
   const ctx: StepperCtx = {
@@ -373,11 +299,8 @@ const PixelStepperRoot = forwardRef<HTMLDivElement, PixelStepperProps>(function 
     surface,
     total,
     registerStep,
-    focusByOffset,
-    focusEdge,
+    moveFocus,
   };
-
-  const isVertical = orientation === 'vertical';
 
   return (
     <StepperContext.Provider value={ctx}>
@@ -387,36 +310,23 @@ const PixelStepperRoot = forwardRef<HTMLDivElement, PixelStepperProps>(function 
         data-pxl-orientation={orientation}
         role="group"
         aria-label={ariaLabel}
-        className={cn(
-          'w-full',
-          isVertical ? 'flex flex-col gap-0' : 'flex items-start gap-0',
-          s.font,
-          className,
-        )}
+        className={cn(stepperClasses(surface, orientation), className)}
         {...rest}
       >
         {childArray.map((child, i) => {
           const isLast = i === total - 1;
-          const nextState: StepState = i < active ? 'completed' : i === active ? 'active' : 'pending';
-          const connectorTone = nextState === 'completed' ? 'green' : 'neutral';
-          const ct = toneMap[connectorTone];
+          const connectorClasses = stepConnectorClasses(orientation, size, stepConnectorCompleted(i, active));
 
-          if (isVertical) {
+          if (orientation === 'vertical') {
             return (
-              <div key={i} className="flex flex-col">
+              <div key={i} className={stepperSlotClasses}>
                 <StepIndexContext.Provider value={i}>{child}</StepIndexContext.Provider>
                 {!isLast ? (
                   <span
                     aria-hidden
                     data-pxl-step-connector="true"
                     data-pxl-step-connector-orientation="vertical"
-                    className={cn(
-                      'mx-auto my-1 block w-0.5 self-start',
-                      // Align with center of indicator on the left
-                      size === 'sm' ? 'ml-3' : size === 'md' ? 'ml-4' : 'ml-5',
-                      'h-6',
-                      nextState === 'completed' ? ct.fill : 'bg-retro-border/40',
-                    )}
+                    className={connectorClasses}
                   />
                 ) : null}
               </div>
@@ -431,12 +341,7 @@ const PixelStepperRoot = forwardRef<HTMLDivElement, PixelStepperProps>(function 
                   aria-hidden
                   data-pxl-step-connector="true"
                   data-pxl-step-connector-orientation="horizontal"
-                  className={cn(
-                    'flex-1 border-0 h-0.5 self-start',
-                    size === 'sm' ? 'mt-3' : size === 'md' ? 'mt-4' : 'mt-5',
-                    'mx-1',
-                    nextState === 'completed' ? ct.fill : 'bg-retro-border/40',
-                  )}
+                  className={connectorClasses}
                 />
               ) : null}
             </React.Fragment>

@@ -4,7 +4,7 @@
  * Validates two coherence invariants of the design-tokens / component API
  * surface that the rest of the kit silently depends on:
  *
- *   A. The `tone` record exported from `packages/ui-kit/src/tokens.ts` has,
+ *   A. The `tone` record exported from `packages/ui-kit-core/src/tokens.ts` has,
  *      for EVERY tone key, ALL seven sub-fields:
  *
  *          border | bg | soft | glow | ring | text | fill
@@ -38,8 +38,8 @@
  *
  *        1. `tone?: ToneKey;`           — by construction covers all keys,
  *                                         passes silently.
- *        2. `tone?: Tone;`              — we resolve `Tone` from
- *                                         `common.tsx` and check coverage.
+ *        2. `tone?: Tone;`              — we resolve `Tone` from the
+ *                                         core `common.ts` and check coverage.
  *        3. `tone?: 'a' | 'b' | 'c';`   — inline literal union; we check
  *                                         coverage directly.
  *
@@ -368,7 +368,8 @@ export interface ToneTypeAliases {
  * Resolve the `Tone` and `ToneKey` type aliases by scanning the ui-kit src
  * tree. We look at every .tsx/.ts file (excluding tests/stories/examples).
  *
- * `Tone` is expected to be a union of string literals in `common.tsx`:
+ * `Tone` is expected to be a union of string literals in the core's
+ * `common.ts` (re-exported by the React kit's `common.tsx`):
  *
  *     export type Tone = 'green' | 'cyan' | … | 'neutral';
  *
@@ -427,6 +428,35 @@ export async function resolveToneAliases(
   }
 
   return aliases;
+}
+
+/**
+ * Resolve the aliases over several source trees, in order. The first tree
+ * that defines `Tone` wins; `ToneKey = keyof typeof tone` counts wherever it
+ * is found. Missing directories (`undefined`) are skipped.
+ */
+export async function resolveAliasesAcross(
+  resolve: (uiKitSrcDir: string, logger: Logger) => Promise<ToneTypeAliases>,
+  dirs: ReadonlyArray<string | undefined>,
+  logger: Logger,
+): Promise<ToneTypeAliases> {
+  const merged: ToneTypeAliases = {
+    toneUnionKeys: null,
+    toneKeyIsKeyofTone: false,
+    aliasFiles: [],
+  };
+  for (const dir of dirs) {
+    if (!dir) continue;
+    const found = await resolve(dir, logger);
+    if (merged.toneUnionKeys === null && found.toneUnionKeys) {
+      merged.toneUnionKeys = found.toneUnionKeys;
+    }
+    merged.toneKeyIsKeyofTone = merged.toneKeyIsKeyofTone || found.toneKeyIsKeyofTone;
+    for (const file of found.aliasFiles) {
+      if (!merged.aliasFiles.includes(file)) merged.aliasFiles.push(file);
+    }
+  }
+  return merged;
 }
 
 /**
@@ -661,7 +691,7 @@ export class ThemeToneMatrixGate extends Gate {
         severity: 'blocker',
         file: toPosix(ctx.tokensFile),
         message: `Cannot locate tokens.ts — gate cannot validate the tone record.`,
-        suggestion: `Create packages/ui-kit/src/tokens.ts and export a \`tone\` record with keys covering every supported tone (e.g. neutral, green, cyan, gold, red, purple, pink), each carrying all 7 sub-fields: ${TONE_REQUIRED_FIELDS.join(', ')}.`,
+        suggestion: `Create packages/ui-kit-core/src/tokens.ts and export a \`tone\` record with keys covering every supported tone (e.g. neutral, green, cyan, gold, red, purple, pink), each carrying all 7 sub-fields: ${TONE_REQUIRED_FIELDS.join(', ')}.`,
       });
       return gateFail(this.name, findings, Date.now() - started);
     }
@@ -713,7 +743,13 @@ export class ThemeToneMatrixGate extends Gate {
     }
 
     // -- Part B: component tone?: coverage --------------------------------
-    const aliases = await this.resolveAliasesImpl(ctx.uiKitSrcDir, ctx.logger);
+    // `Tone` and `ToneKey` are defined in the framework-neutral core and
+    // re-exported by the React kit; resolve them from the core first.
+    const aliases = await resolveAliasesAcross(
+      this.resolveAliasesImpl,
+      [ctx.uiKitCoreSrcDir, ctx.uiKitSrcDir],
+      ctx.logger,
+    );
     const toneProps = await this.scanToneProps(
       ctx.uiKitSrcDir,
       ctx.repoRoot,

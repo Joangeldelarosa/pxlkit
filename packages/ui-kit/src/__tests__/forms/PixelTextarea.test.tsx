@@ -94,3 +94,27 @@ describe('PixelTextarea — upgrades', () => {
     expect(ta.className).toContain('min-h-24');
   });
 });
+
+describe('PixelTextarea — hint / error description (regression)', () => {
+  it('describes the textarea with the hint, then with the error, only while one shows', () => {
+    const { getByRole, rerender } = render(<PixelTextarea label="Bio" hint="Markdown is supported" />);
+    const textarea = getByRole('textbox', { name: 'Bio' });
+    expect(textarea).toHaveAccessibleDescription('Markdown is supported');
+    rerender(<PixelTextarea label="Bio" hint="Markdown is supported" error="Too long" />);
+    expect(textarea).toHaveAccessibleDescription('Too long');
+    rerender(<PixelTextarea label="Bio" />);
+    expect(textarea).not.toHaveAttribute('aria-describedby');
+  });
+
+  it("keeps the consumer's aria-describedby and adds the message after it", () => {
+    const { getByRole } = render(
+      <>
+        <p id="bio-tips">Mention your stack</p>
+        <PixelTextarea id="bio" label="Bio" aria-describedby="bio-tips" hint="Markdown is supported" />
+      </>,
+    );
+    const textarea = getByRole('textbox', { name: 'Bio' });
+    expect(textarea).toHaveAttribute('aria-describedby', 'bio-tips bio-msg');
+    expect(textarea).toHaveAccessibleDescription('Mention your stack Markdown is supported');
+  });
+});

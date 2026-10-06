@@ -19,6 +19,7 @@ import {
   PixelSectionHeader,
   PixelTwoColumn,
 } from '@pxlkit/ui-kit';
+import { ICON_COUNT_LABEL, ICON_PACK_COUNT, UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 
 /* ── Data ───────────────────────────────────────────────────────────────── */
 
@@ -28,35 +29,35 @@ const ACCORDION_ITEMS = [
     tone: 'green' as const,
     category: 'Overview',
     q: 'What is Pxlkit?',
-    a: 'A complete pixel-art component library for React. It includes 54 UI components, 226+ handcrafted SVG icons across 7 themed packs, rich animations, a 3D voxel engine, and full TypeScript support.',
+    a: `A retro pixel-art component library for React — now also for Vue and Angular. It includes ${UI_COMPONENTS_COUNT} UI components, ${ICON_COUNT_LABEL} handcrafted SVG icons across ${ICON_PACK_COUNT} themed packs, rich animations, and full TypeScript support.`,
   },
   {
     icon: Shield,
     tone: 'cyan' as const,
     category: 'Licensing',
     q: 'Is it free to use?',
-    a: 'Yes. Pxlkit is MIT licensed and fully open source. A commercial license is available to remove attribution requirements for production applications and unlock priority support.',
+    a: 'Yes. The code is MIT licensed and open source, and the icon packs are free with an attribution link. A one-time license removes the attribution; the Team tier adds priority support.',
   },
   {
     icon: Globe,
     tone: 'purple' as const,
     category: 'Compatibility',
     q: 'Does it work with Next.js?',
-    a: 'Absolutely. Full SSR, RSC, and App Router support out of the box. It also works seamlessly with Vite, Remix, Astro, and any standard React setup.',
+    a: "Yes. The components render on the server and hydrate, App Router included — keep the kit's providers in a 'use client' file. It also works with Vite, Remix, and any React 18.2+ or 19 setup.",
   },
   {
     icon: Settings,
     tone: 'gold' as const,
     category: 'Setup',
     q: 'How do I install it?',
-    a: 'Run `npm install @pxlkit/core @pxlkit/ui-kit` and add the CSS import. Zero configuration — you can start building pixel-perfect UIs in under a minute.',
+    a: "Run `npm install @pxlkit/ui-kit`, add Tailwind CSS v4 to your build, and import the kit's stylesheet in place of `@import \"tailwindcss\"`. Then start building pixel-perfect UIs.",
   },
   {
     icon: Lightning,
     tone: 'red' as const,
     category: 'Performance',
     q: 'How is performance?',
-    a: 'Every component is tree-shakeable and ships zero runtime JavaScript by default. Icons are pure SVGs with no external dependencies, keeping your bundle lean and fast.',
+    a: 'Icons are tree-shakeable and render as plain SVG with no external dependencies, so your bundle carries only the icons you import. Animations respect reduced-motion preferences.',
   },
   {
     icon: Star,
@@ -84,37 +85,37 @@ const TWO_COL_ITEMS = [
     category: 'Getting Started',
     tone: 'green' as const,
     q: 'What frameworks are supported?',
-    a: 'React 18+, Next.js 13+, Vite, Remix, Astro, and any bundler that handles ESM. All components ship as ES modules with full TypeScript definitions.',
+    a: 'React 18.2+ or 19 — Next.js, Vite, Remix — and, new in 2.2, Vue 3.5+ and Angular 20–22 with their own editions of the kit. Every package ships ES modules with TypeScript definitions.',
   },
   {
     category: 'Getting Started',
     tone: 'green' as const,
     q: 'Do I need Tailwind CSS?',
-    a: 'No. Pxlkit ships its own styling system via CSS custom properties. However, Tailwind users get first-class support with a preset plugin included in the package.',
+    a: "Yes, Tailwind CSS v4. The kit's stylesheet is a Tailwind entry point: add Tailwind's Vite or PostCSS plugin to your build and import the stylesheet in place of `@import \"tailwindcss\"`.",
   },
   {
     category: 'Licensing',
     tone: 'cyan' as const,
     q: 'What does the commercial license include?',
-    a: 'Attribution-free usage in production, priority GitHub support, access to private early-access channels, and a perpetual license with one year of updates.',
+    a: 'The icons without attribution — in one product with Indie, in unlimited products with Team, which adds future icon packs and priority support. One-time payment, lifetime license.',
   },
   {
     category: 'Licensing',
     tone: 'cyan' as const,
     q: 'Can I use it in client projects?',
-    a: 'Yes. Both the MIT and commercial licenses allow unlimited client projects. The commercial license simply removes the attribution clause.',
+    a: 'Yes. The MIT code works in any number of client projects. For the icons without attribution, Indie covers one project and Team unlimited ones.',
   },
   {
     category: 'Technical',
     tone: 'purple' as const,
     q: 'Is server-side rendering supported?',
-    a: 'Fully. Every component works in RSC and SSR environments. Animations gracefully degrade on the server and hydrate on the client with no flash.',
+    a: 'Yes. The components render on the server and hydrate without mismatches — in Next.js, Nuxt and Angular SSR. In the Next.js App Router they run as Client Components.',
   },
   {
     category: 'Technical',
     tone: 'purple' as const,
     q: 'How are icons delivered?',
-    a: 'Icons are inline SVG React components — no icon fonts, no sprite sheets. Each icon is individually tree-shakeable and weighs under 1 KB gzipped.',
+    a: 'Icons render as crisp SVG images — no icon fonts, no sprite sheets — and each one is tree-shakeable.',
   },
 ];
 
@@ -130,12 +131,12 @@ const TABBED_ITEMS: Record<TabKey, { q: string; a: string; tags: string[] }[]> =
   general: [
     {
       q: 'What makes Pxlkit different?',
-      a: 'Pxlkit is purpose-built for pixel-art aesthetics. Unlike generic component libraries, every border, shadow, and animation is crafted for a retro feel while remaining fully accessible.',
+      a: 'Pxlkit is purpose-built for pixel-art aesthetics. Unlike generic component libraries, every border, shadow, and animation is crafted for a retro feel while staying accessible.',
       tags: ['design', 'accessibility'],
     },
     {
       q: 'Is Pxlkit actively maintained?',
-      a: 'Yes. The library receives weekly updates, and the roadmap is publicly tracked on GitHub. Community contributions are welcome and reviewed promptly.',
+      a: 'Yes. Releases ship regularly — the changelog lists every one — and issues and contributions are welcome on GitHub.',
       tags: ['open source', 'community'],
     },
     {
@@ -152,25 +153,25 @@ const TABBED_ITEMS: Record<TabKey, { q: string; a: string; tags: string[] }[]> =
     },
     {
       q: 'Can I use it with a monorepo?',
-      a: 'Absolutely. Pxlkit is designed for monorepos — each package is independently versioned and tree-shakeable. Works perfectly with Turborepo, Nx, and pnpm workspaces.',
+      a: 'Yes. Each package is versioned independently and the icon packs are tree-shakeable. It works with Turborepo, Nx, and pnpm workspaces.',
       tags: ['monorepo', 'turborepo'],
     },
     {
       q: 'Do animations require extra setup?',
-      a: 'No. All animation components (PixelBounce, PixelFadeIn, etc.) are included in @pxlkit/ui-kit and work out of the box. No extra CSS or JS runtime needed.',
+      a: "No. The animation components (PixelBounce, PixelFadeIn and more) are part of @pxlkit/ui-kit, and their keyframes come with the kit's stylesheet.",
       tags: ['animations', 'zero-config'],
     },
   ],
   advanced: [
     {
       q: 'Can I build custom icon packs?',
-      a: 'Yes. The icon authoring CLI lets you convert any pixel-art SVG into a Pxlkit-compatible icon with automatic size normalization and colorful palette extraction.',
-      tags: ['CLI', 'icons', 'authoring'],
+      a: 'Yes. Draw icons in the visual builder — or write the grid-and-palette format by hand — and export them as PxlKitData TypeScript or a JSON icon pack.',
+      tags: ['builder', 'icons', 'authoring'],
     },
     {
       q: 'Is the 3D voxel engine production-ready?',
-      a: 'The voxel engine is stable and used in production by several game-style dashboards. It supports camera controls, lighting, and click interactions on individual voxels.',
-      tags: ['3D', 'voxel', 'production'],
+      a: 'Not yet. @pxlkit/voxel is an early preview, not yet on npm — try its procedural worlds on the Explore page.',
+      tags: ['3D', 'voxel', 'preview'],
     },
     {
       q: 'How do I contribute a component?',
@@ -197,7 +198,7 @@ export function FaqAccordionPreview() {
         <div className="mb-14">
           <PixelFadeIn>
             <div className="inline-flex w-full justify-center items-center gap-2 mb-4">
-              <PxlKitIcon icon={ChatBubble} size={20} colorful />
+              <PxlKitIcon icon={ChatBubble} size={20} colorful decorative />
               <PixelBadge tone="purple">FAQ</PixelBadge>
             </div>
             <PixelSectionHeader
@@ -215,7 +216,7 @@ export function FaqAccordionPreview() {
             placeholder="Search questions..."
             tone="neutral"
             size="md"
-            icon={<PxlKitIcon icon={Search} size={16} colorful />}
+            icon={<PxlKitIcon icon={Search} size={16} colorful decorative />}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -236,7 +237,7 @@ export function FaqAccordionPreview() {
               >
                 <div className="flex items-start gap-2.5">
                   <span className="flex-shrink-0 mt-1">
-                    <PxlKitIcon icon={item.icon} size={16} colorful />
+                    <PxlKitIcon icon={item.icon} size={16} colorful decorative />
                   </span>
                   <PixelBadge tone={item.tone}>{item.category}</PixelBadge>
                   <div className="flex-1">
@@ -285,7 +286,7 @@ export function FaqAccordionPreview() {
         <PixelDivider className="my-10" />
         <div className="text-center">
           <div className="inline-flex items-center gap-2 mb-3">
-            <PxlKitIcon icon={Mail} size={18} colorful />
+            <PxlKitIcon icon={Mail} size={18} colorful decorative />
             <p className="font-pixel text-sm text-retro-text">Still have questions?</p>
           </div>
           <p className="font-mono text-xs text-retro-muted mb-5">
@@ -294,7 +295,7 @@ export function FaqAccordionPreview() {
           <PixelButton
             tone="cyan"
             size="md"
-            iconRight={<PxlKitIcon icon={Send} size={14} />}
+            iconRight={<PxlKitIcon icon={Send} size={14} decorative />}
           >
             Contact Support
           </PixelButton>
@@ -315,7 +316,7 @@ export function FaqTwoColumnPreview() {
   const leftCol = (
     <PixelFadeIn>
       <div className="flex items-center gap-2 mb-4">
-        <PxlKitIcon icon={Search} size={20} colorful />
+        <PxlKitIcon icon={Search} size={20} colorful decorative />
         <PixelBadge tone="green">Help Center</PixelBadge>
       </div>
       <PixelSectionHeader
@@ -328,7 +329,7 @@ export function FaqTwoColumnPreview() {
         <PixelButton
           tone="cyan"
           size="md"
-          iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+          iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
         >
           Contact Support
         </PixelButton>
@@ -340,13 +341,13 @@ export function FaqTwoColumnPreview() {
       {/* Quick stats */}
       <div className="mt-8 space-y-3">
         <div className="flex items-center gap-2">
-          <PxlKitIcon icon={CheckCircle} size={14} colorful />
+          <PxlKitIcon icon={CheckCircle} size={14} colorful decorative />
           <span className="font-mono text-xs text-retro-muted">
             Avg. response time: 4 hrs
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <PxlKitIcon icon={ShieldCheck} size={14} colorful />
+          <PxlKitIcon icon={ShieldCheck} size={14} colorful decorative />
           <span className="font-mono text-xs text-retro-muted">
             99% satisfaction rate
           </span>
@@ -424,7 +425,7 @@ export function FaqTabbedPreview() {
         <div className="mb-10">
           <PixelFadeIn>
             <div className="inline-flex w-full justify-center items-center gap-2 mb-4">
-              <PxlKitIcon icon={InfoCircle} size={20} colorful />
+              <PxlKitIcon icon={InfoCircle} size={20} colorful decorative />
               <PixelBadge tone="gold">Knowledge Base</PixelBadge>
             </div>
             <PixelSectionHeader
@@ -442,7 +443,7 @@ export function FaqTabbedPreview() {
             placeholder="Filter answers..."
             tone="neutral"
             size="md"
-            icon={<PxlKitIcon icon={Search} size={16} colorful />}
+            icon={<PxlKitIcon icon={Search} size={16} colorful decorative />}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -460,7 +461,7 @@ export function FaqTabbedPreview() {
                   : 'text-retro-muted hover:text-retro-text'
               }`}
             >
-              <PxlKitIcon icon={tab.icon} size={14} colorful />
+              <PxlKitIcon icon={tab.icon} size={14} colorful decorative />
               {tab.label}
             </button>
           ))}

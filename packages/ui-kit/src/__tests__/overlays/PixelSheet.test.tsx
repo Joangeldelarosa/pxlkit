@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import { PixelSheet } from '../../overlays/PixelSheet';
 
 describe('PixelSheet', () => {
@@ -55,5 +55,24 @@ describe('PixelSheet', () => {
       </PixelSheet>,
     );
     expect(() => getByTestId('pixel-sheet-drag-handle')).toThrow();
+  });
+
+  it('shows what its parent passes: a refused close keeps it open and locking the page, until the parent closes it', () => {
+    const onOpenChange = vi.fn();
+    const sheet = (open: boolean) => (
+      <PixelSheet open={open} onOpenChange={onOpenChange} title="Actions">
+        <button type="button">inside</button>
+      </PixelSheet>
+    );
+    const { rerender, queryByRole } = render(sheet(true));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.click(document.querySelector('[data-pxl-overlay-backdrop]')!);
+    expect(onOpenChange.mock.calls).toEqual([[false], [false]]);
+    expect(queryByRole('dialog')).toBeTruthy();
+    expect(document.body.style.overflow).toBe('hidden');
+    rerender(sheet(false));
+    expect(queryByRole('dialog')).toBeNull();
+    rerender(sheet(true));
+    expect(queryByRole('dialog')).toBeTruthy();
   });
 });

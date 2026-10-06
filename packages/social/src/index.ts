@@ -1,4 +1,5 @@
-import type { IconPack } from '@pxlkit/core';
+import type { IconPack } from '@pxlkit/core/vanilla';
+import packageJson from '../package.json';
 
 export {
   Heart,
@@ -103,6 +104,10 @@ import { FloatingHearts } from './icons/floating-hearts';
 import { BouncingMessage } from './icons/bouncing-message';
 import { RingingPhone } from './icons/ringing-phone';
 
+// The published version: package.json is its one source. Read here, outside
+// the pack, so a bundler still drops the pack when nothing imports it.
+const { version } = packageJson;
+
 export const SocialPack: IconPack = {
   id: 'social',
   name: 'Social',
@@ -137,6 +142,6 @@ export const SocialPack: IconPack = {
     // New animated
     WinkingFace, LaughingFace, FloatingHearts, BouncingMessage, RingingPhone,
   ],
-  version: '1.2.4',
+  version,
   author: 'pxlkit',
 };

@@ -1,11 +1,18 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
+import {
+  equalHeightGridAlign,
+  equalHeightGridClasses,
+  equalHeightGridItemClasses,
+  type EqualHeightGridRowAlign,
+} from '@pxlkit/ui-kit-core';
+import { cn, useEffectiveSurface } from '../common';
 import { PixelGrid, PixelGridProps } from './PixelGrid';
 
 export interface PixelEqualHeightGridProps extends Omit<PixelGridProps, 'align'> {
-  rowAlign?: 'top' | 'stretch';
+  /** `stretch` gives every item of a row the row's height; `top` keeps their own. */
+  rowAlign?: EqualHeightGridRowAlign;
 }
 
 type ChildLike = React.ReactElement<{ className?: string }>;
@@ -16,23 +23,22 @@ export const PixelEqualHeightGrid = forwardRef<HTMLDivElement, PixelEqualHeightG
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
 
     const wrapped = React.Children.map(children, (child) => {
       if (!React.isValidElement(child)) return child;
       const el = child as ChildLike;
       const childClass = el.props.className;
       return React.cloneElement(el, {
-        className: cn('grid grid-rows-[auto_1fr_auto]', childClass),
+        className: cn(equalHeightGridItemClasses, childClass),
       });
     });
 
     return (
       <PixelGrid
         ref={ref}
-        align="stretch"
+        align={equalHeightGridAlign(rowAlign)}
         surface={surface}
-        className={cn(rowAlign === 'top' && 'items-start', s.transition, className)}
+        className={cn(equalHeightGridClasses(surface), className)}
         style={style}
         {...rest}
       >

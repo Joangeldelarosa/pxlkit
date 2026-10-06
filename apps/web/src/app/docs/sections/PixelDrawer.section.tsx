@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDrawerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelDrawerDocsMeta = {
@@ -17,29 +23,208 @@ export const PixelDrawerDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProps): React.ReactElement {
+/** PixelDrawer's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelDrawer } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelDrawer',
+        props: [
+          { name: 'open', type: 'boolean', required: true, description: 'Whether the drawer is visible; set it from `onOpenChange`.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', required: true, description: 'Called with `false` when the drawer asks to close (Escape, the backdrop).' },
+          { name: 'side', type: "'right' | 'left' | 'top' | 'bottom'", default: "'right'", description: 'Edge of the viewport the drawer is anchored to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: 'Width (left / right) or height (top / bottom) preset.' },
+          { name: 'overlay', type: 'boolean', default: 'true', description: 'Dim the page behind the drawer.' },
+          { name: 'dismissOnOverlay', type: 'boolean', default: 'true', description: 'Close when the backdrop is clicked.' },
+          { name: 'trapFocus', type: 'boolean', default: 'true', description: 'Keep Tab focus inside the drawer while it is open.' },
+          { name: 'title', type: 'string', description: 'Accessible name of the dialog (visually hidden).' },
+          { name: 'description', type: 'string', description: 'Accessible description of the dialog (visually hidden).' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name fallback when `title` is omitted. WCAG 4.1.2 requires every `role="dialog"` to expose a name; supply `title` OR `aria-label`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Portal target; `document.body` when left out.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The drawer content — typically `PixelDrawer.Header`, `PixelDrawer.Body` and `PixelDrawer.Footer`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDrawer.Header',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDrawer.Body',
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDrawer.Footer',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelDrawer',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: 'v-model:open', description: 'Whether the drawer is visible (`v-model:open`).' },
+          { name: 'side', type: "'right' | 'left' | 'top' | 'bottom'", default: "'right'", description: 'Edge of the viewport the drawer is anchored to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: 'Width (left / right) or height (top / bottom) preset.' },
+          { name: 'overlay', type: 'boolean', default: 'true', description: 'Dim the page behind the drawer.' },
+          { name: 'dismissOnOverlay', type: 'boolean', default: 'true', description: 'Close when the backdrop is clicked.' },
+          { name: 'trapFocus', type: 'boolean', default: 'true', description: 'Keep Tab focus inside the drawer while it is open.' },
+          { name: 'title', type: 'string', description: 'Accessible name of the dialog (visually hidden).' },
+          { name: 'description', type: 'string', description: 'Accessible description of the dialog (visually hidden).' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name when there is no `title` — every dialog needs one (WCAG 4.1.2).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Portal target; `document.body` when left out.' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: '`false` when the drawer asks to close (Escape, backdrop), for `v-model:open`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The drawer content — typically header, body and footer parts.' },
+        ],
+        notes: [
+          'Its template ref exposes `element`: the drawer panel while it is open.',
+        ],
+      },
+      {
+        name: 'PixelDrawerBody',
+        slots: [
+          { name: 'default', description: 'Body content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDrawerFooter',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Footer content, such as the actions.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDrawerHeader',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Header content, such as the title.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelDrawer',
+        selector: 'pxl-drawer',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: '[(open)]', description: 'Whether the drawer is visible (`[(open)]`).' },
+          { name: 'side', type: "'right' | 'left' | 'top' | 'bottom'", default: "'right'", description: 'Edge of the viewport the drawer is anchored to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: 'Width (left / right) or height (top / bottom) preset.' },
+          { name: 'overlay', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Dim the page behind the drawer.' },
+          { name: 'dismissOnOverlay', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Close when the backdrop is clicked.' },
+          { name: 'trapFocus', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Keep Tab focus inside the drawer while it is open.' },
+          { name: 'title', type: 'string', description: 'Accessible name of the dialog (visually hidden).' },
+          { name: 'description', type: 'string', description: 'Accessible description of the dialog (visually hidden).' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name when there is no `title` — every dialog needs one (WCAG 4.1.2).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Portal target; `document.body` when left out.' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: '`false` when the drawer asks to close (Escape, backdrop), for `[(open)]`.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelDrawerBody',
+        selector: 'pxl-drawer-body',
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelDrawerFooter',
+        selector: 'pxl-drawer-footer',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelDrawerHeader',
+        selector: 'pxl-drawer-header',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelDrawerDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelDrawerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-drawer-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-drawer-heading'>PixelDrawer</h2>
+      <Title id='pixel-drawer-heading'>PixelDrawer</Title>
       <p className="docs-lead">Side-anchored modal panel (right/left/top/bottom) with focus trap, scroll lock and Escape-to-close.</p>
       <ul className="docs-highlights">
         <li>Four anchor sides (right/left/top/bottom) and five sizes (sm/md/lg/xl/full)</li>
         <li>Focus trap, scroll lock and Escape-to-close out of the box</li>
-        <li>WCAG 4.1.2 compliant: requires `title` or `aria-label` for accessible name</li>
-        <li>Surface-aware borders inherited from theme context</li>
-        <li>Composable subparts: PixelDrawer.Header / Body / Footer</li>
+        <li>WCAG 4.1.2 compliant: requires <code>title</code> or <code>aria-label</code> for accessible name</li>
+        <li>Surface-aware borders from the nearest PxlKitSurfaceProvider</li>
+        <li>Composable subparts: header, body and footer (<code>PixelDrawer.Header</code> in React, <code>PixelDrawerHeader</code> in Vue, <code>pxl-drawer-header</code> in Angular, and so on)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-drawer-api">
+      <Heading id="pixel-drawer-api">API</Heading>
+      <FrameworkApi label={'PixelDrawer API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-drawer-a11y">
-      <h3 id="pixel-drawer-a11y">Accessibility</h3>
+      <Heading id="pixel-drawer-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>role=&quot;dialog&quot; with aria-modal=&quot;true&quot;</code></li>
@@ -48,8 +233,8 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
         <li><code>Escape key closes the drawer</code></li>
         <li><code>Accessible name via `title` (aria-labelledby) or `aria-label`</code></li>
       </ul>
-      <p className="docs-aria-notes">Dev-only warning fires when neither `title` nor `aria-label` is provided to enforce WCAG 4.1.2.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Dev-only warning fires when neither <code>title</code> nor <code>aria-label</code> is provided to enforce WCAG 4.1.2.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -78,8 +263,11 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
       </table>
     </section>
     <section aria-labelledby="pixel-drawer-usage">
-      <h3 id="pixel-drawer-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-drawer-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelDrawer usage'}
+        react={`import { useState } from 'react';
 import { PixelDrawer } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -107,14 +295,66 @@ export function Default() {
       </PixelDrawer>
     </>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open drawer</button>
+  <PixelDrawer v-model:open="open" title="Settings">
+    <PixelDrawerHeader>
+      <span>Settings</span>
+      <button type="button" @click="open = false">Close</button>
+    </PixelDrawerHeader>
+    <PixelDrawerBody>
+      <p>Drawer content goes here.</p>
+    </PixelDrawerBody>
+    <PixelDrawerFooter>
+      <button type="button" @click="open = false">Done</button>
+    </PixelDrawerFooter>
+  </PixelDrawer>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDrawer, PixelDrawerHeader, PixelDrawerBody, PixelDrawerFooter],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open drawer</button>
+    <pxl-drawer [(open)]="open" title="Settings">
+      <pxl-drawer-header>
+        <span>Settings</span>
+        <button type="button" (click)="open.set(false)">Close</button>
+      </pxl-drawer-header>
+      <pxl-drawer-body>
+        <p>Drawer content goes here.</p>
+      </pxl-drawer-body>
+      <pxl-drawer-footer>
+        <button type="button" (click)="open.set(false)">Done</button>
+      </pxl-drawer-footer>
+    </pxl-drawer>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelDrawer } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -139,11 +379,64 @@ export function Default() {
       </PixelDrawer>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open drawer</button>
+  <PixelDrawer v-model:open="open" title="Settings">
+    <PixelDrawerHeader>
+      <span>Settings</span>
+      <button type="button" @click="open = false">Close</button>
+    </PixelDrawerHeader>
+    <PixelDrawerBody>
+      <p>Drawer content goes here.</p>
+    </PixelDrawerBody>
+    <PixelDrawerFooter>
+      <button type="button" @click="open = false">Done</button>
+    </PixelDrawerFooter>
+  </PixelDrawer>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDrawer, PixelDrawerHeader, PixelDrawerBody, PixelDrawerFooter],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open drawer</button>
+    <pxl-drawer [(open)]="open" title="Settings">
+      <pxl-drawer-header>
+        <span>Settings</span>
+        <button type="button" (click)="open.set(false)">Close</button>
+      </pxl-drawer-header>
+      <pxl-drawer-body>
+        <p>Drawer content goes here.</p>
+      </pxl-drawer-body>
+      <pxl-drawer-footer>
+        <button type="button" (click)="open.set(false)">Done</button>
+      </pxl-drawer-footer>
+    </pxl-drawer>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-left-side">
-        <h4>Left side, large</h4>
-        <pre className="docs-code"><code>{`export function LeftSide() {
+        <Subheading>Left side, large</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Left side, large code'}
+          react={`import { useState } from 'react';
+import { PixelDrawer } from '@pxlkit/ui-kit';
+
+export function LeftSide() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -164,11 +457,52 @@ export function Default() {
       </PixelDrawer>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerHeader } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open left drawer</button>
+  <PixelDrawer v-model:open="open" side="left" size="lg" title="Navigation">
+    <PixelDrawerHeader>Navigation</PixelDrawerHeader>
+    <PixelDrawerBody>
+      <p>Menu items here.</p>
+    </PixelDrawerBody>
+  </PixelDrawer>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDrawer, PixelDrawerHeader, PixelDrawerBody],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open left drawer</button>
+    <pxl-drawer [(open)]="open" side="left" size="lg" title="Navigation">
+      <pxl-drawer-header>Navigation</pxl-drawer-header>
+      <pxl-drawer-body>
+        <p>Menu items here.</p>
+      </pxl-drawer-body>
+    </pxl-drawer>
+  \`,
+})
+export class LeftSide {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-bottom-sheet">
-        <h4>Bottom sheet</h4>
-        <pre className="docs-code"><code>{`export function BottomSheet() {
+        <Subheading>Bottom sheet</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Bottom sheet code'}
+          react={`import { useState } from 'react';
+import { PixelDrawer } from '@pxlkit/ui-kit';
+
+export function BottomSheet() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -194,15 +528,54 @@ export function Default() {
       </PixelDrawer>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open bottom sheet</button>
+  <PixelDrawer v-model:open="open" side="bottom" size="md" title="Quick actions" description="Pick an action below">
+    <PixelDrawerBody>
+      <p>Sheet content.</p>
+    </PixelDrawerBody>
+    <PixelDrawerFooter>
+      <button type="button" @click="open = false">Cancel</button>
+    </PixelDrawerFooter>
+  </PixelDrawer>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDrawer, PixelDrawerBody, PixelDrawerFooter],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open bottom sheet</button>
+    <pxl-drawer [(open)]="open" side="bottom" size="md" title="Quick actions" description="Pick an action below">
+      <pxl-drawer-body>
+        <p>Sheet content.</p>
+      </pxl-drawer-body>
+      <pxl-drawer-footer>
+        <button type="button" (click)="open.set(false)">Cancel</button>
+      </pxl-drawer-footer>
+    </pxl-drawer>
+  \`,
+})
+export class BottomSheet {
+  readonly open = signal(false);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-modal">PixelModal</a></li>
-        <li><a href="#pixel-portal">PixelPortal</a></li>
-        <li><a href="#pixel-sheet">PixelSheet</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-modal' : '#pixel-modal'}>PixelModal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-portal' : '#pixel-portal'}>PixelPortal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-sheet' : '#pixel-sheet'}>PixelSheet</a></li>
       </ul>
     </section>
     </section>

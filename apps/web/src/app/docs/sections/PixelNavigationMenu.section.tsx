@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelNavigationMenuDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelNavigationMenuDocsMeta = {
@@ -17,36 +23,97 @@ export const PixelNavigationMenuDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMenuDocsSectionProps): React.ReactElement {
+/** PixelNavigationMenu's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelNavigationMenu } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelNavigationMenu',
+        props: [
+          { name: 'items', type: 'PixelNavigationMenuItem[]', required: true, description: 'The items, in order.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Items in a row or a column; also the arrow keys that move between them.' },
+          { name: 'viewport', type: 'boolean', default: 'true', description: 'One shared panel below the list, instead of a panel under each item.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Main navigation'", description: 'Accessible name for the nav landmark. Required when more than one nav lands on the same page (WCAG 2.4.6). Defaults to "Main navigation".' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`), except `children`.',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelNavigationMenu } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelNavigationMenu',
+        props: [
+          { name: 'items', type: 'PixelNavigationMenuItem[]', required: true, description: 'The items, in order.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Items in a row or a column; also the arrow keys that move between them.' },
+          { name: 'viewport', type: 'boolean', default: 'true', description: 'One shared panel below the list, instead of a panel under each item.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Main navigation'", description: 'Accessible name of the landmark — give each navigation landmark of a page its own.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<nav>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelNavigationMenu } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelNavigationMenu',
+        selector: 'pxl-navigation-menu',
+        props: [
+          { name: 'items', type: 'PixelNavigationMenuItem[]', required: true, description: 'The items, in order.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Items in a row or a column; also the arrow keys that move between them.' },
+          { name: 'viewport', type: 'boolean', default: 'true', accepts: 'unknown', description: 'One shared panel below the list, instead of a panel under each item.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Main navigation'", description: 'Accessible name of the landmark — give each navigation landmark of a page its own.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelNavigationMenuDocsSection({ className, headingLevel = 2 }: PixelNavigationMenuDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-navigation-menu-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-navigation-menu-heading'>PixelNavigationMenu</h2>
+      <Title id='pixel-navigation-menu-heading'>PixelNavigationMenu</Title>
       <p className="docs-lead">Accessible nav landmark with optional mega-panel submenus, keyboard navigation, and surface-aware styling.</p>
       <ul className="docs-highlights">
         <li>Horizontal or vertical orientation</li>
         <li>Optional shared viewport panel or inline per-item panels</li>
-        <li>Full keyboard support (Arrow/Home/End/Escape/Enter)</li>
-        <li>Surface-aware via useEffectiveSurface</li>
-        <li>SSR-safe, ref-forwarded nav landmark</li>
+        <li>WAI-ARIA disclosure navigation: each panel follows its button in the tab order, with Arrow/Home/End/Escape keys</li>
+        <li>Surface-aware (pixel / linear)</li>
+        <li>SSR-safe nav landmark</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-navigation-menu-api">
+      <Heading id="pixel-navigation-menu-api">API</Heading>
+      <FrameworkApi label={'PixelNavigationMenu API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-navigation-menu-a11y">
-      <h3 id="pixel-navigation-menu-a11y">Accessibility</h3>
+      <Heading id="pixel-navigation-menu-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>menubar</code></li>
-        <li><code>menu</code></li>
+        <li><code>disclosure</code></li>
+        <li><code>link</code></li>
       </ul>
-      <p className="docs-aria-notes">Provide a unique ariaLabel when more than one nav landmark exists on the page (WCAG 2.4.6). The root is a nav landmark; submenus render role=menu and mega-panels are labelled by their trigger.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Follows the WAI-ARIA disclosure navigation pattern, without menu roles (those are for application menus): a <code>&lt;nav&gt;</code> landmark — give it a unique <code>ariaLabel</code> when the page has more than one (WCAG 2.4.6) — holding a list of links, and of buttons with <code>aria-expanded</code> and <code>aria-controls</code> for the items with <code>content</code>. Each panel is a plain container rendered right after its button, inside the same list item, so Tab moves from the button into the open panel; the shared viewport is only drawn below the whole list. A click, or Enter / Space on the button, toggles the panel; focus alone never opens it. A mouse pointing at an item opens its panel — touch and pen pointers do not, so a tap opens it once — and the pointer leaving the menu closes that panel, unless a click on its button kept it open: a panel opened by a click stays open until a click on its button or another one, or Escape. A panel that closes while focus is inside it hands focus back to its button. An item with both an <code>href</code> and <code>content</code> is a button whose activation toggles the panel instead of navigating.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -57,23 +124,48 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
         </thead>
         <tbody>
           <tr>
+            <td><kbd>Tab</kbd></td>
+            <td>Move to the next link or button; from the button of an open panel, into the panel</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+Tab</kbd></td>
+            <td>Move to the previous link or button</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Enter</kbd></td>
+            <td>Toggle the panel of a button, or follow a link; invokes <code>onSelect</code></td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Space</kbd></td>
+            <td>Toggle the panel of a button; invokes <code>onSelect</code></td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
             <td><kbd>ArrowRight</kbd></td>
-            <td>Focus next item</td>
+            <td>Focus next item, wrapping round</td>
             <td>horizontal</td>
           </tr>
           <tr>
             <td><kbd>ArrowLeft</kbd></td>
-            <td>Focus previous item</td>
+            <td>Focus previous item, wrapping round</td>
             <td>horizontal</td>
           </tr>
           <tr>
             <td><kbd>ArrowDown</kbd></td>
-            <td>Focus next item</td>
+            <td>Focus the first link of the open panel</td>
+            <td>horizontal, on the button of an open panel</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowDown</kbd></td>
+            <td>Focus next item, wrapping round</td>
             <td>vertical</td>
           </tr>
           <tr>
             <td><kbd>ArrowUp</kbd></td>
-            <td>Focus previous item</td>
+            <td>Focus previous item, wrapping round</td>
             <td>vertical</td>
           </tr>
           <tr>
@@ -87,22 +179,19 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
-            <td><kbd>Enter</kbd></td>
-            <td>Toggle submenu or invoke onSelect</td>
-            <td><span className="docs-muted">—</span></td>
-          </tr>
-          <tr>
             <td><kbd>Escape</kbd></td>
-            <td>Close any open submenu</td>
+            <td>Close the open panel; focus on its button or inside it returns to the button</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
         </tbody>
       </table>
     </section>
     <section aria-labelledby="pixel-navigation-menu-usage">
-      <h3 id="pixel-navigation-menu-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react'
-import { PixelNavigationMenu } from '@pxlkit/ui-kit'
+      <Heading id="pixel-navigation-menu-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelNavigationMenu usage'}
+        react={`import { PixelNavigationMenu } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -124,14 +213,67 @@ export function Default() {
       ]}
     />
   )
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-vue';
+
+const items: PixelNavigationMenuItem[] = [
+  { label: 'Home', href: '#home' },
+  {
+    label: 'Products',
+    content: () =>
+      h('div', { class: 'grid gap-2 text-sm text-retro-text' }, [
+        h('a', { href: '#analytics', class: 'hover:underline' }, 'Analytics'),
+        h('a', { href: '#dashboard', class: 'hover:underline' }, 'Dashboard'),
+        h('a', { href: '#reports', class: 'hover:underline' }, 'Reports'),
+      ]),
+  },
+  { label: 'Docs', href: '#docs' },
+  { label: 'Pricing', href: '#pricing' },
+];
+</script>
+
+<template>
+  <PixelNavigationMenu :items="items" />
+</template>`}
+        angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNavigationMenu],
+  template: \`
+    <pxl-navigation-menu [items]="items()" />
+    <ng-template #products>
+      <div class="grid gap-2 text-sm text-retro-text">
+        <a href="#analytics" class="hover:underline">Analytics</a>
+        <a href="#dashboard" class="hover:underline">Dashboard</a>
+        <a href="#reports" class="hover:underline">Reports</a>
+      </div>
+    </ng-template>
+  \`,
+})
+export class Default {
+  private readonly products = viewChild.required<TemplateRef<unknown>>('products');
+  readonly items = computed<PixelNavigationMenuItem[]>(() => [
+    { label: 'Home', href: '#home' },
+    { label: 'Products', content: this.products() },
+    { label: 'Docs', href: '#docs' },
+    { label: 'Pricing', href: '#pricing' },
+  ]);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelNavigationMenu } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelNavigationMenu
       items={[
@@ -151,11 +293,65 @@ export function Default() {
       ]}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-vue';
+
+const items: PixelNavigationMenuItem[] = [
+  { label: 'Home', href: '#home' },
+  {
+    label: 'Products',
+    content: () =>
+      h('div', { class: 'grid gap-2 text-sm text-retro-text' }, [
+        h('a', { href: '#analytics', class: 'hover:underline' }, 'Analytics'),
+        h('a', { href: '#dashboard', class: 'hover:underline' }, 'Dashboard'),
+        h('a', { href: '#reports', class: 'hover:underline' }, 'Reports'),
+      ]),
+  },
+  { label: 'Docs', href: '#docs' },
+  { label: 'Pricing', href: '#pricing' },
+];
+</script>
+
+<template>
+  <PixelNavigationMenu :items="items" />
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNavigationMenu],
+  template: \`
+    <pxl-navigation-menu [items]="items()" />
+    <ng-template #products>
+      <div class="grid gap-2 text-sm text-retro-text">
+        <a href="#analytics" class="hover:underline">Analytics</a>
+        <a href="#dashboard" class="hover:underline">Dashboard</a>
+        <a href="#reports" class="hover:underline">Reports</a>
+      </div>
+    </ng-template>
+  \`,
+})
+export class Default {
+  private readonly products = viewChild.required<TemplateRef<unknown>>('products');
+  readonly items = computed<PixelNavigationMenuItem[]>(() => [
+    { label: 'Home', href: '#home' },
+    { label: 'Products', content: this.products() },
+    { label: 'Docs', href: '#docs' },
+    { label: 'Pricing', href: '#pricing' },
+  ]);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-vertical">
-        <h4>Vertical</h4>
-        <pre className="docs-code"><code>{`export function Vertical() {
+        <Subheading>Vertical</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Vertical code'}
+          react={`import { PixelNavigationMenu } from '@pxlkit/ui-kit';
+
+export function Vertical() {
   return (
     <PixelNavigationMenu
       orientation="vertical"
@@ -166,11 +362,44 @@ export function Default() {
       ]}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-vue';
+
+const items: PixelNavigationMenuItem[] = [
+  { label: 'Overview', href: '#overview' },
+  { label: 'Settings', href: '#settings' },
+  { label: 'Billing', href: '#billing' },
+];
+</script>
+
+<template>
+  <PixelNavigationMenu orientation="vertical" :items="items" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNavigationMenu],
+  template: \`<pxl-navigation-menu orientation="vertical" [items]="items" />\`,
+})
+export class Vertical {
+  readonly items: PixelNavigationMenuItem[] = [
+    { label: 'Overview', href: '#overview' },
+    { label: 'Settings', href: '#settings' },
+    { label: 'Billing', href: '#billing' },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-inline-panels">
-        <h4>Inline Panels</h4>
-        <pre className="docs-code"><code>{`export function InlinePanels() {
+        <Subheading>Inline Panels</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Inline Panels code'}
+          react={`import { PixelNavigationMenu } from '@pxlkit/ui-kit';
+
+export function InlinePanels() {
   return (
     <PixelNavigationMenu
       viewport={false}
@@ -188,7 +417,50 @@ export function Default() {
       ]}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-vue';
+
+const items: PixelNavigationMenuItem[] = [
+  { label: 'Home', href: '#home' },
+  {
+    label: 'Resources',
+    content: () =>
+      h('div', { class: 'grid gap-2 text-sm text-retro-text' }, [
+        h('a', { href: '#guides', class: 'hover:underline' }, 'Guides'),
+        h('a', { href: '#api', class: 'hover:underline' }, 'API Reference'),
+      ]),
+  },
+];
+</script>
+
+<template>
+  <PixelNavigationMenu :viewport="false" :items="items" />
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNavigationMenu],
+  template: \`
+    <pxl-navigation-menu [viewport]="false" [items]="items()" />
+    <ng-template #resources>
+      <div class="grid gap-2 text-sm text-retro-text">
+        <a href="#guides" class="hover:underline">Guides</a>
+        <a href="#api" class="hover:underline">API Reference</a>
+      </div>
+    </ng-template>
+  \`,
+})
+export class InlinePanels {
+  private readonly resources = viewChild.required<TemplateRef<unknown>>('resources');
+  readonly items = computed<PixelNavigationMenuItem[]>(() => [
+    { label: 'Home', href: '#home' },
+    { label: 'Resources', content: this.resources() },
+  ]);
+}`}
+        />
       </article>
     </section>
     </section>

@@ -1,13 +1,21 @@
 {
   "name": "@pxlkit/voxel",
-  "version": "0.1.4",
-  "description": "MIT-licensed 3D voxel toolkit for React \u2014 voxel utility primitives (pxlToVoxels, upscaleGrid) plus types. The full procedural-world engine (biomes, chunks, day/night cycles, highways, tunnels) lives in the showcase app at pxlkit.xyz/explore and ships in the v1 package.",
+  "version": "0.1.5",
+  "description": "MIT 3D voxel toolkit for React: pxlToVoxels and upscaleGrid turn Pxlkit pixel-art icons into voxel data for Three.js and React Three Fiber. Early preview.",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
   "license": "MIT",
-  "repository": "https://github.com/Joangeldelarosa/pxlkit",
+  "homepage": "https://pxlkit.xyz/explore",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/voxel"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -29,7 +37,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.2.3"
+    "@pxlkit/core": "^1.4.0"
   },
   "devDependencies": {
     "tsup": "^8.3.0",
@@ -38,38 +46,16 @@
   "keywords": [
     "pixel-art",
     "voxel",
-    "voxel-engine",
+    "voxels",
+    "voxel-art",
+    "pixel-to-voxel",
     "3d",
-    "game-engine",
     "react-three-fiber",
+    "r3f",
     "three-js",
     "threejs",
-    "procedural-generation",
-    "procedural-terrain",
-    "procedural-world",
-    "infinite-terrain",
-    "biome-generation",
-    "chunk-based-rendering",
-    "day-night-cycle",
-    "npc-system",
-    "physics-engine",
-    "entity-framework",
-    "react-game-engine",
-    "mit-game-engine",
-    "webgl",
-    "browser-game",
-    "indie-game-engine",
-    "minecraft-like",
-    "voxel-sandbox",
-    "voxel-world",
     "react-3d",
-    "r3f",
     "retro",
-    "pxlkit",
-    "perlin-noise",
-    "terrain-generation",
-    "world-builder",
-    "game-development",
-    "web-game-engine"
+    "pxlkit"
   ]
 }

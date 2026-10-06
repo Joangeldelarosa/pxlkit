@@ -13,22 +13,12 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React, { forwardRef } from 'react';
+import {
+  overlayBackdropClasses,
+  type OverlayBackdropOpacity,
+  type OverlayBackdropPosition,
+} from '@pxlkit/ui-kit-core';
 import { cn } from '../../utils/cn';
-
-type OverlayBackdropPosition = 'fixed' | 'absolute';
-type OverlayBackdropOpacity = 60 | 70 | 80 | 90;
-
-/**
- * Tailwind JIT requires static class strings — we cannot interpolate
- * the opacity into `bg-retro-bg/${n}`. Keep this map exhaustive so all
- * four variants get emitted into the compiled CSS.
- */
-const OPACITY_CLASS: Record<OverlayBackdropOpacity, string> = {
-  60: 'bg-retro-bg/60',
-  70: 'bg-retro-bg/70',
-  80: 'bg-retro-bg/80',
-  90: 'bg-retro-bg/90',
-};
 
 export interface OverlayBackdropProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onClick'> {
@@ -61,12 +51,7 @@ export const OverlayBackdrop = forwardRef<HTMLDivElement, OverlayBackdropProps>(
         aria-hidden={ariaHidden}
         data-pxl-overlay-backdrop=""
         onClick={onClick}
-        className={cn(
-          position === 'fixed' ? 'fixed inset-0' : 'absolute inset-0',
-          OPACITY_CLASS[opacity],
-          blur && 'backdrop-blur-sm',
-          className,
-        )}
+        className={cn(overlayBackdropClasses(position, opacity, blur), className)}
         {...rest}
       />
     );

@@ -1,7 +1,8 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
-import { PxlKitToastProvider, useToast } from '../../toast';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
+import { PixelToast, PxlKitToastProvider, useToast } from '../../toast';
 
 type Listener = (e: { matches: boolean }) => void;
 
@@ -200,12 +201,10 @@ describe('PixelToast / useToast (upgraded)', () => {
         expect(v).toBe(42);
       });
 
-      await waitFor(() => {
-        const t = apiRef.current!.toasts[0];
-        expect(t.title).toBe('saved #42');
-        expect(t.tone).toBe('green');
-        expect(t.loading).toBe(false);
-      });
+      const t = apiRef.current!.toasts[0];
+      expect(t.title).toBe('saved #42');
+      expect(t.tone).toBe('green');
+      expect(t.loading).toBe(false);
     });
 
     it('flips loading → error on reject and re-throws', async () => {
@@ -236,13 +235,11 @@ describe('PixelToast / useToast (upgraded)', () => {
         await expect(outcome!).rejects.toBe(err);
       });
 
-      await waitFor(() => {
-        const t = apiRef.current!.toasts[0];
-        expect(t.title).toBe('failed');
-        expect(t.message).toBe('boom');
-        expect(t.tone).toBe('red');
-        expect(t.loading).toBe(false);
-      });
+      const t = apiRef.current!.toasts[0];
+      expect(t.title).toBe('failed');
+      expect(t.message).toBe('boom');
+      expect(t.tone).toBe('red');
+      expect(t.loading).toBe(false);
     });
 
     it('also accepts a factory `() => Promise`', async () => {
@@ -267,15 +264,15 @@ describe('PixelToast / useToast (upgraded)', () => {
         expect(v).toBe('hello');
       });
 
-      await waitFor(() => {
-        expect(apiRef.current!.toasts[0].title).toBe('done');
-        expect(apiRef.current!.toasts[0].tone).toBe('green');
-      });
+      expect(apiRef.current!.toasts[0].title).toBe('done');
+      expect(apiRef.current!.toasts[0].tone).toBe('green');
     });
   });
 
   describe('viewport / stacked visual', () => {
-    it('renders newest toast with role=status and respects assertive tones', () => {
+    // Regression: each card was its own live region, inserted already filled
+    // (read unreliably) and re-reading its buttons' labels (aria-atomic).
+    it('announces critical tones in the assertive region, the card being no live region', () => {
       const { apiRef, Capture } = makeHarness();
       render(
         <PxlKitToastProvider>
@@ -283,12 +280,13 @@ describe('PixelToast / useToast (upgraded)', () => {
         </PxlKitToastProvider>,
       );
       act(() => {
-        apiRef.current!.toast.error('boom');
+        apiRef.current!.toast.error('boom', 'Upload failed.');
       });
-      // tone=red → assertive role=alert with aria-live=assertive
-      const alert = screen.getByRole('alert');
-      expect(alert).toBeTruthy();
-      expect(alert.getAttribute('aria-live')).toBe('assertive');
+      // tone=red → the role=alert region of the viewport, assertive.
+      expect(screen.getByRole('alert').textContent).toBe('boom Upload failed.');
+      expect(screen.getByRole('status').textContent).toBe('');
+      const card = document.querySelector('[data-pxl-toast]')!;
+      expect(['role', 'aria-live', 'aria-atomic'].map((name) => card.getAttribute(name))).toEqual([null, null, null]);
     });
 
     it('viewport carries stacked + expanded data attributes', () => {
@@ -302,5 +300,134 @@ describe('PixelToast / useToast (upgraded)', () => {
       expect(viewport.getAttribute('data-stacked')).toBe('true');
       expect(viewport.getAttribute('data-expanded')).toBe('false');
     });
+  });
+});
+
+describe('PixelToast — auto-dismiss countdown', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  const bar = (card: HTMLElement) => card.querySelector<HTMLElement>('[aria-hidden] > div')!;
+  const card = () => document.querySelector<HTMLElement>('[data-pxl-toast]')!;
+
+  it('dismisses once its duration has passed', () => {
+    const onDismiss = vi.fn();
+    render(<PixelToast toast={{ id: 't', title: 'Saved', duration: 1000 }} onDismiss={onDismiss} />);
+    act(() => { vi.advanceTimersByTime(999); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  // Regression: entering the paused state twice (hover, then focus) counted the
+  // paused time again, and the pointer leaving resumed the countdown while
+  // focus was still inside — the toast then closed under the focused action.
+  it('holds still until both the pointer and focus have left, losing no time meanwhile', () => {
+    const onDismiss = vi.fn();
+    render(
+      <PixelToast
+        toast={{ id: 't', title: 'Deleted', duration: 4500, action: <button type="button">Undo</button> }}
+        onDismiss={onDismiss}
+      />,
+    );
+    const undo = screen.getByRole('button', { name: 'Undo' });
+    act(() => { vi.advanceTimersByTime(1000); });
+    fireEvent.mouseEnter(card());
+    act(() => { vi.advanceTimersByTime(2000); });
+    act(() => { undo.focus(); });
+    act(() => { vi.advanceTimersByTime(5000); });
+    fireEvent.mouseLeave(card());
+    act(() => { vi.advanceTimersByTime(10_000); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(bar(card()).style.width).toBe(`${(3500 / 4500) * 100}%`);
+
+    act(() => { undo.blur(); });
+    expect(bar(card()).style.transitionDuration).toBe('3500ms');
+    act(() => { vi.advanceTimersByTime(3499); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps still while focus moves between its buttons', () => {
+    const onDismiss = vi.fn();
+    render(
+      <PixelToast toast={{ id: 't', title: 'Deleted', duration: 1000, action: <button type="button">Undo</button> }} onDismiss={onDismiss} />,
+    );
+    act(() => { screen.getByRole('button', { name: 'Undo' }).focus(); });
+    act(() => { screen.getByRole('button', { name: 'Dismiss notification' }).focus(); });
+    act(() => { vi.advanceTimersByTime(5000); });
+    expect(onDismiss).not.toHaveBeenCalled();
+  });
+
+  // Regression: the bar was rendered empty and only showed after a pause.
+  it('starts with a full bar that shrinks over the duration once on the page', () => {
+    const html = renderToString(<PixelToast toast={{ id: 't', title: 'Saved', duration: 4500 }} onDismiss={() => {}} />);
+    expect(html).toContain('style="width:100%;transition-duration:0ms"');
+    render(<PixelToast toast={{ id: 't', title: 'Saved', duration: 4500 }} onDismiss={() => {}} />);
+    const { width, transitionDuration } = bar(card()).style;
+    expect([width, transitionDuration]).toEqual(['0%', '4500ms']);
+  });
+
+  // Regression: after loading → success the bar kept the loading toast's 0 ms.
+  it('counts down the new duration once a loading toast settles', () => {
+    const onDismiss = vi.fn();
+    const { rerender } = render(<PixelToast toast={{ id: 't', title: 'Saving…', loading: true }} onDismiss={onDismiss} />);
+    expect(card().querySelector('[aria-hidden] > div')).toBeNull();
+    act(() => { vi.advanceTimersByTime(10_000); });
+    rerender(<PixelToast toast={{ id: 't', title: 'Saved', loading: false, duration: 4500, tone: 'green' }} onDismiss={onDismiss} />);
+    expect(bar(card()).style.transitionDuration).toBe('4500ms');
+    act(() => { vi.advanceTimersByTime(4500); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  // Regression: a toast ran out while nobody looked at the page (WCAG 2.2.1).
+  it('holds still while the page is hidden or the window in the background, until both come back', () => {
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
+    const onDismiss = vi.fn();
+    render(<PixelToast toast={{ id: 't', title: 'Saved', duration: 4500 }} onDismiss={onDismiss} />);
+    act(() => { vi.advanceTimersByTime(1000); });
+    hidden.mockReturnValue(true);
+    act(() => { document.dispatchEvent(new Event('visibilitychange')); });
+    act(() => { window.dispatchEvent(new FocusEvent('blur')); });
+    hidden.mockReturnValue(false);
+    act(() => { document.dispatchEvent(new Event('visibilitychange')); });
+    act(() => { vi.advanceTimersByTime(60_000); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(bar(card()).style.width).toBe(`${(3500 / 4500) * 100}%`);
+
+    act(() => { window.dispatchEvent(new FocusEvent('focus')); });
+    expect(bar(card()).style.transitionDuration).toBe('3500ms');
+    act(() => { vi.advanceTimersByTime(3500); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('waits for a hidden page to come back before counting down', () => {
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+    const onDismiss = vi.fn();
+    render(<PixelToast toast={{ id: 't', title: 'Saved', duration: 1000 }} onDismiss={onDismiss} />);
+    act(() => { vi.advanceTimersByTime(60_000); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(bar(card()).style.width).toBe('100%');
+    hidden.mockReturnValue(false);
+    act(() => { document.dispatchEvent(new Event('visibilitychange')); });
+    act(() => { vi.advanceTimersByTime(1000); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('PixelToast — loading spinner', () => {
+  it('turns the spinner of a loading toast only for a reader who allows motion', () => {
+    const { container } = render(<PixelToast toast={{ id: 'l', title: 'Saving', loading: true }} onDismiss={() => {}} />);
+    const spinner = container.querySelector('[role="presentation"]')!;
+    const classes = spinner.className.split(' ');
+    expect(classes).toContain('motion-safe:animate-spin');
+    expect(classes).not.toContain('animate-spin');
   });
 });

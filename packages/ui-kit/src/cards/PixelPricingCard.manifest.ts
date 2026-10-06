@@ -9,7 +9,7 @@ export default defineManifest({
   description:
     'Pricing tier card with tone-driven highlight, optional popular ribbon, feature list, and CTA slot.',
   highlights: [
-    'Surface-aware borders, fonts, and radii via useEffectiveSurface',
+    'Surface-aware borders, fonts, and radii (pixel / linear)',
     'Tone tokens drive price color, highlight glow, and feature checks',
     'Optional popular ribbon with its own tone override',
     'Feature list supports included/excluded states with tooltip + a11y labels',

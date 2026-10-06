@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBarChartDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBarChartDocsMeta = {
@@ -17,11 +23,83 @@ export const PixelBarChartDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelBarChartDocsSection({ className }: PixelBarChartDocsSectionProps): React.ReactElement {
+/** PixelBarChart's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBarChart } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBarChart',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series, one bar per point; one whose `y` is not finite leaves its slot empty.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the bars and their labels.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '160×64, 280×120 or 420×180 px.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Bars growing up, or to the right.' },
+          { name: 'showValues', type: 'boolean', default: 'false', description: 'Labels each bar with its value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<svg>` (`SVGAttributes<SVGSVGElement>`).',
+          '`ref` points to `<svg>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBarChart } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBarChart',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series, one bar per point; one whose `y` is not finite leaves its slot empty.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the bars and their labels.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '160×64, 280×120 or 420×180 px.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Bars growing up, or to the right.' },
+          { name: 'showValues', type: 'boolean', default: 'false', description: 'Labels each bar with its value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius around the chart.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name; a summary of the series when unset.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<svg>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBarChart } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBarChart',
+        selector: 'svg[pxlBarChart]',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series, one bar per point; one whose `y` is not finite leaves its slot empty.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the bars and their labels.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '160×64, 280×120 or 420×180 px.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Bars growing up, or to the right.' },
+          { name: 'showValues', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Labels each bar with its value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border and radius around the chart.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name; a summary of the series when unset.' },
+        ],
+        notes: [
+          'Goes on a native `<svg>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelBarChartDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBarChartDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-bar-chart-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-bar-chart-heading'>PixelBarChart</h2>
-      <p className="docs-lead">Pure-SVG bar chart that renders one rect per data point, in vertical (default) or horizontal orientation, with crisp pixel edges or smoothed linear corners.</p>
+      <Title id='pixel-bar-chart-heading'>PixelBarChart</Title>
+      <p className="docs-lead">Pure-SVG bar chart that renders one rect per data point (none for a value that is not finite), in vertical (default) or horizontal orientation, with crisp pixel edges or smoothed linear corners.</p>
       <ul className="docs-highlights">
         <li>Tone-aware fills via retro-* token classes — matches the rest of the kit.</li>
         <li>Three sizes (sm/md/lg) with sensible inner padding and gap math.</li>
@@ -34,21 +112,24 @@ export function PixelBarChartDocsSection({ className }: PixelBarChartDocsSection
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-bar-chart-api">
+      <Heading id="pixel-bar-chart-api">API</Heading>
+      <FrameworkApi label={'PixelBarChart API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bar-chart-a11y">
-      <h3 id="pixel-bar-chart-a11y">Accessibility</h3>
+      <Heading id="pixel-bar-chart-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>img</code></li>
       </ul>
-      <p className="docs-aria-notes">The SVG renders as role=&quot;img&quot; with an auto-derived aria-label summarizing the series (kind, count, min..max range). Pass a custom aria-label for richer context. For full data accessibility, render a visually-hidden &lt;table&gt; sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.</p>
+      <p className="docs-aria-notes">The SVG renders as role=&quot;img&quot; with an auto-derived aria-label summarizing the series (kind, point count and min..max range of its finite values — a point whose y is NaN or ±Infinity is left out of the chart and of the summary, which reads &quot;bar chart, no data&quot; when no value is finite). Pass a custom aria-label for richer context. For full data accessibility, render a visually-hidden &lt;table&gt; sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.</p>
     </section>
     <section aria-labelledby="pixel-bar-chart-usage">
-      <h3 id="pixel-bar-chart-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelBarChart } from '@pxlkit/ui-kit';
+      <Heading id="pixel-bar-chart-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBarChart usage'}
+        react={`import { PixelBarChart } from '@pxlkit/ui-kit';
 
 const sample = [
   { x: 'Mon', y: 12 },
@@ -62,20 +143,125 @@ const sample = [
 
 export function Default() {
   return <PixelBarChart data={sample} />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelBarChart :data="sample" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`<svg pxlBarChart [data]="sample"></svg>\`,
+})
+export class Default {
+  readonly sample = SAMPLE;
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBarChart } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Default() {
   return <PixelBarChart data={sample} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelBarChart :data="sample" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`<svg pxlBarChart [data]="sample"></svg>\`,
+})
+export class Default {
+  readonly sample = SAMPLE;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelBarChart } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Tones() {
   return (
     <div className="flex flex-wrap items-end gap-4">
       <PixelBarChart data={sample} tone="cyan" />
@@ -86,11 +272,80 @@ export function Default() {
       <PixelBarChart data={sample} tone="pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-end gap-4">
+    <PixelBarChart :data="sample" tone="cyan" />
+    <PixelBarChart :data="sample" tone="green" />
+    <PixelBarChart :data="sample" tone="gold" />
+    <PixelBarChart :data="sample" tone="red" />
+    <PixelBarChart :data="sample" tone="purple" />
+    <PixelBarChart :data="sample" tone="pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`
+    <div class="flex flex-wrap items-end gap-4">
+      <svg pxlBarChart [data]="sample" tone="cyan"></svg>
+      <svg pxlBarChart [data]="sample" tone="green"></svg>
+      <svg pxlBarChart [data]="sample" tone="gold"></svg>
+      <svg pxlBarChart [data]="sample" tone="red"></svg>
+      <svg pxlBarChart [data]="sample" tone="purple"></svg>
+      <svg pxlBarChart [data]="sample" tone="pink"></svg>
+    </div>
+  \`,
+})
+export class Tones {
+  readonly sample = SAMPLE;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelBarChart } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Sizes() {
   return (
     <div className="flex flex-wrap items-end gap-4">
       <PixelBarChart data={sample} size="sm" tone="cyan" />
@@ -98,39 +353,254 @@ export function Default() {
       <PixelBarChart data={sample} size="lg" tone="cyan" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-end gap-4">
+    <PixelBarChart :data="sample" size="sm" tone="cyan" />
+    <PixelBarChart :data="sample" size="md" tone="cyan" />
+    <PixelBarChart :data="sample" size="lg" tone="cyan" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`
+    <div class="flex flex-wrap items-end gap-4">
+      <svg pxlBarChart [data]="sample" size="sm" tone="cyan"></svg>
+      <svg pxlBarChart [data]="sample" size="md" tone="cyan"></svg>
+      <svg pxlBarChart [data]="sample" size="lg" tone="cyan"></svg>
+    </div>
+  \`,
+})
+export class Sizes {
+  readonly sample = SAMPLE;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-horizontal">
-        <h4>Horizontal</h4>
-        <pre className="docs-code"><code>{`export function Horizontal() {
+        <Subheading>Horizontal</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Horizontal code'}
+          react={`import { PixelBarChart } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Horizontal() {
   return <PixelBarChart data={sample} orientation="horizontal" tone="green" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelBarChart :data="sample" orientation="horizontal" tone="green" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`<svg pxlBarChart [data]="sample" orientation="horizontal" tone="green"></svg>\`,
+})
+export class Horizontal {
+  readonly sample = SAMPLE;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-values">
-        <h4>With Values</h4>
-        <pre className="docs-code"><code>{`export function WithValues() {
+        <Subheading>With Values</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Values code'}
+          react={`import { PixelBarChart } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function WithValues() {
   return <PixelBarChart data={sample} tone="gold" showValues />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelBarChart :data="sample" tone="gold" show-values />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`<svg pxlBarChart [data]="sample" tone="gold" showValues></svg>\`,
+})
+export class WithValues {
+  readonly sample = SAMPLE;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelBarChart } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap items-end gap-4">
       <PixelBarChart data={sample} surface="pixel" tone="purple" />
       <PixelBarChart data={sample} surface="linear" tone="purple" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-end gap-4">
+    <PixelBarChart :data="sample" surface="pixel" tone="purple" />
+    <PixelBarChart :data="sample" surface="linear" tone="purple" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`
+    <div class="flex flex-wrap items-end gap-4">
+      <svg pxlBarChart [data]="sample" surface="pixel" tone="purple"></svg>
+      <svg pxlBarChart [data]="sample" surface="linear" tone="purple"></svg>
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly sample = SAMPLE;
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-sparkline">PixelSparkline</a></li>
-        <li><a href="#pixel-area-chart">PixelAreaChart</a></li>
-        <li><a href="#pixel-stat-group">PixelStatGroup</a></li>
-        <li><a href="#pixel-data-table">PixelDataTable</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-sparkline' : '#pixel-sparkline'}>PixelSparkline</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-area-chart' : '#pixel-area-chart'}>PixelAreaChart</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stat-group' : '#pixel-stat-group'}>PixelStatGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-data-table' : '#pixel-data-table'}>PixelDataTable</a></li>
       </ul>
     </section>
     </section>

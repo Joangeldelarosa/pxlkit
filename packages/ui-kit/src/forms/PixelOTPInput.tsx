@@ -9,24 +9,37 @@ import React, {
   useRef,
 } from 'react';
 import {
+  isOtpComplete,
+  otpCellLabel,
+  otpCells,
+  otpGroupLabel,
+  otpInputClasses,
+  otpInputMode,
+  otpKeydown,
+  otpPattern,
+  pasteOtp,
+  typeOtpCell,
+  type OtpInputVariant,
+} from '@pxlkit/ui-kit-core';
+import {
   Surface,
-  cn,
-  focusRing,
-  inputBase,
-  sizeHeight,
-  surfaceClasses,
-  toneMap,
   useEffectiveSurface,
 } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
 
 /** Public prop bag for {@link PixelOTPInput}. */
 export interface PixelOTPInputProps {
+  /** Number of cells. */
   length?: number;
+  /** Code; leave unset for an uncontrolled input. */
   value?: string;
+  /** Initial code while uncontrolled. */
   defaultValue?: string;
+  /** Called with the new code, after every edit. */
   onChange?: (next: string) => void;
+  /** Called with the code each time it comes to fill every cell. */
   onComplete?: (full: string) => void;
+  /** Hides the characters, as a password field does. */
   mask?: boolean;
   /** Canonical structural variant. */
   variant?: 'numeric' | 'alphanumeric';
@@ -34,23 +47,18 @@ export interface PixelOTPInputProps {
    * @deprecated Use `variant` instead. Retained as alias for one minor.
    */
   type?: 'numeric' | 'alphanumeric';
+  /** Focuses the first cell once mounted. */
   autoFocus?: boolean;
+  /** Shown between two cells, hidden from assistive technology. */
   separator?: React.ReactNode;
+  /** Cell size. */
   size?: 'sm' | 'md' | 'lg';
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Form field name — a hidden input submits the code. */
   name?: string;
+  /** Disables every cell. */
   disabled?: boolean;
-}
-
-const cellSize: Record<NonNullable<PixelOTPInputProps['size']>, string> = {
-  sm: 'h-8 w-8 text-xs',
-  md: 'h-10 w-10 text-sm',
-  lg: 'h-12 w-12 text-base',
-};
-
-function sanitize(raw: string, type: 'numeric' | 'alphanumeric'): string {
-  if (type === 'numeric') return raw.replace(/[^0-9]/g, '');
-  return raw.replace(/[^0-9a-zA-Z]/g, '');
 }
 
 export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
@@ -74,8 +82,8 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
-    const resolvedVariant: 'numeric' | 'alphanumeric' = variant ?? type ?? 'numeric';
+    const c = otpInputClasses(surface, size);
+    const resolvedVariant: OtpInputVariant = variant ?? type ?? 'numeric';
 
     const [val, setVal] = useControllableState<string>({
       value,
@@ -91,7 +99,7 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
 
     const completedRef = useRef(false);
     useEffect(() => {
-      const isFull = val.length === length && length > 0;
+      const isFull = isOtpComplete(val, length);
       if (isFull && !completedRef.current) {
         completedRef.current = true;
         onComplete?.(val);
@@ -104,25 +112,7 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
       if (autoFocus) cellRefs.current[0]?.focus();
     }, [autoFocus]);
 
-    const chars = useMemo(() => {
-      const arr = new Array<string>(length).fill('');
-      for (let i = 0; i < Math.min(val.length, length); i++) {
-        arr[i] = val[i];
-      }
-      return arr;
-    }, [val, length]);
-
-    const setCharAt = useCallback(
-      (index: number, ch: string): string => {
-        const next = chars.slice();
-        next[index] = ch;
-        // Compact trailing empties off the end but preserve internal gaps.
-        const joined = next.join('');
-        setVal(joined);
-        return joined;
-      },
-      [chars, setVal],
-    );
+    const chars = useMemo(() => otpCells(val, length), [val, length]);
 
     const focusCell = useCallback((index: number) => {
       const target = cellRefs.current[index];
@@ -139,80 +129,38 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
 
     const handleChange = useCallback(
       (index: number, raw: string) => {
-        // Take just the last entered char (handles fast typing where the
-        // previous value is still present when the new key lands).
-        const cleaned = sanitize(raw, resolvedVariant);
-        if (!cleaned) {
-          // Reject — clear cell visually by writing the prior value back.
-          setCharAt(index, '');
-          return;
-        }
-        const ch = cleaned.slice(-1);
-        const joined = setCharAt(index, ch);
-        if (index < length - 1) {
-          focusCell(index + 1);
-        }
-        // onComplete handled by effect once `val` is committed.
-        void joined;
+        // Takes just the last entered char (handles fast typing where the
+        // previous value is still present when the new key lands); a rejected
+        // char empties the cell. onComplete fires from the effect once `val`
+        // is committed.
+        const edit = typeOtpCell(chars, index, raw, resolvedVariant);
+        setVal(edit.value);
+        if (edit.focus !== undefined) focusCell(edit.focus);
       },
-      [resolvedVariant, setCharAt, length, focusCell],
+      [chars, resolvedVariant, setVal, focusCell],
     );
 
     const handleKeyDown = useCallback(
       (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Backspace') {
-          if (chars[index]) {
-            // Clear current cell.
-            setCharAt(index, '');
-            e.preventDefault();
-            return;
-          }
-          if (index > 0) {
-            // Move back AND clear the previous cell.
-            setCharAt(index - 1, '');
-            focusCell(index - 1);
-            e.preventDefault();
-          }
-          return;
-        }
-        if (e.key === 'ArrowLeft' && index > 0) {
-          focusCell(index - 1);
-          e.preventDefault();
-        } else if (e.key === 'ArrowRight' && index < length - 1) {
-          focusCell(index + 1);
-          e.preventDefault();
-        } else if (e.key === 'Home') {
-          focusCell(0);
-          e.preventDefault();
-        } else if (e.key === 'End') {
-          focusCell(length - 1);
-          e.preventDefault();
-        }
+        const edit = otpKeydown(chars, index, e.key);
+        if (!edit) return;
+        e.preventDefault();
+        if (edit.value !== undefined) setVal(edit.value);
+        if (edit.focus !== undefined) focusCell(edit.focus);
       },
-      [chars, setCharAt, focusCell, length],
+      [chars, setVal, focusCell],
     );
 
     const handlePaste = useCallback(
       (index: number, e: React.ClipboardEvent<HTMLInputElement>) => {
         e.preventDefault();
-        const data = e.clipboardData?.getData?.('text') ?? '';
-        const cleaned = sanitize(data, resolvedVariant);
-        if (!cleaned) return;
-
-        const next = chars.slice();
-        let cursor = index;
-        for (const ch of cleaned) {
-          if (cursor >= length) break;
-          next[cursor] = ch;
-          cursor++;
-        }
-        const joined = next.join('');
-        setVal(joined);
-        const focusIndex = Math.min(cursor, length - 1);
+        const edit = pasteOtp(chars, index, e.clipboardData?.getData?.('text') ?? '', resolvedVariant);
+        if (!edit) return;
+        setVal(edit.value);
         // Defer focus until React has flushed the value into the cells.
-        requestAnimationFrame(() => focusCell(focusIndex));
+        requestAnimationFrame(() => focusCell(edit.focus));
       },
-      [chars, setVal, resolvedVariant, length, focusCell],
+      [chars, setVal, resolvedVariant, focusCell],
     );
 
     const handleFocus = useCallback(
@@ -227,14 +175,14 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
       [],
     );
 
-    const inputMode = resolvedVariant === 'numeric' ? 'numeric' : 'text';
-    const pattern = resolvedVariant === 'numeric' ? '[0-9]*' : '[0-9a-zA-Z]*';
+    const inputMode = otpInputMode(resolvedVariant);
+    const pattern = otpPattern(resolvedVariant);
 
     return (
       <div
         role="group"
-        aria-label="One-time passcode"
-        className={cn('inline-flex max-w-full flex-wrap items-center', s.font)}
+        aria-label={otpGroupLabel}
+        className={c.root}
       >
         {Array.from({ length }).map((_, i) => {
           const ch = chars[i] ?? '';
@@ -254,29 +202,17 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
                 maxLength={1}
                 disabled={disabled}
                 value={ch}
-                aria-label={`Digit ${i + 1} of ${length}`}
+                aria-label={otpCellLabel(i, length)}
                 onChange={(e) => handleChange(i, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(i, e)}
                 onPaste={(e) => handlePaste(i, e)}
                 onFocus={handleFocus}
-                className={cn(
-                  inputBase,
-                  s.font,
-                  s.border,
-                  s.radius,
-                  s.transition,
-                  cellSize[size],
-                  sizeHeight[size].replace(/h-\S+\s?/, ''), // keep text-size token only
-                  focusRing,
-                  toneMap.neutral.ring,
-                  'text-center px-0 border-retro-border-strong',
-                  'mx-0.5 first:ml-0 last:mr-0',
-                )}
+                className={c.cell}
               />
               {separator && !isLast ? (
                 <span
                   aria-hidden
-                  className="mx-1 inline-flex items-center text-retro-muted select-none"
+                  className={c.separator}
                 >
                   {separator}
                 </span>

@@ -8,7 +8,7 @@
  * to overwrite it (a hand-authored *.stories.tsx is detected).
  */
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Component from './PxlKitToastProvider';
 import manifest from './PxlKitToastProvider.manifest';
 import * as examples from './PxlKitToastProvider.examples';
@@ -245,6 +245,28 @@ export const PromiseFlow: Story = {
       return (
         <pre style={{ color: 'crimson' }}>
           {"Missing example 'promise-flow' for PxlKitToastProvider."}
+        </pre>
+      );
+    }
+    return <ExampleComponent />;
+  },
+};
+
+/** Promise Rejected */
+export const PromiseRejected: Story = {
+  name: 'Promise Rejected',
+  tags: ["example-promise-rejected"],
+  parameters: {
+    docs: { description: { story: undefined } },
+  },
+  render: () => {
+    const ExampleComponent =
+      ((examples as any).PromiseRejected ?? (examples as any)['promise-rejected']) ??
+      ((manifest as any)?.examples?.find?.((e: any) => e?.id === 'promise-rejected')?.Component);
+    if (!ExampleComponent) {
+      return (
+        <pre style={{ color: 'crimson' }}>
+          {"Missing example 'promise-rejected' for PxlKitToastProvider."}
         </pre>
       );
     }

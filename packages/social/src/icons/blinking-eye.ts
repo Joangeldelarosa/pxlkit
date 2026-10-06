@@ -1,4 +1,4 @@
-import type { AnimatedPxlKitData } from '@pxlkit/core';
+import type { AnimatedPxlKitData } from '@pxlkit/core/vanilla';
 
 // ─── Blinking Eye (6 frames) ───────────────
 // An eye that blinks periodically.

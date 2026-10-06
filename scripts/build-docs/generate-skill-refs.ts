@@ -256,21 +256,27 @@ export async function generateSkillRefs(ctx: GeneratorContext): Promise<Generato
 
   // --- read sources -------------------------------------------------------
   const registryPath = toPosix(path.join(repoRoot, "packages/ui-kit/src/registry.generated.ts"));
-  const tokensPath = path.join(repoRoot, "packages/ui-kit/src/tokens.ts");
-  const commonPath = path.join(repoRoot, "packages/ui-kit/src/common.tsx");
-  const stylesPath = path.join(repoRoot, "packages/ui-kit/styles.css");
+  // Tokens, class maps and the theme stylesheet live in the framework-neutral
+  // core shared by the React, Vue and Angular kits.
+  const tokensPath = path.join(repoRoot, "packages/ui-kit-core/src/tokens.ts");
+  const commonPath = path.join(repoRoot, "packages/ui-kit-core/src/common.ts");
+  const stylesPath = path.join(repoRoot, "packages/ui-kit-core/styles.css");
   const coreTypesPath = path.join(repoRoot, "packages/core/src/types.ts");
+  // The React props moved out of types.ts when the icon data model became
+  // framework-agnostic; the corpus documents both, so both are hashed.
+  const corePropsPath = path.join(repoRoot, "packages/core/src/components/types.ts");
 
   // Prefer the in-memory registry produced by generate-registry earlier in the
   // same run: on a --dry-run it is the only copy, and on a real run it is the
   // one the digest must describe.
   const registryTs = ctx.outputs.get(registryPath) ?? (await readIfPresent(registryPath));
 
-  const [tokensTs, commonTsx, stylesCss, coreTypesTs] = await Promise.all([
+  const [tokensTs, commonTsx, stylesCss, coreTypesTs, corePropsTs] = await Promise.all([
     readIfPresent(tokensPath),
     readIfPresent(commonPath),
     readIfPresent(stylesPath),
     readIfPresent(coreTypesPath),
+    readIfPresent(corePropsPath),
   ]);
 
   const manifestsJson = serializeManifests(ctx.manifests);
@@ -330,6 +336,7 @@ export async function generateSkillRefs(ctx: GeneratorContext): Promise<Generato
     common: commonTsx,
     styles: stylesCss,
     coreTypes: coreTypesTs,
+    coreProps: corePropsTs,
     manifests: manifestsJson,
   });
 

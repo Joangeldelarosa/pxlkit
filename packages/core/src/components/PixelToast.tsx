@@ -1,86 +1,90 @@
-import { useEffect } from 'react';
-import type { PixelToastProps } from '../types';
+import { useEffect, type CSSProperties } from 'react';
+import type { PixelToastProps } from './types';
+import {
+  PIXEL_TOAST_DEFAULTS,
+  resolvePixelToastView,
+  resolveToastAutoClose,
+} from '../engine/toast';
 import { PxlKitIcon } from './PxlKitIcon';
 
-const positionClasses: Record<NonNullable<PixelToastProps['position']>, string> = {
-  'top-left': 'top-4 left-4',
-  'top-right': 'top-4 right-4',
-  'bottom-left': 'bottom-4 left-4',
-  'bottom-right': 'bottom-4 right-4',
-};
-
+/**
+ * Pixel-art styled toast notification pinned to a screen corner.
+ *
+ * Markup, classes and colours come from the framework-agnostic view model
+ * (`resolvePixelToastView` in `@pxlkit/core/vanilla`), shared with
+ * `@pxlkit/vue` and `@pxlkit/angular`. Styled with Tailwind utility classes.
+ */
 export function PixelToast({
   visible,
   title,
   message,
   icon,
-  colorfulIcon = true,
-  iconSize = 24,
-  bgColor = '#12121a',
-  borderColor = '#2a2a3e',
-  textColor = '#e8e6e3',
-  accentColor = '#00ff88',
-  position = 'top-right',
-  duration = 2200,
-  showClose = true,
+  colorfulIcon,
+  iconSize,
+  bgColor,
+  borderColor,
+  textColor,
+  accentColor,
+  position,
+  duration,
+  showClose = PIXEL_TOAST_DEFAULTS.showClose,
   onClose,
   className,
 }: PixelToastProps) {
   useEffect(() => {
-    if (!visible || !duration || duration <= 0 || !onClose) return;
-    const timer = window.setTimeout(() => onClose(), duration);
+    const delay = resolveToastAutoClose(visible, duration);
+    if (delay === null || !onClose) return;
+    const timer = window.setTimeout(() => onClose(), delay);
     return () => window.clearTimeout(timer);
   }, [visible, duration, onClose]);
 
   if (!visible) return null;
 
-  return (
-    <div className={`fixed z-[80] ${positionClasses[position]} ${className ?? ''}`}>
-      <div
-        className="min-w-[260px] max-w-[360px] rounded-lg border-2 px-3 py-2 shadow-xl"
-        style={{
-          backgroundColor: bgColor,
-          borderColor,
-          color: textColor,
-          boxShadow: `0 0 0 2px ${borderColor}55, 8px 8px 0 0 ${borderColor}33`,
-        }}
-      >
-        <div className="absolute inset-0 pointer-events-none opacity-20 rounded-lg"
-          style={{
-            background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.25) 2px, rgba(0,0,0,0.25) 4px)',
-          }}
-        />
+  const view = resolvePixelToastView({
+    position,
+    className,
+    colorfulIcon,
+    iconSize,
+    bgColor,
+    borderColor,
+    textColor,
+    accentColor,
+  });
 
-        <div className="relative flex items-start gap-3">
+  return (
+    <div className={view.classes.root}>
+      <div className={view.classes.box} style={view.styles.box as CSSProperties}>
+        <div className={view.classes.scanline} style={view.styles.scanline as CSSProperties} />
+
+        <div className={view.classes.row}>
           {icon ? (
-            <div className="mt-0.5 shrink-0">
-              <PxlKitIcon icon={icon} size={iconSize} colorful={colorfulIcon} color={accentColor} />
+            <div className={view.classes.iconSlot}>
+              <PxlKitIcon
+                icon={icon}
+                size={view.icon.size}
+                appearance={view.icon.appearance}
+                color={view.icon.color}
+                decorative={view.icon.decorative}
+              />
             </div>
           ) : (
-            <div
-              className="mt-1 h-2.5 w-2.5 rounded-full shrink-0"
-              style={{ backgroundColor: accentColor, boxShadow: `0 0 8px ${accentColor}` }}
-            />
+            <div className={view.classes.dot} style={view.styles.dot as CSSProperties} />
           )}
 
-          <div className="min-w-0 flex-1">
-            <p className="font-pixel text-[10px] leading-relaxed break-words" style={{ color: accentColor }}>
+          <div className={view.classes.body}>
+            <p className={view.classes.title} style={view.styles.title as CSSProperties}>
               {title}
             </p>
-            {message ? (
-              <p className="font-mono text-xs leading-relaxed opacity-90 mt-1 break-words">
-                {message}
-              </p>
-            ) : null}
+            {message ? <p className={view.classes.message}>{message}</p> : null}
           </div>
 
           {showClose ? (
             <button
               type="button"
-              aria-label="Close toast"
+              aria-label={view.closeLabel}
               onClick={onClose}
-              className="shrink-0 text-xs font-mono px-1.5 py-0.5 border rounded transition-colors"
-              style={{ borderColor: accentColor, color: accentColor }}
+              className={view.classes.close}
+              style={view.styles.close as CSSProperties}
             >
               ×
             </button>

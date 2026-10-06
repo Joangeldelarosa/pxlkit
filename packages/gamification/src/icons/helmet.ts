@@ -1,4 +1,4 @@
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * ⛑️ Helmet — a knight's great-helm with a "+" visor (vertical breathing slit

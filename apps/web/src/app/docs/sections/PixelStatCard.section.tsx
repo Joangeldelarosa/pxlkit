@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStatCardDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelStatCardDocsMeta = {
@@ -17,29 +23,103 @@ export const PixelStatCardDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelStatCardDocsSection({ className }: PixelStatCardDocsSectionProps): React.ReactElement {
+/** PixelStatCard's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelStatCard } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelStatCard',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Caption rendered above the value.' },
+          { name: 'value', type: 'string', required: true, description: 'Primary metric value.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Optional leading icon.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'gold'", description: 'Tone tint for border, soft background, and icon color.' },
+          { name: 'trend', type: 'string', description: 'Optional trend/delta line rendered under the value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Padding + typography scale. Defaults to `'md'`." },
+          { name: 'iconPosition', type: "'left' | 'right' | 'top' | 'bottom-left'", default: "'top'", description: "Icon placement relative to label/value. Defaults to `'top'`." },
+          { name: 'valueTone', type: 'boolean', default: 'false', description: 'Color the value with the tone color instead of the default text color.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: "Horizontal alignment of label/value/trend. Defaults to `'start'`." },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Render with surface-aware border + radius chrome. Defaults to true — a stat card needs visible chrome.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelStatCard } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelStatCard',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Caption above the value.' },
+          { name: 'value', type: 'string', required: true, description: 'The metric.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'gold'", description: 'Tone of the border, background and icon.' },
+          { name: 'trend', type: 'string', description: 'Trend or delta line under the value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and type scale.' },
+          { name: 'iconPosition', type: "'left' | 'right' | 'top' | 'bottom-left'", default: "'top'", description: 'Where the icon sits: above, beside or in the bottom-left corner.' },
+          { name: 'valueTone', type: 'boolean', default: 'false', description: 'Colours the value with the tone.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Alignment of the label, value and trend.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Surface border, radius and tone tint.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'The icon, in the tone.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelStatCard } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelStatCard',
+        selector: 'pxl-stat-card',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Caption above the value.' },
+          { name: 'value', type: 'string', required: true, description: 'The metric.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'The icon, in the tone.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'gold'", description: 'Tone of the border, background and icon.' },
+          { name: 'trend', type: 'string', description: 'Trend or delta line under the value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and type scale.' },
+          { name: 'iconPosition', type: "'left' | 'right' | 'top' | 'bottom-left'", default: "'top'", description: 'Where the icon sits: above, beside or in the bottom-left corner.' },
+          { name: 'valueTone', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Colours the value with the tone.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Alignment of the label, value and trend.' },
+          { name: 'bordered', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Surface border, radius and tone tint.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelStatCardDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelStatCardDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-stat-card-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-stat-card-heading'>PixelStatCard</h2>
+      <Title id='pixel-stat-card-heading'>PixelStatCard</Title>
       <p className="docs-lead">Compact metric card surfacing a label, value, optional icon and trend line for dashboards and KPI grids.</p>
       <ul className="docs-highlights">
         <li>Seven tone presets aligned with the pxlkit palette (green, cyan, gold, red, purple, pink, neutral).</li>
         <li>Three sizes (sm/md/lg) that scale padding, value, label and trend typography in lockstep.</li>
         <li>Icon position aware: top, left, right or bottom-left layouts without prop drilling.</li>
-        <li>Surface-aware (pixel vs linear) — inherits the ambient surface context or override per-card.</li>
-        <li>Pure presentational + SSR-safe — no client hooks, fully tree-shakable.</li>
+        <li>Surface-aware (pixel vs linear) — follows the nearest PxlKitSurfaceProvider or a per-card override.</li>
+        <li>Pure presentational + SSR-safe — no client state, fully tree-shakable.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-stat-card-api">
+      <Heading id="pixel-stat-card-api">API</Heading>
+      <FrameworkApi label={'PixelStatCard API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stat-card-a11y">
-      <h3 id="pixel-stat-card-a11y">Accessibility</h3>
+      <Heading id="pixel-stat-card-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>none</code></li>
@@ -47,25 +127,69 @@ export function PixelStatCardDocsSection({ className }: PixelStatCardDocsSection
       <p className="docs-aria-notes">Presentational card with no interactive affordances; relies on surrounding heading hierarchy and tone contrast tokens for legibility.</p>
     </section>
     <section aria-labelledby="pixel-stat-card-usage">
-      <h3 id="pixel-stat-card-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelStatCard } from '@pxlkit/ui-kit'
+      <Heading id="pixel-stat-card-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelStatCard usage'}
+        react={`import { PixelStatCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`<pxl-stat-card label="Revenue" value="$12,480" trend="+8.2% vs last week" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`<pxl-stat-card label="Revenue" value="$12,480" trend="+8.2% vs last week" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelStatCard label="Active" value="1,204" tone="green" trend="+3.1%" />
@@ -77,11 +201,50 @@ export function Default() {
       <PixelStatCard label="Drafts" value="7" tone="neutral" />
     </div>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelStatCard label="Active" value="1,204" tone="green" trend="+3.1%" />
+    <PixelStatCard label="Pending" value="48" tone="gold" trend="2 overdue" />
+    <PixelStatCard label="Cancelled" value="12" tone="red" trend="-1 vs ayer" />
+    <PixelStatCard label="Sessions" value="3.2k" tone="cyan" trend="+220 hoy" />
+    <PixelStatCard label="Members" value="89" tone="purple" />
+    <PixelStatCard label="Likes" value="412" tone="pink" />
+    <PixelStatCard label="Drafts" value="7" tone="neutral" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-stat-card label="Active" value="1,204" tone="green" trend="+3.1%" />
+      <pxl-stat-card label="Pending" value="48" tone="gold" trend="2 overdue" />
+      <pxl-stat-card label="Cancelled" value="12" tone="red" trend="-1 vs ayer" />
+      <pxl-stat-card label="Sessions" value="3.2k" tone="cyan" trend="+220 hoy" />
+      <pxl-stat-card label="Members" value="89" tone="purple" />
+      <pxl-stat-card label="Likes" value="412" tone="pink" />
+      <pxl-stat-card label="Drafts" value="7" tone="neutral" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex flex-col gap-3">
       <PixelStatCard label="Small" value="$1,200" size="sm" trend="+2%" tone="cyan" />
@@ -89,22 +252,82 @@ export function Default() {
       <PixelStatCard label="Large" value="$24,900" size="lg" trend="+11%" tone="green" />
     </div>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelStatCard label="Small" value="$1,200" size="sm" trend="+2%" tone="cyan" />
+    <PixelStatCard label="Medium" value="$8,400" size="md" trend="+5%" tone="gold" />
+    <PixelStatCard label="Large" value="$24,900" size="lg" trend="+11%" tone="green" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-stat-card label="Small" value="$1,200" size="sm" trend="+2%" tone="cyan" />
+      <pxl-stat-card label="Medium" value="$8,400" size="md" trend="+5%" tone="gold" />
+      <pxl-stat-card label="Large" value="$24,900" size="lg" trend="+11%" tone="green" />
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelStatCard label="Pixel" value="$4,200" surface="pixel" tone="gold" trend="+6%" />
       <PixelStatCard label="Linear" value="$4,200" surface="linear" tone="gold" trend="+6%" />
     </div>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelStatCard label="Pixel" value="$4,200" surface="pixel" tone="gold" trend="+6%" />
+    <PixelStatCard label="Linear" value="$4,200" surface="linear" tone="gold" trend="+6%" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-stat-card label="Pixel" value="$4,200" surface="pixel" tone="gold" trend="+6%" />
+      <pxl-stat-card label="Linear" value="$4,200" surface="linear" tone="gold" trend="+6%" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-icon-positions">
-        <h4>Icon positions</h4>
-        <pre className="docs-code"><code>{`export function IconPositions() {
+        <Subheading>Icon positions</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Icon positions code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function IconPositions() {
   const dot = <span aria-hidden="true">$</span>
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -120,32 +343,119 @@ export function Default() {
       />
     </div>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelStatCard label="Top" value="$1,200" icon-position="top" tone="cyan">
+      <template #icon><span aria-hidden="true">$</span></template>
+    </PixelStatCard>
+    <PixelStatCard label="Left" value="$1,200" icon-position="left" tone="green">
+      <template #icon><span aria-hidden="true">$</span></template>
+    </PixelStatCard>
+    <PixelStatCard label="Right" value="$1,200" icon-position="right" tone="purple">
+      <template #icon><span aria-hidden="true">$</span></template>
+    </PixelStatCard>
+    <PixelStatCard label="Bottom-left" value="$1,200" icon-position="bottom-left" tone="gold">
+      <template #icon><span aria-hidden="true">$</span></template>
+    </PixelStatCard>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-stat-card label="Top" value="$1,200" [icon]="dot" iconPosition="top" tone="cyan" />
+      <pxl-stat-card label="Left" value="$1,200" [icon]="dot" iconPosition="left" tone="green" />
+      <pxl-stat-card label="Right" value="$1,200" [icon]="dot" iconPosition="right" tone="purple" />
+      <pxl-stat-card label="Bottom-left" value="$1,200" [icon]="dot" iconPosition="bottom-left" tone="gold" />
+    </div>
+    <ng-template #dot><span aria-hidden="true">$</span></ng-template>
+  \`,
+})
+export class IconPositions {}`}
+        />
       </article>
       <article className="docs-example" id="example-without-trend">
-        <h4>Without trend</h4>
-        <pre className="docs-code"><code>{`export function WithoutTrend() {
+        <Subheading>Without trend</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Without trend code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function WithoutTrend() {
   return <PixelStatCard label="Total users" value="12,480" tone="cyan" />
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatCard label="Total users" value="12,480" tone="cyan" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`<pxl-stat-card label="Total users" value="12,480" tone="cyan" />\`,
+})
+export class WithoutTrend {}`}
+        />
       </article>
       <article className="docs-example" id="example-toned-value-centered">
-        <h4>Toned value (centered)</h4>
-        <pre className="docs-code"><code>{`export function TonedValueCentered() {
+        <Subheading>Toned value (centered)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Toned value (centered) code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function TonedValueCentered() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelStatCard label="Uptime" value="99.98%" tone="green" valueTone align="center" />
       <PixelStatCard label="Error rate" value="0.02%" tone="red" valueTone align="center" />
     </div>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelStatCard label="Uptime" value="99.98%" tone="green" value-tone align="center" />
+    <PixelStatCard label="Error rate" value="0.02%" tone="red" value-tone align="center" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-stat-card label="Uptime" value="99.98%" tone="green" valueTone align="center" />
+      <pxl-stat-card label="Error rate" value="0.02%" tone="red" valueTone align="center" />
+    </div>
+  \`,
+})
+export class TonedValueCentered {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-card">PixelCard</a></li>
-        <li><a href="#pixel-stat-group">PixelStatGroup</a></li>
-        <li><a href="#pixel-sparkline">PixelSparkline</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-card' : '#pixel-card'}>PixelCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stat-group' : '#pixel-stat-group'}>PixelStatGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-sparkline' : '#pixel-sparkline'}>PixelSparkline</a></li>
       </ul>
     </section>
     </section>

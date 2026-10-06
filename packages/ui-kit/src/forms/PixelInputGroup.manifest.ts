@@ -21,7 +21,7 @@ export default defineManifest({
     '`size` and `surface` props inherit the kit-wide design tokens.',
     'Accessible: applies `role="group"` only when an `aria-label`/`aria-labelledby` is provided.',
     'Dev-mode warning when a multi-child group is missing an accessible name.',
-    'Preserves child `className` (consumer styles win over the join overrides).',
+    'Keeps the classes of each control alongside the join classes.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
@@ -41,7 +41,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus through the joined controls in order.' },
     ],
     notes:
-      'Sets `role="group"` only when given an accessible name (`aria-label` / `aria-labelledby`). Decorative addons inside should use `aria-hidden`; child controls keep their own labels.',
+      'Sets `role="group"` only when given an accessible name (`aria-label` / `aria-labelledby`). Decorative addons inside should use `aria-hidden`; child controls keep their own labels. The shell clips its controls, so each shows keyboard focus inside its own edge.',
   },
   related: ['PixelInput', 'PixelBareInput', 'PixelSelect', 'PixelButton'],
   apiStability: 'stable',

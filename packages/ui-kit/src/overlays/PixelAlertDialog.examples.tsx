@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PixelAlertDialog } from './PixelAlertDialog';
 
 export function Default() {

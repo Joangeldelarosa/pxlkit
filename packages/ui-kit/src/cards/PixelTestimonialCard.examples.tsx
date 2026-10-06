@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelTestimonialCard } from './PixelTestimonialCard';
 
 export function Default() {

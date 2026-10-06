@@ -1,13 +1,40 @@
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import {
-  Tone, Surface, Option, cn, useClickOutside,
-  toneMap, surfaceClasses, useEffectiveSurface,
+  DROPDOWN_TYPEAHEAD_RESET_MS,
+  SPLIT_BUTTON_TOGGLE_LABEL,
+  dropdownChevronClasses,
+  dropdownMenuKeyAction,
+  dropdownTriggerKeyAction,
+  dropdownTypeaheadMatch,
+  nextDropdownHighlight,
+  splitButtonGroupClasses,
+  splitButtonItemClasses,
+  splitButtonItemId,
+  splitButtonMenuAlignsRight,
+  splitButtonMenuClasses,
+  splitButtonPrimaryClasses,
+  splitButtonRootClasses,
+  splitButtonToggleClasses,
+  type DropdownEdge,
+  type DropdownMove,
+} from '@pxlkit/ui-kit-core';
+import {
+  Tone, Surface, Option, useClickOutside,
+  useEffectiveSurface,
   ChevronDownIcon,
 } from '../common';
-import { PixelButton } from './PixelButton';
+import { useEscape } from '../hooks/useEscape';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelSplitButton — primary action + chevron dropdown for secondary options.
+
+   The menu follows the WAI-ARIA menu button pattern, as PixelDropdown's
+   does: it takes focus as it opens and points `aria-activedescendant` at the
+   highlighted option. The arrows, Home and End move the highlight, Enter and
+   Space choose it, typing jumps to an option by its label; ArrowDown on the
+   chevron opens the menu on its first option, ArrowUp on its last. Escape,
+   Tab and choosing close it with focus back on the chevron; a press outside
+   closes it and focus follows the pointer.
    ───────────────────────────────────────────────────────────────────────── */
 
 /** Public prop bag for {@link PixelSplitButton}. */
@@ -41,11 +68,96 @@ export const PixelSplitButton = forwardRef<HTMLDivElement, PixelSplitButtonProps
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const [open, setOpen] = useState(false);
   const [alignRight, setAlignRight] = useState(false);
+  const [highlighted, setHighlighted] = useState<string | null>(null);
+  const toggleId = useId();
+  const menuId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
-  useClickOutside(rootRef, () => setOpen(false));
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const typed = useRef('');
+  const typeaheadTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const values = options.map((option) => option.value);
+  const activeIndex = highlighted === null ? -1 : values.indexOf(highlighted);
+
+  // Opened from the keyboard, the menu starts on its first or last option.
+  function show(edge?: DropdownEdge) {
+    if (rootRef.current) {
+      setAlignRight(splitButtonMenuAlignsRight(rootRef.current.getBoundingClientRect().left, window.innerWidth));
+    }
+    setHighlighted(edge ? (nextDropdownHighlight(values, null, edge) ?? null) : null);
+    setOpen(true);
+  }
+
+  // Focus the menu holds goes back to the chevron — but not after a press
+  // outside, where it follows the pointer.
+  function close(returnFocus = true) {
+    if (returnFocus && menuRef.current?.contains(document.activeElement)) toggleRef.current?.focus();
+    setOpen(false);
+    setHighlighted(null);
+  }
+
+  function choose(value: string) {
+    onSelect?.(value);
+    close();
+  }
+
+  function move(to: DropdownMove) {
+    const next = nextDropdownHighlight(values, highlighted, to);
+    if (next) setHighlighted(next);
+  }
+
+  function typeahead(key: string) {
+    clearTimeout(typeaheadTimer.current);
+    typed.current = (typed.current + key).toLowerCase();
+    const match = dropdownTypeaheadMatch(values, (value) => options.find((option) => option.value === value)?.label, typed.current);
+    if (match) setHighlighted(match);
+    typeaheadTimer.current = setTimeout(() => { typed.current = ''; }, DROPDOWN_TYPEAHEAD_RESET_MS);
+  }
+
+  useClickOutside(rootRef, () => close(false));
+  useEscape(() => close(), open);
+  useEffect(() => () => clearTimeout(typeaheadTimer.current), []);
+
+  // Focus moves into the menu as it opens.
+  useLayoutEffect(() => {
+    if (open) menuRef.current?.focus({ preventScroll: true });
+  }, [open]);
+
+  // ArrowDown on the chevron opens the menu on its first option and ArrowUp
+  // on its last; either moves into the menu when it is already open. Enter
+  // and Space stay the button's own click, which toggles the menu.
+  const onToggleKeyDown = (event: React.KeyboardEvent) => {
+    const edge = dropdownTriggerKeyAction(event.key);
+    if (!edge) return;
+    event.preventDefault();
+    if (!open) {
+      show(edge);
+      return;
+    }
+    menuRef.current?.focus({ preventScroll: true });
+    move(event.key === 'ArrowDown' ? 1 : -1);
+  };
+
+  // The menu holds focus while open; Escape closes it from anywhere.
+  const onMenuKeyDown = (event: React.KeyboardEvent) => {
+    const action = dropdownMenuKeyAction(event.key);
+    if (action === undefined) return;
+    if (action === 'typeahead') {
+      typeahead(event.key);
+      return;
+    }
+    if (action === 'leave') {
+      // Focus is back on the chevron before the browser's own Tab, which
+      // then moves on from there.
+      close();
+      return;
+    }
+    event.preventDefault();
+    if (action !== 'select') move(action);
+    else if (highlighted !== null) choose(highlighted);
+  };
 
   return (
     <div
@@ -54,59 +166,51 @@ export const PixelSplitButton = forwardRef<HTMLDivElement, PixelSplitButtonProps
         if (typeof ref === 'function') ref(node);
         else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
       }}
-      className="relative inline-flex"
+      className={splitButtonRootClasses}
     >
-      <div className={cn('inline-flex overflow-hidden', s.border, s.radius, toneMap[tone].border)}>
-        <PixelButton
-          tone={tone}
-          surface={surface}
-          disabled={disabled}
-          className="rounded-none border-0 shadow-none hover:shadow-none active:shadow-none hover:translate-x-0 hover:translate-y-0 active:translate-x-0 active:translate-y-0"
-          onClick={onPrimary}
-        >
-          {label}
-        </PixelButton>
+      <div className={splitButtonGroupClasses(surface, tone)}>
+        <button disabled={disabled} className={splitButtonPrimaryClasses(surface, tone)} onClick={onPrimary}>
+          <span>{label}</span>
+        </button>
         <button
+          ref={toggleRef}
+          id={toggleId}
           type="button"
-          aria-label="More options"
+          aria-label={SPLIT_BUTTON_TOGGLE_LABEL}
           aria-haspopup="menu"
           aria-expanded={open}
+          aria-controls={open ? menuId : undefined}
           disabled={disabled}
-          className={cn(
-            'flex items-center border-0 border-l px-2 outline-none disabled:opacity-50 disabled:cursor-not-allowed',
-            s.transition,
-            toneMap[tone].border,
-            toneMap[tone].bg, toneMap[tone].hover, toneMap[tone].text,
-          )}
-          onClick={() => {
-            if (!open && rootRef.current) {
-              setAlignRight(rootRef.current.getBoundingClientRect().left + 168 > window.innerWidth);
-            }
-            setOpen(!open);
-          }}
+          className={splitButtonToggleClasses(surface, tone)}
+          onClick={() => (open ? close() : show())}
+          onKeyDown={onToggleKeyDown}
         >
-          <ChevronDownIcon className={cn('transition-transform', open && 'rotate-180')} />
+          <ChevronDownIcon className={dropdownChevronClasses(open)} />
         </button>
       </div>
       {open && (
         <div
+          ref={menuRef}
+          id={menuId}
           role="menu"
-          className={cn(
-            'absolute top-full z-40 mt-1 min-w-40 max-w-[calc(100vw-1rem)] bg-retro-bg p-1 shadow-xl',
-            alignRight ? 'right-0' : 'left-0',
-            s.border, s.radiusLg, 'border-retro-border-strong',
-          )}
+          tabIndex={-1}
+          aria-orientation="vertical"
+          aria-labelledby={toggleId}
+          aria-activedescendant={activeIndex >= 0 ? splitButtonItemId(menuId, activeIndex) : undefined}
+          className={splitButtonMenuClasses(surface, alignRight)}
+          onKeyDown={onMenuKeyDown}
         >
-          {options.map((opt) => (
+          {options.map((opt, index) => (
             <button
               key={opt.value}
+              id={splitButtonItemId(menuId, index)}
               type="button"
               role="menuitem"
-              className={cn(
-                'flex w-full items-center text-left text-xs break-words px-3 py-2 text-retro-muted transition-colors hover:bg-retro-surface hover:text-retro-text',
-                s.font, s.radius,
-              )}
-              onClick={() => { onSelect?.(opt.value); setOpen(false); }}
+              tabIndex={-1}
+              data-highlighted={index === activeIndex || undefined}
+              className={splitButtonItemClasses(surface, index === activeIndex)}
+              onMouseEnter={() => setHighlighted(opt.value)}
+              onClick={() => choose(opt.value)}
             >
               {opt.label}
             </button>

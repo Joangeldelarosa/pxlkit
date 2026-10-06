@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelColorInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelColorInputDocsMeta = {
@@ -17,10 +23,100 @@ export const PixelColorInputDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSectionProps): React.ReactElement {
+/** PixelColorInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelColorInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelColorInput',
+        props: [
+          { name: 'value', type: 'string', description: 'The colour; leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial colour while uncontrolled.' },
+          { name: 'onChange', type: '(next: string) => void', description: 'Called with the colour picked or typed, in `format`.' },
+          { name: 'format', type: "'hex' | 'rgb' | 'hsl'", default: "'hex'", description: 'How a picked colour is written: `#rrggbb`, `rgb(r, g, b)` or `hsl(h, s%, l%)`.' },
+          { name: 'presets', type: 'string[]', description: 'The preset colours; sixteen greys and hues by default.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger, which it also names.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the colour.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelColorInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelColorInput',
+        props: [
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'The colour (`v-model`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial colour while uncontrolled.' },
+          { name: 'format', type: "'hex' | 'rgb' | 'hsl'", default: "'hex'", description: 'How a picked colour is written: `#rrggbb`, `rgb(r, g, b)` or `hsl(h, s%, l%)`.' },
+          { name: 'presets', type: 'string[]', description: 'The preset colours; sixteen greys and hues by default.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger, which it also names.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the colour.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The colour picked or typed, in `format`.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+          'Its template ref exposes `element`: the trigger button.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelColorInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelColorInput',
+        selector: 'pxl-color-input',
+        props: [
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'The colour (`[(value)]`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial colour while uncontrolled.' },
+          { name: 'format', type: "'hex' | 'rgb' | 'hsl'", default: "'hex'", description: 'How a picked colour is written: `#rrggbb`, `rgb(r, g, b)` or `hsl(h, s%, l%)`.' },
+          { name: 'presets', type: 'string[]', description: 'The preset colours; sixteen greys and hues by default.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger, which it also names.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the colour.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the trigger; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelColorInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelColorInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-color-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-color-input-heading'>PixelColorInput</h2>
+      <Title id='pixel-color-input-heading'>PixelColorInput</Title>
       <p className="docs-lead">Color picker field with a hex text input, native color swatch, and a keyboard-navigable preset grid inside a popover.</p>
       <ul className="docs-highlights">
         <li>Outputs hex, rgb(), or hsl() depending on the format prop</li>
@@ -34,12 +130,12 @@ export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSec
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-color-input-api">
+      <Heading id="pixel-color-input-api">API</Heading>
+      <FrameworkApi label={'PixelColorInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-color-input-a11y">
-      <h3 id="pixel-color-input-a11y">Accessibility</h3>
+      <Heading id="pixel-color-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>popover-dialog</code></li>
@@ -47,7 +143,7 @@ export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSec
         <li><code>labelled-field</code></li>
       </ul>
       <p className="docs-aria-notes">Trigger exposes aria-label; swatches are role=button with the color value as aria-label and aria-pressed reflecting selection.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -86,8 +182,11 @@ export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-color-input-usage">
-      <h3 id="pixel-color-input-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-color-input-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelColorInput usage'}
+        react={`import { useState } from 'react';
 import { PixelColorInput } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -99,14 +198,40 @@ export function Default() {
       onChange={setValue}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelColorInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('#06b6d4');
+</script>
+
+<template>
+  <PixelColorInput v-model="value" label="Brand color" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelColorInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorInput],
+  template: \`<pxl-color-input label="Brand color" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal('#06b6d4');
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelColorInput } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [value, setValue] = useState<string>('#06b6d4');
   return (
     <PixelColorInput
@@ -115,11 +240,38 @@ export function Default() {
       onChange={setValue}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelColorInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('#06b6d4');
+</script>
+
+<template>
+  <PixelColorInput v-model="value" label="Brand color" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelColorInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorInput],
+  template: \`<pxl-color-input label="Brand color" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal('#06b6d4');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-rgb-format">
-        <h4>RGB format</h4>
-        <pre className="docs-code"><code>{`export function RgbFormat() {
+        <Subheading>RGB format</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'RGB format code'}
+          react={`import { useState } from 'react';
+import { PixelColorInput } from '@pxlkit/ui-kit';
+
+export function RgbFormat() {
   const [value, setValue] = useState<string>('rgb(34, 197, 94)');
   return (
     <PixelColorInput
@@ -130,11 +282,38 @@ export function Default() {
       hint="Stored as rgb()"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelColorInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('rgb(34, 197, 94)');
+</script>
+
+<template>
+  <PixelColorInput v-model="value" label="Accent color" format="rgb" hint="Stored as rgb()" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelColorInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorInput],
+  template: \`<pxl-color-input label="Accent color" format="rgb" hint="Stored as rgb()" [(value)]="value" />\`,
+})
+export class RgbFormat {
+  readonly value = signal('rgb(34, 197, 94)');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-presets">
-        <h4>Custom presets</h4>
-        <pre className="docs-code"><code>{`export function CustomPresets() {
+        <Subheading>Custom presets</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Custom presets code'}
+          react={`import { useState } from 'react';
+import { PixelColorInput } from '@pxlkit/ui-kit';
+
+export function CustomPresets() {
   const [value, setValue] = useState<string>('#ef4444');
   return (
     <PixelColorInput
@@ -144,11 +323,39 @@ export function Default() {
       onChange={setValue}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelColorInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('#ef4444');
+const presets = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#a855f7'];
+</script>
+
+<template>
+  <PixelColorInput v-model="value" label="Theme tone" :presets="presets" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelColorInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorInput],
+  template: \`<pxl-color-input label="Theme tone" [presets]="presets" [(value)]="value" />\`,
+})
+export class CustomPresets {
+  readonly presets = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#a855f7'];
+  readonly value = signal('#ef4444');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-error">
-        <h4>With error</h4>
-        <pre className="docs-code"><code>{`export function WithError() {
+        <Subheading>With error</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With error code'}
+          react={`import { PixelColorInput } from '@pxlkit/ui-kit';
+
+export function WithError() {
   return (
     <PixelColorInput
       label="Background"
@@ -156,15 +363,31 @@ export function Default() {
       error="Invalid color value"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelColorInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelColorInput label="Background" default-value="not-a-color" error="Invalid color value" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelColorInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorInput],
+  template: \`<pxl-color-input label="Background" defaultValue="not-a-color" error="Invalid color value" />\`,
+})
+export class WithError {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
-        <li><a href="#field-shell">FieldShell</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/field-shell' : '#field-shell'}>FieldShell</a></li>
       </ul>
     </section>
     </section>

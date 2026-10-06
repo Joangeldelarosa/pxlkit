@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTwoColumnDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTwoColumnDocsMeta = {
@@ -17,29 +23,106 @@ export const PixelTwoColumnDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelTwoColumnDocsSection({ className }: PixelTwoColumnDocsSectionProps): React.ReactElement {
+/** PixelTwoColumn's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTwoColumn } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTwoColumn',
+        props: [
+          { name: 'ratio', type: "'50/50' | '60/40' | '40/60' | '70/30' | '30/70'", default: "'50/50'", description: 'Width of the left column against the right one.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '6', description: 'Gap token (`stackGap`).' },
+          { name: 'reverse', type: 'boolean', default: 'false', description: 'Show the right column first (CSS `order`; the DOM order stays).' },
+          { name: 'stackBelow', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Breakpoint below which the columns stack.' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the columns.' },
+          { name: 'left', type: 'React.ReactNode', required: true, description: 'Content of the left column.' },
+          { name: 'right', type: 'React.ReactNode', required: true, description: 'Content of the right column.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'as', type: 'keyof React.JSX.IntrinsicElements', description: 'Element to render.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTwoColumn',
+        props: [
+          { name: 'ratio', type: "'50/50' | '60/40' | '40/60' | '70/30' | '30/70'", default: "'50/50'", description: 'Width of the left column against the right one.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '6', description: 'Gap token (`stackGap`).' },
+          { name: 'reverse', type: 'boolean', default: 'false', description: 'Show the right column first (CSS `order`; the DOM order stays).' },
+          { name: 'stackBelow', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Breakpoint below which the columns stack.' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the columns.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'as', type: 'string', default: "'div'", description: 'Element to render.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius.' },
+        ],
+        slots: [
+          { name: 'left', description: 'Content of the left column.' },
+          { name: 'right', description: 'Content of the right column.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTwoColumn',
+        selector: '[pxlTwoColumn]',
+        props: [
+          { name: 'left', type: 'string | TemplateRef<any>', required: true, description: 'Content of the left column.' },
+          { name: 'right', type: 'string | TemplateRef<any>', required: true, description: 'Content of the right column.' },
+          { name: 'ratio', type: "'50/50' | '60/40' | '40/60' | '70/30' | '30/70'", default: "'50/50'", description: 'Width of the left column against the right one.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '6', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap token (`stackGap`).' },
+          { name: 'reverse', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Show the right column first (CSS `order`; the DOM order stays).' },
+          { name: 'stackBelow', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Breakpoint below which the columns stack.' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the columns.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border and radius.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelTwoColumnDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelTwoColumnDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-two-column-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-two-column-heading'>PixelTwoColumn</h2>
+      <Title id='pixel-two-column-heading'>PixelTwoColumn</Title>
       <p className="docs-lead">Two-column grid layout with preset ratios, responsive stacking, and surface-aware transitions.</p>
       <ul className="docs-highlights">
         <li>Preset ratios (50/50, 60/40, 40/60, 70/30, 30/70) with JIT-safe class maps</li>
         <li>Responsive stacking below sm, md, or lg breakpoints</li>
         <li>Reverse order toggle to flip visual order without changing markup semantics</li>
         <li>Token-based gap scale via stackGap for consistent rhythm</li>
-        <li>Surface-aware transitions through useEffectiveSurface</li>
+        <li>Surface-aware transitions</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-two-column-api">
+      <Heading id="pixel-two-column-api">API</Heading>
+      <FrameworkApi label={'PixelTwoColumn API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-two-column-a11y">
-      <h3 id="pixel-two-column-a11y">Accessibility</h3>
+      <Heading id="pixel-two-column-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>ratio-split-container</code></li>
@@ -47,8 +130,11 @@ export function PixelTwoColumnDocsSection({ className }: PixelTwoColumnDocsSecti
       <p className="docs-aria-notes">Renders as &lt;div&gt; with semantic neutrality; relies on inner content for landmarks and headings.</p>
     </section>
     <section aria-labelledby="pixel-two-column-usage">
-      <h3 id="pixel-two-column-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+      <Heading id="pixel-two-column-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelTwoColumn usage'}
+        react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -57,25 +143,80 @@ export function Default() {
       right={<div className="text-sm text-retro-muted">Right column</div>}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn>
+    <template #left><div class="text-sm text-retro-muted">Left column</div></template>
+    <template #right><div class="text-sm text-retro-muted">Right column</div></template>
+  </PixelTwoColumn>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Left column</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Right column</div></ng-template>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelTwoColumn
       left={<div className="text-sm text-retro-muted">Left column</div>}
       right={<div className="text-sm text-retro-muted">Right column</div>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn>
+    <template #left><div class="text-sm text-retro-muted">Left column</div></template>
+    <template #right><div class="text-sm text-retro-muted">Right column</div></template>
+  </PixelTwoColumn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Left column</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Right column</div></ng-template>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-sixty-forty">
-        <h4>Sixty Forty</h4>
-        <pre className="docs-code"><code>{`export function SixtyForty() {
+        <Subheading>Sixty Forty</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sixty Forty code'}
+          react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+
+export function SixtyForty() {
   return (
     <PixelTwoColumn
       ratio="60/40"
@@ -84,11 +225,39 @@ export function Default() {
       right={<div className="text-sm text-retro-muted">Sidebar (40%)</div>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn ratio="60/40" :gap="6">
+    <template #left><div class="text-sm text-retro-muted">Main content (60%)</div></template>
+    <template #right><div class="text-sm text-retro-muted">Sidebar (40%)</div></template>
+  </PixelTwoColumn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn ratio="60/40" [gap]="6" [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Main content (60%)</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Sidebar (40%)</div></ng-template>
+  \`,
+})
+export class SixtyForty {}`}
+        />
       </article>
       <article className="docs-example" id="example-reversed">
-        <h4>Reversed</h4>
-        <pre className="docs-code"><code>{`export function Reversed() {
+        <Subheading>Reversed</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Reversed code'}
+          react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+
+export function Reversed() {
   return (
     <PixelTwoColumn
       ratio="70/30"
@@ -97,11 +266,39 @@ export function Default() {
       right={<div className="text-sm text-retro-muted">Visually first</div>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn ratio="70/30" reverse>
+    <template #left><div class="text-sm text-retro-muted">Logical left</div></template>
+    <template #right><div class="text-sm text-retro-muted">Visually first</div></template>
+  </PixelTwoColumn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn ratio="70/30" reverse [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Logical left</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Visually first</div></ng-template>
+  \`,
+})
+export class Reversed {}`}
+        />
       </article>
       <article className="docs-example" id="example-stacked-below-lg">
-        <h4>Stacked Below Lg</h4>
-        <pre className="docs-code"><code>{`export function StackedBelowLg() {
+        <Subheading>Stacked Below Lg</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Stacked Below Lg code'}
+          react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+
+export function StackedBelowLg() {
   return (
     <PixelTwoColumn
       stackBelow="lg"
@@ -110,11 +307,39 @@ export function Default() {
       right={<div className="text-sm text-retro-muted">Side-by-side at lg+</div>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn stack-below="lg" align="center">
+    <template #left><div class="text-sm text-retro-muted">Stacks below lg</div></template>
+    <template #right><div class="text-sm text-retro-muted">Side-by-side at lg+</div></template>
+  </PixelTwoColumn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn stackBelow="lg" align="center" [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Stacks below lg</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Side-by-side at lg+</div></ng-template>
+  \`,
+})
+export class StackedBelowLg {}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <Subheading>Pixel Surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel Surface code'}
+          react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+
+export function PixelSurface() {
   return (
     <PixelTwoColumn
       surface="pixel"
@@ -123,15 +348,38 @@ export function Default() {
       right={<div className="text-sm text-retro-muted">Surface-aware right</div>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn surface="pixel" ratio="50/50">
+    <template #left><div class="text-sm text-retro-muted">Surface-aware left</div></template>
+    <template #right><div class="text-sm text-retro-muted">Surface-aware right</div></template>
+  </PixelTwoColumn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn surface="pixel" ratio="50/50" [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Surface-aware left</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Surface-aware right</div></ng-template>
+  \`,
+})
+export class PixelSurface {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-grid">PixelGrid</a></li>
-        <li><a href="#pixel-stack">PixelStack</a></li>
-        <li><a href="#pixel-equal-height-grid">PixelEqualHeightGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-grid' : '#pixel-grid'}>PixelGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stack' : '#pixel-stack'}>PixelStack</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-equal-height-grid' : '#pixel-equal-height-grid'}>PixelEqualHeightGrid</a></li>
       </ul>
     </section>
     </section>

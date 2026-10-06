@@ -37,7 +37,7 @@ export default defineManifest({
     patterns: ['img'],
     keyboard: [],
     notes:
-      'The SVG renders as role="img" with an auto-derived aria-label summarizing the series (kind, count, min..max range). Pass a custom aria-label for richer context. For full data accessibility, render a visually-hidden <table> sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.',
+      'The SVG renders as role="img" with an auto-derived aria-label summarizing the series (kind, point count and min..max range of its finite values — a point whose y is NaN or ±Infinity is left out of the chart and of the summary, which reads "area chart, no data" when no value is finite). Pass a custom aria-label for richer context. For full data accessibility, render a visually-hidden <table> sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.',
   },
   related: ['PixelSparkline', 'PixelBarChart', 'PixelStatGroup', 'PixelDataTable'],
   apiStability: 'stable',

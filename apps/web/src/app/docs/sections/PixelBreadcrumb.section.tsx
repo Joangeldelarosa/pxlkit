@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBreadcrumbDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBreadcrumbDocsMeta = {
@@ -17,35 +23,89 @@ export const PixelBreadcrumbDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSectionProps): React.ReactElement {
+/** PixelBreadcrumb's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBreadcrumb } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBreadcrumb',
+        props: [
+          { name: 'items', type: 'PixelBreadcrumbItem[]', required: true, description: 'Crumbs in order, from root to current page.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface treatment override.' },
+          { name: 'ariaLabel', type: 'string', default: "'Breadcrumb'", description: 'Accessible label for the nav region.' },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBreadcrumb } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBreadcrumb',
+        props: [
+          { name: 'items', type: 'PixelBreadcrumbItem[]', required: true, description: 'Crumbs in order, from the root to the current page.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Breadcrumb'", description: 'Accessible name of the landmark.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<nav>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBreadcrumb } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBreadcrumb',
+        selector: 'pxl-breadcrumb',
+        props: [
+          { name: 'items', type: 'PixelBreadcrumbItem[]', required: true, description: 'Crumbs in order, from the root to the current page.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Breadcrumb'", description: 'Accessible name of the landmark.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelBreadcrumbDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBreadcrumbDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-breadcrumb-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-breadcrumb-heading'>PixelBreadcrumb</h2>
+      <Title id='pixel-breadcrumb-heading'>PixelBreadcrumb</Title>
       <p className="docs-lead">Trail of links representing the user&#39;s location in a hierarchical site structure, with pixel-chevron or slash separators per surface.</p>
       <ul className="docs-highlights">
         <li>Renders &lt;nav&gt; + &lt;ol&gt;/&lt;li&gt; landmark with configurable aria-label.</li>
         <li>Active crumb marked with aria-current=&quot;page&quot; and emphasised typography.</li>
         <li>Per-item href (link), onClick (button), or plain label — choose per crumb.</li>
         <li>Pixel surface uses a crisp-edged chevron SVG; linear surface uses a slash separator.</li>
-        <li>SSR-safe, tree-shakable, and inherits ambient surface context.</li>
+        <li>SSR-safe, tree-shakable, and follows the nearest PxlKitSurfaceProvider.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-breadcrumb-api">
+      <Heading id="pixel-breadcrumb-api">API</Heading>
+      <FrameworkApi label={'PixelBreadcrumb API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-breadcrumb-a11y">
-      <h3 id="pixel-breadcrumb-a11y">Accessibility</h3>
+      <Heading id="pixel-breadcrumb-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>navigation</code></li>
       </ul>
       <p className="docs-aria-notes">Rendered as a &lt;nav&gt; landmark with a configurable aria-label (defaults to &quot;Breadcrumb&quot;). Crumbs live inside an ordered &lt;ol&gt;/&lt;li&gt; list reflecting the hierarchy. The active crumb carries aria-current=&quot;page&quot; and is rendered as a non-interactive &lt;span&gt; to convey the user&#39;s current location. Separators between crumbs use aria-hidden so screen readers skip the decorative chevron or slash.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -74,8 +134,11 @@ export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-breadcrumb-usage">
-      <h3 id="pixel-breadcrumb-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelBreadcrumb } from '@pxlkit/ui-kit';
+      <Heading id="pixel-breadcrumb-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBreadcrumb usage'}
+        react={`import { PixelBreadcrumb } from '@pxlkit/ui-kit';
 
 const TRAIL = [
   { label: 'Home', href: '/' },
@@ -86,32 +149,247 @@ const TRAIL = [
 
 export function Default() {
   return <PixelBreadcrumb items={TRAIL} />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-vue';
+
+const trail: PixelBreadcrumbItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+</script>
+
+<template>
+  <PixelBreadcrumb :items="trail" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-angular';
+
+const TRAIL: PixelBreadcrumbItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+
+@Component({
+  imports: [PixelBreadcrumb],
+  template: \`<pxl-breadcrumb [items]="trail" />\`,
+})
+export class Default {
+  readonly trail = TRAIL;
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBreadcrumb } from '@pxlkit/ui-kit';
+
+const TRAIL = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+
+export function Default() {
   return <PixelBreadcrumb items={TRAIL} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-vue';
+
+const trail: PixelBreadcrumbItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+</script>
+
+<template>
+  <PixelBreadcrumb :items="trail" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-angular';
+
+const TRAIL: PixelBreadcrumbItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+
+@Component({
+  imports: [PixelBreadcrumb],
+  template: \`<pxl-breadcrumb [items]="trail" />\`,
+})
+export class Default {
+  readonly trail = TRAIL;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <Subheading>Pixel surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel surface code'}
+          react={`import { PixelBreadcrumb } from '@pxlkit/ui-kit';
+
+const TRAIL = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+
+export function PixelSurface() {
   return <PixelBreadcrumb items={TRAIL} surface="pixel" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-vue';
+
+const trail: PixelBreadcrumbItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+</script>
+
+<template>
+  <PixelBreadcrumb :items="trail" surface="pixel" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-angular';
+
+const TRAIL: PixelBreadcrumbItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+
+@Component({
+  imports: [PixelBreadcrumb],
+  template: \`<pxl-breadcrumb [items]="trail" surface="pixel" />\`,
+})
+export class PixelSurface {
+  readonly trail = TRAIL;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-linear-surface">
-        <h4>Linear surface</h4>
-        <pre className="docs-code"><code>{`export function LinearSurface() {
+        <Subheading>Linear surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Linear surface code'}
+          react={`import { PixelBreadcrumb } from '@pxlkit/ui-kit';
+
+const TRAIL = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+
+export function LinearSurface() {
   return <PixelBreadcrumb items={TRAIL} surface="linear" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-vue';
+
+const trail: PixelBreadcrumbItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+</script>
+
+<template>
+  <PixelBreadcrumb :items="trail" surface="linear" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-angular';
+
+const TRAIL: PixelBreadcrumbItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+
+@Component({
+  imports: [PixelBreadcrumb],
+  template: \`<pxl-breadcrumb [items]="trail" surface="linear" />\`,
+})
+export class LinearSurface {
+  readonly trail = TRAIL;
+}`}
+        />
+      </article>
+      <article className="docs-example" id="example-with-onclick">
+        <Subheading>With onClick</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With onClick code'}
+          react={`import { PixelBreadcrumb } from '@pxlkit/ui-kit';
+
+export function WithOnClick() {
+  return (
+    <PixelBreadcrumb
+      items={[
+        { label: 'Dashboard', onClick: () => {} },
+        { label: 'Reports', onClick: () => {} },
+        { label: 'Q4 Summary', active: true },
+      ]}
+    />
+  );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-vue';
+
+const items: PixelBreadcrumbItem[] = [
+  { label: 'Dashboard', onClick: () => {} },
+  { label: 'Reports', onClick: () => {} },
+  { label: 'Q4 Summary', active: true },
+];
+</script>
+
+<template>
+  <PixelBreadcrumb :items="items" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBreadcrumb],
+  template: \`<pxl-breadcrumb [items]="items" />\`,
+})
+export class WithOnClick {
+  readonly items: PixelBreadcrumbItem[] = [
+    { label: 'Dashboard', onClick: () => {} },
+    { label: 'Reports', onClick: () => {} },
+    { label: 'Q4 Summary', active: true },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-plain-labels">
-        <h4>Plain labels</h4>
-        <pre className="docs-code"><code>{`export function PlainLabels() {
+        <Subheading>Plain labels</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Plain labels code'}
+          react={`import { PixelBreadcrumb } from '@pxlkit/ui-kit';
+
+export function PlainLabels() {
   return (
     <PixelBreadcrumb
       items={[
@@ -121,23 +399,113 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-vue';
+
+const items: PixelBreadcrumbItem[] = [{ label: 'Library' }, { label: 'Albums' }, { label: 'Photos', active: true }];
+</script>
+
+<template>
+  <PixelBreadcrumb :items="items" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBreadcrumb],
+  template: \`<pxl-breadcrumb [items]="items" />\`,
+})
+export class PlainLabels {
+  readonly items: PixelBreadcrumbItem[] = [{ label: 'Library' }, { label: 'Albums' }, { label: 'Photos', active: true }];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-single-crumb">
-        <h4>Single crumb</h4>
-        <pre className="docs-code"><code>{`export function SingleCrumb() {
+        <Subheading>Single crumb</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Single crumb code'}
+          react={`import { PixelBreadcrumb } from '@pxlkit/ui-kit';
+
+export function SingleCrumb() {
   return <PixelBreadcrumb items={[{ label: 'Home', active: true }]} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBreadcrumb } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBreadcrumb :items="[{ label: 'Home', active: true }]" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBreadcrumb } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBreadcrumb],
+  template: \`<pxl-breadcrumb [items]="[{ label: 'Home', active: true }]" />\`,
+})
+export class SingleCrumb {}`}
+        />
       </article>
       <article className="docs-example" id="example-localised-label">
-        <h4>Localised label</h4>
-        <pre className="docs-code"><code>{`export function LocalisedLabel() {
+        <Subheading>Localised label</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Localised label code'}
+          react={`import { PixelBreadcrumb } from '@pxlkit/ui-kit';
+
+const TRAIL = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+
+export function LocalisedLabel() {
   return <PixelBreadcrumb items={TRAIL} ariaLabel="Ruta de navegación" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-vue';
+
+const trail: PixelBreadcrumbItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+</script>
+
+<template>
+  <PixelBreadcrumb :items="trail" aria-label="Ruta de navegación" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-angular';
+
+const TRAIL: PixelBreadcrumbItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+
+@Component({
+  imports: [PixelBreadcrumb],
+  template: \`<pxl-breadcrumb [items]="trail" ariaLabel="Ruta de navegación" />\`,
+})
+export class LocalisedLabel {
+  readonly trail = TRAIL;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-deep-trail">
-        <h4>Deep trail</h4>
-        <pre className="docs-code"><code>{`export function DeepTrail() {
+        <Subheading>Deep trail</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Deep trail code'}
+          react={`import { PixelBreadcrumb } from '@pxlkit/ui-kit';
+
+export function DeepTrail() {
   return (
     <PixelBreadcrumb
       items={[
@@ -150,14 +518,48 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-vue';
+
+const items: PixelBreadcrumbItem[] = [
+  { label: 'Org', href: '/' },
+  { label: 'Workspaces', href: '/workspaces' },
+  { label: 'Engineering', href: '/workspaces/eng' },
+  { label: 'Projects', href: '/workspaces/eng/projects' },
+  { label: 'pxlkit', href: '/workspaces/eng/projects/pxlkit' },
+  { label: 'Settings', active: true },
+];
+</script>
+
+<template>
+  <PixelBreadcrumb :items="items" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBreadcrumb, type PixelBreadcrumbItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBreadcrumb],
+  template: \`<pxl-breadcrumb [items]="items" />\`,
+})
+export class DeepTrail {
+  readonly items: PixelBreadcrumbItem[] = [
+    { label: 'Org', href: '/' },
+    { label: 'Workspaces', href: '/workspaces' },
+    { label: 'Engineering', href: '/workspaces/eng' },
+    { label: 'Projects', href: '/workspaces/eng/projects' },
+    { label: 'pxlkit', href: '/workspaces/eng/projects/pxlkit' },
+    { label: 'Settings', active: true },
+  ];
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-pagination">PixelPagination</a></li>
-        <li><a href="#pixel-text-link">PixelTextLink</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pagination' : '#pixel-pagination'}>PixelPagination</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-text-link' : '#pixel-text-link'}>PixelTextLink</a></li>
       </ul>
     </section>
     </section>

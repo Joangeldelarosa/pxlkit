@@ -8,7 +8,7 @@
  * to overwrite it (a hand-authored *.stories.tsx is detected).
  */
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Component from './PxlKitSurfaceProvider';
 import manifest from './PxlKitSurfaceProvider.manifest';
 import * as examples from './PxlKitSurfaceProvider.examples';
@@ -69,6 +69,28 @@ export const Linear: Story = {
       return (
         <pre style={{ color: 'crimson' }}>
           {"Missing example 'linear' for PxlKitSurfaceProvider."}
+        </pre>
+      );
+    }
+    return <ExampleComponent />;
+  },
+};
+
+/** Per-component override */
+export const Override: Story = {
+  name: 'Per-component override',
+  tags: ["example-override"],
+  parameters: {
+    docs: { description: { story: undefined } },
+  },
+  render: () => {
+    const ExampleComponent =
+      ((examples as any).Override ?? (examples as any)['override']) ??
+      ((manifest as any)?.examples?.find?.((e: any) => e?.id === 'override')?.Component);
+    if (!ExampleComponent) {
+      return (
+        <pre style={{ color: 'crimson' }}>
+          {"Missing example 'override' for PxlKitSurfaceProvider."}
         </pre>
       );
     }

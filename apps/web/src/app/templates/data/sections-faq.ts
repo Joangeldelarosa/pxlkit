@@ -7,12 +7,12 @@ const FAQ_ITEMS = [
   {
     id: 'free',
     title: 'Is Pxlkit free to use?',
-    content: 'Yes! Pxlkit is MIT licensed and free for personal and commercial use. No attribution required.',
+    content: 'Yes! The code is MIT licensed and free for personal and commercial use; the icon packs are free with an attribution link.',
   },
   {
     id: 'app-router',
     title: 'Does it work with Next.js App Router?',
-    content: 'Absolutely. All interactive components are marked with \\'use client\\'. Server components can import and render non-interactive components without the directive.',
+    content: 'Yes. Keep the kit\\'s providers in a \\'use client\\' file, start the files that use its components\\' hooks or event handlers with \\'use client\\', and import server-side helpers from @pxlkit/ui-kit-core.',
   },
   {
     id: 'theming',
@@ -33,7 +33,6 @@ const FAQ_ITEMS = [
 
 const accordionFaq = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PixelAccordion, PixelContainer, PixelSectionHeader } from '@pxlkit/ui-kit';
 
 ${FAQ_ITEMS}
@@ -58,7 +57,6 @@ export function AccordionFaq() {
 
 const twoColumnFaq = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { useState } from 'react';
 import {
   PixelAccordion,
@@ -76,15 +74,15 @@ const CATEGORIES = [
 const BY_CATEGORY: Record<string, { id: string; title: string; content: string }[]> = {
   general: [
     { id: 'what', title: 'What is Pxlkit?', content: 'Pxlkit is an open-source retro pixel-art React UI ecosystem with icons, components, and effects.' },
-    { id: 'free', title: 'Is Pxlkit free?', content: 'Yes, MIT licensed and free forever.' },
+    { id: 'free', title: 'Is Pxlkit free?', content: 'Yes. The code is MIT licensed; the icon packs are free with attribution.' },
   ],
   technical: [
-    { id: 'nextjs', title: 'Does it work with Next.js?', content: 'Yes, optimized for Next.js App Router and Pages Router.' },
+    { id: 'nextjs', title: 'Does it work with Next.js?', content: 'Yes, App Router included.' },
     { id: 'typescript', title: 'TypeScript support?', content: 'Full strict TypeScript support across all packages.' },
   ],
   billing: [
-    { id: 'license', title: 'Do I need a license?', content: 'No, the MIT license covers personal and commercial use.' },
-    { id: 'pro-plan', title: 'Is there a Pro plan?', content: 'Currently Pxlkit is fully free and open-source.' },
+    { id: 'license', title: 'Do I need a license?', content: 'Not for the code: MIT covers personal and commercial use. Icons without attribution need a one-time license.' },
+    { id: 'pro-plan', title: 'Is there a Pro plan?', content: 'No subscription: the code is free, and one-time Indie and Team licenses remove the attribution on the icons.' },
   ],
 };
 
@@ -130,7 +128,6 @@ export function TwoColumnFaq() {
 
 const tabbedFaq = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import {
   PixelAccordion,
   PixelTabs,
@@ -144,14 +141,14 @@ const TABS = [
     label: 'General',
     items: [
       { id: 'what', title: 'What is Pxlkit?', content: 'An open-source retro pixel-art React UI ecosystem.' },
-      { id: 'free', title: 'Is it free?', content: 'Yes, MIT licensed. Free forever.' },
+      { id: 'free', title: 'Is it free?', content: 'Yes. MIT code; icons free with attribution.' },
     ],
   },
   {
     id: 'technical',
     label: 'Technical',
     items: [
-      { id: 'nextjs', title: 'Next.js compatible?', content: 'Yes, works with App Router and Pages Router.' },
+      { id: 'nextjs', title: 'Next.js compatible?', content: 'Yes, App Router included.' },
       { id: 'typescript', title: 'TypeScript?', content: 'Full strict TypeScript across all packages.' },
     ],
   },
@@ -159,8 +156,8 @@ const TABS = [
     id: 'billing',
     label: 'Licensing',
     items: [
-      { id: 'license', title: 'Need a license?', content: 'No, MIT covers personal and commercial use.' },
-      { id: 'attribution', title: 'Attribution required?', content: 'No attribution required.' },
+      { id: 'license', title: 'Need a license?', content: 'Not for the code. Icons without attribution need one.' },
+      { id: 'attribution', title: 'Attribution required?', content: 'For the icon packs, unless you buy a license.' },
     ],
   },
 ];

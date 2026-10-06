@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSidebarDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSidebarDocsMeta = {
@@ -17,10 +23,86 @@ export const PixelSidebarDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionProps): React.ReactElement {
+/** PixelSidebar's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSidebar } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSidebar',
+        props: [
+          { name: 'collapsible', type: 'boolean', description: 'Shows the collapse toggle in the header row.' },
+          { name: 'defaultCollapsed', type: 'boolean', description: 'Initial collapsed state while uncontrolled.' },
+          { name: 'collapsed', type: 'boolean', description: 'Collapsed state; leave unset for an uncontrolled rail.' },
+          { name: 'onCollapsedChange', type: '(next: boolean) => void', description: 'Called with the collapsed state the toggle asks for.' },
+          { name: 'sections', type: 'PixelSidebarSectionProps[]', required: true, description: 'The sections, in order.' },
+          { name: 'header', type: 'React.ReactNode', description: 'Header content beside the toggle (hidden while collapsed).' },
+          { name: 'footer', type: 'React.ReactNode', description: 'Footer row content.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSidebar } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSidebar',
+        props: [
+          { name: 'collapsible', type: 'boolean', default: 'false', description: 'Shows the collapse toggle in the header row.' },
+          { name: 'defaultCollapsed', type: 'boolean', default: 'false', description: 'Initial collapsed state while uncontrolled.' },
+          { name: 'collapsed', type: 'boolean', binding: 'v-model:collapsed', description: 'Collapsed state (`v-model:collapsed`); leave unset for an uncontrolled rail.' },
+          { name: 'sections', type: 'PixelSidebarSectionProps[]', required: true, description: 'The sections, in order.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'update:collapsed', payload: 'collapsed: boolean', description: 'The collapsed state the toggle asks for, for `v-model:collapsed`.' },
+        ],
+        slots: [
+          { name: 'header', description: 'Header content beside the toggle (hidden while collapsed).' },
+          { name: 'footer', description: 'Footer row content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<nav>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSidebar } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSidebar',
+        selector: 'pxl-sidebar',
+        props: [
+          { name: 'collapsible', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows the collapse toggle in the header row.' },
+          { name: 'defaultCollapsed', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Initial collapsed state while uncontrolled.' },
+          { name: 'collapsed', type: 'boolean', binding: '[(collapsed)]', description: 'Collapsed state (`[(collapsed)]`); leave unset for an uncontrolled rail.' },
+          { name: 'sections', type: 'PixelSidebarSectionProps[]', required: true, description: 'The sections, in order.' },
+          { name: 'header', type: 'string | TemplateRef<any>', description: 'Header content beside the toggle (hidden while collapsed).' },
+          { name: 'footer', type: 'string | TemplateRef<any>', description: 'Footer row content.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'collapsedChange', payload: 'boolean', description: 'The new `collapsed`: the event half of `[(collapsed)]`.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelSidebarDocsSection({ className, headingLevel = 2 }: PixelSidebarDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-sidebar-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-sidebar-heading'>PixelSidebar</h2>
+      <Title id='pixel-sidebar-heading'>PixelSidebar</Title>
       <p className="docs-lead">Vertical navigation rail with sections, nested items, badges, and an optional collapsible width.</p>
       <ul className="docs-highlights">
         <li>Sections with optional titles and nested items up to two levels deep</li>
@@ -33,12 +115,12 @@ export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionPr
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-sidebar-api">
+      <Heading id="pixel-sidebar-api">API</Heading>
+      <FrameworkApi label={'PixelSidebar API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-sidebar-a11y">
-      <h3 id="pixel-sidebar-a11y">Accessibility</h3>
+      <Heading id="pixel-sidebar-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>nav landmark</code></li>
@@ -47,7 +129,7 @@ export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionPr
         <li><code>badge aria-label</code></li>
       </ul>
       <p className="docs-aria-notes">Collapse toggle uses aria-expanded; collapsed items expose their label via aria-label and title.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -71,8 +153,11 @@ export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionPr
       </table>
     </section>
     <section aria-labelledby="pixel-sidebar-usage">
-      <h3 id="pixel-sidebar-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelSidebar } from '@pxlkit/ui-kit';
+      <Heading id="pixel-sidebar-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSidebar usage'}
+        react={`import { PixelSidebar } from '@pxlkit/ui-kit';
 
 const sections = [
   {
@@ -98,24 +183,196 @@ export function Default() {
       <PixelSidebar sections={sections} header={<span className="text-xs text-retro-text">pxlkit</span>} />
     </div>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelSidebar, type PixelSidebarSectionProps } from '@pxlkit/ui-kit-vue';
+
+const sections: PixelSidebarSectionProps[] = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' } },
+    ],
+  },
+];
+</script>
+
+<template>
+  <div style="height: 320px">
+    <PixelSidebar :sections="sections">
+      <template #header><span class="text-xs text-retro-text">pxlkit</span></template>
+    </PixelSidebar>
+  </div>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSidebar, type PixelSidebarSectionProps } from '@pxlkit/ui-kit-angular';
+
+const SECTIONS: PixelSidebarSectionProps[] = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' } },
+    ],
+  },
+];
+
+@Component({
+  imports: [PixelSidebar],
+  template: \`
+    <div style="height: 320px">
+      <pxl-sidebar [sections]="sections" [header]="header" />
+    </div>
+    <ng-template #header><span class="text-xs text-retro-text">pxlkit</span></ng-template>
+  \`,
+})
+export class Default {
+  readonly sections = SECTIONS;
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSidebar } from '@pxlkit/ui-kit';
+
+const sections = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' as const } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' as const } },
+    ],
+  },
+];
+
+export function Default() {
   return (
     <div style={{ height: 320 }}>
       <PixelSidebar sections={sections} header={<span className="text-xs text-retro-text">pxlkit</span>} />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSidebar, type PixelSidebarSectionProps } from '@pxlkit/ui-kit-vue';
+
+const sections: PixelSidebarSectionProps[] = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' } },
+    ],
+  },
+];
+</script>
+
+<template>
+  <div style="height: 320px">
+    <PixelSidebar :sections="sections">
+      <template #header><span class="text-xs text-retro-text">pxlkit</span></template>
+    </PixelSidebar>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSidebar, type PixelSidebarSectionProps } from '@pxlkit/ui-kit-angular';
+
+const SECTIONS: PixelSidebarSectionProps[] = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' } },
+    ],
+  },
+];
+
+@Component({
+  imports: [PixelSidebar],
+  template: \`
+    <div style="height: 320px">
+      <pxl-sidebar [sections]="sections" [header]="header" />
+    </div>
+    <ng-template #header><span class="text-xs text-retro-text">pxlkit</span></ng-template>
+  \`,
+})
+export class Default {
+  readonly sections = SECTIONS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-collapsible">
-        <h4>Collapsible</h4>
-        <pre className="docs-code"><code>{`export function Collapsible() {
+        <Subheading>Collapsible</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Collapsible code'}
+          react={`import React from 'react';
+import { PixelSidebar } from '@pxlkit/ui-kit';
+
+const sections = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' as const } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' as const } },
+    ],
+  },
+];
+
+export function Collapsible() {
   const [collapsed, setCollapsed] = React.useState(false);
   return (
     <div style={{ height: 320 }}>
@@ -128,11 +385,83 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSidebar, type PixelSidebarSectionProps } from '@pxlkit/ui-kit-vue';
+
+const sections: PixelSidebarSectionProps[] = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' } },
+    ],
+  },
+];
+
+const collapsed = ref(false);
+</script>
+
+<template>
+  <div style="height: 320px">
+    <PixelSidebar v-model:collapsed="collapsed" collapsible :sections="sections">
+      <template #header><span class="text-xs text-retro-text">pxlkit</span></template>
+    </PixelSidebar>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSidebar, type PixelSidebarSectionProps } from '@pxlkit/ui-kit-angular';
+
+const SECTIONS: PixelSidebarSectionProps[] = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' } },
+    ],
+  },
+];
+
+@Component({
+  imports: [PixelSidebar],
+  template: \`
+    <div style="height: 320px">
+      <pxl-sidebar collapsible [(collapsed)]="collapsed" [sections]="sections" [header]="header" />
+    </div>
+    <ng-template #header><span class="text-xs text-retro-text">pxlkit</span></ng-template>
+  \`,
+})
+export class Collapsible {
+  readonly sections = SECTIONS;
+  readonly collapsed = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-nested">
-        <h4>Nested items</h4>
-        <pre className="docs-code"><code>{`export function Nested() {
+        <Subheading>Nested items</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Nested items code'}
+          react={`import { PixelSidebar } from '@pxlkit/ui-kit';
+
+export function Nested() {
   const nestedSections = [
     {
       title: 'Library',
@@ -156,11 +485,94 @@ export function Default() {
       <PixelSidebar sections={nestedSections} />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSidebar, type PixelSidebarSectionProps } from '@pxlkit/ui-kit-vue';
+
+const sections: PixelSidebarSectionProps[] = [
+  {
+    title: 'Library',
+    items: [
+      {
+        id: 'components',
+        label: 'Components',
+        active: true,
+        nested: [
+          { id: 'buttons', label: 'Buttons' },
+          { id: 'forms', label: 'Forms' },
+          { id: 'navigation', label: 'Navigation' },
+        ],
+      },
+      { id: 'tokens', label: 'Tokens' },
+    ],
+  },
+];
+</script>
+
+<template>
+  <div style="height: 320px">
+    <PixelSidebar :sections="sections" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSidebar, type PixelSidebarSectionProps } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSidebar],
+  template: \`
+    <div style="height: 320px">
+      <pxl-sidebar [sections]="sections" />
+    </div>
+  \`,
+})
+export class Nested {
+  readonly sections: PixelSidebarSectionProps[] = [
+    {
+      title: 'Library',
+      items: [
+        {
+          id: 'components',
+          label: 'Components',
+          active: true,
+          nested: [
+            { id: 'buttons', label: 'Buttons' },
+            { id: 'forms', label: 'Forms' },
+            { id: 'navigation', label: 'Navigation' },
+          ],
+        },
+        { id: 'tokens', label: 'Tokens' },
+      ],
+    },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-footer">
-        <h4>With footer</h4>
-        <pre className="docs-code"><code>{`export function WithFooter() {
+        <Subheading>With footer</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With footer code'}
+          react={`import { PixelSidebar } from '@pxlkit/ui-kit';
+
+const sections = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' as const } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' as const } },
+    ],
+  },
+];
+
+export function WithFooter() {
   return (
     <div style={{ height: 320 }}>
       <PixelSidebar
@@ -170,7 +582,72 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSidebar, type PixelSidebarSectionProps } from '@pxlkit/ui-kit-vue';
+
+const sections: PixelSidebarSectionProps[] = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' } },
+    ],
+  },
+];
+</script>
+
+<template>
+  <div style="height: 320px">
+    <PixelSidebar :sections="sections">
+      <template #header><span class="text-xs text-retro-text">pxlkit</span></template>
+      <template #footer><span class="text-[10px] text-retro-muted">v2.0.0</span></template>
+    </PixelSidebar>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSidebar, type PixelSidebarSectionProps } from '@pxlkit/ui-kit-angular';
+
+const SECTIONS: PixelSidebarSectionProps[] = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' } },
+    ],
+  },
+];
+
+@Component({
+  imports: [PixelSidebar],
+  template: \`
+    <div style="height: 320px">
+      <pxl-sidebar [sections]="sections" [header]="header" [footer]="footer" />
+    </div>
+    <ng-template #header><span class="text-xs text-retro-text">pxlkit</span></ng-template>
+    <ng-template #footer><span class="text-[10px] text-retro-muted">v2.0.0</span></ng-template>
+  \`,
+})
+export class WithFooter {
+  readonly sections = SECTIONS;
+}`}
+        />
       </article>
     </section>
     </section>

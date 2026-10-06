@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTypewriterDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTypewriterDocsMeta = {
@@ -17,68 +23,244 @@ export const PixelTypewriterDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSectionProps): React.ReactElement {
+/** PixelTypewriter's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTypewriter } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTypewriter',
+        props: [
+          { name: 'label', type: 'string', description: 'Label (text) to type out. Canonical prop.' },
+          { name: 'text', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'speed', type: 'number', default: '60', description: 'Milliseconds between each character. Default `60`.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Delay before typing starts, in milliseconds. Default `0`.' },
+          { name: 'cursor', type: 'boolean', default: 'true', description: 'Show a blinking caret while writing. Default `true`.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral' | 'inherit'", default: "'green'", description: "Tone token applied to the text color, in monospace; `'inherit'` keeps the font and colour of the text around it. Default `'green'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires once the full string is rendered.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<span>`.' },
+        ],
+        notes: [
+          '`ref` points to `<span>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTypewriter } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTypewriter',
+        props: [
+          { name: 'label', type: 'string', description: 'Label (text) to type out. Canonical prop.' },
+          { name: 'text', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'speed', type: 'number', default: '60', description: 'Milliseconds between each character.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Delay before typing starts, in milliseconds.' },
+          { name: 'cursor', type: 'boolean', default: 'true', description: 'Show a blinking caret while writing.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral' | 'inherit'", default: "'green'", description: "Tone token applied to the text color, in monospace; `'inherit'` keeps the font and colour of the text around it." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the typing plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'Once the full string is rendered (at once under reduced motion, then only once).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<span>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTypewriter } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTypewriter',
+        selector: 'pxl-typewriter',
+        props: [
+          { name: 'label', type: 'string', description: 'Label (text) to type out. Canonical input.' },
+          { name: 'text', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'speed', type: 'number', default: '60', accepts: 'unknown', description: 'Milliseconds between each character.' },
+          { name: 'delay', type: 'number', default: '0', accepts: 'unknown', description: 'Delay before typing starts, in milliseconds.' },
+          { name: 'cursor', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Show a blinking caret while writing.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral' | 'inherit'", default: "'green'", description: "Tone token applied to the text color, in monospace; `'inherit'` keeps the font and colour of the text around it." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the typing plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'Once the full string is rendered (at once under reduced motion, then only once).' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelTypewriterDocsSection({ className, headingLevel = 2 }: PixelTypewriterDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-typewriter-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-typewriter-heading'>PixelTypewriter</h2>
+      <Title id='pixel-typewriter-heading'>PixelTypewriter</Title>
       <p className="docs-lead">Types out a string one character at a time with an optional blinking caret.</p>
       <ul className="docs-highlights">
         <li>Configurable speed, delay, and blinking caret</li>
         <li>Tone-aware text color via shared tone tokens</li>
         <li>Animation trigger modes: mount, view, hover, click</li>
-        <li>onComplete callback fires when full text is rendered</li>
+        <li>Signals when the full text is typed: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-typewriter-api">
+      <Heading id="pixel-typewriter-api">API</Heading>
+      <FrameworkApi label={'PixelTypewriter API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-typewriter-a11y">
-      <h3 id="pixel-typewriter-a11y">Accessibility</h3>
+      <Heading id="pixel-typewriter-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
       </ul>
-      <p className="docs-aria-notes">Caret and the character-by-character animation are aria-hidden; the complete string is exposed to assistive tech from the first render via a visually hidden span. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and onComplete fires once.</p>
+      <p className="docs-aria-notes">Caret and the character-by-character animation are aria-hidden; the complete string is exposed to assistive tech from the first render via a visually hidden span. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and the completion event fires once.</p>
     </section>
     <section aria-labelledby="pixel-typewriter-usage">
-      <h3 id="pixel-typewriter-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelTypewriter } from '@pxlkit/ui-kit';
+      <Heading id="pixel-typewriter-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelTypewriter usage'}
+        react={`import { PixelTypewriter } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelTypewriter text="Hello, pxlkit." />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelTypewriter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTypewriter text="Hello, pxlkit." />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelTypewriter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTypewriter],
+  template: \`<pxl-typewriter text="Hello, pxlkit." />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelTypewriter } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelTypewriter text="Hello, pxlkit." />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTypewriter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTypewriter text="Hello, pxlkit." />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTypewriter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTypewriter],
+  template: \`<pxl-typewriter text="Hello, pxlkit." />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-fast-cyan">
-        <h4>Fast (cyan)</h4>
-        <pre className="docs-code"><code>{`export function FastCyan() {
+        <Subheading>Fast (cyan)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Fast (cyan) code'}
+          react={`import { PixelTypewriter } from '@pxlkit/ui-kit';
+
+export function FastCyan() {
   return <PixelTypewriter text="Typing fast in cyan..." speed={30} tone="cyan" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTypewriter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTypewriter text="Typing fast in cyan..." :speed="30" tone="cyan" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTypewriter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTypewriter],
+  template: \`<pxl-typewriter text="Typing fast in cyan..." [speed]="30" tone="cyan" />\`,
+})
+export class FastCyan {}`}
+        />
       </article>
       <article className="docs-example" id="example-no-cursor">
-        <h4>No cursor</h4>
-        <pre className="docs-code"><code>{`export function NoCursor() {
+        <Subheading>No cursor</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'No cursor code'}
+          react={`import { PixelTypewriter } from '@pxlkit/ui-kit';
+
+export function NoCursor() {
   return <PixelTypewriter text="No blinking caret here." cursor={false} tone="gold" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTypewriter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTypewriter text="No blinking caret here." :cursor="false" tone="gold" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTypewriter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTypewriter],
+  template: \`<pxl-typewriter text="No blinking caret here." [cursor]="false" tone="gold" />\`,
+})
+export class NoCursor {}`}
+        />
       </article>
       <article className="docs-example" id="example-on-view">
-        <h4>On view</h4>
-        <pre className="docs-code"><code>{`export function OnView() {
+        <Subheading>On view</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'On view code'}
+          react={`import { PixelTypewriter } from '@pxlkit/ui-kit';
+
+export function OnView() {
   return <PixelTypewriter text="Types when scrolled into view." trigger="inView" tone="purple" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTypewriter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTypewriter text="Types when scrolled into view." trigger="inView" tone="purple" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTypewriter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTypewriter],
+  template: \`<pxl-typewriter text="Types when scrolled into view." trigger="inView" tone="purple" />\`,
+})
+export class OnView {}`}
+        />
       </article>
     </section>
     </section>

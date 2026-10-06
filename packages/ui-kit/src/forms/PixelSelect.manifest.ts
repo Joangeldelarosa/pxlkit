@@ -22,7 +22,7 @@ export default defineManifest({
   highlights: [
     'WAI-ARIA combobox + listbox semantics — `aria-expanded`, `aria-haspopup`, `aria-selected` wired to the trigger and options.',
     'Full keyboard support: ArrowUp/Down, Home/End, Enter/Space to select, Escape to close, Tab to dismiss.',
-    'Controlled or uncontrolled — `value` + `onChange` or `defaultValue`; emits the selected option value as a string.',
+    'Controlled — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or uncontrolled with `defaultValue`; the value is the selected option value, as a string.',
     'Form-friendly — hidden mirror input lets the value participate in native `<form>` submissions via `name`.',
     'Tone, size, and surface (pixel/linear) variants share the same primitives as the rest of the input family.',
   ],
@@ -53,7 +53,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Closes the listbox and moves focus to the next focusable element.' },
     ],
     notes:
-      'Trigger is a `<button role="combobox">` paired with a `role="listbox"` popup containing `role="option"` children. Provide an accessible name via `label` or `aria-describedby`; `error` automatically sets `aria-invalid`.',
+      'Trigger is a `<button role="combobox">` paired with a `role="listbox"` popup containing `role="option"` children. Provide an accessible name via `label`; the hint/error it shows is linked through `aria-describedby`, after any ids you pass, and `error` automatically sets `aria-invalid`.',
   },
   related: ['PixelCombobox', 'PixelMultiSelect', 'PixelDropdown'],
   apiStability: 'stable',

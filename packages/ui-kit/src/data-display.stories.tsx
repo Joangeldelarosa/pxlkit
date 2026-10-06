@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { PixelCard } from './cards/PixelCard';
 import { PixelStatCard } from './cards/PixelStatCard';
 import { PixelTable } from './data/PixelTable';

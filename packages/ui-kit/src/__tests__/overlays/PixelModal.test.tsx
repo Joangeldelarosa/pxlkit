@@ -19,6 +19,32 @@ describe('PixelModal — hardening', () => {
     expect(inline?.contains(child)).toBe(false);
   });
 
+  it('moves focus into the dialog when it opens and back to the opener when it closes', async () => {
+    function Harness() {
+      const [open, setOpen] = React.useState(false);
+      return (
+        <>
+          <button data-testid="opener" onClick={() => setOpen(true)}>open</button>
+          <PixelModal open={open} title="Focus" onClose={() => setOpen(false)}>
+            <button>inside</button>
+          </PixelModal>
+        </>
+      );
+    }
+    render(<Harness />);
+    const opener = screen.getByTestId('opener');
+    opener.focus();
+    await act(async () => {
+      fireEvent.click(opener);
+    });
+    // The close button in the title bar is the first focusable element.
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close' }));
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    });
+    expect(document.activeElement).toBe(opener);
+  });
+
   it('traps Tab focus inside the modal — Tab from last cycles to first', async () => {
     render(
       <PixelModal open title="Trap" onClose={() => {}}>
@@ -149,5 +175,26 @@ describe('PixelModal — hardening', () => {
       resolveClose?.();
     });
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows what its parent passes: a refused close keeps it open and locking the page, until the parent closes it', () => {
+    const onClose = vi.fn();
+    const modal = (open: boolean) => (
+      <PixelModal open={open} title="Keep" onClose={onClose}>
+        <button type="button">inside</button>
+      </PixelModal>
+    );
+    const { rerender } = render(modal(true));
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.click(document.querySelector('[data-pxl-overlay-backdrop]')!);
+    expect(onClose).toHaveBeenCalledTimes(3);
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(document.body.style.overflow).toBe('hidden');
+    rerender(modal(false));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.body.style.overflow).toBe('');
+    rerender(modal(true));
+    expect(screen.getByRole('dialog')).toBeTruthy();
   });
 });

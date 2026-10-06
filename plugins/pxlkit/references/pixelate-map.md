@@ -146,7 +146,7 @@ a conversion produces code that does not compile.
 
 | Source | pxlkit | Notes |
 |---|---|---|
-| lucide, heroicons, react-icons, MUI icons | a pack icon rendered by `PxlKitIcon` | search `icon-shapes.generated.json` by tag |
+| lucide, heroicons, react-icons, MUI icons | a pack icon rendered by `PxlKitIcon` | search `icon-shapes.generated.json` by tag. Screen readers skip those libraries' icons but announce a `PxlKitIcon` by its name: pass `decorative` when it sits beside visible text, an `aria-label` when it is a button's only content |
 | no equivalent found | offer `/pxlkit:icon` | do not substitute something that means a different thing |
 
 Using pxlkit's shipped icons requires visible attribution — "Icons by Pxlkit",

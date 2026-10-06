@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBadgeGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBadgeGroupDocsMeta = {
@@ -17,36 +23,97 @@ export const PixelBadgeGroupDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSectionProps): React.ReactElement {
+/** PixelBadgeGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBadgeGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBadgeGroup',
+        props: [
+          { name: 'max', type: 'number', default: '5', description: 'Most places the row shows; beyond it, the last place becomes a "+N" button that opens a popover with the rest.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override, for the row and its popover; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Optional accessible name for the group. When provided, the wrapper renders `role="group"` so SR users can navigate the landmark; otherwise it stays a plain div to avoid an unlabeled group announcement.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group, in place of `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The badges.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBadgeGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBadgeGroup',
+        props: [
+          { name: 'max', type: 'number', default: '5', description: 'Most places the row shows; beyond it, the last place becomes a "+N" button that opens a popover with the rest.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override, for the row and its popover; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The badges.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBadgeGroup',
+        selector: 'pxl-badge-group',
+        props: [
+          { name: 'max', type: 'number', default: '5', accepts: 'unknown', description: 'Most places the row shows; beyond it, the last place becomes a "+N" button that opens a popover with the rest.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override, for the row and its popover; defaults to the nearest provider.' },
+        ],
+      },
+      {
+        name: 'PixelBadgeGroupItem',
+        selector: '[pxlBadgeGroupItem]',
+        notes: [
+          'Structural: write it as `*pxlBadgeGroupItem` on the content, or on an `<ng-template>`.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelBadgeGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBadgeGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-badge-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-badge-group-heading'>PixelBadgeGroup</h2>
-      <p className="docs-lead">Inline row of badges with automatic &quot;+N&quot; overflow popover when the count exceeds `max`.</p>
+      <Title id='pixel-badge-group-heading'>PixelBadgeGroup</Title>
+      <p className="docs-lead">Inline row of badges with automatic &quot;+N&quot; overflow popover when the count exceeds <code>max</code>.</p>
       <ul className="docs-highlights">
-        <li>Renders the first `max - 1` badges inline; remaining items collapse into a &quot;+N&quot; trigger.</li>
+        <li>Renders the first <code>max - 1</code> badges inline; remaining items collapse into a &quot;+N&quot; trigger.</li>
         <li>Overflow trigger opens a PixelPopover with the hidden badges, surface-matched.</li>
-        <li>Wrapper becomes `role=&quot;group&quot;` when an accessible name (aria-label or aria-labelledby) is provided.</li>
+        <li>Wrapper becomes <code>role=&quot;group&quot;</code> when an accessible name (aria-label or aria-labelledby) is provided.</li>
         <li>Surface-aware: pixel chamfered radius + pixel font or linear pill, propagated to the popover.</li>
-        <li>Forwarded ref to the underlying div and full passthrough of HTMLAttributes.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-badge-group-api">
+      <Heading id="pixel-badge-group-api">API</Heading>
+      <FrameworkApi label={'PixelBadgeGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-badge-group-a11y">
-      <h3 id="pixel-badge-group-a11y">Accessibility</h3>
+      <Heading id="pixel-badge-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
         <li><code>disclosure</code></li>
       </ul>
-      <p className="docs-aria-notes">Group landmark is only emitted when an accessible name is supplied to avoid an unlabeled &quot;group&quot; announcement. The overflow button carries aria-label=&quot;Show N more&quot;, aria-expanded, aria-haspopup=&quot;dialog&quot;, and aria-controls wired by PixelPopover.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Group landmark is only emitted when an accessible name is supplied to avoid an unlabeled &quot;group&quot; announcement. The overflow button carries aria-label=&quot;Show N more&quot;, aria-expanded, aria-haspopup=&quot;dialog&quot;, and aria-controls wired by PixelPopover; it also names the popover dialog through aria-labelledby.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -75,9 +142,11 @@ export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-badge-group-usage">
-      <h3 id="pixel-badge-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelBadgeGroup } from '@pxlkit/ui-kit';
-import { PixelBadge } from '@pxlkit/ui-kit';
+      <Heading id="pixel-badge-group-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBadgeGroup usage'}
+        react={`import { PixelBadgeGroup, PixelBadge } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -87,14 +156,44 @@ export function Default() {
       <PixelBadge tone="gold">design</PixelBadge>
     </PixelBadgeGroup>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelBadge, PixelBadgeGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBadgeGroup aria-label="Tags">
+    <PixelBadge tone="cyan">react</PixelBadge>
+    <PixelBadge tone="green">typescript</PixelBadge>
+    <PixelBadge tone="gold">design</PixelBadge>
+  </PixelBadgeGroup>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem],
+  template: \`
+    <pxl-badge-group aria-label="Tags">
+      <pxl-badge *pxlBadgeGroupItem tone="cyan">react</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="green">typescript</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="gold">design</pxl-badge>
+    </pxl-badge-group>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBadgeGroup, PixelBadge } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelBadgeGroup aria-label="Tags">
       <PixelBadge tone="cyan">react</PixelBadge>
@@ -102,11 +201,42 @@ export function Default() {
       <PixelBadge tone="gold">design</PixelBadge>
     </PixelBadgeGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge, PixelBadgeGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBadgeGroup aria-label="Tags">
+    <PixelBadge tone="cyan">react</PixelBadge>
+    <PixelBadge tone="green">typescript</PixelBadge>
+    <PixelBadge tone="gold">design</PixelBadge>
+  </PixelBadgeGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem],
+  template: \`
+    <pxl-badge-group aria-label="Tags">
+      <pxl-badge *pxlBadgeGroupItem tone="cyan">react</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="green">typescript</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="gold">design</pxl-badge>
+    </pxl-badge-group>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-overflow">
-        <h4>Overflow +N</h4>
-        <pre className="docs-code"><code>{`export function Overflow() {
+        <Subheading>Overflow +N</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Overflow +N code'}
+          react={`import { PixelBadgeGroup, PixelBadge } from '@pxlkit/ui-kit';
+
+export function Overflow() {
   return (
     <PixelBadgeGroup aria-label="Stack" max={3}>
       <PixelBadge tone="cyan">react</PixelBadge>
@@ -117,11 +247,48 @@ export function Default() {
       <PixelBadge tone="red">vitest</PixelBadge>
     </PixelBadgeGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge, PixelBadgeGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBadgeGroup aria-label="Stack" :max="3">
+    <PixelBadge tone="cyan">react</PixelBadge>
+    <PixelBadge tone="green">typescript</PixelBadge>
+    <PixelBadge tone="gold">design</PixelBadge>
+    <PixelBadge tone="purple">tailwind</PixelBadge>
+    <PixelBadge tone="pink">motion</PixelBadge>
+    <PixelBadge tone="red">vitest</PixelBadge>
+  </PixelBadgeGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem],
+  template: \`
+    <pxl-badge-group aria-label="Stack" [max]="3">
+      <pxl-badge *pxlBadgeGroupItem tone="cyan">react</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="green">typescript</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="gold">design</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="purple">tailwind</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="pink">motion</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="red">vitest</pxl-badge>
+    </pxl-badge-group>
+  \`,
+})
+export class Overflow {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelBadgeGroup, PixelBadge } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelBadgeGroup aria-label="Pixel tags" surface="pixel">
@@ -136,16 +303,56 @@ export function Default() {
       </PixelBadgeGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge, PixelBadgeGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelBadgeGroup aria-label="Pixel tags" surface="pixel">
+      <PixelBadge tone="cyan">pixel</PixelBadge>
+      <PixelBadge tone="green">chamfered</PixelBadge>
+      <PixelBadge tone="gold">retro</PixelBadge>
+    </PixelBadgeGroup>
+    <PixelBadgeGroup aria-label="Linear tags" surface="linear">
+      <PixelBadge tone="cyan">linear</PixelBadge>
+      <PixelBadge tone="green">pill</PixelBadge>
+      <PixelBadge tone="gold">modern</PixelBadge>
+    </PixelBadgeGroup>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-badge-group aria-label="Pixel tags" surface="pixel">
+        <pxl-badge *pxlBadgeGroupItem tone="cyan">pixel</pxl-badge>
+        <pxl-badge *pxlBadgeGroupItem tone="green">chamfered</pxl-badge>
+        <pxl-badge *pxlBadgeGroupItem tone="gold">retro</pxl-badge>
+      </pxl-badge-group>
+      <pxl-badge-group aria-label="Linear tags" surface="linear">
+        <pxl-badge *pxlBadgeGroupItem tone="cyan">linear</pxl-badge>
+        <pxl-badge *pxlBadgeGroupItem tone="green">pill</pxl-badge>
+        <pxl-badge *pxlBadgeGroupItem tone="gold">modern</pxl-badge>
+      </pxl-badge-group>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-badge">PixelBadge</a></li>
-        <li><a href="#pixel-chip-group">PixelChipGroup</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
-        <li><a href="#pixel-avatar-group">PixelAvatarGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge' : '#pixel-badge'}>PixelBadge</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-chip-group' : '#pixel-chip-group'}>PixelChipGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-avatar-group' : '#pixel-avatar-group'}>PixelAvatarGroup</a></li>
       </ul>
     </section>
     </section>

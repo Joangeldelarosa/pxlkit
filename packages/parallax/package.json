@@ -1,13 +1,21 @@
 {
   "name": "@pxlkit/parallax",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Multi-layer 3D parallax pixel art icons \u2014 10 interactive depth-based mouse-tracking icons with configurable perspective and layer separation",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
-  "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://pxlkit.xyz/icons",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/parallax"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -32,7 +40,7 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.2.3"
+    "@pxlkit/core": "^1.4.0"
   },
   "devDependencies": {
     "tsup": "^8.5.0",
@@ -59,6 +67,9 @@
     "source-available-icons",
     "3d-pixel-art",
     "layered-icons",
-    "css-3d-transform"
+    "css-3d-transform",
+    "pixel-icons",
+    "vue-icons",
+    "angular-icons"
   ]
 }

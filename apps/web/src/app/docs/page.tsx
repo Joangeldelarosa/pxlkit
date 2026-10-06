@@ -14,6 +14,8 @@ import type { IconPack, AnyIcon } from '@pxlkit/core';
 import { ParallaxPack, GhostFriend, CoolEmoji } from '@pxlkit/parallax';
 import { PixelTextLink, PxlKitButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
 import { ComponentDocs } from './_component-docs';
+import { FrameworkCode, type FrameworkCodeProps } from '@/components/FrameworkCode';
+import { STYLESHEET_SETUP, TAILWIND_SETUP } from '@/lib/setup-snippets';
 
 /* ─── Dynamic pack registry ─── */
 const ALL_PACKS: { pack: IconPack; previewIcon: AnyIcon; accent: string }[] = [
@@ -32,14 +34,20 @@ const TOTAL_PACKS = ALL_PACKS.length + 1; // +1 for parallax
 const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
 
 const ALL_PACK_IDS = [...ALL_PACKS.map((p) => p.pack.id), 'parallax'];
-const INSTALL_CMD = `npm install @pxlkit/core ${ALL_PACK_IDS.map((id) => `@pxlkit/${id}`).join(' ')}`;
+const ALL_PACK_PACKAGES = ALL_PACK_IDS.map((id) => `@pxlkit/${id}`).join(' ');
+/** The icon components of each framework, with every icon pack. */
+const INSTALL = {
+  react: `npm install @pxlkit/core ${ALL_PACK_PACKAGES}`,
+  vue: `npm install @pxlkit/vue ${ALL_PACK_PACKAGES}`,
+  angular: `npm install @pxlkit/angular ${ALL_PACK_PACKAGES}`,
+};
 
 const sections = [
   { id: 'getting-started', label: 'Getting Started' },
   { id: 'available-packs', label: 'Available Packs' },
   { id: 'icon-format', label: 'Icon Format' },
   { id: 'opacity', label: 'Opacity / Alpha' },
-  { id: 'react-component', label: 'React Component' },
+  { id: 'icon-component', label: 'Icon Component' },
   { id: 'animated-icons', label: 'Animated Icons' },
   { id: 'parallax-icons', label: 'Parallax 3D Icons' },
   { id: 'toast-notifications', label: 'Toast Notifications' },
@@ -211,7 +219,7 @@ export default function DocsPage() {
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-10 py-8 pb-24 space-y-16">
 
           <div className="text-center pt-8 mb-4">
-            <h1 className="font-pixel text-xl text-retro-cyan mb-3">DOCUMENTATION</h1>
+            <h1 className="font-pixel text-xl text-retro-cyan mb-3">PXLKIT DOCUMENTATION</h1>
             <p className="text-retro-muted font-mono text-sm">
               Three steps to your first rendered component. Then dig into icons, animation, and the rest of the kit.
             </p>
@@ -223,42 +231,85 @@ export default function DocsPage() {
           {/* Getting Started */}
           <Section id="getting-started" title="Getting Started">
             <P>
-              <strong className="text-retro-green">Step 1 — Install.</strong> One command pulls{' '}
-              <Code>@pxlkit/core</Code> and whichever icon packs you actually need. Pure SVG, no font loading,
-              tree-shakeable — every pack is its own npm module under the <Code>@pxlkit</Code> scope.
+              <strong className="text-retro-green">Step 1 — Install.</strong> One command pulls the
+              components for your framework — <Code>@pxlkit/core</Code> for React or, new in 2.2,{' '}
+              <Code>@pxlkit/vue</Code> for Vue 3 and <Code>@pxlkit/angular</Code> for Angular — and whichever icon
+              packs you actually need.
+              The packs are plain data, the same in every framework: pure SVG, no font loading, tree-shakeable —
+              every pack is its own npm module under the <Code>@pxlkit</Code> scope. The code below follows the
+              framework you pick, here and across the site.
             </P>
-            <CodeBlock title="npm install @pxlkit/core + icon packs">{INSTALL_CMD}</CodeBlock>
+            <FrameworkCodeBlock title="Install the components and the icon packs" {...INSTALL} />
             <P>
-              <strong className="text-retro-green">Step 2 — Wrap with the provider</strong>{' '}
-              (only needed for the UI Kit). Mount <Code>{'<PxlKitSurfaceProvider>'}</Code> once at the root of your
-              app to set the default surface — &quot;pixel&quot; for the retro 8-bit aesthetic, &quot;linear&quot; for
-              a flat modern one. Every UI Kit component reads from it, and any component can override locally with
-              its own <Code>surface</Code> prop.
+              <strong className="text-retro-green">Step 2 — Add the UI kit (optional).</strong> Install{' '}
+              <Code>@pxlkit/ui-kit</Code> for React — or, new in 2.2, <Code>@pxlkit/ui-kit-vue</Code> or{' '}
+              <Code>@pxlkit/ui-kit-angular</Code> — set up Tailwind CSS v4 and import the kit&apos;s stylesheet (see{' '}
+              <a href="#ui-kit" className="text-retro-cyan underline decoration-retro-cyan/40">UI Kit Components</a> below).
+              Then, if you want, set the default surface once at the root — it is &quot;pixel&quot;, the retro 8-bit
+              aesthetic, unless you pick &quot;linear&quot;, a flat modern one — with{' '}
+              <Code>{'<PxlKitSurfaceProvider>'}</Code> in React and Vue, or <Code>providePxlKitSurface()</Code> in
+              Angular. Every UI Kit component reads it, and any component can override it locally with its own{' '}
+              <Code>surface</Code> prop.
             </P>
-            <CodeBlock title="app/layout.tsx — wrap once at the root">{`import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
-import '@pxlkit/ui-kit/styles.css';
+            <FrameworkCodeBlock
+              title="Set the surface once at the root"
+              react={`// app/providers.tsx — Next.js App Router: the kit renders in Client Components
+'use client';
 
-export default function RootLayout({ children }) {
+import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return <PxlKitSurfaceProvider surface="pixel">{children}</PxlKitSurfaceProvider>;
+}
+
+// app/layout.tsx — stays a Server Component;
+// app/globals.css: @import "@pxlkit/ui-kit/styles.css"; (in place of @import "tailwindcss")
+import './globals.css';
+import { Providers } from './providers';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html lang="en">
       <body>
-        <PxlKitSurfaceProvider surface="pixel">
-          {children}
-        </PxlKitSurfaceProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
-}`}</CodeBlock>
+}`}
+              vue={`<!-- App.vue — and in src/style.css: @import "@pxlkit/ui-kit-vue/styles.css"; -->
+<script setup lang="ts">
+import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitSurfaceProvider surface="pixel">
+    <!-- your app (RouterView with Vue Router) -->
+    <RouterView />
+  </PxlKitSurfaceProvider>
+</template>`}
+              angular={`// src/app/app.config.ts — and in src/styles.css: @import "@pxlkit/ui-kit-angular/styles.css";
+import type { ApplicationConfig } from '@angular/core';
+import { providePxlKitSurface } from '@pxlkit/ui-kit-angular';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // …keep the providers \`ng new\` generated (error listeners, change detection,
+    // router, provideClientHydration() in SSR apps), and add:
+    providePxlKitSurface('pixel'),
+  ],
+};`}
+            />
             <P>
               <strong className="text-retro-green">Step 3 — Use components.</strong> Import any icon and any UI Kit
               primitive and render. Icons accept <Code>palette</Code> (default), <Code>tinted</Code>, and{' '}
               <Code>solid</Code> appearance modes — same prop, three looks.
             </P>
-            <CodeBlock title="Render an icon">{`import { PxlKitIcon } from '@pxlkit/core';
+            <FrameworkCodeBlock
+              title="Render an icon"
+              react={`import { PxlKitIcon } from '@pxlkit/core';
 import { Trophy } from '@pxlkit/gamification';
 import { CheckCircle } from '@pxlkit/feedback';
 import { Heart } from '@pxlkit/social';
-import { Sun } from '@pxlkit/weather';
 
 function App() {
   return (
@@ -273,7 +324,52 @@ function App() {
       <PxlKitIcon icon={Heart} size={48} appearance="tinted" color="#FF0000" />
     </div>
   );
-}`}</CodeBlock>
+}`}
+              vue={`<script setup lang="ts">
+import { PxlKitIcon } from '@pxlkit/vue';
+import { Trophy } from '@pxlkit/gamification';
+import { CheckCircle } from '@pxlkit/feedback';
+import { Heart } from '@pxlkit/social';
+</script>
+
+<template>
+  <div>
+    <!-- Palette colors (default) — uses the icon's original palette -->
+    <PxlKitIcon :icon="Trophy" :size="32" />
+
+    <!-- Solid mode — every pixel flattened to one color -->
+    <PxlKitIcon :icon="CheckCircle" :size="32" appearance="solid" color="#00FF88" />
+
+    <!-- Tinted mode — palette + colour overlay, preserves luminance -->
+    <PxlKitIcon :icon="Heart" :size="48" appearance="tinted" color="#FF0000" />
+  </div>
+</template>`}
+              angular={`import { Component } from '@angular/core';
+import { PxlKitIcon } from '@pxlkit/angular';
+import { Trophy } from '@pxlkit/gamification';
+import { CheckCircle } from '@pxlkit/feedback';
+import { Heart } from '@pxlkit/social';
+
+@Component({
+  selector: 'app-icons',
+  imports: [PxlKitIcon],
+  template: \`
+    <!-- Palette colors (default) — uses the icon's original palette -->
+    <pxl-icon [icon]="trophy" [size]="32" />
+
+    <!-- Solid mode — every pixel flattened to one color -->
+    <pxl-icon [icon]="checkCircle" [size]="32" appearance="solid" color="#00FF88" />
+
+    <!-- Tinted mode — palette + colour overlay, preserves luminance -->
+    <pxl-icon [icon]="heart" [size]="48" appearance="tinted" color="#FF0000" />
+  \`,
+})
+export class Icons {
+  protected readonly trophy = Trophy;
+  protected readonly checkCircle = CheckCircle;
+  protected readonly heart = Heart;
+}`}
+            />
             <div className="flex flex-wrap items-end gap-4 p-4 bg-retro-surface rounded-lg border border-retro-border/30 mt-4">
               <div className="text-center">
                 <PxlKitIcon icon={Trophy} size={32} />
@@ -336,7 +432,12 @@ function App() {
                 );
               })}
             </div>
-            <CodeBlock title="Install a single pack">{`npm install @pxlkit/core @pxlkit/social`}</CodeBlock>
+            <FrameworkCodeBlock
+              title="Install a single pack"
+              react="npm install @pxlkit/core @pxlkit/social"
+              vue="npm install @pxlkit/vue @pxlkit/social"
+              angular="npm install @pxlkit/angular @pxlkit/social"
+            />
           </Section>
 
           {/* Icon Format */}
@@ -440,9 +541,11 @@ const solid = encodeHexColor('#FF0000');
           </Section>
 
           {/* React Component */}
-          <Section id="react-component" title="React Component">
+          <Section id="icon-component" title="Icon Component">
+            {/* The section's earlier id, kept so links to it still land here. */}
+            <span id="react-component" className="block scroll-mt-24" aria-hidden="true" />
             <P>
-              The <Code>{'<PxlKitIcon />'}</Code> component renders pixel art as an{' '}
+              The <Code>{'<PxlKitIcon />'}</Code> component — <Code>{'<pxl-icon>'}</Code> in Angular — renders pixel art as an{' '}
               <Code>{'<img>'}</Code> element whose <Code>src</Code> is an inline SVG
               document encoded as a data URI (MIME <Code>image/svg+xml</Code>). The
               source format stays SVG end-to-end — vector, hi-DPI sharp, exportable —
@@ -461,7 +564,8 @@ const solid = encodeHexColor('#FF0000');
   appearance?: IconAppearance; // Colour mode (default: 'palette')
   color?: string;              // Tint hue / flat colour for 'tinted' & 'solid'
   className?: string;          // CSS class names (applied to the <img>)
-  'aria-label'?: string;       // Accessibility label (becomes <img alt>)
+  'aria-label'?: string;       // Accessible name (the <img alt>); unset or empty → the icon's name
+  decorative?: boolean;        // Beside text that says the same: alt="", skipped by screen readers
   style?: React.CSSProperties; // Inline styles (merged onto the <img>)
 
   /** @deprecated since v1.3 — use \`appearance="palette" | "solid"\` instead. */
@@ -471,14 +575,103 @@ const solid = encodeHexColor('#FF0000');
   /** @deprecated since v1.3 — use \`appearance="tinted" color="..."\` instead. */
   tint?: string;
 }`}</CodeBlock>
-            <CodeBlock title="Colour modes in action">{`// Default — original artwork palette
+            <P>
+              Vue&apos;s <Code>PxlKitIcon</Code> (<Code>@pxlkit/vue</Code>) and Angular&apos;s{' '}
+              <Code>{'<pxl-icon>'}</Code> (<Code>@pxlkit/angular</Code>) take the same props as inputs —{' '}
+              <Code>icon</Code>, <Code>size</Code>, <Code>appearance</Code>, <Code>color</Code>, the
+              accessible name (<Code>aria-label</Code>, <Code>ariaLabel</Code> in Angular) and{' '}
+              <Code>decorative</Code> — and render the same image; <Code>class</Code> and <Code>style</Code>{' '}
+              apply to their root. The deprecated props are React only.
+            </P>
+            <FrameworkCodeBlock
+              title="Colour modes in action"
+              react={`// Default — original artwork palette
 <PxlKitIcon icon={Trophy} size={32} />
 
 // Tinted — keep the palette luminance, shift the hue
 <PxlKitIcon icon={Trophy} size={32} appearance="tinted" color="#00FF88" />
 
 // Solid — every pixel becomes one colour
-<PxlKitIcon icon={Trophy} size={32} appearance="solid" color="#FF0000" />`}</CodeBlock>
+<PxlKitIcon icon={Trophy} size={32} appearance="solid" color="#FF0000" />`}
+              vue={`<!-- Default — original artwork palette -->
+<PxlKitIcon :icon="Trophy" :size="32" />
+
+<!-- Tinted — keep the palette luminance, shift the hue -->
+<PxlKitIcon :icon="Trophy" :size="32" appearance="tinted" color="#00FF88" />
+
+<!-- Solid — every pixel becomes one colour -->
+<PxlKitIcon :icon="Trophy" :size="32" appearance="solid" color="#FF0000" />`}
+              angular={`<!-- Default — original artwork palette -->
+<pxl-icon [icon]="trophy" [size]="32" />
+
+<!-- Tinted — keep the palette luminance, shift the hue -->
+<pxl-icon [icon]="trophy" [size]="32" appearance="tinted" color="#00FF88" />
+
+<!-- Solid — every pixel becomes one colour -->
+<pxl-icon [icon]="trophy" [size]="32" appearance="solid" color="#FF0000" />`}
+            />
+            <P>
+              Screen readers announce an icon by its <Code>aria-label</Code>, else by the icon&apos;s name; an
+              empty label counts as none. When visible text beside the icon already says what it means — a
+              button or link label, a heading, a list item — mark it <Code>decorative</Code>: it renders{' '}
+              <Code>alt=&quot;&quot;</Code>, so it is skipped instead of read before the label, and its name stays
+              out of the page&apos;s text. An icon that is a button&apos;s only content is its label: give it an{' '}
+              <Code>aria-label</Code> instead.
+            </P>
+            <FrameworkCodeBlock
+              title="Decorative icons"
+              react={`import { PxlKitIcon } from '@pxlkit/core';
+import { Download, Trash } from '@pxlkit/ui';
+
+// The visible label names the button: the icon beside it is decorative.
+<button>
+  <PxlKitIcon icon={Download} size={16} decorative /> Download
+</button>
+
+// The icon is the button's only content: it needs a label.
+<button>
+  <PxlKitIcon icon={Trash} size={16} aria-label="Delete" />
+</button>`}
+              vue={`<script setup lang="ts">
+import { PxlKitIcon } from '@pxlkit/vue';
+import { Download, Trash } from '@pxlkit/ui';
+</script>
+
+<template>
+  <!-- The visible label names the button: the icon beside it is decorative. -->
+  <button>
+    <PxlKitIcon :icon="Download" :size="16" decorative /> Download
+  </button>
+
+  <!-- The icon is the button's only content: it needs a label. -->
+  <button>
+    <PxlKitIcon :icon="Trash" :size="16" aria-label="Delete" />
+  </button>
+</template>`}
+              angular={`import { Component } from '@angular/core';
+import { PxlKitIcon } from '@pxlkit/angular';
+import { Download, Trash } from '@pxlkit/ui';
+
+@Component({
+  selector: 'app-file-actions',
+  imports: [PxlKitIcon],
+  template: \`
+    <!-- The visible label names the button: the icon beside it is decorative. -->
+    <button>
+      <pxl-icon [icon]="download" [size]="16" decorative /> Download
+    </button>
+
+    <!-- The icon is the button's only content: it needs a label. -->
+    <button>
+      <pxl-icon [icon]="trash" [size]="16" ariaLabel="Delete" />
+    </button>
+  \`,
+})
+export class FileActions {
+  protected readonly download = Download;
+  protected readonly trash = Trash;
+}`}
+            />
             <div className="rounded-lg border border-retro-border/30 bg-retro-surface p-4 mt-2">
               <p className="font-pixel text-[10px] text-retro-gold mb-3">MIGRATION FROM v1.2.x</p>
               <ul className="space-y-1.5 text-xs font-mono text-retro-muted">
@@ -545,7 +738,8 @@ type AnimationTrigger = 'loop' | 'once' | 'hover' | 'appear' | 'ping-pong';`}</C
   playing?: boolean;           // manual play/pause override
   className?: string;
   style?: React.CSSProperties;
-  'aria-label'?: string;
+  'aria-label'?: string;       // accessible name of the frames (default: the icon's name)
+  decorative?: boolean;        // beside text that says the same: every frame alt=""
 
   /** @deprecated since v1.3 — use \`appearance\` instead. */
   colorful?: boolean;
@@ -554,7 +748,14 @@ type AnimationTrigger = 'loop' | 'once' | 'hover' | 'appear' | 'ping-pong';`}</C
   /** @deprecated since v1.3 — use \`appearance="tinted" color="..."\` instead. */
   tint?: string;
 }`}</CodeBlock>
-            <CodeBlock title="Basic Usage">{`import { AnimatedPxlKitIcon } from '@pxlkit/core';
+            <P>
+              Vue&apos;s <Code>AnimatedPxlKitIcon</Code> and Angular&apos;s <Code>{'<pxl-animated-icon>'}</Code>{' '}
+              take the same props as inputs and play the same frames at the same times; the deprecated props are
+              React only.
+            </P>
+            <FrameworkCodeBlock
+              title="Basic Usage"
+              react={`import { AnimatedPxlKitIcon } from '@pxlkit/core';
 import { FireSword } from '@pxlkit/gamification';
 
 // Loop forever in palette mode (default)
@@ -564,8 +765,47 @@ import { FireSword } from '@pxlkit/gamification';
 <AnimatedPxlKitIcon icon={FireSword} size={32} appearance="solid" color="#00FF88" />
 
 // Tinted loop — keep luminance, shift hue
-<AnimatedPxlKitIcon icon={FireSword} size={32} appearance="tinted" color="#FF00AA" />`}</CodeBlock>
-            <CodeBlock title="Trigger Modes">{`// 'loop'      — plays continuously (default)
+<AnimatedPxlKitIcon icon={FireSword} size={32} appearance="tinted" color="#FF00AA" />`}
+              vue={`<script setup lang="ts">
+import { AnimatedPxlKitIcon } from '@pxlkit/vue';
+import { FireSword } from '@pxlkit/gamification';
+</script>
+
+<template>
+  <!-- Loop forever in palette mode (default) -->
+  <AnimatedPxlKitIcon :icon="FireSword" :size="48" />
+
+  <!-- Solid colour loop — flatten every pixel to one colour -->
+  <AnimatedPxlKitIcon :icon="FireSword" :size="32" appearance="solid" color="#00FF88" />
+
+  <!-- Tinted loop — keep luminance, shift hue -->
+  <AnimatedPxlKitIcon :icon="FireSword" :size="32" appearance="tinted" color="#FF00AA" />
+</template>`}
+              angular={`import { Component } from '@angular/core';
+import { AnimatedPxlKitIcon } from '@pxlkit/angular';
+import { FireSword } from '@pxlkit/gamification';
+
+@Component({
+  selector: 'app-fire-swords',
+  imports: [AnimatedPxlKitIcon],
+  template: \`
+    <!-- Loop forever in palette mode (default) -->
+    <pxl-animated-icon [icon]="fireSword" [size]="48" />
+
+    <!-- Solid colour loop — flatten every pixel to one colour -->
+    <pxl-animated-icon [icon]="fireSword" [size]="32" appearance="solid" color="#00FF88" />
+
+    <!-- Tinted loop — keep luminance, shift hue -->
+    <pxl-animated-icon [icon]="fireSword" [size]="32" appearance="tinted" color="#FF00AA" />
+  \`,
+})
+export class FireSwords {
+  protected readonly fireSword = FireSword;
+}`}
+            />
+            <FrameworkCodeBlock
+              title="Trigger Modes"
+              react={`// 'loop'      — plays continuously (default)
 <AnimatedPxlKitIcon icon={FireSword} trigger="loop" />
 
 // 'once'      — plays one time, stops on last frame
@@ -578,8 +818,39 @@ import { FireSword } from '@pxlkit/gamification';
 <AnimatedPxlKitIcon icon={FireSword} trigger="appear" />
 
 // 'ping-pong' — loops forward then backward alternating
-<AnimatedPxlKitIcon icon={FireSword} trigger="ping-pong" />`}</CodeBlock>
-            <CodeBlock title="Speed & FPS Control">{`// 2× speed — double frame rate
+<AnimatedPxlKitIcon icon={FireSword} trigger="ping-pong" />`}
+              vue={`<!-- 'loop'      — plays continuously (default) -->
+<AnimatedPxlKitIcon :icon="FireSword" trigger="loop" />
+
+<!-- 'once'      — plays one time, stops on last frame -->
+<AnimatedPxlKitIcon :icon="FireSword" trigger="once" />
+
+<!-- 'hover'     — plays only while the user hovers -->
+<AnimatedPxlKitIcon :icon="FireSword" trigger="hover" />
+
+<!-- 'appear'    — plays once when it enters the viewport -->
+<AnimatedPxlKitIcon :icon="FireSword" trigger="appear" />
+
+<!-- 'ping-pong' — loops forward then backward alternating -->
+<AnimatedPxlKitIcon :icon="FireSword" trigger="ping-pong" />`}
+              angular={`<!-- 'loop'      — plays continuously (default) -->
+<pxl-animated-icon [icon]="fireSword" trigger="loop" />
+
+<!-- 'once'      — plays one time, stops on last frame -->
+<pxl-animated-icon [icon]="fireSword" trigger="once" />
+
+<!-- 'hover'     — plays only while the user hovers -->
+<pxl-animated-icon [icon]="fireSword" trigger="hover" />
+
+<!-- 'appear'    — plays once when it enters the viewport -->
+<pxl-animated-icon [icon]="fireSword" trigger="appear" />
+
+<!-- 'ping-pong' — loops forward then backward alternating -->
+<pxl-animated-icon [icon]="fireSword" trigger="ping-pong" />`}
+            />
+            <FrameworkCodeBlock
+              title="Speed & FPS Control"
+              react={`// 2× speed — double frame rate
 <AnimatedPxlKitIcon icon={FireSword} speed={2} />
 
 // Half speed
@@ -589,7 +860,30 @@ import { FireSword } from '@pxlkit/gamification';
 <AnimatedPxlKitIcon icon={FireSword} fps={6} />
 
 // Paused manually
-<AnimatedPxlKitIcon icon={FireSword} playing={false} />`}</CodeBlock>
+<AnimatedPxlKitIcon icon={FireSword} playing={false} />`}
+              vue={`<!-- 2× speed — double frame rate -->
+<AnimatedPxlKitIcon :icon="FireSword" :speed="2" />
+
+<!-- Half speed -->
+<AnimatedPxlKitIcon :icon="FireSword" :speed="0.5" />
+
+<!-- Fixed FPS — takes priority over speed and icon.frameDuration -->
+<AnimatedPxlKitIcon :icon="FireSword" :fps="6" />
+
+<!-- Paused manually -->
+<AnimatedPxlKitIcon :icon="FireSword" :playing="false" />`}
+              angular={`<!-- 2× speed — double frame rate -->
+<pxl-animated-icon [icon]="fireSword" [speed]="2" />
+
+<!-- Half speed -->
+<pxl-animated-icon [icon]="fireSword" [speed]="0.5" />
+
+<!-- Fixed FPS — takes priority over speed and icon.frameDuration -->
+<pxl-animated-icon [icon]="fireSword" [fps]="6" />
+
+<!-- Paused manually -->
+<pxl-animated-icon [icon]="fireSword" [playing]="false" />`}
+            />
             <CodeBlock title="Export as Animated SVG">{`import { generateAnimatedSvg } from '@pxlkit/core';
 import { FireSword } from '@pxlkit/gamification';
 
@@ -618,7 +912,7 @@ const monoSvg = generateAnimatedSvg(FireSword, {
               </div>
               <div className="ml-auto text-right">
                 <p className="font-pixel text-[10px] text-retro-gold mb-1">LIVE PREVIEW</p>
-                <p className="font-mono text-[10px] text-retro-muted">FireSword &mdash; 4 frames &middot; 150ms</p>
+                <p className="font-mono text-[10px] text-retro-muted">FireSword &mdash; {FireSword.frames.length} frames &middot; {FireSword.frameDuration}ms</p>
                 <p className="font-mono text-[10px] text-retro-muted/50 mt-0.5">hover center icon to trigger it</p>
               </div>
             </div>
@@ -632,8 +926,15 @@ const monoSvg = generateAnimatedSvg(FireSword, {
               viewport rotates the entire scene, creating a true 3D effect. Click interactions trigger particle bursts,
               layer explosions, and color shifts.
             </P>
-            <CodeBlock title="Install">{`npm install @pxlkit/core @pxlkit/parallax`}</CodeBlock>
-            <CodeBlock title="Basic Usage">{`import { ParallaxPxlKitIcon } from '@pxlkit/core';
+            <FrameworkCodeBlock
+              title="Install"
+              react="npm install @pxlkit/core @pxlkit/parallax"
+              vue="npm install @pxlkit/vue @pxlkit/parallax"
+              angular="npm install @pxlkit/angular @pxlkit/parallax"
+            />
+            <FrameworkCodeBlock
+              title="Basic Usage"
+              react={`import { ParallaxPxlKitIcon } from '@pxlkit/core';
 import { GhostFriend, CoolEmoji } from '@pxlkit/parallax';
 
 // Basic 3D parallax icon (palette is the default — every layer keeps its colours)
@@ -647,7 +948,53 @@ import { GhostFriend, CoolEmoji } from '@pxlkit/parallax';
   interactive
   appearance="tinted"
   color="#FFD700"
-/>`}</CodeBlock>
+/>`}
+              vue={`<script setup lang="ts">
+import { ParallaxPxlKitIcon } from '@pxlkit/vue';
+import { GhostFriend, CoolEmoji } from '@pxlkit/parallax';
+</script>
+
+<template>
+  <!-- Basic 3D parallax icon (palette is the default — every layer keeps its colours) -->
+  <ParallaxPxlKitIcon :icon="GhostFriend" :size="64" />
+
+  <!-- Large interactive icon with custom strength + a tint applied to every layer -->
+  <ParallaxPxlKitIcon
+    :icon="CoolEmoji"
+    :size="128"
+    :strength="20"
+    interactive
+    appearance="tinted"
+    color="#FFD700"
+  />
+</template>`}
+              angular={`import { Component } from '@angular/core';
+import { ParallaxPxlKitIcon } from '@pxlkit/angular';
+import { GhostFriend, CoolEmoji } from '@pxlkit/parallax';
+
+@Component({
+  selector: 'app-parallax-icons',
+  imports: [ParallaxPxlKitIcon],
+  template: \`
+    <!-- Basic 3D parallax icon (palette is the default — every layer keeps its colours) -->
+    <pxl-parallax-icon [icon]="ghostFriend" [size]="64" />
+
+    <!-- Large interactive icon with custom strength + a tint applied to every layer -->
+    <pxl-parallax-icon
+      [icon]="coolEmoji"
+      [size]="128"
+      [strength]="20"
+      interactive
+      appearance="tinted"
+      color="#FFD700"
+    />
+  \`,
+})
+export class ParallaxIcons {
+  protected readonly ghostFriend = GhostFriend;
+  protected readonly coolEmoji = CoolEmoji;
+}`}
+            />
 
             <P>
               <strong className="text-retro-gold">How it works:</strong> Each parallax icon is composed
@@ -667,8 +1014,9 @@ import { GhostFriend, CoolEmoji } from '@pxlkit/parallax';
 }
 
 interface ParallaxLayer {
-  icon: AnimatedPxlKitData;  // each layer is an animated icon
-  depth: number;             // Z-depth: positive = far, negative = near
+  icon: PxlKitData | AnimatedPxlKitData;  // static or animated
+  depth: number;  // authoring metadata: 0 = anchor, positive = behind, negative = in front;
+                  // the renderers stack layers in array order, deepest first
   // depth: 3.0  → far background (shadow, trail)
   // depth: 0    → center baseline (body)
   // depth: -2.0 → near foreground (face details, blush)
@@ -688,7 +1036,8 @@ interface ParallaxLayer {
   onActivate?: (active: boolean) => void;  // Click toggle callback
   className?: string;
   style?: React.CSSProperties;
-  'aria-label'?: string;
+  'aria-label'?: string;       // Name of the role="img" container (default: the icon's name)
+  decorative?: boolean;        // Container aria-hidden, every layer alt="" (default: false)
 
   /** @deprecated since v1.3 — use \`appearance\` instead. */
   colorful?: boolean;
@@ -697,6 +1046,12 @@ interface ParallaxLayer {
   /** @deprecated since v1.3 — use \`appearance="tinted" color="..."\` instead. */
   tint?: string;
 }`}</CodeBlock>
+            <P>
+              Vue&apos;s <Code>ParallaxPxlKitIcon</Code> and Angular&apos;s <Code>{'<pxl-parallax-icon>'}</Code>{' '}
+              take the same props as inputs; <Code>onActivate</Code> is the <Code>activate</Code> event in Vue
+              (<Code>@activate</Code>) and the <Code>activate</Code> output in Angular (<Code>(activate)</Code>).
+              The deprecated props are React only.
+            </P>
 
             <P>
               <strong className="text-retro-cyan">Key features:</strong>
@@ -705,7 +1060,7 @@ interface ParallaxLayer {
               <li><strong className="text-retro-text">True 3D Depth</strong> — CSS perspective + preserve-3d + per-layer translateZ for real depth</li>
               <li><strong className="text-retro-text">Page-Wide Tracking</strong> — Mouse rotation works across the entire viewport, not just the icon</li>
               <li><strong className="text-retro-text">Click Interactions</strong> — Particle bursts, layer explosions, random rotation jolt, color hue-shift on click</li>
-              <li><strong className="text-retro-text">Animated Layers</strong> — Each layer is a full <Code>AnimatedPxlKitData</Code> with frame-based animation (e.g., blinking eyes, flickering shadows)</li>
+              <li><strong className="text-retro-text">Animated Layers</strong> — Each layer is a static or animated icon; animated layers play their frames (e.g., blinking eyes, flickering shadows)</li>
               <li><strong className="text-retro-text">Peel-Apart Intro</strong> — Layers spread out in a dramatic animation on mount</li>
               <li><strong className="text-retro-text">Depth Shadows</strong> — Soft CSS shadows between layers for visual depth</li>
             </ul>
@@ -769,56 +1124,190 @@ import {
 
           {/* Toast Notifications */}
           <Section id="toast-notifications" title="Toast Notifications">
-            <P>
-              Toast notifications come in two layers — both documented in the UI Kit:
-            </P>
+            <P>Toast notifications come in two layers:</P>
             <ul className="space-y-2 text-sm text-retro-muted ml-4 list-disc list-outside mb-3">
               <li>
-                <PixelTextLink href="/ui-kit#pixel-toast">/ui-kit#pixel-toast</PixelTextLink>{' '}
-                — the low-level <Code>{'<PixelToast>'}</Code> component shipped from{' '}
-                <Code>@pxlkit/core</Code>: 15 props for visibility, title/message, icon,
-                position, duration, colours, close button.
+                <strong className="text-retro-text">The UI kit&apos;s toasts</strong> — its{' '}
+                <Code>{'<PxlKitToastProvider>'}</Code> with <Code>useToast()</Code> (React, Vue) or{' '}
+                <Code>injectToast()</Code> (Angular), which stacks toasts, handles their timers, announces them
+                to screen readers and exposes <Code>success</Code> / <Code>error</Code> / <Code>info</Code> /{' '}
+                <Code>warning</Code> / <Code>loading</Code> / <Code>promise</Code> shortcuts. Use this in app
+                code: try it in the{' '}
+                <PixelTextLink href="/ui-kit#use-toast">/ui-kit playground</PixelTextLink>, or read{' '}
+                <PixelTextLink href="/docs#pxl-kit-toast-provider">its reference</PixelTextLink>.
               </li>
               <li>
-                <PixelTextLink href="/ui-kit#use-toast">/ui-kit#use-toast</PixelTextLink>{' '}
-                — the <Code>{'<ToastProvider>'}</Code> + <Code>useToast()</Code> hook pattern
-                that stacks multiple toasts, handles timers, and exposes{' '}
-                <Code>success</Code> / <Code>error</Code> / <Code>info</Code> / <Code>warning</Code>{' '}
-                shortcuts. Use this in app code.
+                <strong className="text-retro-text">The icon components&apos; PixelToast</strong> —{' '}
+                <Code>@pxlkit/core</Code>, <Code>@pxlkit/vue</Code> and <Code>@pxlkit/angular</Code> ship a
+                single toast pinned to a corner of the screen, whose visibility you control: for a page that
+                needs one notification without the UI kit. Its props and code are below.
               </li>
             </ul>
-            <CodeBlock title="Quick Usage">{`import { useToast } from '@/components/ToastProvider';
-import { PixelButton } from '@pxlkit/ui-kit';
-import { CheckCircle } from '@pxlkit/feedback';
+            <FrameworkCodeBlock
+              title="Quick usage — inside the toast provider"
+              react={`import { PixelButton, PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
 
-function App() {
-  const { success } = useToast();
-
+function SaveButton() {
+  const { toast } = useToast();
   return (
-    <PixelButton tone="green"
-      onClick={() => success('SAVED', 'Your changes have been saved', CheckCircle)}
-    >
+    <PixelButton tone="green" onClick={() => toast.success('Saved', 'Your changes have been saved')}>
       Show Toast
     </PixelButton>
   );
-}`}</CodeBlock>
+}
+
+export function App() {
+  return (
+    <PxlKitToastProvider>
+      <SaveButton />
+    </PxlKitToastProvider>
+  );
+}`}
+              vue={`<!-- SaveButton.vue — rendered inside <PxlKitToastProvider> -->
+<script setup lang="ts">
+import { PixelButton, useToast } from '@pxlkit/ui-kit-vue';
+
+const { toast } = useToast();
+</script>
+
+<template>
+  <PixelButton tone="green" @click="toast.success('Saved', 'Your changes have been saved')">
+    Show Toast
+  </PixelButton>
+</template>`}
+              angular={`// Rendered inside <pxl-toast-provider>
+import { Component } from '@angular/core';
+import { PixelButton, injectToast } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  selector: 'app-save-button',
+  imports: [PixelButton],
+  template: \`<button pxlButton tone="green" (click)="save()">Show Toast</button>\`,
+})
+export class SaveButton {
+  private readonly toasts = injectToast();
+
+  save() {
+    this.toasts.toast.success('Saved', 'Your changes have been saved');
+  }
+}`}
+            />
             <P>
-              Available tones: <Code>success</Code>, <Code>error</Code>, <Code>warning</Code>,{' '}
-              <Code>info</Code>. Each tone has default colors and icons, but you can override them
-              with any Pxlkit icon — including animated ones.
+              Shortcuts: <Code>success</Code>, <Code>error</Code>, <Code>warning</Code>, <Code>info</Code>{' '}
+              and <Code>loading</Code>, plus <Code>promise</Code> for work in flight. Each tone has its
+              colours; pass an <Code>icon</Code> (any Pxlkit icon, animated ones included) in the toast&apos;s
+              options to show one.
             </P>
             <div className="p-4 bg-retro-surface rounded-lg border border-retro-cyan/20 mt-4">
-              <p className="font-pixel text-[10px] text-retro-cyan mb-2">DETAILED UI KIT DOCS</p>
+              <p className="font-pixel text-[10px] text-retro-cyan mb-2">TRY THE UI KIT&apos;S TOASTS</p>
               <p className="text-xs text-retro-muted">
-                Open the dedicated UI Kit section for interactive controls and full prop details:
+                Push toasts live — every shortcut, position, duration, an animated icon and a promise:
               </p>
               <PixelTextLink
-                href="/ui-kit#pixel-toast"
+                href="/ui-kit#use-toast"
                 className="inline-block mt-3 px-4 py-2 font-mono text-xs border border-retro-cyan/40 rounded hover:bg-retro-cyan/10 transition-colors no-underline"
               >
-                Open PixelToast Docs →
+                Open the toast playground →
               </PixelTextLink>
             </div>
+
+            <p className="font-pixel text-[10px] text-retro-gold mt-8 mb-3">THE ICON COMPONENTS&apos; PIXELTOAST</p>
+            <P>
+              One toast at a time, pinned to a corner: you show it with <Code>visible</Code>, and it asks to be
+              closed when its <Code>duration</Code> runs out or the reader presses its close button —{' '}
+              <Code>onClose</Code> in React, the <Code>close</Code> event in Vue (<Code>@close</Code>), the{' '}
+              <Code>closed</Code> output in Angular (<Code>(closed)</Code>).
+            </P>
+            <CodeBlock title="PixelToast props">{`interface PixelToastProps {
+  /** Whether the toast is shown. */
+  visible: boolean;
+  title: string;
+  message?: string;
+  /** A Pxlkit icon, shown on the left. */
+  icon?: PxlKitData;
+  /** The icon in its palette colours (default), or flat in accentColor. */
+  colorfulIcon?: boolean;      // default true
+  iconSize?: number;           // default 24
+  bgColor?: string;            // default '#12121a'
+  borderColor?: string;        // default '#2a2a3e'
+  textColor?: string;          // default '#e8e6e3'
+  /** Colour of the title, status dot and close button. */
+  accentColor?: string;        // default '#00ff88'
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'; // default 'top-right'
+  /** Auto-close delay in ms; 0 disables it. */
+  duration?: number;           // default 2200
+  showClose?: boolean;         // default true
+  onClose?: () => void;        // Vue: @close · Angular: (closed)
+  className?: string;          // Vue and Angular: class
+}`}</CodeBlock>
+            <FrameworkCodeBlock
+              title="A single toast"
+              react={`import { useState } from 'react';
+import { PixelToast } from '@pxlkit/core';
+import { CheckCircle } from '@pxlkit/feedback';
+
+export function SaveButton() {
+  const [saved, setSaved] = useState(false);
+  return (
+    <>
+      <button onClick={() => setSaved(true)}>Save</button>
+      <PixelToast
+        visible={saved}
+        title="Saved"
+        message="Your changes were saved."
+        icon={CheckCircle}
+        onClose={() => setSaved(false)}
+      />
+    </>
+  );
+}`}
+              vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToast } from '@pxlkit/vue';
+import { CheckCircle } from '@pxlkit/feedback';
+
+const saved = ref(false);
+</script>
+
+<template>
+  <button @click="saved = true">Save</button>
+  <PixelToast
+    :visible="saved"
+    title="Saved"
+    message="Your changes were saved."
+    :icon="CheckCircle"
+    @close="saved = false"
+  />
+</template>`}
+              angular={`import { Component, signal } from '@angular/core';
+import { PixelToast } from '@pxlkit/angular';
+import { CheckCircle } from '@pxlkit/feedback';
+
+@Component({
+  selector: 'app-save-button',
+  imports: [PixelToast],
+  template: \`
+    <button (click)="saved.set(true)">Save</button>
+    <pxl-toast
+      [visible]="saved()"
+      title="Saved"
+      message="Your changes were saved."
+      [icon]="checkCircle"
+      (closed)="saved.set(false)"
+    />
+  \`,
+})
+export class SaveButton {
+  protected readonly saved = signal(false);
+  protected readonly checkCircle = CheckCircle;
+}`}
+            />
+            <P>
+              This <Code>PixelToast</Code> is styled with Tailwind utilities that ship inside <Code>@pxlkit/core</Code>{' '}
+              — the UI kit&apos;s stylesheet does not cover them. With Tailwind CSS v4, add{' '}
+              <Code>@source &quot;../node_modules/@pxlkit/core/dist&quot;;</Code> to your stylesheet (adjust the
+              relative path to where your stylesheet sits).
+            </P>
           </Section>
 
           {/* SVG Generation */}
@@ -939,28 +1428,103 @@ if (icon) {
           {/* UI Kit Components */}
           <Section id="ui-kit" title="UI Kit Components">
             <P>
-              Pxlkit includes a full React + TypeScript component library with{' '}
-              <Code>{UI_COMPONENTS_COUNT} production-ready components</Code>: buttons, inputs, cards,
-              selects, modals, toasts, tables, badges, avatars, skeletons, layout primitives, and animation wrappers.
+              Pxlkit&apos;s UI kit is a React library, <Code>@pxlkit/ui-kit</Code>:{' '}
+              <Code>{UI_COMPONENTS_COUNT} production-ready components</Code> — buttons, inputs, cards, selects,
+              modals, toasts, tables, badges, avatars, skeletons, layout primitives and animation wrappers. New in
+              2.2, the same components ship for Vue 3 (<Code>@pxlkit/ui-kit-vue</Code>) and Angular (
+              <Code>@pxlkit/ui-kit-angular</Code>, standalone, signal-based components that work with{' '}
+              <Code>ngModel</Code> and reactive forms), with the same markup, theme and behaviour on one
+              framework-neutral core (<Code>@pxlkit/ui-kit-core</Code>). Live demos and the walkthrough are on{' '}
+              <PixelTextLink href="/ui-kit#getting-started">/ui-kit</PixelTextLink>.
             </P>
-            <CodeBlock title="UI Kit Route">{`/ui-kit#getting-started`}</CodeBlock>
-            <CodeBlock title="Install UI Kit">{`npm install @pxlkit/core @pxlkit/ui-kit tailwindcss`}</CodeBlock>
-            <CodeBlock title="CSS Setup (Tailwind v4)">{`/* Add this to your global stylesheet (e.g., globals.css or index.css) */
-@import "tailwindcss";
-@import "@pxlkit/ui-kit/styles.css";
-
-/* Tell Tailwind to scan the package for its utility classes */
-@source "../node_modules/@pxlkit/ui-kit";`}</CodeBlock>
-            <CodeBlock title="Import Components">{`import { PixelButton, PixelCard, PixelInput, PixelSelect } from '@pxlkit/ui-kit';
+            <FrameworkCodeBlock
+              title="Install the UI kit"
+              react="npm install @pxlkit/ui-kit @pxlkit/core @pxlkit/gamification"
+              vue="npm install @pxlkit/ui-kit-vue @pxlkit/vue @pxlkit/gamification"
+              angular="npm install @pxlkit/ui-kit-angular @pxlkit/angular @pxlkit/gamification"
+            />
+            <FrameworkCodeBlock title="Tailwind CSS v4 in your build" {...TAILWIND_SETUP} />
+            <P>
+              The kit&apos;s stylesheet is a Tailwind CSS v4 entry point, so Tailwind has to process it. Without that
+              step the build still succeeds, but the CSS keeps <Code>@theme</Code>, <Code>@source</Code> and{' '}
+              <Code>@apply</Code> as written and the components render unstyled.
+            </P>
+            <FrameworkCodeBlock title="CSS setup — in place of @import &quot;tailwindcss&quot;" {...STYLESHEET_SETUP} />
+            <P>
+              The kit&apos;s stylesheet imports Tailwind CSS itself, so do not import <Code>tailwindcss</Code> as well.
+              It styles the components, not the page: give <Code>{'<body>'}</Code> the theme yourself, and remove a
+              starter template&apos;s own theme rules — create-next-app&apos;s <Code>globals.css</Code> sets a white
+              body background, <Code>font-family: Arial</Code> and an <Code>@theme inline</Code> that remaps{' '}
+              <Code>--font-sans</Code> and <Code>--font-mono</Code>, all of which override the kit&apos;s.
+            </P>
+            <FrameworkCodeBlock
+              title="Use the components"
+              react={`import { PixelButton } from '@pxlkit/ui-kit';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Trophy } from '@pxlkit/gamification';
 
-<PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} />}>
+<PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} decorative />}>
   Create Quest
-</PixelButton>`}</CodeBlock>
+</PixelButton>`}
+              vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+import { PxlKitIcon } from '@pxlkit/vue';
+import { Trophy } from '@pxlkit/gamification';
+</script>
+
+<template>
+  <PixelButton tone="green">
+    <template #icon-left><PxlKitIcon :icon="Trophy" :size="16" decorative /></template>
+    Create Quest
+  </PixelButton>
+</template>`}
+              angular={`import { Component } from '@angular/core';
+import { PxlKitIcon } from '@pxlkit/angular';
+import { Trophy } from '@pxlkit/gamification';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  selector: 'app-create-quest',
+  imports: [PixelButton, PxlKitIcon],
+  template: \`
+    <button pxlButton tone="green" [iconLeft]="trophyIcon">Create Quest</button>
+    <ng-template #trophyIcon><pxl-icon [icon]="trophy" [size]="16" decorative /></ng-template>
+  \`,
+})
+export class CreateQuest {
+  protected readonly trophy = Trophy;
+}`}
+            />
+            <P>
+              <strong className="text-retro-text">Next.js (App Router).</strong> The components use state, effects
+              and context, so they render in Client Components. Keep <Code>app/layout.tsx</Code> a Server Component
+              and put the providers in a <Code>&apos;use client&apos;</Code> file of your own (Step 2 above has both
+              files); start the files that use the components&apos; hooks or event handlers with{' '}
+              <Code>&apos;use client&apos;</Code>. In Server Components, import helpers such as{' '}
+              <Code>buildGoogleFontsUrl</Code>, <Code>toLocaleUpper</Code> or <Code>cn</Code> from{' '}
+              <Code>@pxlkit/ui-kit-core</Code>. Of the icon components, <Code>PxlKitIcon</Code> renders in a
+              Server Component; <Code>AnimatedPxlKitIcon</Code>, <Code>ParallaxPxlKitIcon</Code> and{' '}
+              <Code>PixelToast</Code> need a Client Component.
+            </P>
+            <P>
+              <strong className="text-retro-text">Server rendering.</strong> The three kits render on the server
+              and hydrate — Next.js, Nuxt, <Code>@angular/ssr</Code>. A calendar shows the current month and marks
+              today, which depends on the reader&apos;s clock: give <Code>PixelCalendarGrid</Code> a{' '}
+              <Code>month</Code> (or a <Code>value</Code>) for a stable server render, or render a current-month
+              calendar in the browser only — <Code>next/dynamic</Code> with <Code>ssr: false</Code> in Next.js,{' '}
+              <Code>{'<ClientOnly>'}</Code> in Nuxt, <Code>@defer</Code> in Angular.
+            </P>
+            <P>
+              <strong className="text-retro-text">Dark mode.</strong> The theme follows a class:{' '}
+              <Code>.dark</Code> on <Code>{'<html>'}</Code> (or any ancestor) selects the dark palette,{' '}
+              <Code>.light</Code> the light one. <Code>useDarkMode()</Code> (React, Vue) and{' '}
+              <Code>injectDarkMode()</Code> (Angular) switch it and remember the reader&apos;s choice. To re-skin,
+              redefine any <Code>--retro-*</Code> variable on <Code>:root</Code> (light) and <Code>.dark</Code>, after
+              the kit&apos;s import.
+            </P>
             <P>
               The UI Kit page includes live previews, props tables, and copy-ready code examples
-              for each element. Use the sidebar to browse everything by category, including
+              for each element. Use the sidebar to browse everything by category, including{' '}
               <Code>PixelToast</Code> and animation utilities.
             </P>
             <PixelTextLink
@@ -980,11 +1544,12 @@ import { Trophy } from '@pxlkit/gamification';
               components are added or removed from @pxlkit/ui-kit. */}
           <Section id="component-reference" title="Component Reference">
             <P>
-              Per-component API reference for every <Code>@pxlkit/ui-kit</Code> component, generated
-              straight from each component&apos;s SSOT manifest — description, props, accessibility
-              contract, keyboard map, and examples, all inlined per component. Click an entry to
-              expand it, or deep-link with <Code>/docs#pixel-button</Code>. For live demos, head to
-              the <PixelTextLink href="/ui-kit">UI Kit showcase</PixelTextLink>.
+              Per-component reference for every component of the kit — description, accessibility
+              contract, keyboard map and the examples in React, Vue and Angular, from each
+              component&apos;s manifest, and its API in each framework (props, events, slots and
+              bindings), read from the kits&apos; sources. Click an entry to expand it, open its own
+              page, or deep-link with <Code>/docs#pixel-button</Code>. For live demos, head to the{' '}
+              <PixelTextLink href="/ui-kit">UI Kit showcase</PixelTextLink>.
             </P>
             <div className="space-y-1.5">
               <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">ACTIONS (4)</h3>
@@ -1231,6 +1796,31 @@ function Code({ children }: { children: React.ReactNode }) {
     <code className="px-1.5 py-0.5 bg-retro-surface border border-retro-border/30 rounded font-mono text-xs text-retro-cyan">
       {children}
     </code>
+  );
+}
+
+/**
+ * The same code in React, Vue and Angular, drawn like `CodeBlock`: tabs that
+ * follow the framework the reader picked, on this page and across the site.
+ */
+function FrameworkCodeBlock({
+  title,
+  ...sources
+}: { title: string } & Pick<FrameworkCodeProps, 'react' | 'vue' | 'angular'>) {
+  return (
+    <div className="mb-4">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="w-2 h-2 rounded-full bg-retro-green/50" />
+        <span className="font-mono text-[10px] text-retro-muted">{title}</span>
+      </div>
+      <FrameworkCode {...sources} label={`${title}, by framework`}>
+        {(code) => (
+          <pre className="code-block text-xs leading-relaxed">
+            <code className="text-retro-text/80">{code}</code>
+          </pre>
+        )}
+      </FrameworkCode>
+    </div>
   );
 }
 

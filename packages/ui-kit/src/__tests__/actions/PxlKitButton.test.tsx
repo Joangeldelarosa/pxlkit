@@ -36,3 +36,23 @@ describe('PxlKitButton — deprecated alias of PixelIconButton', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('PixelIconButton — shadows and moves', () => {
+  it('moves a pixel button on hover and press without a drop shadow, which its cut corners would clip', () => {
+    const classes = render(<PixelIconButton label="Go" icon={<span>x</span>} />).getByRole('button').className.split(' ');
+    expect(classes).toEqual(expect.arrayContaining(['pxl-corner-sm', 'pxl-nudge-hover', 'pxl-nudge-active']));
+    for (const shadow of ['pxl-shadow', 'pxl-shadow-hover', 'pxl-shadow-active']) expect(classes).not.toContain(shadow);
+  });
+
+  it('keeps the linear shadows, and holds a disabled button still', () => {
+    const { getAllByRole } = render(
+      <>
+        <PixelIconButton label="Go" icon={<span>x</span>} surface="linear" />
+        <PixelIconButton label="Off" icon={<span>x</span>} disabled />
+      </>,
+    );
+    const [linear, disabled] = getAllByRole('button').map((button) => button.className.split(' '));
+    expect(linear).toEqual(expect.arrayContaining(['shadow-sm', 'hover:shadow-md', 'active:shadow-sm']));
+    for (const name of ['pxl-shadow', 'pxl-nudge-hover', 'pxl-nudge-active']) expect(disabled).not.toContain(name);
+  });
+});

@@ -69,7 +69,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          # Publish @pxlkit/core first — other packages depend on it
+          # Dependencies first: @pxlkit/core, the icon packs, the icon components,
+          # then @pxlkit/ui-kit-core before the three kits built on it
           PACKAGES=(
             "packages/core"
             "packages/gamification"
@@ -79,7 +80,12 @@ jobs:
             "packages/ui"
             "packages/effects"
             "packages/parallax"
+            "packages/vue"
+            "packages/angular"
+            "packages/ui-kit-core"
             "packages/ui-kit"
+            "packages/ui-kit-vue"
+            "packages/ui-kit-angular"
           )
 
           published=0

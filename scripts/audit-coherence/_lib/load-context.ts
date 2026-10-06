@@ -33,6 +33,11 @@ export interface AuditContext {
   repoRoot: string;
   manifests: ManifestRecord[];
   uiKitSrcDir: string;
+  /**
+   * `packages/ui-kit-core/src` — the framework-neutral core shared by the
+   * React, Vue and Angular kits (tokens, the `Tone` vocabulary, class maps).
+   */
+  uiKitCoreSrcDir?: string;
   appsWebSrcDir: string;
   tokensFile: string;
   registryFile: string;
@@ -42,13 +47,18 @@ export interface AuditContext {
   logger: Logger;
 }
 
-export function createLogger(verbose = false): Logger {
+/**
+ * The console logger. With `stderr`, info and debug lines go to stderr as
+ * well — for `--json`, whose stdout must carry the report alone.
+ */
+export function createLogger(verbose = false, { stderr = false }: { stderr?: boolean } = {}): Logger {
+  const out = stderr ? console.error : console.log;
   return {
-    info: (msg) => console.log(pc.cyan('info'), msg),
+    info: (msg) => out(pc.cyan('info'), msg),
     warn: (msg) => console.warn(pc.yellow('warn'), msg),
     error: (msg) => console.error(pc.red('error'), msg),
     debug: (msg) => {
-      if (verbose) console.log(pc.dim('debug'), pc.dim(msg));
+      if (verbose) out(pc.dim('debug'), pc.dim(msg));
     },
   };
 }
@@ -215,8 +225,10 @@ export async function loadAuditContext(
   }
 
   const uiKitSrcDir = path.join(absRoot, 'packages/ui-kit/src');
+  const uiKitCoreSrcDir = path.join(absRoot, 'packages/ui-kit-core/src');
   const appsWebSrcDir = path.join(absRoot, 'apps/web/src');
-  const tokensFile = path.join(uiKitSrcDir, 'tokens.ts');
+  // The design tokens are defined once, in the framework-neutral core.
+  const tokensFile = path.join(uiKitCoreSrcDir, 'tokens.ts');
   const registryFile = path.join(uiKitSrcDir, 'registry.ts');
 
   const packageJsons = await discoverPackages(absRoot, logger);
@@ -228,6 +240,7 @@ export async function loadAuditContext(
     repoRoot: absRoot,
     manifests,
     uiKitSrcDir,
+    uiKitCoreSrcDir,
     appsWebSrcDir,
     tokensFile,
     registryFile,

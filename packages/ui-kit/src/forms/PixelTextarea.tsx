@@ -4,8 +4,17 @@
 
 import React, { forwardRef, useCallback, useId, useRef, useState } from 'react';
 import {
+  autosizeTextarea,
+  characterCountClasses,
+  characterCountText,
+  fieldDescribedBy,
+  fieldMessageId,
+  showCountMax,
+  textareaClasses,
+} from '@pxlkit/ui-kit-core';
+import {
   Tone, Surface, cn,
-  toneMap, focusRing, inputBase, surfaceClasses, useEffectiveSurface,
+  useEffectiveSurface,
   FieldShell,
 } from '../common';
 import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
@@ -46,12 +55,12 @@ export const PixelTextarea = forwardRef<HTMLTextAreaElement, PixelTextareaProps>
     value,
     defaultValue,
     onChange,
+    'aria-describedby': ariaDescribedBy,
     ...rest
   },
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const reactId = useId();
   const textareaId = rest.id ?? `pxl-textarea-${reactId}`;
 
@@ -74,18 +83,7 @@ export const PixelTextarea = forwardRef<HTMLTextAreaElement, PixelTextareaProps>
 
   const resize = useCallback(() => {
     const el = innerRef.current;
-    if (!el || !autosize) return;
-    // Read line-height to clamp by row count. Fallback to 20 if not measurable.
-    const cs = typeof window !== 'undefined' ? window.getComputedStyle(el) : null;
-    const lineHeight = cs ? parseFloat(cs.lineHeight) || 20 : 20;
-    const padY = cs ? parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) : 0;
-    const min = lineHeight * minRows + padY;
-    const max = typeof maxRows === 'number' ? lineHeight * maxRows + padY : Infinity;
-    // Reset to allow shrink, then read scrollHeight.
-    el.style.height = 'auto';
-    const next = Math.max(min, Math.min(el.scrollHeight, max));
-    el.style.height = `${next}px`;
-    el.style.overflowY = el.scrollHeight > max ? 'auto' : 'hidden';
+    if (el && autosize) autosizeTextarea(el, minRows, maxRows);
   }, [autosize, minRows, maxRows]);
 
   // Resize on mount + when the value changes externally (controlled mode).
@@ -105,42 +103,26 @@ export const PixelTextarea = forwardRef<HTMLTextAreaElement, PixelTextareaProps>
     }
   };
 
-  const max =
-    typeof showCount === 'object' && showCount !== null && typeof showCount.max === 'number'
-      ? showCount.max
-      : undefined;
-  const countText = max !== undefined ? `${valueLen}/${max}` : `${valueLen}`;
+  const max = showCountMax(showCount);
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={textareaId}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={textareaId} messageId={fieldMessageId(textareaId)}>
       <textarea
         id={textareaId}
         ref={setRefs}
         aria-invalid={error ? true : undefined}
+        aria-describedby={fieldDescribedBy(textareaId, { hint, error }, ariaDescribedBy)}
         value={isControlled ? (value as string | number) : undefined}
         defaultValue={!isControlled ? defaultValue : undefined}
         onChange={handleChange}
         rows={autosize ? minRows : (rest as { rows?: number }).rows}
         maxLength={max ?? (rest as { maxLength?: number }).maxLength}
-        className={cn(
-          inputBase, s.font, s.border, s.radius, s.transition,
-          focusRing, toneMap[tone].ring,
-          autosize ? 'px-3 py-2 text-sm resize-none' : 'min-h-24 px-3 py-2 text-sm',
-          error ? 'border-retro-red/60' : 'border-retro-border-strong',
-          className,
-        )}
+        className={cn(textareaClasses(surface, { tone, invalid: !!error, autosize: !!autosize }), className)}
         {...rest}
       />
       {showCount && (
-        <span
-          aria-live="polite"
-          className={cn(
-            'block text-right text-[10px] text-retro-muted',
-            s.font,
-            max !== undefined && valueLen > max && 'text-retro-red',
-          )}
-        >
-          {countText}
+        <span aria-live="polite" className={characterCountClasses(surface, valueLen, max)}>
+          {characterCountText(valueLen, max)}
         </span>
       )}
     </FieldShell>

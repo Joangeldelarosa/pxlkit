@@ -16,7 +16,6 @@ export default defineManifest({
     'Overflow trigger opens a PixelPopover with the hidden badges, surface-matched.',
     'Wrapper becomes `role="group"` when an accessible name (aria-label or aria-labelledby) is provided.',
     'Surface-aware: pixel chamfered radius + pixel font or linear pill, propagated to the popover.',
-    'Forwarded ref to the underlying div and full passthrough of HTMLAttributes.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
@@ -33,7 +32,7 @@ export default defineManifest({
       { key: 'Escape', does: 'Closes the overflow popover.', when: 'overflow popover is open' },
     ],
     notes:
-      'Group landmark is only emitted when an accessible name is supplied to avoid an unlabeled "group" announcement. The overflow button carries aria-label="Show N more", aria-expanded, aria-haspopup="dialog", and aria-controls wired by PixelPopover.',
+      'Group landmark is only emitted when an accessible name is supplied to avoid an unlabeled "group" announcement. The overflow button carries aria-label="Show N more", aria-expanded, aria-haspopup="dialog", and aria-controls wired by PixelPopover; it also names the popover dialog through aria-labelledby.',
   },
   related: ['PixelBadge', 'PixelChipGroup', 'PixelPopover', 'PixelAvatarGroup'],
   apiStability: 'stable',

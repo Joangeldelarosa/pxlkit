@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSectionHeaderDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSectionHeaderDocsMeta = {
@@ -17,39 +23,120 @@ export const PixelSectionHeaderDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelSectionHeaderDocsSection({ className }: PixelSectionHeaderDocsSectionProps): React.ReactElement {
+/** PixelSectionHeader's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSectionHeader } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSectionHeader',
+        props: [
+          { name: 'eyebrow', type: 'string', description: 'Small uppercase line above the title.' },
+          { name: 'title', type: 'string', required: true, description: 'The heading.' },
+          { name: 'titleTone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", description: 'Tone of the title and eyebrow.' },
+          { name: 'description', type: 'string', description: 'Paragraph under the title.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Start-aligned, or centred with a capped width.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Type scale.' },
+          { name: 'spacing', type: "'tight' | 'normal' | 'loose'", default: "'normal'", description: 'Gaps between the blocks.' },
+          { name: 'actions', type: 'React.ReactNode', description: 'Buttons or links under the description.' },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h2'", description: 'Heading level of the title.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSectionHeader',
+        props: [
+          { name: 'eyebrow', type: 'string', description: 'Small uppercase line above the title.' },
+          { name: 'title', type: 'string', required: true, description: 'The heading.' },
+          { name: 'titleTone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", description: 'Tone of the title and eyebrow.' },
+          { name: 'description', type: 'string', description: 'Paragraph under the title.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Start-aligned, or centred with a capped width.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Type scale.' },
+          { name: 'spacing', type: "'tight' | 'normal' | 'loose'", default: "'normal'", description: 'Gaps between the blocks.' },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h2'", description: 'Heading level of the title.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'actions', description: 'Buttons or links under the description.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<header>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSectionHeader',
+        selector: 'pxl-section-header',
+        props: [
+          { name: 'title', type: 'string', required: true, description: 'The heading.' },
+          { name: 'eyebrow', type: 'string', description: 'Small uppercase line above the title.' },
+          { name: 'titleTone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", description: 'Tone of the title and eyebrow.' },
+          { name: 'description', type: 'string', description: 'Paragraph under the title.' },
+          { name: 'actions', type: 'string | TemplateRef<any>', description: 'Buttons or links under the description.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Start-aligned, or centred with a capped width.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Type scale.' },
+          { name: 'spacing', type: "'tight' | 'normal' | 'loose'", default: "'normal'", description: 'Gaps between the blocks.' },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h2'", description: 'Heading level of the title.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelSectionHeaderDocsSection({ className, headingLevel = 2 }: PixelSectionHeaderDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-section-header-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-section-header-heading'>PixelSectionHeader</h2>
+      <Title id='pixel-section-header-heading'>PixelSectionHeader</Title>
       <p className="docs-lead">Section header with eyebrow, title, description, and actions — rhythm-aware and surface-aware.</p>
       <ul className="docs-highlights">
-        <li>Configurable heading level (h1–h4) preserves document outline</li>
+        <li>Configurable heading level (h1–h6) preserves document outline</li>
         <li>Size and spacing scales (sm/md/lg, tight/normal/loose) use shared rhythm tokens</li>
         <li>Optional eyebrow is decorative (aria-hidden) with sr-only restatement in the heading</li>
         <li>Tone-aware title coloring via ToneKey</li>
-        <li>Surface-aware typography via useEffectiveSurface</li>
+        <li>Surface-aware typography</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-section-header-api">
+      <Heading id="pixel-section-header-api">API</Heading>
+      <FrameworkApi label={'PixelSectionHeader API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-section-header-a11y">
-      <h3 id="pixel-section-header-a11y">Accessibility</h3>
+      <Heading id="pixel-section-header-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>Heading hierarchy via as=h1..h6</code></li>
         <li><code>Decorative eyebrow tagged with aria-hidden and restated sr-only inside the heading</code></li>
       </ul>
-      <p className="docs-aria-notes">Choose `as` to match the document outline of the page. The eyebrow is visually decorative but is preserved for screen readers via sr-only prefix on the heading.</p>
+      <p className="docs-aria-notes">Choose <code>as</code> to match the document outline of the page. The eyebrow is visually decorative but is preserved for screen readers via sr-only prefix on the heading.</p>
     </section>
     <section aria-labelledby="pixel-section-header-usage">
-      <h3 id="pixel-section-header-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelSectionHeader } from '@pxlkit/ui-kit';
+      <Heading id="pixel-section-header-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSectionHeader usage'}
+        react={`import { PixelSectionHeader } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -59,14 +146,44 @@ export function Default() {
       description="A retro-cinematic component kit with surface awareness and rhythm tokens."
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSectionHeader
+    eyebrow="Section"
+    title="Build pixel-perfect interfaces"
+    description="A retro-cinematic component kit with surface awareness and rhythm tokens."
+  />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSectionHeader],
+  template: \`
+    <pxl-section-header
+      eyebrow="Section"
+      title="Build pixel-perfect interfaces"
+      description="A retro-cinematic component kit with surface awareness and rhythm tokens."
+    />
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSectionHeader } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelSectionHeader
       eyebrow="Section"
@@ -74,11 +191,42 @@ export function Default() {
       description="A retro-cinematic component kit with surface awareness and rhythm tokens."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSectionHeader
+    eyebrow="Section"
+    title="Build pixel-perfect interfaces"
+    description="A retro-cinematic component kit with surface awareness and rhythm tokens."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSectionHeader],
+  template: \`
+    <pxl-section-header
+      eyebrow="Section"
+      title="Build pixel-perfect interfaces"
+      description="A retro-cinematic component kit with surface awareness and rhythm tokens."
+    />
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-centered">
-        <h4>Centered</h4>
-        <pre className="docs-code"><code>{`export function Centered() {
+        <Subheading>Centered</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Centered code'}
+          react={`import { PixelSectionHeader } from '@pxlkit/ui-kit';
+
+export function Centered() {
   return (
     <PixelSectionHeader
       align="center"
@@ -87,11 +235,44 @@ export function Default() {
       description="Centered headers work great as page intros above a feature grid."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSectionHeader
+    align="center"
+    eyebrow="Features"
+    title="Designed for clarity"
+    description="Centered headers work great as page intros above a feature grid."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSectionHeader],
+  template: \`
+    <pxl-section-header
+      align="center"
+      eyebrow="Features"
+      title="Designed for clarity"
+      description="Centered headers work great as page intros above a feature grid."
+    />
+  \`,
+})
+export class Centered {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-actions">
-        <h4>With Actions</h4>
-        <pre className="docs-code"><code>{`export function WithActions() {
+        <Subheading>With Actions</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Actions code'}
+          react={`import { PixelSectionHeader } from '@pxlkit/ui-kit';
+
+export function WithActions() {
   return (
     <PixelSectionHeader
       eyebrow="Dashboard"
@@ -106,11 +287,54 @@ export function Default() {
       }
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSectionHeader
+    eyebrow="Dashboard"
+    title="Recent activity"
+    description="What happened across your workspace today."
+    title-tone="cyan"
+  >
+    <template #actions>
+      <button type="button">Refresh</button>
+      <button type="button">Export</button>
+    </template>
+  </PixelSectionHeader>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSectionHeader],
+  template: \`
+    <pxl-section-header
+      eyebrow="Dashboard"
+      title="Recent activity"
+      description="What happened across your workspace today."
+      titleTone="cyan"
+      [actions]="actions"
+    />
+    <ng-template #actions>
+      <button type="button">Refresh</button>
+      <button type="button">Export</button>
+    </ng-template>
+  \`,
+})
+export class WithActions {}`}
+        />
       </article>
       <article className="docs-example" id="example-large-hero">
-        <h4>Large Hero</h4>
-        <pre className="docs-code"><code>{`export function LargeHero() {
+        <Subheading>Large Hero</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Large Hero code'}
+          react={`import { PixelSectionHeader } from '@pxlkit/ui-kit';
+
+export function LargeHero() {
   return (
     <PixelSectionHeader
       as="h1"
@@ -123,7 +347,43 @@ export function Default() {
       titleTone="green"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSectionHeader
+    as="h1"
+    size="lg"
+    align="center"
+    spacing="loose"
+    eyebrow="Introducing pxlkit"
+    title="The retro-cinematic UI kit"
+    description="Build interfaces that feel handcrafted, with a coherent token system."
+    title-tone="green"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSectionHeader],
+  template: \`
+    <pxl-section-header
+      as="h1"
+      size="lg"
+      align="center"
+      spacing="loose"
+      eyebrow="Introducing pxlkit"
+      title="The retro-cinematic UI kit"
+      description="Build interfaces that feel handcrafted, with a coherent token system."
+      titleTone="green"
+    />
+  \`,
+})
+export class LargeHero {}`}
+        />
       </article>
     </section>
     </section>

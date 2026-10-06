@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStarRatingDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelStarRatingDocsMeta = {
@@ -17,16 +23,103 @@ export const PixelStarRatingDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSectionProps): React.ReactElement {
+/** PixelStarRating's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelStarRating } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelStarRating',
+        props: [
+          { name: 'value', type: 'number', description: 'Controlled rating value (0..max).' },
+          { name: 'defaultValue', type: 'number', description: 'Uncontrolled initial rating value (0..max).' },
+          { name: 'max', type: 'number', default: '5', description: 'Total number of stars rendered. Default 5.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size of each star — maps to 16 / 20 / 24 px for sm / md / lg.' },
+          { name: 'tone', type: "'gold' | 'green'", default: "'gold'", description: 'Color tone applied to filled stars.' },
+          { name: 'showCount', type: 'boolean', default: 'false', description: 'When true, renders "N/M" beside the stars.' },
+          { name: 'interactive', type: 'boolean', default: 'false', description: 'When true, exposes each star as a button that updates the rating on click.' },
+          { name: 'onChange', type: '(next: number) => void', description: 'Called with the new rating when the user clicks a star (interactive only).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Override the ambient surface (pixel | linear).' },
+          { name: 'starIcon', type: 'ReactNode | ((args: { filled: boolean; size: number; tone: StarTone }) => ReactNode)', description: 'Polymorphic escape hatch. Replace the default gamification Star glyph with any custom node, or a render function called per-star with `{ filled, size, tone }` so the caller can choose a different sibling pack icon (Heart, Coin, Crown…) without forking the component. - `undefined` (default) → render the gamification `Star` for filled positions and the inline outlined rect-SVG for empty ones. - `ReactNode` → render for filled positions only; empty positions continue to use the outlined fallback for the empty-state silhouette. - `(args) => ReactNode` → render for both filled and empty positions, giving full control over the glyph in every state.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelStarRating } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelStarRating',
+        props: [
+          { name: 'modelValue', type: 'number', binding: 'v-model', description: 'The rating (`v-model`), from 0 to `max`; leave unset for an uncontrolled rating.' },
+          { name: 'defaultValue', type: 'number', description: 'Initial rating while uncontrolled.' },
+          { name: 'max', type: 'number', default: '5', description: 'Number of stars.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Star size: 16, 20 or 24 px.' },
+          { name: 'tone', type: "'gold' | 'green'", default: "'gold'", description: 'Colour of the filled stars.' },
+          { name: 'showCount', type: 'boolean', default: 'false', description: 'Shows "N/M" beside the stars.' },
+          { name: 'interactive', type: 'boolean', default: 'false', description: 'Makes each star a button that rates.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: number', description: 'The rating of the star the user clicked.' },
+        ],
+        slots: [
+          { name: 'star-icon', props: 'StarIconProps', description: 'Glyph of the filled stars, in place of the Star icon.' },
+          { name: 'empty-star-icon', props: 'StarIconProps', description: 'Glyph of the empty stars, in place of the dimmed Star icon.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelStarRating } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelStarRating',
+        selector: 'pxl-star-rating',
+        props: [
+          { name: 'value', type: 'number', binding: '[(value)]', description: 'The rating (`[(value)]`), from 0 to `max`; leave unset for an uncontrolled rating.' },
+          { name: 'defaultValue', type: 'number', default: '0', accepts: 'unknown', description: 'Initial rating while uncontrolled.' },
+          { name: 'max', type: 'number', default: '5', accepts: 'unknown', description: 'Number of stars.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Star size: 16, 20 or 24 px.' },
+          { name: 'tone', type: "'gold' | 'green'", default: "'gold'", description: 'Colour of the filled stars.' },
+          { name: 'showCount', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows "N/M" beside the stars.' },
+          { name: 'interactive', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes each star a button that rates.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'starIcon', type: 'PxlContent<PixelStarIconContext>', description: 'Glyph of the filled stars, in place of the Star icon.' },
+          { name: 'emptyStarIcon', type: 'PxlContent<PixelStarIconContext>', description: 'Glyph of the empty stars, in place of the dimmed Star icon.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'number', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`number`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelStarRatingDocsSection({ className, headingLevel = 2 }: PixelStarRatingDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-star-rating-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-star-rating-heading'>PixelStarRating</h2>
+      <Title id='pixel-star-rating-heading'>PixelStarRating</Title>
       <p className="docs-lead">Pixel-art star rating display with optional interactive selection and surface-aware styling.</p>
       <ul className="docs-highlights">
         <li>Renders the @pxlkit/gamification Star at 16/20/24px with crisp nearest-neighbour scaling</li>
-        <li>Gold or green tone tokens for readonly and interactive states, surface-aware via useEffectiveSurface</li>
+        <li>Gold or green tone tokens for readonly and interactive states, surface-aware (pixel / linear)</li>
         <li>Optional showCount label renders &quot;N/M&quot; beside the stars</li>
-        <li>Interactive mode exposes per-star buttons with onChange callback</li>
+        <li>Interactive mode exposes per-star buttons; bind the rating with <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular)</li>
         <li>Polymorphic starIcon prop swaps in any sibling-pack glyph without forking</li>
       </ul>
     <dl className="docs-meta">
@@ -34,19 +127,19 @@ export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSec
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v2.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-star-rating-api">
+      <Heading id="pixel-star-rating-api">API</Heading>
+      <FrameworkApi label={'PixelStarRating API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-star-rating-a11y">
-      <h3 id="pixel-star-rating-a11y">Accessibility</h3>
+      <Heading id="pixel-star-rating-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>role=img with aria-label=&quot;N out of M&quot; for readonly display</code></li>
         <li><code>role=group with per-star buttons (aria-pressed) for interactive mode</code></li>
       </ul>
       <p className="docs-aria-notes">Interactive mode exposes each star as a button with aria-pressed reflecting filled state; readonly mode collapses to a single aria-labeled image.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -70,46 +163,159 @@ export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-star-rating-usage">
-      <h3 id="pixel-star-rating-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PxlKitIcon } from '@pxlkit/core';
-import { Heart } from '@pxlkit/gamification';
-import { PixelStarRating } from '@pxlkit/ui-kit';
+      <Heading id="pixel-star-rating-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelStarRating usage'}
+        react={`import { PixelStarRating } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelStarRating value={4} />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStarRating :model-value="4" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating],
+  template: \`<pxl-star-rating [value]="4" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelStarRating } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelStarRating value={4} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStarRating :model-value="4" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating],
+  template: \`<pxl-star-rating [value]="4" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-count">
-        <h4>With Count</h4>
-        <pre className="docs-code"><code>{`export function WithCount() {
+        <Subheading>With Count</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Count code'}
+          react={`import { PixelStarRating } from '@pxlkit/ui-kit';
+
+export function WithCount() {
   return <PixelStarRating value={3} max={5} showCount />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStarRating :model-value="3" :max="5" show-count />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating],
+  template: \`<pxl-star-rating [value]="3" [max]="5" showCount />\`,
+})
+export class WithCount {}`}
+        />
       </article>
       <article className="docs-example" id="example-green-tone">
-        <h4>Green Tone (Large)</h4>
-        <pre className="docs-code"><code>{`export function GreenTone() {
+        <Subheading>Green Tone (Large)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Green Tone (Large) code'}
+          react={`import { PixelStarRating } from '@pxlkit/ui-kit';
+
+export function GreenTone() {
   return <PixelStarRating value={5} tone="green" size="lg" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStarRating :model-value="5" tone="green" size="lg" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating],
+  template: \`<pxl-star-rating [value]="5" tone="green" size="lg" />\`,
+})
+export class GreenTone {}`}
+        />
       </article>
       <article className="docs-example" id="example-interactive">
-        <h4>Interactive</h4>
-        <pre className="docs-code"><code>{`export function Interactive() {
+        <Subheading>Interactive</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Interactive code'}
+          react={`import React from 'react';
+import { PixelStarRating } from '@pxlkit/ui-kit';
+
+export function Interactive() {
   const [rating, setRating] = React.useState(3);
   return <PixelStarRating value={rating} interactive onChange={setRating} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+
+const rating = ref(3);
+</script>
+
+<template>
+  <PixelStarRating v-model="rating" interactive />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating],
+  template: \`<pxl-star-rating [(value)]="rating" interactive />\`,
+})
+export class Interactive {
+  readonly rating = signal(3);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-icon">
-        <h4>Custom Icon (Heart)</h4>
-        <pre className="docs-code"><code>{`export function CustomIcon() {
+        <Subheading>Custom Icon (Heart)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Custom Icon (Heart) code'}
+          react={`import { PxlKitIcon } from '@pxlkit/core';
+import { Heart } from '@pxlkit/gamification';
+import { PixelStarRating } from '@pxlkit/ui-kit';
+
+export function CustomIcon() {
   return (
     <PixelStarRating
       value={3}
@@ -118,7 +324,36 @@ export function Default() {
       }
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { Heart } from '@pxlkit/gamification';
+import { PxlKitIcon } from '@pxlkit/vue';
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStarRating :model-value="3">
+    <template #star-icon>
+      <PxlKitIcon :icon="Heart" :size="20" appearance="solid" color="#EF4444" />
+    </template>
+  </PixelStarRating>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PxlKitIcon } from '@pxlkit/angular';
+import { Heart } from '@pxlkit/gamification';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating, PxlKitIcon],
+  template: \`
+    <pxl-star-rating [value]="3" [starIcon]="heart" />
+    <ng-template #heart><pxl-icon [icon]="heartIcon" [size]="20" appearance="solid" color="#EF4444" /></ng-template>
+  \`,
+})
+export class CustomIcon {
+  readonly heartIcon = Heart;
+}`}
+        />
       </article>
     </section>
     </section>

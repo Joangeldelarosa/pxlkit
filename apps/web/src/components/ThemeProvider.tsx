@@ -4,8 +4,8 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from 'react';
 
@@ -40,8 +40,7 @@ function applyThemeToDOM(theme: Theme) {
   }
 }
 
-function getInitialTheme(): Theme {
-  if (typeof window === 'undefined') return 'dark';
+function readStoredTheme(): Theme {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'light' || stored === 'dark') return stored;
@@ -52,26 +51,32 @@ function getInitialTheme(): Theme {
   return 'dark';
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+// Only a pick on this page changes the stored theme, and that pick is state.
+const subscribeNever = () => () => {};
+const brandTheme = (): Theme => 'dark';
 
-  // Sync class on mount + theme change
-  useEffect(() => {
-    applyThemeToDOM(theme);
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  // The server cannot know the stored theme and renders the brand theme, as
+  // does the render that hydrates its markup; the stored theme follows right
+  // after. The layout's inline script has already put its class on <html>.
+  const stored = useSyncExternalStore(subscribeNever, readStoredTheme, brandTheme);
+  // A theme picked on this page, which lasts where storage is blocked too.
+  const [picked, setPicked] = useState<Theme | null>(null);
+  const theme = picked ?? stored;
+
+  const setTheme = useCallback((next: Theme) => {
+    setPicked(next);
+    applyThemeToDOM(next);
     try {
-      localStorage.setItem(STORAGE_KEY, theme);
+      localStorage.setItem(STORAGE_KEY, next);
     } catch {
       // ignore
     }
-  }, [theme]);
-
-  const setTheme = useCallback((t: Theme) => {
-    setThemeState(t);
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  }, []);
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  }, [setTheme, theme]);
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>

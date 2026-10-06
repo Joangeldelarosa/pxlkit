@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+
+// Next.js marks the 404 response noindex itself.
+export const metadata: Metadata = {
+  title: 'Page Not Found',
+};
 
 export default function NotFound() {
   return (

@@ -1,4 +1,4 @@
-import type { AnimatedPxlKitData } from '@pxlkit/core';
+import type { AnimatedPxlKitData } from '@pxlkit/core/vanilla';
 
 // ─── Waving Flag (6 frames) ────────────────
 // A flag on a pole waving in the wind.

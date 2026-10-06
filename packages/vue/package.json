@@ -1,0 +1,88 @@
+{
+  "name": "@pxlkit/vue",
+  "version": "0.1.0",
+  "description": "Vue 3 components for Pxlkit pixel art icons: static, animated and 3D parallax icons plus pixel toasts, on the shared framework-agnostic engine",
+  "license": "MIT",
+  "homepage": "https://pxlkit.xyz/icons",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/vue"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "vue": "^3.3.0"
+  },
+  "dependencies": {
+    "@pxlkit/core": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitest/coverage-v8": "^4.1.2",
+    "@vue/test-utils": "~2.4.6",
+    "jsdom": "^29.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.2",
+    "vue": "^3.5.0"
+  },
+  "keywords": [
+    "pxlkit",
+    "pixel-art",
+    "pixel-art-icons",
+    "vue",
+    "vue3",
+    "vue-components",
+    "vue-icons",
+    "nuxt",
+    "icons",
+    "svg-icons",
+    "animated-icons",
+    "parallax-3d",
+    "toast-notifications",
+    "retro",
+    "8bit",
+    "16bit",
+    "typescript",
+    "mit-license"
+  ],
+  "author": {
+    "name": "Joangel De La Rosa",
+    "url": "https://github.com/joangeldelarosa"
+  }
+}

@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelModalDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelModalDocsMeta = {
@@ -17,14 +23,99 @@ export const PixelModalDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps): React.ReactElement {
+/** PixelModal's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelModal } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelModal',
+        props: [
+          { name: 'open', type: 'boolean', required: true, description: 'Whether the modal is currently visible.' },
+          { name: 'title', type: 'string', required: true, description: 'Modal title shown in the header.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Modal body content.' },
+          { name: 'onClose', type: '() => void', required: true, description: 'Called when the user requests to close the modal.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: "Width preset. Default `'md'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override. Falls back to nearest `<PxlKitProvider>` surface.' },
+          { name: 'closeLabel', type: 'string', default: "'Close'", description: "Optional override for the close button's accessible label." },
+          { name: 'footer', type: 'React.ReactNode', description: 'Optional footer node, rendered at the bottom separated by a surface-aware divider.' },
+          { name: 'description', type: 'React.ReactNode', description: 'Optional description, wired via `aria-describedby` for AT users.' },
+          { name: 'asyncClose', type: '() => Promise<void>', description: 'When provided, the close button awaits this promise (and shows a loading state) before the consumer-controlled `onClose` is invoked. Lets callers persist or animate-out before unmounting.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Optional portal container override. Defaults to `document.body`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelModal } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelModal',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: 'v-model:open', description: 'Whether the modal is visible (`v-model:open`).' },
+          { name: 'title', type: 'string', required: true, description: 'Title shown in the header; it names the dialog.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: 'Width preset.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'closeLabel', type: 'string', default: "'Close'", description: 'Accessible label of the close button.' },
+          { name: 'asyncClose', type: '() => Promise<void>', description: 'Awaited before the modal closes — the close button shows a busy state meanwhile. Lets you persist or animate out first.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Portal target; `document.body` when left out.' },
+        ],
+        events: [
+          { name: 'close', description: 'The user asked to close the modal (close button, Escape, backdrop).' },
+          { name: 'update:open', payload: 'open: boolean', description: '`false` when the modal asks to close, for `v-model:open`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Body content.' },
+          { name: 'description', description: 'Description under the title, wired via `aria-describedby`.' },
+          { name: 'footer', description: 'Actions at the bottom, set off by a divider.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelModal } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelModal',
+        selector: 'pxl-modal',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: '[(open)]', description: 'Whether the modal is visible (`[(open)]`).' },
+          { name: 'title', type: 'string', required: true, description: 'Title shown in the header; it names the dialog.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: 'Width preset.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'closeLabel', type: 'string', default: "'Close'", description: 'Accessible label of the close button.' },
+          { name: 'description', type: 'string | TemplateRef<any>', description: 'Description under the title, wired via `aria-describedby`.' },
+          { name: 'footer', type: 'string | TemplateRef<any>', description: 'Actions at the bottom, set off by a divider.' },
+          { name: 'asyncClose', type: '() => Promise<void>', description: 'Awaited before the modal closes — the close button shows a busy state meanwhile. Lets you persist or animate out first.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Portal target; `document.body` when left out.' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: '`false` when the modal asks to close (close button, Escape, backdrop), for `[(open)]`.' },
+          { name: 'closed', description: 'The user asked to close the modal (close button, Escape, backdrop).' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelModalDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelModalDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-modal-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-modal-heading'>PixelModal</h2>
+      <Title id='pixel-modal-heading'>PixelModal</Title>
       <p className="docs-lead">Centered modal dialog with title bar, optional description and footer, surface-aware chrome, focus trap, scroll lock, and async close support.</p>
       <ul className="docs-highlights">
         <li>Five sizes (sm/md/lg/xl/full) with surface-aware chrome — pixel renders an old-school window, linear a flat card</li>
-        <li>Focus trap, scroll lock, and Escape-to-close come built in via shared hooks</li>
+        <li>Focus trap, scroll lock, and Escape-to-close come built in</li>
         <li>Optional description wired via aria-describedby and optional footer slot for actions</li>
         <li>asyncClose awaits a promise (with loading affordance on the close button) before unmounting</li>
         <li>Portals to document.body by default; accepts a custom container override</li>
@@ -34,18 +125,18 @@ export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps)
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-modal-api">
+      <Heading id="pixel-modal-api">API</Heading>
+      <FrameworkApi label={'PixelModal API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-modal-a11y">
-      <h3 id="pixel-modal-a11y">Accessibility</h3>
+      <Heading id="pixel-modal-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>dialog</code></li>
       </ul>
       <p className="docs-aria-notes">Renders with role=&quot;dialog&quot; and aria-modal=&quot;true&quot;. Title is exposed via aria-labelledby; description (when provided) via aria-describedby. The close button advertises aria-busy while asyncClose is in flight. Backdrop click is equivalent to Escape and is disabled while closing to avoid double-firing.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -74,10 +165,12 @@ export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps)
       </table>
     </section>
     <section aria-labelledby="pixel-modal-usage">
-      <h3 id="pixel-modal-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelModal } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+      <Heading id="pixel-modal-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelModal usage'}
+        react={`import { useState } from 'react';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [open, setOpen] = useState(false);
@@ -89,14 +182,48 @@ export function Default() {
       </PixelModal>
     </>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelButton @click="open = true">Open modal</PixelButton>
+  <PixelModal v-model:open="open" title="Default modal">
+    <p>This is a minimal modal with title and body content.</p>
+  </PixelModal>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelModal],
+  template: \`
+    <button pxlButton (click)="open.set(true)">Open modal</button>
+    <pxl-modal [(open)]="open" title="Default modal">
+      <p>This is a minimal modal with title and body content.</p>
+    </pxl-modal>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -106,11 +233,46 @@ export function Default() {
       </PixelModal>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelButton @click="open = true">Open modal</PixelButton>
+  <PixelModal v-model:open="open" title="Default modal">
+    <p>This is a minimal modal with title and body content.</p>
+  </PixelModal>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelModal],
+  template: \`
+    <button pxlButton (click)="open.set(true)">Open modal</button>
+    <pxl-modal [(open)]="open" title="Default modal">
+      <p>This is a minimal modal with title and body content.</p>
+    </pxl-modal>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { useState } from 'react';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   const [size, setSize] = useState<'sm' | 'md' | 'lg' | 'xl' | 'full' | null>(null);
   return (
     <>
@@ -128,11 +290,59 @@ export function Default() {
       )}
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-vue';
+
+type Size = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+const sizes: Size[] = ['sm', 'md', 'lg', 'xl', 'full'];
+const size = ref<Size | null>(null);
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton v-for="option in sizes" :key="option" size="sm" @click="size = option">{{ option }}</PixelButton>
+  </div>
+  <PixelModal v-if="size" open :size="size" :title="\`Size: \${size}\`" @close="size = null">
+    <p>Modal rendered at size <code>{{ size }}</code>.</p>
+  </PixelModal>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-angular';
+
+type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+
+@Component({
+  imports: [PixelButton, PixelModal],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      @for (option of sizes; track option) {
+        <button pxlButton size="sm" (click)="size.set(option)">{{ option }}</button>
+      }
+    </div>
+    @if (size(); as current) {
+      <pxl-modal [open]="true" [size]="current" [title]="'Size: ' + current" (closed)="size.set(null)">
+        <p>Modal rendered at size <code>{{ current }}</code>.</p>
+      </pxl-modal>
+    }
+  \`,
+})
+export class Sizes {
+  readonly sizes: ModalSize[] = ['sm', 'md', 'lg', 'xl', 'full'];
+  readonly size = signal<ModalSize | null>(null);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { useState } from 'react';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   const [which, setWhich] = useState<'pixel' | 'linear' | null>(null);
   return (
     <>
@@ -147,11 +357,54 @@ export function Default() {
       )}
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-vue';
+
+const which = ref<'pixel' | 'linear' | null>(null);
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton @click="which = 'pixel'">Pixel surface</PixelButton>
+    <PixelButton @click="which = 'linear'">Linear surface</PixelButton>
+  </div>
+  <PixelModal v-if="which" open :surface="which" :title="\`\${which} surface\`" @close="which = null">
+    <p>The {{ which }} surface uses surface-aware borders, dividers, and chrome.</p>
+  </PixelModal>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelButton, PixelModal, type Surface } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelModal],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton (click)="which.set('pixel')">Pixel surface</button>
+      <button pxlButton (click)="which.set('linear')">Linear surface</button>
+    </div>
+    @if (which(); as surface) {
+      <pxl-modal [open]="true" [surface]="surface" [title]="surface + ' surface'" (closed)="which.set(null)">
+        <p>The {{ surface }} surface uses surface-aware borders, dividers, and chrome.</p>
+      </pxl-modal>
+    }
+  \`,
+})
+export class Surfaces {
+  readonly which = signal<Surface | null>(null);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-description">
-        <h4>With description</h4>
-        <pre className="docs-code"><code>{`export function WithDescription() {
+        <Subheading>With description</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With description code'}
+          react={`import { useState } from 'react';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
+
+export function WithDescription() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -166,11 +419,51 @@ export function Default() {
       </PixelModal>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelButton @click="open = true">Open with description</PixelButton>
+  <PixelModal v-model:open="open" title="Confirm action">
+    <template #description>This description is wired via aria-describedby for assistive tech.</template>
+    <p>Body content sits below the description.</p>
+  </PixelModal>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelModal],
+  template: \`
+    <button pxlButton (click)="open.set(true)">Open with description</button>
+    <pxl-modal
+      [(open)]="open"
+      title="Confirm action"
+      description="This description is wired via aria-describedby for assistive tech."
+    >
+      <p>Body content sits below the description.</p>
+    </pxl-modal>
+  \`,
+})
+export class WithDescription {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-footer">
-        <h4>With footer</h4>
-        <pre className="docs-code"><code>{`export function WithFooter() {
+        <Subheading>With footer</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With footer code'}
+          react={`import { useState } from 'react';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
+
+export function WithFooter() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -190,11 +483,54 @@ export function Default() {
       </PixelModal>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelButton @click="open = true">Open with footer</PixelButton>
+  <PixelModal v-model:open="open" title="Save changes?">
+    <p>Footer slot separates actions from body with a surface-aware divider.</p>
+    <template #footer>
+      <PixelButton variant="ghost" @click="open = false">Cancel</PixelButton>
+      <PixelButton tone="cyan" @click="open = false">Save</PixelButton>
+    </template>
+  </PixelModal>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelModal],
+  template: \`
+    <button pxlButton (click)="open.set(true)">Open with footer</button>
+    <pxl-modal [(open)]="open" title="Save changes?" [footer]="actions">
+      <p>Footer slot separates actions from body with a surface-aware divider.</p>
+    </pxl-modal>
+    <ng-template #actions>
+      <button pxlButton variant="ghost" (click)="open.set(false)">Cancel</button>
+      <button pxlButton tone="cyan" (click)="open.set(false)">Save</button>
+    </ng-template>
+  \`,
+})
+export class WithFooter {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-async-close">
-        <h4>Async close</h4>
-        <pre className="docs-code"><code>{`export function AsyncClose() {
+        <Subheading>Async close</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Async close code'}
+          react={`import { useState } from 'react';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
+
+export function AsyncClose() {
   const [open, setOpen] = useState(false);
   const asyncClose = () => new Promise<void>((resolve) => setTimeout(resolve, 800));
   return (
@@ -210,11 +546,48 @@ export function Default() {
       </PixelModal>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+const asyncClose = () => new Promise<void>((resolve) => setTimeout(resolve, 800));
+</script>
+
+<template>
+  <PixelButton @click="open = true">Open async-close</PixelButton>
+  <PixelModal v-model:open="open" :async-close="asyncClose" title="Persisting…">
+    <p>The close button awaits the asyncClose promise before unmounting.</p>
+  </PixelModal>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelModal],
+  template: \`
+    <button pxlButton (click)="open.set(true)">Open async-close</button>
+    <pxl-modal [(open)]="open" [asyncClose]="asyncClose" title="Persisting…">
+      <p>The close button awaits the asyncClose promise before unmounting.</p>
+    </pxl-modal>
+  \`,
+})
+export class AsyncClose {
+  readonly open = signal(false);
+  readonly asyncClose = () => new Promise<void>((resolve) => setTimeout(resolve, 800));
+}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-close-label">
-        <h4>Custom close label</h4>
-        <pre className="docs-code"><code>{`export function CustomCloseLabel() {
+        <Subheading>Custom close label</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Custom close label code'}
+          react={`import { useState } from 'react';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
+
+export function CustomCloseLabel() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -229,16 +602,45 @@ export function Default() {
       </PixelModal>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelButton @click="open = true">Open with custom close label</PixelButton>
+  <PixelModal v-model:open="open" title="Localized" close-label="Cerrar">
+    <p>The close button announces a custom accessible label.</p>
+  </PixelModal>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelButton, PixelModal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelModal],
+  template: \`
+    <button pxlButton (click)="open.set(true)">Open with custom close label</button>
+    <pxl-modal [(open)]="open" title="Localized" closeLabel="Cerrar">
+      <p>The close button announces a custom accessible label.</p>
+    </pxl-modal>
+  \`,
+})
+export class CustomCloseLabel {
+  readonly open = signal(false);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-drawer">PixelDrawer</a></li>
-        <li><a href="#pixel-alert-dialog">PixelAlertDialog</a></li>
-        <li><a href="#pixel-sheet">PixelSheet</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-drawer' : '#pixel-drawer'}>PixelDrawer</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert-dialog' : '#pixel-alert-dialog'}>PixelAlertDialog</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-sheet' : '#pixel-sheet'}>PixelSheet</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
       </ul>
     </section>
     </section>

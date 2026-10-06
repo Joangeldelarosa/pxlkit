@@ -1,39 +1,33 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import {
+  stackAlignClasses,
+  stackDirectionClasses,
+  stackJustifyClasses,
+  type StackAlign,
+  type StackDirection,
+  type StackJustify,
+} from '@pxlkit/ui-kit-core';
 import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
 import { stackGap, StackGapKey } from '../tokens';
 
-const alignMap = {
-  start: 'items-start',
-  center: 'items-center',
-  end: 'items-end',
-  stretch: 'items-stretch',
-  baseline: 'items-baseline',
-} as const;
-
-const justifyMap = {
-  start: 'justify-start',
-  center: 'justify-center',
-  end: 'justify-end',
-  between: 'justify-between',
-  around: 'justify-around',
-  evenly: 'justify-evenly',
-} as const;
-
-const directionMap = {
-  col: 'flex-col',
-  row: 'flex-row',
-} as const;
-
 export interface PixelStackProps extends React.HTMLAttributes<HTMLDivElement> {
-  direction?: 'col' | 'row';
+  /** Main axis. */
+  direction?: StackDirection;
+  /** Gap token (`stackGap`). */
   gap?: StackGapKey;
-  align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline';
-  justify?: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly';
+  /** Cross-axis alignment. */
+  align?: StackAlign;
+  /** Main-axis distribution. */
+  justify?: StackJustify;
+  /** Wrap onto multiple lines. */
   wrap?: boolean;
+  /** `inline-flex` instead of `flex`. */
   inline?: boolean;
+  /** Element to render. */
   as?: keyof React.JSX.IntrinsicElements;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 
@@ -62,10 +56,10 @@ export const PixelStack = forwardRef<HTMLDivElement, PixelStackProps>(function P
       ref={ref}
       className={cn(
         inline ? 'inline-flex' : 'flex',
-        directionMap[direction],
+        stackDirectionClasses[direction],
         stackGap[gap],
-        align && alignMap[align],
-        justify && justifyMap[justify],
+        align && stackAlignClasses[align],
+        justify && stackJustifyClasses[justify],
         wrap && 'flex-wrap',
         s.transition,
         className,

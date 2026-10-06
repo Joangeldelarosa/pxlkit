@@ -23,7 +23,7 @@ export default defineManifest({
     'Surface-aware: pixel adds a left HP-bar accent stripe and chamfered border; linear stays rounded.',
     'Smart aria-live default — red/gold use "assertive", everything else "polite". Overridable via live prop.',
     'Optional icon and action slots for quick triage (e.g. Retry, Dismiss).',
-    'SSR-safe, ref-forwarded, no client state.',
+    'SSR-safe, no client state.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

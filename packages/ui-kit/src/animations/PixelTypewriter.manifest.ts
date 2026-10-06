@@ -11,7 +11,7 @@ export default defineManifest({
     'Configurable speed, delay, and blinking caret',
     'Tone-aware text color via shared tone tokens',
     'Animation trigger modes: mount, view, hover, click',
-    'onComplete callback fires when full text is rendered',
+    'Signals when the full text is typed: `onComplete` (React), `@complete` (Vue), `(complete)` (Angular)',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
@@ -25,7 +25,7 @@ export default defineManifest({
     patterns: ['respects prefers-reduced-motion'],
     keyboard: [],
     notes:
-      'Caret and the character-by-character animation are aria-hidden; the complete string is exposed to assistive tech from the first render via a visually hidden span. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and onComplete fires once.',
+      'Caret and the character-by-character animation are aria-hidden; the complete string is exposed to assistive tech from the first render via a visually hidden span. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and the completion event fires once.',
   },
   related: [],
   apiStability: 'stable',

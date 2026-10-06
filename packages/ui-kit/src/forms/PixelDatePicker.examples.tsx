@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PixelDatePicker } from './PixelDatePicker';
 
 export function Default() {

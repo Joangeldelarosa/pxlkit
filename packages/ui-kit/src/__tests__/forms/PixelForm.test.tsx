@@ -124,6 +124,57 @@ describe('PixelForm', () => {
     expect(input.getAttribute('aria-invalid')).toBe('true');
   });
 
+  it('PixelForm.Control keeps its child\'s ref: an invalid submit focuses the first invalid field (regression)', async () => {
+    // Control used to replace the child's ref with its own — null without
+    // one — so React Hook Form's `field.ref` never reached the input: no
+    // focus on the first error, and `setFocus` did nothing.
+    const controlRef = React.createRef<HTMLElement>();
+    let form: ReturnType<typeof useForm<{ name: string; email: string }>> | undefined;
+    function W() {
+      form = useForm({ defaultValues: { name: '', email: '' } });
+      return (
+        <PixelForm.Root form={form} onSubmit={() => {}}>
+          <PixelForm.Field
+            name="name"
+            render={({ field }) => (
+              <PixelForm.Item>
+                <PixelForm.Control>
+                  <input data-testid="name" {...field} />
+                </PixelForm.Control>
+              </PixelForm.Item>
+            )}
+          />
+          <PixelForm.Field
+            name="email"
+            rules={{ required: 'Email is required' }}
+            render={({ field }) => (
+              <PixelForm.Item>
+                <PixelForm.Control ref={controlRef}>
+                  <input data-testid="email" {...field} />
+                </PixelForm.Control>
+                <PixelForm.Message />
+              </PixelForm.Item>
+            )}
+          />
+          <button type="submit">Go</button>
+        </PixelForm.Root>
+      );
+    }
+    render(<W />);
+    fireEvent.click(screen.getByText('Go'));
+    await waitFor(() => {
+      expect(screen.getByTestId('email')).toHaveFocus();
+    });
+    // The Control's own ref reaches the element too.
+    expect(controlRef.current).toBe(screen.getByTestId('email'));
+    act(() => {
+      form!.setFocus('name');
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId('name')).toHaveFocus();
+    });
+  });
+
   it('Submitting calls onSubmit with form values', async () => {
     const onSubmit = vi.fn();
     render(<LoginForm onSubmit={onSubmit} />);

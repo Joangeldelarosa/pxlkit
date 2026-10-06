@@ -1,46 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import type { AnimatedPxlKitProps, AnimationTrigger, PxlKitData } from '../types';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
+import type { AnimatedPxlKitProps } from './types';
+import {
+  animatedIconWrapperStyle,
+  createAnimatedIconPlayer,
+  getAnimationFrame,
+} from '../engine/animation';
+import { resolveIconLabel } from '../engine/icon';
 import { PxlKitIcon } from './PxlKitIcon';
-import { observeVisibility } from '../utils/visibilityObserver';
-
-/**
- * Resolves the effective trigger for an animated icon.
- * Priority: prop `trigger` > `icon.trigger` > legacy `icon.loop` fallback.
- */
-function resolveTrigger(
-  propTrigger: AnimationTrigger | undefined,
-  iconTrigger: AnimationTrigger | undefined,
-  iconLoop: boolean,
-): AnimationTrigger {
-  if (propTrigger) return propTrigger;
-  if (iconTrigger) return iconTrigger;
-  return iconLoop ? 'loop' : 'once';
-}
-
-/** Clamp a number between min and max. */
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
-}
-
-/**
- * Compute the effective frame duration (ms) from props.
- * Priority: `fps` prop → `speed` prop → `icon.frameDuration`.
- */
-function resolveFrameDuration(
-  baseDuration: number,
-  speed?: number,
-  fps?: number,
-): number {
-  if (fps !== undefined) {
-    const clampedFps = clamp(fps, 1, 60);
-    return Math.round(1000 / clampedFps);
-  }
-  if (speed !== undefined) {
-    const clampedSpeed = clamp(speed, 0.1, 10);
-    return Math.round(baseDuration / clampedSpeed);
-  }
-  return baseDuration;
-}
+import { resolveColorProps } from './_internal/resolveColorProps';
+import { useIsomorphicLayoutEffect } from './_internal/useIsomorphicLayoutEffect';
 
 /**
  * Renders an animated pixel art icon by cycling through frames.
@@ -55,6 +23,10 @@ function resolveFrameDuration(
  * Supports speed/fps control:
  * - **speed** — multiplier (2 = double speed, 0.5 = half speed)
  * - **fps**   — override frame rate (takes priority over speed)
+ *
+ * Playback is driven by the framework-agnostic player
+ * (`createAnimatedIconPlayer` in `@pxlkit/core/vanilla`), shared with
+ * `@pxlkit/vue` and `@pxlkit/angular`. Looping icons pause while off-screen.
  *
  * @example
  * ```tsx
@@ -88,201 +60,64 @@ export function AnimatedPxlKitIcon({
   size = 32,
   appearance: appearanceProp,
   color: colorProp,
-  playing: playingProp,
-  trigger: triggerProp,
+  playing,
+  trigger,
   speed,
   fps,
   className = '',
   style,
   'aria-label': ariaLabel,
+  decorative = false,
   // Deprecated legacy props — resolved into `appearance` below.
-  colorful: colorfulProp,
-  solid: solidProp,
-  tint: tintProp,
+  colorful,
+  solid,
+  tint,
 }: AnimatedPxlKitProps) {
-  // Resolve effective appearance + colour with backward-compat fallbacks.
-  const appearance =
-    appearanceProp ??
-    (solidProp ? 'solid' :
-     tintProp ? 'tinted' :
-     colorfulProp === false ? 'solid' :
-     'palette');
-  const color = colorProp ?? tintProp;
-  const trigger = resolveTrigger(triggerProp, icon.trigger, icon.loop);
-  const frameCount = icon.frames.length;
-  const effectiveDuration = resolveFrameDuration(icon.frameDuration, speed, fps);
+  const { appearance, color } = resolveColorProps({
+    appearance: appearanceProp,
+    color: colorProp,
+    colorful,
+    solid,
+    tint,
+  });
 
-  const [frameIndex, setFrameIndex] = useState(0);
-  const [direction, setDirection] = useState<1 | -1>(1); // 1 = forward, -1 = backward
-  const [isHovering, setIsHovering] = useState(false);
-  const [hasAppeared, setHasAppeared] = useState(false);
-  const [playedOnce, setPlayedOnce] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [player] = useState(() => createAnimatedIconPlayer({ icon, playing, trigger, speed, fps }));
+  const frameIndex = useSyncExternalStore(
+    player.subscribe,
+    player.getFrameIndex,
+    player.getFrameIndex,
+  );
 
-  // ── Pause off-screen ──
-  // Every interval tick is a React state update; a page with dozens of
-  // looping icons would keep re-rendering them forever while scrolled away.
-  // One shared observer serves all icon instances.
+  // Before paint, so switching icons never shows a stale frame.
+  useIsomorphicLayoutEffect(() => {
+    player.update({ icon, playing, trigger, speed, fps });
+  }, [player, icon, playing, trigger, speed, fps]);
+
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    return observeVisibility(el, setIsVisible);
-  }, []);
+    const element = containerRef.current;
+    if (!element) return;
+    player.connect(element);
+    return () => player.disconnect();
+  }, [player]);
 
-  // ── Determine if animation should be running ──
-  const shouldPlay = isVisible && (() => {
-    // Explicit playing prop overrides trigger logic (backward compat)
-    if (playingProp !== undefined) return playingProp;
-    if (frameCount <= 1) return false;
-
-    switch (trigger) {
-      case 'loop':
-      case 'ping-pong':
-        return true;
-      case 'once':
-        return !playedOnce;
-      case 'hover':
-        return isHovering;
-      case 'appear':
-        return hasAppeared && !playedOnce;
-      default:
-        return true;
-    }
-  })();
-
-  // ── Frame cycling ──
-  useEffect(() => {
-    if (!shouldPlay || frameCount <= 1) return;
-
-    const timer = window.setInterval(() => {
-      setFrameIndex((prev) => {
-        if (trigger === 'ping-pong') {
-          const next = prev + direction;
-          if (next >= frameCount) {
-            setDirection(-1);
-            return prev - 1 >= 0 ? prev - 1 : prev;
-          }
-          if (next < 0) {
-            setDirection(1);
-            return prev + 1 < frameCount ? prev + 1 : prev;
-          }
-          return next;
-        }
-
-        // Forward-only modes
-        const next = prev + 1;
-        if (next >= frameCount) {
-          if (trigger === 'loop' || (trigger === 'hover' && isHovering)) {
-            return 0;
-          }
-          // 'once' / 'appear' — stop at last frame
-          setPlayedOnce(true);
-          return prev;
-        }
-        return next;
-      });
-    }, effectiveDuration);
-
-    return () => window.clearInterval(timer);
-  }, [shouldPlay, frameCount, effectiveDuration, trigger, isHovering, direction]);
-
-  // ── Reset on hover start (for trigger === 'hover') ──
-  useEffect(() => {
-    if (trigger === 'hover' && isHovering) {
-      setFrameIndex(0);
-      setDirection(1);
-      setPlayedOnce(false);
-    }
-  }, [trigger, isHovering]);
-
-  // ── IntersectionObserver for trigger === 'appear' ──
-  useEffect(() => {
-    if (trigger !== 'appear' || hasAppeared) return;
-    const el = containerRef.current;
-    if (!el || typeof IntersectionObserver === 'undefined') return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setHasAppeared(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.3 },
-    );
-    observer.observe(el);
-
-    return () => observer.disconnect();
-  }, [trigger, hasAppeared]);
-
-  // ── Reset frame index when icon changes ──
-  useEffect(() => {
-    setFrameIndex(0);
-    setDirection(1);
-    setPlayedOnce(false);
-    setHasAppeared(false);
-  }, [icon.name]);
-
-  // ── Build static PxlKitData for current frame ──
-  const safeIndex = Math.max(0, Math.min(frameIndex, frameCount - 1));
-  const currentFrame = icon.frames[safeIndex];
-  const mergedPalette = currentFrame.palette
-    ? { ...icon.palette, ...currentFrame.palette }
-    : icon.palette;
-
-  const frameIcon: PxlKitData = {
-    name: icon.name,
-    size: icon.size,
-    category: icon.category,
-    grid: currentFrame.grid,
-    palette: mergedPalette,
-    tags: icon.tags,
-  };
-
-  // ── Hover handlers ──
-  const onMouseEnter = useCallback(() => {
-    if (trigger === 'hover') setIsHovering(true);
-  }, [trigger]);
-
-  const onMouseLeave = useCallback(() => {
-    if (trigger === 'hover') {
-      setIsHovering(false);
-      setFrameIndex(0);
-      setDirection(1);
-    }
-  }, [trigger]);
+  const frameIcon = useMemo(() => getAnimationFrame(icon, frameIndex), [icon, frameIndex]);
 
   return (
     <div
       ref={containerRef}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      onMouseEnter={player.hoverStart}
+      onMouseLeave={player.hoverEnd}
       className={className}
-      // Wrapper centers the frame icon and stays the exact size of the icon.
-      // - `inline-flex` + `align-items/justify-content center` → frame icon is
-      //   perfectly centered no matter the surrounding context.
-      // - `vertical-align: middle` → no baseline descender gap when mixed with text.
-      // - `flex-shrink: 0` → wrapper never collapses in a cramped flex slot.
-      // - explicit width/height fix the box so all frames render in the same slot.
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        verticalAlign: 'middle',
-        flexShrink: 0,
-        width: size,
-        height: size,
-        lineHeight: 0,
-        ...style,
-      }}
+      style={{ ...(animatedIconWrapperStyle(size) as CSSProperties), ...style }}
     >
       <PxlKitIcon
         icon={frameIcon}
         size={size}
         appearance={appearance}
         color={color}
-        aria-label={ariaLabel || icon.name}
+        aria-label={resolveIconLabel(icon, { label: ariaLabel })}
+        decorative={decorative}
       />
     </div>
   );

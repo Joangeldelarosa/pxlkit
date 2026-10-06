@@ -22,7 +22,7 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as <article>, <a href>, or role="button" depending on props.',
+    'Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as `<article>`, `<a href>`, or `role="button"` depending on props.',
   highlights: [
     'Pixel + linear surfaces with optional tone tint on border and soft background',
     'Polymorphic root: renders as <article>, <a href>, or interactive role="button" with Enter/Space activation',
@@ -55,7 +55,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus to the card when interactive or anchored' },
     ],
     notes:
-      'When interactive without href, the root renders as <div role="button" tabIndex={0}> with Enter/Space activation parity (<article> does not permit role="button"). When href is set, the root renders as a native <a> — nesting interactive children (buttons, links) inside footer or media is invalid in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.',
+      'When interactive without href, the root renders as <div role="button" tabindex="0"> with Enter/Space activation parity (<article> does not permit role="button"). When href is set, the root renders as a native <a> — nesting interactive children (buttons, links) inside footer or media is invalid in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.',
   },
   related: ['PixelStatCard', 'PixelFeatureCard', 'PixelPricingCard', 'PixelTestimonialCard'],
   apiStability: 'stable',

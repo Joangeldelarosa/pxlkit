@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, act } from '@testing-library/react';
+import { render, act, fireEvent } from '@testing-library/react';
 import { PixelDrawer } from '../../overlays/PixelDrawer';
 
 describe('PixelDrawer', () => {
@@ -159,5 +159,24 @@ describe('PixelDrawer', () => {
       </PixelDrawer>,
     );
     expect(document.querySelector('[data-pxl-drawer-overlay]')).toBeNull();
+  });
+
+  it('shows what its parent passes: a refused close keeps it open and locking the page, until the parent closes it', () => {
+    const onOpenChange = vi.fn();
+    const drawer = (open: boolean) => (
+      <PixelDrawer open={open} onOpenChange={onOpenChange} title="Settings">
+        <button type="button">inside</button>
+      </PixelDrawer>
+    );
+    const { rerender, queryByRole } = render(drawer(true));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.click(document.querySelector('[data-pxl-drawer-overlay]')!);
+    expect(onOpenChange.mock.calls).toEqual([[false], [false]]);
+    expect(queryByRole('dialog')).toBeTruthy();
+    expect(document.body.style.overflow).toBe('hidden');
+    rerender(drawer(false));
+    expect(queryByRole('dialog')).toBeNull();
+    rerender(drawer(true));
+    expect(queryByRole('dialog')).toBeTruthy();
   });
 });

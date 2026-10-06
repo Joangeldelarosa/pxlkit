@@ -4,7 +4,6 @@ const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui';
 
 const simplePricingCards = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import {
@@ -79,7 +78,7 @@ export function SimplePricingCards() {
                     size="md"
                     variant={plan.highlight ? 'solid' : 'outline'}
                     className="w-full justify-center"
-                    iconRight={<PxlKitIcon icon={ArrowRight} size={12} />}
+                    iconRight={<PxlKitIcon icon={ArrowRight} size={12} decorative />}
                   >
                     {plan.cta}
                   </PixelButton>
@@ -96,7 +95,6 @@ export function SimplePricingCards() {
 
 const comparisonTable = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Check, Close } from '@pxlkit/ui';
 import {
@@ -118,8 +116,8 @@ const ROWS = [
 ];
 
 function Val({ val }: { val: string | boolean }) {
-  if (val === true) return <PxlKitIcon icon={Check} size={16} className="text-retro-green" />;
-  if (val === false) return <PxlKitIcon icon={Close} size={16} className="text-retro-muted/40" />;
+  if (val === true) return <PxlKitIcon icon={Check} size={16} className="text-retro-green" aria-label="Included" />;
+  if (val === false) return <PxlKitIcon icon={Close} size={16} className="text-retro-muted/40" aria-label="Not included" />;
   return <span className="font-mono text-xs text-retro-text">{val}</span>;
 }
 
@@ -180,7 +178,6 @@ export function ComparisonTable() {
 
 const togglePricing = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { useState } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
@@ -246,7 +243,7 @@ export function TogglePricing() {
                     size="md"
                     variant={'highlight' in plan && plan.highlight ? 'solid' : 'outline'}
                     className="w-full justify-center"
-                    iconRight={<PxlKitIcon icon={ArrowRight} size={12} />}
+                    iconRight={<PxlKitIcon icon={ArrowRight} size={12} decorative />}
                   >
                     Get {plan.name}
                   </PixelButton>

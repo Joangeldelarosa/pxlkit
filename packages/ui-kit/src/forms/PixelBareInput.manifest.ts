@@ -18,10 +18,10 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Unstyled, forwardRef-enabled `<input>` primitive used as an escape hatch for fully custom field compositions.',
+    'Unstyled `<input>` primitive, the native input itself, used as an escape hatch for fully custom field compositions.',
   highlights: [
-    'Native `<input>` semantics — accepts every `InputHTMLAttributes` prop verbatim.',
-    'forwardRef passthrough exposes the underlying `HTMLInputElement` for measurement, focus, or imperative APIs.',
+    'Native `<input>` semantics — takes every native input attribute verbatim.',
+    'Its element is the native `<input>`, for measurement, focus, or imperative APIs: a ref in React, `$el` in Vue, the `input[pxlBareInput]` element in Angular.',
     'Zero styling — pair with parent surfaces (PixelInputGroup, PixelFieldset) when building bespoke field widgets.',
     'SSR-safe and tree-shakable — no client effects or runtime dependencies.',
   ],

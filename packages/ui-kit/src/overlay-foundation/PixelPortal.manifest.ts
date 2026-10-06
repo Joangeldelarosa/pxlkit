@@ -10,13 +10,13 @@ export default defineManifest({
   since: '1.8.0',
   status: 'stable',
   description:
-    'SSR-safe portal primitive that renders children inline during SSR and first hydration, then swaps to a real createPortal after mount.',
+    'SSR-safe portal primitive: renders children inline on the server and while hydrating, then portals them into document.body or a container, keeping the focus set inside them.',
   highlights: [
-    'SSR-safe: renders inline on the server and on first client paint to avoid hydration mismatches',
-    'Swaps to React.createPortal after mount, targeting document.body by default',
-    'Accepts a custom container element via the container prop',
-    'Can be disabled to keep children inline (useful for testing or conditional portaling)',
-    'Preserves React tree context so focus, events, and providers flow normally',
+    'SSR-safe: renders inline on the server and during hydration to avoid hydration mismatches',
+    'Focus set inside the content stays put as the content reaches its target',
+    'Targets document.body by default; the container prop picks another element',
+    'Can be disabled to keep its content inline (useful for testing or conditional portaling)',
+    'The content keeps its place in the component tree, so providers still reach it (in React, its events also bubble through that tree)',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
@@ -25,10 +25,10 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: ['SSR-safe portal', 'focus order preserved via React tree'],
+    patterns: ['SSR-safe portal', 'context preserved through the component tree'],
     keyboard: [],
     notes:
-      'Portal content remains in the React tree, so focus order, events, and context providers behave as if the children were rendered in place.',
+      'Portal content keeps its place in the component tree, so providers reach it as if it were rendered in place; in React, its events also bubble through that tree. Keyboard focus follows the document order, where the content sits in its target.',
   },
   related: [],
   apiStability: 'stable',

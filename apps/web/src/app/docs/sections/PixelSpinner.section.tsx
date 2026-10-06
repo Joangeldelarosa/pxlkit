@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSpinnerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSpinnerDocsMeta = {
@@ -17,56 +23,160 @@ export const PixelSpinnerDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelSpinnerDocsSection({ className }: PixelSpinnerDocsSectionProps): React.ReactElement {
+/** PixelSpinner's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSpinner } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSpinner',
+        props: [
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Box size.' },
+          { name: 'label', type: 'string', default: "'Loading'", description: 'Accessible name.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour.' },
+          { name: 'decorative', type: 'boolean', default: 'false', description: 'When `true`, renders as pure decoration (aria-hidden, no role, no label). Use inside an already-announcing parent (e.g. a `<button loading>` that declares `aria-busy="true"`) to avoid double announcements. NOTE: when using PixelSpinner as a standalone loading indicator (not decorative), the consumer MUST set `aria-busy="true"` on the loading container per WAI-ARIA — the spinner alone isn\'t enough context.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<span>` (`HTMLAttributes<HTMLSpanElement>`).',
+          '`ref` points to `<span>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSpinner } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSpinner',
+        props: [
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Box size.' },
+          { name: 'label', type: 'string', default: "'Loading'", description: 'Accessible name.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour.' },
+          { name: 'decorative', type: 'boolean', default: 'false', description: 'Pure decoration (`aria-hidden`, no role, no label), for a parent that already announces its busy state (a button with `aria-busy="true"`). A standalone spinner needs `aria-busy="true"` on the container that loads.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<span>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSpinner } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSpinner',
+        selector: 'pxl-spinner',
+        props: [
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Box size.' },
+          { name: 'label', type: 'string', default: "'Loading'", description: 'Accessible name.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour.' },
+          { name: 'decorative', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Pure decoration (`aria-hidden`, no role, no label), for a parent that already announces its busy state (a button with `aria-busy="true"`). A standalone spinner needs `aria-busy="true"` on the container that loads.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelSpinnerDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSpinnerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-spinner-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-spinner-heading'>PixelSpinner</h2>
+      <Title id='pixel-spinner-heading'>PixelSpinner</Title>
       <p className="docs-lead">Compact loading indicator with surface-aware animation (stepped on pixel, smooth on linear) and tone-driven color.</p>
       <ul className="docs-highlights">
         <li>Four sizes (xs/sm/md/lg) and seven tones aligned with token palette</li>
         <li>Surface-aware: 8-step pixel rotation vs smooth linear sweep</li>
         <li>Respects prefers-reduced-motion (freezes animation, keeps shape)</li>
         <li>role=status with sr-only label by default; decorative mode for nested use</li>
-        <li>forwardRef to the host span; SSR-safe and tree-shakable</li>
+        <li>SSR-safe and tree-shakable</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-spinner-api">
+      <Heading id="pixel-spinner-api">API</Heading>
+      <FrameworkApi label={'PixelSpinner API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-spinner-a11y">
-      <h3 id="pixel-spinner-a11y">Accessibility</h3>
+      <Heading id="pixel-spinner-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>status</code></li>
       </ul>
-      <p className="docs-aria-notes">Default renders role=status with aria-label=&quot;Loading&quot; and a visually-hidden label for SR. Pass `decorative` when the parent already announces busy state (e.g. button with aria-busy) to avoid double announcements. Honors prefers-reduced-motion.</p>
+      <p className="docs-aria-notes">Default renders role=status with aria-label=&quot;Loading&quot; and a visually-hidden label for SR. Pass <code>decorative</code> when the parent already announces busy state (e.g. button with aria-busy) to avoid double announcements. Honors prefers-reduced-motion.</p>
     </section>
     <section aria-labelledby="pixel-spinner-usage">
-      <h3 id="pixel-spinner-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react'
-import { PixelSpinner } from '@pxlkit/ui-kit'
+      <Heading id="pixel-spinner-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSpinner usage'}
+        react={`import { PixelSpinner } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelSpinner />
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSpinner />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`<pxl-spinner />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSpinner } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelSpinner />
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSpinner />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`<pxl-spinner />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelSpinner } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex items-center gap-4">
       <PixelSpinner size="xs" />
@@ -75,11 +185,44 @@ export function Default() {
       <PixelSpinner size="lg" />
     </div>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-4">
+    <PixelSpinner size="xs" />
+    <PixelSpinner size="sm" />
+    <PixelSpinner size="md" />
+    <PixelSpinner size="lg" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`
+    <div class="flex items-center gap-4">
+      <pxl-spinner size="xs" />
+      <pxl-spinner size="sm" />
+      <pxl-spinner size="md" />
+      <pxl-spinner size="lg" />
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelSpinner } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex items-center gap-4">
       <PixelSpinner tone="neutral" />
@@ -91,31 +234,115 @@ export function Default() {
       <PixelSpinner tone="pink" />
     </div>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-4">
+    <PixelSpinner tone="neutral" />
+    <PixelSpinner tone="green" />
+    <PixelSpinner tone="cyan" />
+    <PixelSpinner tone="gold" />
+    <PixelSpinner tone="red" />
+    <PixelSpinner tone="purple" />
+    <PixelSpinner tone="pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`
+    <div class="flex items-center gap-4">
+      <pxl-spinner tone="neutral" />
+      <pxl-spinner tone="green" />
+      <pxl-spinner tone="cyan" />
+      <pxl-spinner tone="gold" />
+      <pxl-spinner tone="red" />
+      <pxl-spinner tone="purple" />
+      <pxl-spinner tone="pink" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <Subheading>Pixel surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel surface code'}
+          react={`import { PixelSpinner } from '@pxlkit/ui-kit';
+
+export function PixelSurface() {
   return <PixelSpinner surface="pixel" size="lg" tone="cyan" />
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSpinner surface="pixel" size="lg" tone="cyan" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`<pxl-spinner surface="pixel" size="lg" tone="cyan" />\`,
+})
+export class PixelSurface {}`}
+        />
       </article>
       <article className="docs-example" id="example-decorative">
-        <h4>Decorative (inside aria-busy parent)</h4>
-        <pre className="docs-code"><code>{`export function Decorative() {
+        <Subheading>Decorative (inside aria-busy parent)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Decorative (inside aria-busy parent) code'}
+          react={`import { PixelSpinner } from '@pxlkit/ui-kit';
+
+export function Decorative() {
   return (
     <button type="button" aria-busy="true" className="inline-flex items-center gap-2">
       <PixelSpinner decorative size="sm" />
       <span>Saving…</span>
     </button>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <button type="button" aria-busy="true" class="inline-flex items-center gap-2">
+    <PixelSpinner decorative size="sm" />
+    <span>Saving…</span>
+  </button>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`
+    <button type="button" aria-busy="true" class="inline-flex items-center gap-2">
+      <pxl-spinner decorative size="sm" />
+      <span>Saving…</span>
+    </button>
+  \`,
+})
+export class Decorative {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-alert">PixelAlert</a></li>
-        <li><a href="#pixel-toast">PixelToast</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert' : '#pixel-alert'}>PixelAlert</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toast' : '#pixel-toast'}>PixelToast</a></li>
       </ul>
     </section>
     </section>

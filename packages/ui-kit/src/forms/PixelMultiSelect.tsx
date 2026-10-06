@@ -11,17 +11,27 @@ import React, {
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
 import {
+  chipDeleteLabel,
+  clampHighlight,
+  comboboxListboxId,
+  comboboxOptionId,
+  fieldDescribedBy,
+  fieldMessageId,
+  filterComboboxOptions,
+  isMultiSelectFull,
+  multiSelectCheckClasses,
+  multiSelectClasses,
+  multiSelectKeydown,
+  multiSelectOptionClasses,
+  passMultiSelectFocus,
+  toggleMultiSelectValue,
+} from '@pxlkit/ui-kit-core';
+import {
   CheckIcon,
   ChevronDownIcon,
   CloseIcon,
   FieldShell,
   Surface,
-  cn,
-  focusRing,
-  inputBase,
-  sizeHeight,
-  surfaceClasses,
-  toneMap,
   useEffectiveSurface,
 } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
@@ -35,18 +45,31 @@ export interface PixelMultiSelectOption {
 }
 
 export interface PixelMultiSelectProps {
+  /** The selected values, in the order picked; leave unset for an uncontrolled multi-select. */
   value?: string[];
+  /** Initial values while uncontrolled. */
   defaultValue?: string[];
+  /** Called with the selected values after every toggle, removal or clear. */
   onChange?: (next: string[]) => void;
+  /** The options of the listbox. */
   options: PixelMultiSelectOption[];
+  /** Shows a search field that filters the options. */
   searchable?: boolean;
+  /** Most values that can be selected. */
   max?: number;
+  /** Text shown while nothing is selected. */
   placeholder?: string;
+  /** Shows a button that clears the selection while there is one. */
   clearable?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Trigger height. */
   size?: 'sm' | 'md' | 'lg';
+  /** Label rendered above the trigger. */
   label?: string;
+  /** Helper text below the field; hidden while `error` is set. */
   hint?: string;
+  /** Error message below the field; marks the trigger invalid. */
   error?: string;
   /**
    * Hidden-input `name`. Multiple values are serialized as repeated
@@ -54,8 +77,27 @@ export interface PixelMultiSelectProps {
    * `FormData.getAll(name)`.
    */
   name?: string;
+  /** `id` of the trigger; generated when left out. */
   id?: string;
 }
+
+/*
+ * The field the chips, the combobox and the clear button sit in, side by side
+ * as a button cannot hold another. It anchors the popover, and a press on it
+ * toggles the listbox as one on the combobox does, but for its buttons, which
+ * prevent that. The combobox carries the popup's ARIA, so the field leaves
+ * out what PixelPopover.Trigger gives it.
+ */
+type MultiSelectFieldProps = React.HTMLAttributes<HTMLDivElement>;
+
+const MultiSelectField = forwardRef<HTMLDivElement, MultiSelectFieldProps>(
+  function MultiSelectField(
+    { 'aria-expanded': _expanded, 'aria-haspopup': _haspopup, 'aria-controls': _controls, ...rest },
+    ref,
+  ) {
+    return <div ref={ref} {...rest} />;
+  },
+);
 
 export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectProps>(
   function PixelMultiSelect(
@@ -79,10 +121,9 @@ export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectPr
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
     const reactId = useId();
     const triggerId = id ?? `${reactId}-trigger`;
-    const listboxId = `${reactId}-listbox`;
+    const listboxId = comboboxListboxId(reactId);
 
     const [value, setValue] = useControllableState<string[]>({
       value: controlledValue,
@@ -94,17 +135,25 @@ export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectPr
     const [query, setQuery] = useState('');
     const [highlighted, setHighlighted] = useState(0);
     const searchRef = useRef<HTMLInputElement | null>(null);
+    const valuesRef = useRef<HTMLSpanElement | null>(null);
+    const comboboxRef = useRef<HTMLButtonElement | null>(null);
+    const setComboboxRef = useCallback(
+      (node: HTMLButtonElement | null) => {
+        comboboxRef.current = node;
+        if (typeof ref === 'function') ref(node);
+        else if (ref) ref.current = node;
+      },
+      [ref],
+    );
 
     const isSelected = (v: string) => value.includes(v);
-    const capReached = typeof max === 'number' && value.length >= max;
+    const capReached = isMultiSelectFull(value, max);
+    // Unselected options cannot be picked once the cap is reached.
+    const isOptionDisabled = (opt: PixelMultiSelectOption) => !!opt.disabled || (!isSelected(opt.value) && capReached);
 
     const toggle = (v: string) => {
-      if (isSelected(v)) {
-        setValue(value.filter((x) => x !== v));
-        return;
-      }
-      if (capReached) return;
-      setValue([...value, v]);
+      const next = toggleMultiSelectValue(value, v, max);
+      if (next) setValue(next);
     };
 
     const clear = useCallback(() => {
@@ -116,10 +165,7 @@ export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectPr
       .filter((o): o is PixelMultiSelectOption => !!o);
 
     const filtered = useMemo(
-      () =>
-        searchable && query
-          ? options.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()))
-          : options,
+      () => (searchable && query ? filterComboboxOptions(options, query) : options),
       [options, query, searchable],
     );
 
@@ -133,64 +179,78 @@ export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectPr
 
     // Clamp highlight when list shrinks.
     useEffect(() => {
-      if (filtered.length === 0) {
-        if (highlighted !== 0) setHighlighted(0);
-        return;
-      }
-      if (highlighted > filtered.length - 1) setHighlighted(filtered.length - 1);
+      const clamped = clampHighlight(highlighted, filtered.length);
+      if (clamped !== highlighted) setHighlighted(clamped);
     }, [filtered.length, highlighted]);
 
-    const optionIdFor = (v: string) => `${listboxId}-opt-${v}`;
     const activeId = filtered[highlighted]
-      ? optionIdFor(filtered[highlighted].value)
+      ? comboboxOptionId(listboxId, filtered[highlighted].value)
       : undefined;
 
-    const navigate = (e: ReactKeyboardEvent<HTMLElement>) => {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        if (!open) {
+    // The combobox and the search field share the keys; Space types in the
+    // search field.
+    const navigate = (e: ReactKeyboardEvent<HTMLElement>, inSearch = false) => {
+      // Escape closes the popover, which hands focus back to the field: it
+      // cannot take it, so focus leaves the search field for the combobox.
+      if (e.key === 'Escape' && inSearch) {
+        comboboxRef.current?.focus();
+        return;
+      }
+      const action = multiSelectKeydown(e.key, {
+        open,
+        highlighted,
+        count: filtered.length,
+        canToggle: (index) => !isOptionDisabled(filtered[index]!),
+        query,
+        selected: value.length,
+        inSearch,
+      });
+      if (!action) return;
+      e.preventDefault();
+      switch (action.kind) {
+        case 'open':
           setOpen(true);
           return;
-        }
-        if (filtered.length === 0) return;
-        setHighlighted((h) => (h + 1) % filtered.length);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        if (!open) {
-          setOpen(true);
+        case 'highlight':
+          setHighlighted(action.index);
           return;
-        }
-        if (filtered.length === 0) return;
-        setHighlighted((h) => (h - 1 + filtered.length) % filtered.length);
-      } else if (e.key === 'Home') {
-        e.preventDefault();
-        setHighlighted(0);
-      } else if (e.key === 'End') {
-        e.preventDefault();
-        setHighlighted(Math.max(0, filtered.length - 1));
-      } else if (e.key === 'Enter' || e.key === ' ') {
-        if (!open) {
-          e.preventDefault();
-          setOpen(true);
+        case 'toggle':
+          toggle(filtered[action.index]!.value);
           return;
-        }
-        const it = filtered[highlighted];
-        if (it && !it.disabled && !(capReached && !isSelected(it.value))) {
-          e.preventDefault();
-          toggle(it.value);
-        }
-      } else if (e.key === 'Backspace' && !query && value.length > 0) {
-        // Convenience: backspace on the trigger removes the last chip.
-        e.preventDefault();
-        const last = value[value.length - 1];
-        toggle(last);
+        case 'removeLast':
+          // Convenience: backspace removes the last chip.
+          toggle(value[value.length - 1]!);
+          return;
+        default:
+          return;
       }
     };
 
+    // A press on the field focuses the combobox, which takes the keys.
+    const focusCombobox = (e: React.MouseEvent) => {
+      if (!e.defaultPrevented) comboboxRef.current?.focus();
+    };
+
+    // The remove and clear buttons leave focus where it is under the pointer,
+    // as the options do, and keep the field from toggling the listbox; one
+    // that holds focus hands it on as it goes.
+    const keepFocus = (e: React.MouseEvent) => e.preventDefault();
+    const removeChip = (e: React.MouseEvent<HTMLButtonElement>, v: string) => {
+      e.preventDefault();
+      passMultiSelectFocus(e.currentTarget, valuesRef.current, comboboxRef.current);
+      toggle(v);
+    };
+    const clearSelection = (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      passMultiSelectFocus(e.currentTarget, valuesRef.current, comboboxRef.current);
+      clear();
+    };
+
     const showClear = clearable && value.length > 0;
+    const classes = multiSelectClasses(surface, { size, invalid: !!error, open });
 
     return (
-      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId}>
+      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId} messageId={fieldMessageId(triggerId)}>
         {name &&
           value.map((v) => (
             <input key={v} type="hidden" name={name} value={v} />
@@ -206,129 +266,83 @@ export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectPr
           role="none"
         >
           <PixelPopover.Trigger>
-            <button
-              ref={ref}
-              id={triggerId}
-              type="button"
-              role="combobox"
-              aria-controls={listboxId}
-              aria-haspopup="listbox"
-              aria-expanded={open}
-              aria-activedescendant={open ? activeId : undefined}
-              aria-invalid={error ? true : undefined}
-              onKeyDown={navigate}
-              className={cn(
-                'flex w-full items-center justify-between gap-2 px-3 outline-none',
-                inputBase,
-                s.font,
-                s.border,
-                s.radius,
-                s.transition,
-                sizeHeight[size],
-                focusRing,
-                toneMap.neutral.ring,
-                error ? 'border-retro-red/60' : 'border-retro-border-strong',
-              )}
-            >
-              <span className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
-                {selectedOptions.length === 0 ? (
-                  <span className="truncate text-retro-muted">
-                    {placeholder}
-                  </span>
-                ) : (
-                  selectedOptions.map((opt) => (
-                    <span
-                      key={opt.value}
-                      className={cn(
-                        'inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px]',
-                        s.border,
-                        s.radiusFull,
-                        toneMap.neutral.border,
-                        toneMap.neutral.soft,
-                        'text-retro-text',
-                      )}
+            <MultiSelectField onClick={focusCombobox} className={classes.field}>
+              <span ref={valuesRef} className={classes.values}>
+                {selectedOptions.map((opt) => (
+                  <span key={opt.value} className={classes.chip}>
+                    {opt.icon && (
+                      <span className={classes.icon}>{opt.icon}</span>
+                    )}
+                    <span className={classes.chipLabel}>{opt.label}</span>
+                    <button
+                      type="button"
+                      aria-label={chipDeleteLabel(opt.label)}
+                      data-pxl-chip-remove={opt.value}
+                      onMouseDown={keepFocus}
+                      onClick={(e) => removeChip(e, opt.value)}
+                      className={classes.chipRemove}
                     >
-                      {opt.icon && (
-                        <span className="opacity-80">{opt.icon}</span>
-                      )}
-                      <span className="truncate">{opt.label}</span>
-                      {/*
-                        Chip-X is rendered as a span (NOT a button) on purpose:
-                        nesting a real <button> inside the trigger <button> is
-                        invalid HTML. We swallow pointerdown AND click so the
-                        outer trigger doesn't toggle the popover spuriously.
-                        Keyboard removal: Backspace on the trigger removes the
-                        last chip (see navigate()).
-                      */}
-                      <span
-                        role="img"
-                        aria-label={`${opt.label} chip`}
-                        onPointerDown={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggle(opt.value);
-                        }}
-                        data-pxl-chip-remove={opt.value}
-                        aria-hidden="true"
-                        className="inline-flex shrink-0 items-center text-retro-muted hover:text-retro-text cursor-pointer"
-                      >
-                        <CloseIcon className="h-2 w-2" />
-                        <span className="sr-only">Remove {opt.label}</span>
-                      </span>
-                    </span>
-                  ))
-                )}
-              </span>
-              <span className="ml-1 flex shrink-0 items-center gap-1">
-                {showClear && (
-                  // span+role=button for the same nested-button HTML reason.
-                  // Stops propagation on both pointer and click so the outer
-                  // trigger doesn't toggle the popover.
-                  <span
-                    role="button"
-                    tabIndex={-1}
-                    aria-label="Clear selection"
-                    onPointerDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      clear();
-                    }}
-                    className="inline-flex items-center text-retro-muted hover:text-retro-text cursor-pointer"
-                  >
-                    <CloseIcon className="h-3 w-3" />
+                      <CloseIcon className={classes.chipRemoveGlyph} />
+                    </button>
                   </span>
-                )}
-                <ChevronDownIcon
-                  className={cn(
-                    'text-retro-muted transition-transform',
-                    open && 'rotate-180',
+                ))}
+                <button
+                  ref={setComboboxRef}
+                  id={triggerId}
+                  type="button"
+                  role="combobox"
+                  aria-controls={listboxId}
+                  aria-haspopup="listbox"
+                  aria-expanded={open}
+                  aria-activedescendant={open ? activeId : undefined}
+                  aria-invalid={error ? true : undefined}
+                  aria-describedby={fieldDescribedBy(triggerId, { hint, error })}
+                  onKeyDown={(e) => navigate(e)}
+                  className={classes.trigger}
+                >
+                  {/* The placeholder, or the value the chips before it show. */}
+                  {selectedOptions.length === 0 ? (
+                    <span className={classes.placeholder}>
+                      {placeholder}
+                    </span>
+                  ) : (
+                    <span className="sr-only">
+                      {selectedOptions.map((opt) => opt.label).join(', ')}
+                    </span>
                   )}
-                />
+                </button>
               </span>
-            </button>
+              <span className={classes.actions}>
+                {showClear && (
+                  <button
+                    type="button"
+                    aria-label="Clear selection"
+                    onMouseDown={keepFocus}
+                    onClick={clearSelection}
+                    className={classes.clear}
+                  >
+                    <CloseIcon className={classes.clearGlyph} />
+                  </button>
+                )}
+                <ChevronDownIcon className={classes.chevron} />
+              </span>
+            </MultiSelectField>
           </PixelPopover.Trigger>
           <PixelPopover.Content
-            className="p-1 w-[var(--pxl-multiselect-w,16rem)]"
+            className={classes.content}
             style={{ minWidth: 220 }}
           >
             {searchable && (
-              <div
-                className={cn(
-                  'mb-1 flex items-center px-2 py-1.5 border-b-2 border-retro-border',
-                  surface === 'linear' && 'border-b',
-                )}
-              >
+              <div className={classes.search}>
+                {/* Focus sits here while it is open: it carries the active option, as the combobox does. */}
                 <input
                   ref={searchRef}
                   type="text"
+                  role="searchbox"
+                  aria-label="Filter options"
+                  aria-autocomplete="list"
+                  aria-controls={listboxId}
+                  aria-activedescendant={activeId}
                   autoFocus
                   placeholder="Search…"
                   value={query}
@@ -336,11 +350,8 @@ export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectPr
                     setQuery(e.target.value);
                     setHighlighted(0);
                   }}
-                  onKeyDown={navigate}
-                  className={cn(
-                    'w-full bg-transparent text-xs text-retro-text outline-none placeholder:text-retro-muted',
-                    s.font,
-                  )}
+                  onKeyDown={(e) => navigate(e, true)}
+                  className={classes.input}
                 />
               </div>
             )}
@@ -348,26 +359,21 @@ export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectPr
               id={listboxId}
               role="listbox"
               aria-multiselectable="true"
-              className="max-h-60 overflow-y-auto"
+              className={classes.listbox}
             >
               {filtered.length === 0 ? (
-                <li
-                  className={cn(
-                    'px-3 py-2 text-center text-xs text-retro-muted',
-                    s.font,
-                  )}
-                >
+                <li className={classes.empty}>
                   No results.
                 </li>
               ) : (
                 filtered.map((opt, idx) => {
                   const selected = isSelected(opt.value);
-                  const disabled = opt.disabled || (!selected && capReached);
+                  const disabled = isOptionDisabled(opt);
                   const isActive = idx === highlighted;
                   return (
                     <li
                       key={opt.value}
-                      id={optionIdFor(opt.value)}
+                      id={comboboxOptionId(listboxId, opt.value)}
                       role="option"
                       aria-selected={selected}
                       aria-disabled={disabled || undefined}
@@ -377,53 +383,24 @@ export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectPr
                         if (disabled) return;
                         toggle(opt.value);
                       }}
-                      className={cn(
-                        'flex cursor-pointer items-center gap-2 px-2 py-1.5 text-xs text-retro-text',
-                        s.font,
-                        s.radius,
-                        selected
-                          ? cn(toneMap.neutral.soft, 'text-retro-text')
-                          : 'text-retro-muted',
-                        isActive && !disabled && 'bg-retro-surface/60',
-                        disabled && 'opacity-50 cursor-not-allowed',
-                        !disabled && !isActive && 'hover:bg-retro-surface hover:text-retro-text',
-                      )}
+                      className={multiSelectOptionClasses(surface, { selected, highlighted: isActive, disabled })}
                     >
-                      <span
-                        className={cn(
-                          'flex h-[14px] w-[14px] shrink-0 items-center justify-center',
-                          s.border,
-                          s.radius,
-                          selected
-                            ? cn(
-                                toneMap.neutral.border,
-                                toneMap.neutral.bg,
-                              )
-                            : 'border-retro-border-strong bg-retro-bg',
-                        )}
-                      >
+                      <span className={multiSelectCheckClasses(surface, selected)}>
                         {selected && (
-                          <CheckIcon className="h-2 w-2 text-retro-text" />
+                          <CheckIcon className={classes.checkGlyph} />
                         )}
                       </span>
                       {opt.icon && (
-                        <span className="opacity-80">{opt.icon}</span>
+                        <span className={classes.icon}>{opt.icon}</span>
                       )}
-                      <span className="flex-1 truncate">{opt.label}</span>
+                      <span className={classes.label}>{opt.label}</span>
                     </li>
                   );
                 })
               )}
             </ul>
             {typeof max === 'number' && (
-              <div
-                className={cn(
-                  'mt-1 px-2 py-1 text-[10px] text-retro-muted',
-                  s.font,
-                  'border-t-2 border-retro-border',
-                  surface === 'linear' && 'border-t',
-                )}
-              >
+              <div className={classes.footer}>
                 {value.length}/{max} selected
               </div>
             )}

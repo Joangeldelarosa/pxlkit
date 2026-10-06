@@ -25,7 +25,9 @@
  *       PixelToast). BLOCKER.
  *   R3. If `surface?` is declared in Props → MUST call `surfaceClasses` at
  *       least once in the same file, OR consume the resolved surface in
- *       another legitimate way: branch-render on it (PixelSpinner's
+ *       another legitimate way: hand it to a class recipe
+ *       (`emptyStateClasses(useEffectiveSurface(surfaceProp))`, or through
+ *       a variable), branch-render on it (PixelSpinner's
  *       `surface === 'pixel'`), publish it through a context value
  *       (PixelTabs / PixelToggleGroup), or JSX-forward it. What it must
  *       NOT do is resolve the surface and discard it. BLOCKER.
@@ -328,24 +330,29 @@ export function analyzeSurfaceCoherence(
   // in common.tsx — also matches the call regex, with its parameter list as
   // the "argument"; exclude it, or it poisons R4 and masks R2.
   const useEffectiveSurfaceArgs: string[] = [];
+  // R3 delegation signal A — the resolved surface is consumed: handed
+  // straight to a call or an object (`emptyStateClasses(useEffectiveSurface(p))`,
+  // `{ surface: useEffectiveSurface(p) }`), or assigned and referenced again
+  // (branch rendering, context value, child props, ...). A
+  // resolved-and-discarded surface stays false.
+  let usesResolvedSurface = false;
   for (const m of source.matchAll(USE_EFFECTIVE_SURFACE_CALL_REGEX)) {
     const before = source.slice(Math.max(0, (m.index ?? 0) - 24), m.index);
     if (/\bfunction\s*$/.test(before)) continue; // definition, not a call
     useEffectiveSurfaceArgs.push((m[1] ?? '').trim());
+    if (/[(,:]\s*$/.test(before)) usesResolvedSurface = true;
   }
   const callsUseEffectiveSurface = useEffectiveSurfaceArgs.length > 0;
 
-  // R3 delegation signal A — the resolved surface is assigned and then
-  // referenced again (branch rendering, context value, child props, ...).
-  // A resolved-and-discarded surface stays false.
-  let usesResolvedSurface = false;
-  for (const m of source.matchAll(RESOLVED_SURFACE_ASSIGN_REGEX)) {
-    const ident = m[1]!;
-    const escaped = ident.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const after = source.slice((m.index ?? 0) + m[0].length);
-    if (new RegExp(`\\b${escaped}\\b`).test(after)) {
-      usesResolvedSurface = true;
-      break;
+  if (!usesResolvedSurface) {
+    for (const m of source.matchAll(RESOLVED_SURFACE_ASSIGN_REGEX)) {
+      const ident = m[1]!;
+      const escaped = ident.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const after = source.slice((m.index ?? 0) + m[0].length);
+      if (new RegExp(`\\b${escaped}\\b`).test(after)) {
+        usesResolvedSurface = true;
+        break;
+      }
     }
   }
 
@@ -510,7 +517,7 @@ export function findingsFor(
       file: analysis.file,
       component: analysis.component,
       message: `Component "${analysis.component}" declares "surface?: Surface" but never calls surfaceClasses() — the surface-specific border/radius/shadow tokens are not being computed.`,
-      suggestion: `Add: const s = surfaceClasses(useEffectiveSurface(${analysis.surfacePropIdent ?? 'surface'})); and apply s.border + s.radius (or s.radiusLg / s.radiusFull) in your className. (Branching on the resolved surface, publishing it through a context value, or JSX-forwarding it also satisfies this rule.)`,
+      suggestion: `Add: const s = surfaceClasses(useEffectiveSurface(${analysis.surfacePropIdent ?? 'surface'})); and apply s.border + s.radius (or s.radiusLg / s.radiusFull) in your className. (Handing the resolved surface to a class recipe, branching on it, publishing it through a context value, or JSX-forwarding it also satisfies this rule.)`,
     });
   }
 

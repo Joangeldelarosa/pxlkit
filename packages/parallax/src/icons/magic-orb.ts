@@ -1,4 +1,4 @@
-import type { PxlKitData, AnimatedPxlKitData, ParallaxPxlKitData } from '@pxlkit/core';
+import type { PxlKitData, AnimatedPxlKitData, ParallaxPxlKitData } from '@pxlkit/core/vanilla';
 
 const MagicOrbStars: AnimatedPxlKitData = {
   name: 'magic-orb-stars',

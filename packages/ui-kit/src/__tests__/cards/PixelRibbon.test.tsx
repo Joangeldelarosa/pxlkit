@@ -67,3 +67,11 @@ describe('PixelRibbon', () => {
     expect(getByText('Most Popular')).toBeInTheDocument();
   });
 });
+
+describe('PixelRibbon — letter spacing', () => {
+  it('spaces its label wide on linear too, where the display face is tight', () => {
+    const tracking = (el: Element) => el.className.split(' ').filter((name) => name.startsWith('tracking-'));
+    const { getByTestId } = render(<PixelRibbon data-testid="ribbon" surface="linear">New</PixelRibbon>);
+    expect(tracking(getByTestId('ribbon'))).toEqual(['tracking-wider']);
+  });
+});

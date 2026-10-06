@@ -1,10 +1,10 @@
 import type { TemplateSection } from '../types';
+import { UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 
 const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/gamification';
 
 const bannerCta = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { SparkleStar } from '@pxlkit/gamification';
@@ -28,7 +28,7 @@ export function BannerCta() {
     >
       <PixelStack gap={6} align="center" className="text-center">
         <PixelBounce>
-          <AnimatedPxlKitIcon icon={SparkleStar} size={48} colorful />
+          <AnimatedPxlKitIcon icon={SparkleStar} size={48} colorful decorative />
         </PixelBounce>
         <PixelSectionHeader
           id="banner-cta-title"
@@ -42,7 +42,7 @@ export function BannerCta() {
           <PixelButton
             tone="green"
             size="lg"
-            iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+            iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
           >
             Get Started Free
           </PixelButton>
@@ -58,7 +58,6 @@ export function BannerCta() {
 
 const splitCta = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { Trophy, Coin, LevelUp } from '@pxlkit/gamification';
@@ -76,7 +75,7 @@ export function SplitCta() {
   const stats = [
     { icon: Trophy, label: 'Stars', value: '4.2k', tone: 'gold' as const },
     { icon: Coin, label: 'Downloads/mo', value: '18k', tone: 'cyan' as const },
-    { icon: LevelUp, label: 'Components', value: '60+', tone: 'green' as const },
+    { icon: LevelUp, label: 'Components', value: '${UI_COMPONENTS_COUNT}', tone: 'green' as const },
   ];
 
   return (
@@ -97,7 +96,7 @@ export function SplitCta() {
                   <PixelButton
                     tone="green"
                     size="lg"
-                    iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                    iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
                   >
                     Start Free
                   </PixelButton>
@@ -118,7 +117,7 @@ export function SplitCta() {
                   label={s.label}
                   value={s.value}
                   tone={s.tone}
-                  icon={<PxlKitIcon icon={s.icon} size={20} colorful />}
+                  icon={<PxlKitIcon icon={s.icon} size={20} colorful decorative />}
                 />
               ))}
             </PixelStack>
@@ -132,7 +131,6 @@ export function SplitCta() {
 
 const cardCta = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { FireSword } from '@pxlkit/gamification';
@@ -152,7 +150,7 @@ export function CardCta() {
       <PixelFadeIn>
         <PixelCard tone="gold" padding="lg" className="text-center sm:p-12">
           <PixelStack gap={5} align="center">
-            <AnimatedPxlKitIcon icon={FireSword} size={56} colorful />
+            <AnimatedPxlKitIcon icon={FireSword} size={56} colorful decorative />
             <h2 className="font-pixel text-lg sm:text-xl text-retro-text leading-loose">
               <PixelTypewriter label="Level up your UI" speed={50} />
             </h2>
@@ -164,7 +162,7 @@ export function CardCta() {
               <PixelButton
                 tone="gold"
                 size="lg"
-                iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
               >
                 Start for Free
               </PixelButton>

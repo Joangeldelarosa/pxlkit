@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAlertDialogDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelAlertDialogDocsMeta = {
@@ -17,16 +23,95 @@ export const PixelAlertDialogDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsSectionProps): React.ReactElement {
+/** PixelAlertDialog's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelAlertDialog } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelAlertDialog',
+        props: [
+          { name: 'open', type: 'boolean', required: true, description: 'Whether the dialog is visible; set it from `onOpenChange`.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', required: true, description: 'Called with `false` when the dialog asks to close (Cancel, Escape, the backdrop, a completed action).' },
+          { name: 'title', type: 'string', required: true, description: 'Title; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'cancelLabel', type: 'string', default: "'Cancel'", description: 'Label of the button that dismisses the dialog.' },
+          { name: 'actionLabel', type: 'string', default: "'Confirm'", description: 'Label of the button that confirms.' },
+          { name: 'onAction', type: '() => void | Promise<void>', required: true, description: 'The confirmed action. Its result matters: the dialog closes once it returns, or once the promise it returns resolves — and stays open, busy, until then.' },
+          { name: 'onError', type: '(error: unknown) => void', description: 'Called when `onAction` throws / rejects. Receives the thrown value. When set, the dialog stays OPEN on failure so the consumer can show an inline error. When unset, errors are silently swallowed (back-compat).' },
+          { name: 'destructive', type: 'boolean', default: 'false', description: 'Red accent for a destructive action (cyan otherwise).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelAlertDialog } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelAlertDialog',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: 'v-model:open', description: 'Whether the dialog is visible (`v-model:open`).' },
+          { name: 'title', type: 'string', required: true, description: 'Title; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'cancelLabel', type: 'string', default: "'Cancel'", description: 'Label of the button that dismisses the dialog.' },
+          { name: 'actionLabel', type: 'string', default: "'Confirm'", description: 'Label of the button that confirms.' },
+          { name: 'onAction', type: '(() => void) | (() => Promise<void>)', required: true, binding: '@action', description: 'The confirmed action (`@action`). Declared as a prop because its result matters: the dialog closes once it returns, or once the promise it returns resolves — and stays open, busy, until then.' },
+          { name: 'onError', type: '(error: unknown) => void', binding: '@error', description: 'Receives what the action threw or rejected with (`@error`); the dialog stays open so you can show the error. Declared as a prop because its presence matters: without one a thrown error propagates and a rejection is logged to the console.' },
+          { name: 'destructive', type: 'boolean', default: 'false', description: 'Red accent for a destructive action (cyan otherwise).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: '`false` when the dialog asks to close (Cancel, Escape, backdrop, a completed action), for `v-model:open`.' },
+        ],
+        notes: [
+          'Its template ref exposes `element`: the dialog panel while it is open.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelAlertDialog } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelAlertDialog',
+        selector: 'pxl-alert-dialog',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: '[(open)]', description: 'Whether the dialog is visible (`[(open)]`).' },
+          { name: 'title', type: 'string', required: true, description: 'Title; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'cancelLabel', type: 'string', default: "'Cancel'", description: 'Label of the button that dismisses the dialog.' },
+          { name: 'actionLabel', type: 'string', default: "'Confirm'", description: 'Label of the button that confirms.' },
+          { name: 'onAction', type: '() => void | Promise<void>', required: true, description: 'The confirmed action. Its result matters: the dialog closes once it returns, or once the promise it returns resolves — and stays open, busy, until then.' },
+          { name: 'onError', type: '(error: unknown) => void', description: 'Receives what the action threw or rejected with; the dialog stays open so you can show the error. Without one a thrown error propagates and a rejection is logged to the console.' },
+          { name: 'destructive', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Red accent for a destructive action (cyan otherwise).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: '`false` when the dialog asks to close (Cancel, Escape, backdrop, a completed action), for `[(open)]`.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelAlertDialogDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelAlertDialogDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-alert-dialog-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-alert-dialog-heading'>PixelAlertDialog</h2>
+      <Title id='pixel-alert-dialog-heading'>PixelAlertDialog</Title>
       <p className="docs-lead">Modal confirmation dialog for destructive or irreversible actions, with async-aware action handling and Cancel-focused defaults.</p>
       <ul className="docs-highlights">
         <li>role=&quot;alertdialog&quot; + aria-modal with initial focus pinned to Cancel for safer destructive flows</li>
         <li>Async onAction with pending state, spinner, and stays open on rejection when onError is provided</li>
         <li>Destructive tone variant switches the action accent to red</li>
-        <li>Surface-aware styling via useEffectiveSurface (pixel chrome vs. modern)</li>
+        <li>Surface-aware styling (pixel chrome vs. linear)</li>
         <li>Scroll lock, focus trap, and Escape-to-close baked in</li>
       </ul>
     <dl className="docs-meta">
@@ -34,18 +119,18 @@ export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsS
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-alert-dialog-api">
+      <Heading id="pixel-alert-dialog-api">API</Heading>
+      <FrameworkApi label={'PixelAlertDialog API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-alert-dialog-a11y">
-      <h3 id="pixel-alert-dialog-a11y">Accessibility</h3>
+      <Heading id="pixel-alert-dialog-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>alertdialog</code></li>
       </ul>
       <p className="docs-aria-notes">Initial focus is placed on the Cancel button to prevent accidental confirmation of destructive actions.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -74,8 +159,11 @@ export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsS
       </table>
     </section>
     <section aria-labelledby="pixel-alert-dialog-usage">
-      <h3 id="pixel-alert-dialog-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-alert-dialog-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelAlertDialog usage'}
+        react={`import { useState } from 'react';
 import { PixelAlertDialog } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -95,14 +183,61 @@ export function Default() {
       />
     </div>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <div>
+    <button type="button" @click="open = true">Open alert dialog</button>
+    <PixelAlertDialog
+      v-model:open="open"
+      title="Save changes?"
+      description="Your edits will be applied to the live document."
+      action-label="Save"
+      @action="open = false"
+    />
+  </div>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlertDialog],
+  template: \`
+    <div>
+      <button type="button" (click)="open.set(true)">Open alert dialog</button>
+      <pxl-alert-dialog
+        [(open)]="open"
+        title="Save changes?"
+        description="Your edits will be applied to the live document."
+        actionLabel="Save"
+        [onAction]="save"
+      />
+    </div>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+  readonly save = () => this.open.set(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelAlertDialog } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [open, setOpen] = useState(false);
   return (
     <div>
@@ -119,11 +254,59 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <div>
+    <button type="button" @click="open = true">Open alert dialog</button>
+    <PixelAlertDialog
+      v-model:open="open"
+      title="Save changes?"
+      description="Your edits will be applied to the live document."
+      action-label="Save"
+      @action="open = false"
+    />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlertDialog],
+  template: \`
+    <div>
+      <button type="button" (click)="open.set(true)">Open alert dialog</button>
+      <pxl-alert-dialog
+        [(open)]="open"
+        title="Save changes?"
+        description="Your edits will be applied to the live document."
+        actionLabel="Save"
+        [onAction]="save"
+      />
+    </div>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+  readonly save = () => this.open.set(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-destructive">
-        <h4>Destructive</h4>
-        <pre className="docs-code"><code>{`export function Destructive() {
+        <Subheading>Destructive</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Destructive code'}
+          react={`import { useState } from 'react';
+import { PixelAlertDialog } from '@pxlkit/ui-kit';
+
+export function Destructive() {
   const [open, setOpen] = useState(false);
   return (
     <div>
@@ -142,11 +325,63 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <div>
+    <button type="button" @click="open = true">Delete item</button>
+    <PixelAlertDialog
+      v-model:open="open"
+      title="Delete this item?"
+      description="This action cannot be undone."
+      cancel-label="Keep"
+      action-label="Delete"
+      destructive
+      @action="open = false"
+    />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlertDialog],
+  template: \`
+    <div>
+      <button type="button" (click)="open.set(true)">Delete item</button>
+      <pxl-alert-dialog
+        [(open)]="open"
+        title="Delete this item?"
+        description="This action cannot be undone."
+        cancelLabel="Keep"
+        actionLabel="Delete"
+        destructive
+        [onAction]="remove"
+      />
+    </div>
+  \`,
+})
+export class Destructive {
+  readonly open = signal(false);
+  readonly remove = () => this.open.set(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-async-action">
-        <h4>Async Action</h4>
-        <pre className="docs-code"><code>{`export function AsyncAction() {
+        <Subheading>Async Action</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Async Action code'}
+          react={`import { useState } from 'react';
+import { PixelAlertDialog } from '@pxlkit/ui-kit';
+
+export function AsyncAction() {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   return (
@@ -167,14 +402,73 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+const error = ref<string | null>(null);
+
+function show() {
+  error.value = null;
+  open.value = true;
+}
+
+const submit = () => new Promise<void>((resolve) => setTimeout(resolve, 600));
+</script>
+
+<template>
+  <div>
+    <button type="button" @click="show">Submit</button>
+    <PixelAlertDialog
+      v-model:open="open"
+      title="Submit report?"
+      :description="error ?? 'The report will be sent for review.'"
+      action-label="Submit"
+      @action="submit"
+      @error="(e) => (error = e instanceof Error ? e.message : 'Failed')"
+    />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlertDialog],
+  template: \`
+    <div>
+      <button type="button" (click)="show()">Submit</button>
+      <pxl-alert-dialog
+        [(open)]="open"
+        title="Submit report?"
+        [description]="error() ?? 'The report will be sent for review.'"
+        actionLabel="Submit"
+        [onAction]="submit"
+        [onError]="fail"
+      />
+    </div>
+  \`,
+})
+export class AsyncAction {
+  readonly open = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly submit = () => new Promise<void>((resolve) => setTimeout(resolve, 600));
+  readonly fail = (e: unknown) => this.error.set(e instanceof Error ? e.message : 'Failed');
+
+  show(): void {
+    this.error.set(null);
+    this.open.set(true);
+  }
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-dialog">PixelDialog</a></li>
-        <li><a href="#pixel-portal">PixelPortal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-dialog' : '#pixel-dialog'}>PixelDialog</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-portal' : '#pixel-portal'}>PixelPortal</a></li>
       </ul>
     </section>
     </section>

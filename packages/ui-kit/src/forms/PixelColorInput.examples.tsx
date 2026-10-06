@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PixelColorInput } from './PixelColorInput';
 
 export function Default() {

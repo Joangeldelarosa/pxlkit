@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit" width="480" />
+  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit pixel-art icons" width="480" />
 </p>
 
 <h1 align="center">@pxlkit/social</h1>
@@ -23,23 +23,64 @@
 
 ## Installation
 
+Install the pack next to the components for your framework:
+
 ```bash
-npm install @pxlkit/core @pxlkit/social
+npm install @pxlkit/core @pxlkit/social      # React
+npm install @pxlkit/vue @pxlkit/social       # Vue 3
+npm install @pxlkit/angular @pxlkit/social   # Angular
 ```
 
-> `@pxlkit/core` is required as a dependency for rendering components.
+> The pack is plain data (`PxlKitData` objects typed by `@pxlkit/core`); the React components in `@pxlkit/core`, [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) or [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) render it.
 
 ## Quick Start
+
+### React
 
 ```tsx
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { Heart, PulseHeart } from '@pxlkit/social';
 
 // Static social icon
-<PxlKitIcon icon={Heart} size={32} colorful />
+<PxlKitIcon icon={Heart} size={32} />
 
 // Animated pulsing heart
-<AnimatedPxlKitIcon icon={PulseHeart} size={32} colorful />
+<AnimatedPxlKitIcon icon={PulseHeart} size={32} />
+```
+
+### Vue
+
+```vue
+<script setup lang="ts">
+import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/vue';
+import { Heart, PulseHeart } from '@pxlkit/social';
+</script>
+
+<template>
+  <PxlKitIcon :icon="Heart" :size="32" />
+  <AnimatedPxlKitIcon :icon="PulseHeart" :size="32" />
+</template>
+```
+
+### Angular
+
+```ts
+import { Component } from '@angular/core';
+import { AnimatedPxlKitIcon, PxlKitIcon } from '@pxlkit/angular';
+import { Heart, PulseHeart } from '@pxlkit/social';
+
+@Component({
+  selector: 'app-reactions',
+  imports: [PxlKitIcon, AnimatedPxlKitIcon],
+  template: `
+    <pxl-icon [icon]="heart" [size]="32" />
+    <pxl-animated-icon [icon]="pulseHeart" [size]="32" />
+  `,
+})
+export class Reactions {
+  protected readonly heart = Heart;
+  protected readonly pulseHeart = PulseHeart;
+}
 ```
 
 ## Icons
@@ -99,25 +140,55 @@ import { Heart, PulseHeart } from '@pxlkit/social';
 
 ## Using the Icon Pack
 
+`SocialPack.icons` holds every icon of the pack, static and animated; `isAnimatedIcon` tells them apart.
+
 ```tsx
+// React
 import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/core';
 import { SocialPack } from '@pxlkit/social';
 
-// Render all social icons
 {SocialPack.icons.map((icon) =>
   isAnimatedIcon(icon) ? (
-    <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} colorful />
+    <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} />
   ) : (
-    <PxlKitIcon key={icon.name} icon={icon} size={32} colorful />
-  )
+    <PxlKitIcon key={icon.name} icon={icon} size={32} />
+  ),
 )}
+```
+
+```vue
+<!-- Vue -->
+<script setup lang="ts">
+import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/vue';
+import { SocialPack } from '@pxlkit/social';
+</script>
+
+<template>
+  <template v-for="icon in SocialPack.icons" :key="icon.name">
+    <AnimatedPxlKitIcon v-if="isAnimatedIcon(icon)" :icon="icon" :size="32" />
+    <PxlKitIcon v-else :icon="icon" :size="32" />
+  </template>
+</template>
+```
+
+```html
+<!-- Angular: the component exposes `icons = SocialPack.icons` and `isAnimated = isAnimatedIcon` -->
+@for (icon of icons; track icon.name) {
+  @if (isAnimated(icon)) {
+    <pxl-animated-icon [icon]="icon" [size]="32" />
+  } @else {
+    <pxl-icon [icon]="icon" [size]="32" />
+  }
+}
 ```
 
 ## Related Packages
 
 | Package | Description |
 | --- | --- |
-| [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | Core rendering engine (required) |
+| [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | Rendering engine and React components |
+| [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) | Vue 3 components |
+| [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) | Angular standalone components |
 | [`@pxlkit/gamification`](https://www.npmjs.com/package/@pxlkit/gamification) | 51 icons — RPG, achievements, rewards |
 | [`@pxlkit/feedback`](https://www.npmjs.com/package/@pxlkit/feedback) | 33 icons — alerts, status, notifications |
 | [`@pxlkit/weather`](https://www.npmjs.com/package/@pxlkit/weather) | 36 icons — climate, moon, temperature |

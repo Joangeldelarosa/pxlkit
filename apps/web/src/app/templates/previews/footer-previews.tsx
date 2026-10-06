@@ -28,7 +28,7 @@ export function FooterMinimalPreview() {
       <footer className="px-6 py-5 border-t border-retro-border">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <PxlKitIcon icon={Grid} size={18} colorful />
+            <PxlKitIcon icon={Grid} size={18} colorful decorative />
             <span className="font-pixel text-sm text-retro-text">MyApp</span>
           </div>
           <nav className="flex items-center gap-6 font-mono text-sm text-retro-muted">
@@ -67,7 +67,7 @@ export function FooterMultiColumnPreview() {
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-8 mb-8">
             <div className="col-span-2 sm:col-span-1">
               <div className="flex items-center gap-2 mb-3">
-                <PxlKitIcon icon={Grid} size={20} colorful />
+                <PxlKitIcon icon={Grid} size={20} colorful decorative />
                 <span className="font-pixel text-sm text-retro-text">DevKit</span>
               </div>
               <p className="font-mono text-xs text-retro-muted leading-relaxed mb-4">
@@ -82,10 +82,10 @@ export function FooterMultiColumnPreview() {
                   size="sm"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  icon={<PxlKitIcon icon={Mail} size={12} colorful />}
+                  icon={<PxlKitIcon icon={Mail} size={12} colorful decorative />}
                 />
-                <PixelButton tone="green" size="sm">
-                  <PxlKitIcon icon={ArrowRight} size={12} />
+                <PixelButton tone="green" size="sm" aria-label="Subscribe">
+                  <PxlKitIcon icon={ArrowRight} size={12} decorative />
                 </PixelButton>
               </div>
               <div className="flex items-center gap-1.5">
@@ -144,7 +144,7 @@ export function FooterCtaPreview() {
         <div className="max-w-5xl mx-auto px-6 py-8">
           <div className="rounded-xl border border-retro-green/30 bg-retro-green/5 px-6 py-10 text-center mb-8 hover:scale-[1.01] transition-transform">
             <div className="mb-4">
-              <PxlKitIcon icon={Lightning} size={28} colorful />
+              <PxlKitIcon icon={Lightning} size={28} colorful decorative />
             </div>
             <p className="font-pixel text-sm sm:text-base text-retro-text mb-2">
               Ready to ship something great?
@@ -156,7 +156,7 @@ export function FooterCtaPreview() {
               <PixelButton
                 tone="green"
                 size="md"
-                iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
               >
                 Start Building
               </PixelButton>
@@ -177,7 +177,7 @@ export function FooterCtaPreview() {
               <span className="font-mono text-sm text-retro-muted/50">&copy; 2026 Pxlkit</span>
               <PixelTooltip content="Independently audited and certified" position="top">
                 <span className="inline-flex items-center gap-1 font-mono text-xs text-retro-muted/40 cursor-default">
-                  <PxlKitIcon icon={ShieldCheck} size={12} colorful />
+                  <PxlKitIcon icon={ShieldCheck} size={12} colorful decorative />
                   SOC 2 Compliant
                 </span>
               </PixelTooltip>
@@ -188,7 +188,7 @@ export function FooterCtaPreview() {
               <span className="cursor-pointer hover:text-retro-green transition-colors">Security</span>
               <span className="inline-flex items-center gap-1 cursor-pointer hover:text-retro-green transition-colors">
                 Status
-                <PxlKitIcon icon={Sparkles} size={12} colorful />
+                <PxlKitIcon icon={Sparkles} size={12} colorful decorative />
               </span>
             </nav>
           </div>

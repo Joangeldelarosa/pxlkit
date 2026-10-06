@@ -4,24 +4,22 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef } from 'react';
+import { autoUpdate, useFloating } from '@floating-ui/react-dom';
 import {
-  autoUpdate,
-  flip,
-  offset as floatingOffset,
-  shift,
-  useFloating,
-  type Placement,
-} from '@floating-ui/react-dom';
-import {
-  Surface, cn,
-  surfaceClasses, useEffectiveSurface,
-} from '../common';
+  TOOLTIP_Z_INDEX,
+  anchoredMiddleware,
+  describeTooltipTrigger,
+  resolveTooltipDelays,
+  tooltipClasses,
+  tooltipTriggerClasses,
+  type TooltipDelay,
+  type TooltipPosition,
+  type TooltipTrigger,
+} from '@pxlkit/ui-kit-core';
+import { Surface, useEffectiveSurface } from '../common';
 import { PixelPortal } from '../overlay-foundation/PixelPortal';
 import { useEscape } from '../hooks/useEscape';
 import { useControllableState } from '../hooks/useControllableState';
-
-type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
-type TooltipTrigger = 'hover' | 'click' | 'focus';
 
 /** Public prop bag for {@link PixelTooltip}. */
 export interface PixelTooltipProps {
@@ -39,7 +37,7 @@ export interface PixelTooltipProps {
    * Open/close delays in ms. A bare `number` is treated as `{ open }` for
    * backwards-compat with the previous API. Defaults to `{ open: 200, close: 100 }`.
    */
-  delay?: number | { open?: number; close?: number };
+  delay?: TooltipDelay;
   /** Controlled open state. When provided, the tooltip ignores its internal state. */
   open?: boolean;
   /** Initial open state when uncontrolled. */
@@ -50,17 +48,6 @@ export interface PixelTooltipProps {
   trigger?: TooltipTrigger;
   /** Distance in px from the trigger. Default `8`. */
   sideOffset?: number;
-}
-
-const DEFAULT_OPEN_DELAY = 200;
-const DEFAULT_CLOSE_DELAY = 100;
-
-function resolveDelays(delay: PixelTooltipProps['delay']): { open: number; close: number } {
-  if (typeof delay === 'number') return { open: delay, close: DEFAULT_CLOSE_DELAY };
-  return {
-    open: delay?.open ?? DEFAULT_OPEN_DELAY,
-    close: delay?.close ?? DEFAULT_CLOSE_DELAY,
-  };
 }
 
 export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(function PixelTooltip({
@@ -77,13 +64,15 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
   sideOffset = 8,
 }, forwardedRef) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const tipId = useId();
-  const delays = useMemo(() => resolveDelays(delay), [delay]);
+  const delays = useMemo(() => resolveTooltipDelays(delay), [delay]);
   const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrapperRef = useRef<HTMLSpanElement | null>(null);
   const floatingNodeRef = useRef<HTMLSpanElement | null>(null);
+  // Set when Escape dismisses the tooltip: hover and focus leave it closed
+  // until the pointer or focus has left the trigger.
+  const dismissedRef = useRef(false);
 
   const [open, setOpen] = useControllableState<boolean>({
     value: openProp,
@@ -93,9 +82,9 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
 
   const { refs, floatingStyles } = useFloating({
     open,
-    placement: position as Placement,
+    placement: position,
     whileElementsMounted: autoUpdate,
-    middleware: [floatingOffset(sideOffset), flip(), shift({ padding: 8 })],
+    middleware: anchoredMiddleware(sideOffset),
   });
 
   const clearTimers = useCallback(() => {
@@ -104,9 +93,13 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
   }, []);
 
   const scheduleOpen = useCallback(() => {
+    if (dismissedRef.current) return;
     clearTimers();
     if (delays.open <= 0) { setOpen(true); return; }
-    openTimer.current = setTimeout(() => setOpen(true), delays.open);
+    openTimer.current = setTimeout(() => {
+      openTimer.current = null;
+      setOpen(true);
+    }, delays.open);
   }, [clearTimers, delays.open, setOpen]);
 
   const scheduleClose = useCallback(() => {
@@ -115,9 +108,23 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
     closeTimer.current = setTimeout(() => setOpen(false), delays.close);
   }, [clearTimers, delays.close, setOpen]);
 
+  const leave = useCallback(() => {
+    dismissedRef.current = false;
+    scheduleClose();
+  }, [scheduleClose]);
+
   useEffect(() => () => clearTimers(), [clearTimers]);
 
-  // Click-trigger needs explicit dismissal: outside-pointerdown + Escape.
+  // Escape dismisses the tooltip in every mode (WCAG 1.4.13), a pending
+  // open included.
+  useEscape(() => {
+    if (!open && !openTimer.current) return;
+    clearTimers();
+    if (trigger !== 'click') dismissedRef.current = true;
+    if (open) setOpen(false);
+  });
+
+  // A click tooltip also closes on a press outside it.
   useEffect(() => {
     if (trigger !== 'click' || !open) return;
     const handler = (e: PointerEvent) => {
@@ -130,17 +137,16 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
     document.addEventListener('pointerdown', handler);
     return () => document.removeEventListener('pointerdown', handler);
   }, [trigger, open, setOpen]);
-  useEscape(() => setOpen(false), trigger === 'click' && open);
 
   const triggerProps: React.HTMLAttributes<HTMLSpanElement> = {};
   if (trigger === 'hover') {
     triggerProps.onMouseEnter = scheduleOpen;
-    triggerProps.onMouseLeave = scheduleClose;
+    triggerProps.onMouseLeave = leave;
     triggerProps.onFocus = scheduleOpen;
-    triggerProps.onBlur = scheduleClose;
+    triggerProps.onBlur = leave;
   } else if (trigger === 'focus') {
     triggerProps.onFocus = scheduleOpen;
-    triggerProps.onBlur = scheduleClose;
+    triggerProps.onBlur = leave;
   } else if (trigger === 'click') {
     // The wrapper stays non-interactive: role="button" + tabIndex here nests
     // interactive controls when the anchor child is a button/link — the
@@ -166,31 +172,33 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
   };
 
   const body = content ?? label;
+  const shown = open && body != null;
+
+  // While shown, the tooltip describes the element that takes focus — the
+  // first focusable one inside the wrapper, else the wrapper itself.
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!shown || !wrapper) return;
+    return describeTooltipTrigger(wrapper, tipId);
+  }, [shown, tipId]);
 
   return (
     <>
       <span
         ref={setWrapperRef}
-        className="relative inline-flex"
-        aria-describedby={open ? tipId : undefined}
+        className={tooltipTriggerClasses}
         {...triggerProps}
       >
         {children}
       </span>
-      {open && body != null && (
+      {shown && (
         <PixelPortal>
           <span
             ref={setFloatingRef}
             id={tipId}
             role="tooltip"
-            style={{ ...floatingStyles, zIndex: 70 }}
-            className={cn(
-              'w-max max-w-[calc(100vw-16px)] break-words bg-retro-bg px-2 py-1 text-[11px] text-retro-text shadow-lg',
-              // Hover/focus tooltips are non-interactive; click tooltips
-              // must accept clicks (e.g. to copy text or click links inside).
-              trigger === 'click' ? '' : 'pointer-events-none',
-              s.border, s.radius, s.font, 'border-retro-border',
-            )}
+            style={{ ...floatingStyles, zIndex: TOOLTIP_Z_INDEX }}
+            className={tooltipClasses(surface, trigger)}
           >
             {body}
           </span>

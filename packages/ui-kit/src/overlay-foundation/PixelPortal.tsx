@@ -1,16 +1,22 @@
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 
 export interface PixelPortalProps {
+  /** Content to render in the target. */
   children: React.ReactNode;
+  /** Target element; `document.body` when left out. */
   container?: HTMLElement | null;
+  /** Keep the content in place. */
   disabled?: boolean;
 }
 
 /**
  * Portals children to `container` (default: `document.body`). On the server
- * AND on the first client render, renders children inline so SSR + first-paint
- * hydration are non-empty; switches to a real `createPortal` after mount.
+ * and while hydrating, renders children inline so the server HTML is
+ * non-empty and hydration matches it; switches to a real `createPortal` right
+ * after. Content mounted later on the client is portaled from its first
+ * render, so it is created once, in place — focus set by a modal's focus trap
+ * stays where it was put.
  */
 export const PixelPortal = forwardRef<HTMLDivElement, PixelPortalProps>(
   function PixelPortal({ children, container, disabled }, _ref) {
@@ -26,21 +32,20 @@ export const PixelPortal = forwardRef<HTMLDivElement, PixelPortalProps>(
 );
 PixelPortal.displayName = 'PixelPortal';
 
+// Hydration reads the server snapshot (inline, as on the server); any other
+// client render reads the client one (portal). Neither ever changes.
+const subscribeNever = () => () => {};
+const portalOnClient = () => true;
+const inlineOnServer = () => false;
+
 function PixelPortalClient({
   children,
   container,
   disabled,
 }: PixelPortalProps): React.ReactElement | null {
-  const [mounted, setMounted] = useState(false);
+  const portal = useSyncExternalStore(subscribeNever, portalOnClient, inlineOnServer);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (disabled) return <>{children}</>;
-  // Pre-mount on the client: render children inline (matches SSR output so
-  // hydration doesn't tear). After mount we swap to a real portal.
-  if (!mounted) return <>{children}</>;
+  if (disabled || !portal) return <>{children}</>;
 
   const target = container ?? document.body;
   return createPortal(children, target);

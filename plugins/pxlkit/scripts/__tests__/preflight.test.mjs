@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyProject, parseVersionFloor } from '../preflight.mjs';
+import { classifyProject, missingSetup, needsOwnSource, parseVersionFloor } from '../preflight.mjs';
 
 test('flags a project without React as a blocker', () => {
   const r = classifyProject({ dependencies: {} });
@@ -66,4 +66,61 @@ test('an unreadable version range does not manufacture a blocker', () => {
   // `workspace:*` is legitimate in a monorepo; refusing to run on it would be wrong.
   const r = classifyProject({ dependencies: { react: 'workspace:*', tailwindcss: '^4.0.0' } });
   assert.equal(r.blockers.length, 0);
+});
+
+const COMPLETE_SETUP = {
+  stylesImport: true,
+  surfaceProvider: true,
+  toastProvider: true,
+  localeProvider: true,
+  fonts: true,
+  tailwindImport: false,
+  tailwindSource: false,
+};
+
+test('kits from 2.2 register their own Tailwind sources; earlier ones need an @source line', () => {
+  assert.equal(needsOwnSource('2.1.1'), true);
+  assert.equal(needsOwnSource('^2.1.1'), true);
+  assert.equal(needsOwnSource('1.8.0'), true);
+  assert.equal(needsOwnSource('2.2.0'), false);
+  assert.equal(needsOwnSource('^2.2.0'), false);
+  assert.equal(needsOwnSource('3.0.0'), false);
+  // Nothing installed, or an unreadable range: the install gets the current kit.
+  assert.equal(needsOwnSource(null), false);
+  assert.equal(needsOwnSource('workspace:*'), false);
+});
+
+test('a complete setup on a current kit has nothing missing, with no @source line', () => {
+  assert.deepEqual(missingSetup(COMPLETE_SETUP, '2.2.0'), []);
+});
+
+test('a kit before 2.2 still needs the @source line', () => {
+  const missing = missingSetup(COMPLETE_SETUP, '2.1.1');
+  assert.equal(missing.length, 1);
+  assert.match(missing[0], /@source/);
+  assert.deepEqual(missingSetup({ ...COMPLETE_SETUP, tailwindSource: true }, '2.1.1'), []);
+});
+
+test('reports the kit stylesheet as the replacement for the tailwindcss import', () => {
+  const missing = missingSetup({ ...COMPLETE_SETUP, stylesImport: false }, '2.2.0');
+  assert.equal(missing.length, 1);
+  assert.match(missing[0], /@import "@pxlkit\/ui-kit\/styles\.css";/);
+  assert.match(missing[0], /in place of `@import "tailwindcss"`/);
+});
+
+test('flags tailwindcss imported next to the kit stylesheet, which already imports it', () => {
+  const missing = missingSetup({ ...COMPLETE_SETUP, tailwindImport: true }, '2.2.0');
+  assert.equal(missing.length, 1);
+  assert.match(missing[0], /twice/);
+});
+
+test('lists every missing provider and the fonts', () => {
+  const missing = missingSetup(
+    { ...COMPLETE_SETUP, surfaceProvider: false, toastProvider: false, fonts: false },
+    '2.2.0',
+  );
+  assert.equal(missing.length, 3);
+  assert.match(missing.join(' '), /PxlKitSurfaceProvider/);
+  assert.match(missing.join(' '), /PxlKitToastProvider/);
+  assert.match(missing.join(' '), /fonts/);
 });

@@ -1,4 +1,4 @@
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * ⬆️ LevelUp — a bold green up-arrow above a base bar (the "level"). The old

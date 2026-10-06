@@ -38,7 +38,9 @@ export const PixelTabsList = forwardRef<HTMLDivElement, PixelTabsListProps>(
           aria-orientation={ctx.orientation}
           className={cn(
             'flex gap-1',
-            isVertical ? 'flex-col' : 'flex-wrap',
+            // A scrollable list keeps its tabs on one line, which overflows:
+            // `flex-wrap` would beat `flex-nowrap`, as Tailwind emits it last.
+            isVertical ? 'flex-col' : !effectiveScrollable && 'flex-wrap',
             effectiveScrollable && 'flex-nowrap overflow-x-auto scrollbar-hidden',
             effectiveScrollable && 'overflow-y-hidden',
           )}

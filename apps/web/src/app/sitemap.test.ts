@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import sitemap from './sitemap';
 import robots from './robots';
+import { UI_KIT_LATEST_DATE } from '@/lib/pxlkit-version';
+import { DOCS_COMPONENT_PAGES } from './docs/sections/component-pages.generated';
 
 describe('sitemap()', () => {
   const result = sitemap();
@@ -43,6 +45,23 @@ describe('sitemap()', () => {
     ];
     for (const url of required) {
       expect(urls).toContain(url);
+    }
+  });
+
+  it("lists every component's page, dated with the release", () => {
+    const pages = result.filter((r) => r.url.startsWith('https://pxlkit.xyz/docs/components/'));
+    expect(pages).toHaveLength(DOCS_COMPONENT_PAGES.length);
+    expect(pages.map((r) => r.url)).toContain('https://pxlkit.xyz/docs/components/pixel-button');
+    for (const page of pages) {
+      expect((page.lastModified as Date).toISOString()).toBe(`${UI_KIT_LATEST_DATE}T00:00:00.000Z`);
+    }
+  });
+
+  it('dates each page by its last change, not by the build', () => {
+    const home = result.find((r) => r.url === 'https://pxlkit.xyz');
+    expect((home?.lastModified as Date).toISOString()).toBe(`${UI_KIT_LATEST_DATE}T00:00:00.000Z`);
+    for (const entry of result) {
+      expect((entry.lastModified as Date).toISOString()).toMatch(/^\d{4}-\d{2}-\d{2}T00:00:00\.000Z$/);
     }
   });
 

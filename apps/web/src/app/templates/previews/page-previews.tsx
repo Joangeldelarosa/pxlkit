@@ -162,7 +162,7 @@ export function PageEcommercePreview() {
         className="origin-top-left"
         style={{ transform: 'scale(0.45)', width: '222.22%', height: '222.22%' }}
       >
-        <PixelEcommerceTemplate />
+        <PixelEcommerceTemplate headingAs="h2" />
       </div>
     </div>
   );

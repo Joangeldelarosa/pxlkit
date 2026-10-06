@@ -8,7 +8,7 @@
  * to overwrite it (a hand-authored *.stories.tsx is detected).
  */
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Component from './PixelPopover';
 import manifest from './PixelPopover.manifest';
 import * as examples from './PixelPopover.examples';
@@ -91,6 +91,28 @@ export const SidePlacement: Story = {
       return (
         <pre style={{ color: 'crimson' }}>
           {"Missing example 'side-placement' for PixelPopover."}
+        </pre>
+      );
+    }
+    return <ExampleComponent />;
+  },
+};
+
+/** Interactive content */
+export const InteractiveContent: Story = {
+  name: 'Interactive content',
+  tags: ["example-interactive-content"],
+  parameters: {
+    docs: { description: { story: undefined } },
+  },
+  render: () => {
+    const ExampleComponent =
+      ((examples as any).InteractiveContent ?? (examples as any)['interactive-content']) ??
+      ((manifest as any)?.examples?.find?.((e: any) => e?.id === 'interactive-content')?.Component);
+    if (!ExampleComponent) {
+      return (
+        <pre style={{ color: 'crimson' }}>
+          {"Missing example 'interactive-content' for PixelPopover."}
         </pre>
       );
     }

@@ -23,6 +23,8 @@ import {
   renderRootReadme,
   renderWorkspacesBlock,
   fillWorkspacesBlock,
+  readPublishedWorkspaces,
+  PUBLISH_WORKFLOW,
   WORKSPACES_START_MARKER,
   WORKSPACES_END_MARKER,
   type RootPackageJsonLike,
@@ -310,6 +312,50 @@ describe("renderWorkspacesBlock", () => {
     expect(block).toContain("_(private)_");
     expect(block).toContain("https://www.npmjs.com/package/@pxlkit/core");
     expect(block).not.toContain("https://www.npmjs.com/package/@pxlkit/web");
+  });
+});
+
+describe("published packages", () => {
+  const voxel: WorkspaceEntry = {
+    name: "@pxlkit/voxel",
+    version: "0.1.5",
+    description: "voxel toolkit",
+    dir: "/tmp/pxlkit/packages/voxel",
+    relDir: "packages/voxel",
+    bucket: "packages",
+    isPrivate: false,
+    published: false,
+  };
+
+  it("reads the workspace directories the release workflow publishes", () => {
+    const workflow = [
+      "        run: |",
+      "          PACKAGES=(",
+      '            "packages/core"',
+      "            'packages/ui-kit/'",
+      "          )",
+      '          for pkg in "${PACKAGES[@]}"; do',
+    ].join("\n");
+    expect(readPublishedWorkspaces(workflow)).toEqual(new Set(["packages/core", "packages/ui-kit"]));
+    expect(readPublishedWorkspaces("jobs: {}")).toBeNull();
+  });
+
+  it("does not link a public package the workflow does not publish to npm", () => {
+    const block = renderWorkspacesBlock([voxel]);
+    expect(block).toContain("`@pxlkit/voxel` _(not yet on npm)_");
+    expect(block).not.toContain("npmjs.com/package/@pxlkit/voxel");
+  });
+
+  it("links exactly the packages this repository's release workflow publishes", async () => {
+    const repoRoot = path.resolve(__dirname, "../../..");
+    const res = await generateRootReadme({ repoRoot, dryRun: true });
+    const published = readPublishedWorkspaces(await fs.readFile(path.join(repoRoot, PUBLISH_WORKFLOW), "utf8"));
+    expect(published).not.toBeNull();
+    for (const w of res.workspaces.filter((entry) => !entry.isPrivate)) {
+      const link = `https://www.npmjs.com/package/${w.name})`;
+      if (published!.has(w.relDir)) expect(res.content).toContain(link);
+      else expect(res.content).not.toContain(link);
+    }
   });
 });
 

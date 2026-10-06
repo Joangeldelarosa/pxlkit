@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelNumberInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelNumberInputDocsMeta = {
@@ -17,35 +23,158 @@ export const PixelNumberInputDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsSectionProps): React.ReactElement {
+/** PixelNumberInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelNumberInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelNumberInput',
+        props: [
+          { name: 'value', type: 'number', description: 'Value; leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'number', description: 'Initial value while uncontrolled.' },
+          { name: 'onChange', type: '(next: number) => void', description: 'Called with the new number, after each step, edit that reads as a number, or settle on blur.' },
+          { name: 'min', type: 'number', description: 'Lowest value.' },
+          { name: 'max', type: 'number', description: 'Highest value.' },
+          { name: 'step', type: 'number', default: '1', description: 'Amount each step adds or removes.' },
+          { name: 'precision', type: 'number', description: 'Decimals shown, and the value is rounded to.' },
+          { name: 'clampBehavior', type: "'strict' | 'blur' | 'none'", default: "'blur'", description: 'When a value outside `min` / `max` is pulled back: while typing, on blur, or never.' },
+          { name: 'prefix', type: 'string', description: 'Text inside the field on the left (`$`).' },
+          { name: 'suffix', type: 'string', description: 'Text inside the field on the right (`USD`).' },
+          { name: 'thousandsSeparator', type: 'string', description: 'Groups the integer digits (`,` shows `1,500,000`).' },
+          { name: 'allowNegative', type: 'boolean', default: 'true', description: 'Accepts negative numbers.' },
+          { name: 'hideControls', type: 'boolean', default: 'false', description: 'Hides the stepper buttons.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the field.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<input>` (`InputHTMLAttributes<HTMLInputElement>`), except `type`.',
+          '`ref` points to `<input>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelNumberInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelNumberInput',
+        props: [
+          { name: 'modelValue', type: 'number', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'number', description: 'Initial value while uncontrolled.' },
+          { name: 'min', type: 'number', description: 'Lowest value.' },
+          { name: 'max', type: 'number', description: 'Highest value.' },
+          { name: 'step', type: 'number', default: '1', description: 'Amount each step adds or removes.' },
+          { name: 'precision', type: 'number', description: 'Decimals shown, and the value is rounded to.' },
+          { name: 'clampBehavior', type: "'strict' | 'blur' | 'none'", default: "'blur'", description: 'When a value outside `min` / `max` is pulled back: while typing, on blur, or never.' },
+          { name: 'prefix', type: 'string', description: 'Text inside the field on the left (`$`).' },
+          { name: 'suffix', type: 'string', description: 'Text inside the field on the right (`USD`).' },
+          { name: 'thousandsSeparator', type: 'string', description: 'Groups the integer digits (`,` shows `1,500,000`).' },
+          { name: 'allowNegative', type: 'boolean', default: 'true', description: 'Accepts negative numbers.' },
+          { name: 'hideControls', type: 'boolean', default: 'false', description: 'Hides the stepper buttons.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the field.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the field and its steppers.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the number.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+          { name: 'placeholder', type: 'string', description: 'Text shown while the field is empty.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: number', description: 'The new number, after each step, edit that reads as a number, or settle on blur.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<input>`.',
+          'Its template ref exposes `element`: the native input.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelNumberInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelNumberInput',
+        selector: 'pxl-number-input',
+        props: [
+          { name: 'value', type: 'number', binding: '[(value)]', description: 'Value (`[(value)]`); leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'number', accepts: 'unknown', description: 'Initial value while uncontrolled.' },
+          { name: 'min', type: 'number', accepts: 'unknown', description: 'Lowest value.' },
+          { name: 'max', type: 'number', accepts: 'unknown', description: 'Highest value.' },
+          { name: 'step', type: 'number', default: '1', accepts: 'unknown', description: 'Amount each step adds or removes.' },
+          { name: 'precision', type: 'number', accepts: 'unknown', description: 'Decimals shown, and the value is rounded to.' },
+          { name: 'clampBehavior', type: "'strict' | 'blur' | 'none'", default: "'blur'", description: 'When a value outside `min` / `max` is pulled back: while typing, on blur, or never.' },
+          { name: 'prefix', type: 'string', description: 'Text inside the field on the left (`$`).' },
+          { name: 'suffix', type: 'string', description: 'Text inside the field on the right (`USD`).' },
+          { name: 'thousandsSeparator', type: 'string', description: 'Groups the integer digits (`,` shows `1,500,000`).' },
+          { name: 'allowNegative', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Accepts negative numbers.' },
+          { name: 'hideControls', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Hides the stepper buttons.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the field.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the field and its steppers.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the number.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+          { name: 'placeholder', type: 'string', description: 'Text shown while the field is empty.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the field required.' },
+          { name: 'readonly', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the field read-only.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the field when no `label` is shown.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the input; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'number', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`number`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelNumberInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelNumberInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-number-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-number-input-heading'>PixelNumberInput</h2>
+      <Title id='pixel-number-input-heading'>PixelNumberInput</Title>
       <p className="docs-lead">Numeric input with spin controls, clamp behaviors, precision, prefix/suffix, and thousands-separator formatting.</p>
       <ul className="docs-highlights">
         <li>Spinbutton with ArrowUp/ArrowDown step bumps and clickable increment/decrement controls</li>
         <li>Configurable clamp behavior (strict, on-blur, or none) with min/max bounds</li>
         <li>Precision rounding avoids floating-point artifacts (e.g. 0.1 + 0.2)</li>
         <li>Optional prefix, suffix, and thousands-separator with parse-aware display</li>
-        <li>Surface/tone aware, controlled or uncontrolled via useControllableState</li>
+        <li>Surface/tone aware; controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code></li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-number-input-api">
+      <Heading id="pixel-number-input-api">API</Heading>
+      <FrameworkApi label={'PixelNumberInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-number-input-a11y">
-      <h3 id="pixel-number-input-a11y">Accessibility</h3>
+      <Heading id="pixel-number-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>spinbutton</code></li>
       </ul>
       <p className="docs-aria-notes">Renders role=&quot;spinbutton&quot; with aria-valuemin/aria-valuemax/aria-valuenow reflecting the current numeric state. Error state sets aria-invalid.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -69,8 +198,11 @@ export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsS
       </table>
     </section>
     <section aria-labelledby="pixel-number-input-usage">
-      <h3 id="pixel-number-input-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-number-input-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelNumberInput usage'}
+        react={`import { useState } from 'react';
 import { PixelNumberInput } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -84,14 +216,40 @@ export function Default() {
       max={100}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(5);
+</script>
+
+<template>
+  <PixelNumberInput v-model="value" label="Quantity" :min="0" :max="100" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`<pxl-number-input label="Quantity" [(value)]="value" [min]="0" [max]="100" />\`,
+})
+export class Default {
+  readonly value = signal(5);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelNumberInput } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [value, setValue] = useState<number>(5);
   return (
     <PixelNumberInput
@@ -102,11 +260,38 @@ export function Default() {
       max={100}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(5);
+</script>
+
+<template>
+  <PixelNumberInput v-model="value" label="Quantity" :min="0" :max="100" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`<pxl-number-input label="Quantity" [(value)]="value" [min]="0" [max]="100" />\`,
+})
+export class Default {
+  readonly value = signal(5);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-prefix-suffix">
-        <h4>With Prefix &amp; Suffix</h4>
-        <pre className="docs-code"><code>{`export function WithPrefixSuffix() {
+        <Subheading>With Prefix &amp; Suffix</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Prefix & Suffix code'}
+          react={`import { useState } from 'react';
+import { PixelNumberInput } from '@pxlkit/ui-kit';
+
+export function WithPrefixSuffix() {
   const [value, setValue] = useState<number>(19.99);
   return (
     <PixelNumberInput
@@ -120,11 +305,56 @@ export function Default() {
       min={0}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(19.99);
+</script>
+
+<template>
+  <PixelNumberInput
+    v-model="value"
+    label="Price"
+    prefix="$"
+    suffix="USD"
+    :precision="2"
+    :step="0.01"
+    :min="0"
+  />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`
+    <pxl-number-input
+      label="Price"
+      [(value)]="value"
+      prefix="$"
+      suffix="USD"
+      [precision]="2"
+      [step]="0.01"
+      [min]="0"
+    />
+  \`,
+})
+export class WithPrefixSuffix {
+  readonly value = signal(19.99);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-thousands-separator">
-        <h4>Thousands Separator</h4>
-        <pre className="docs-code"><code>{`export function ThousandsSeparator() {
+        <Subheading>Thousands Separator</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Thousands Separator code'}
+          react={`import { useState } from 'react';
+import { PixelNumberInput } from '@pxlkit/ui-kit';
+
+export function ThousandsSeparator() {
   const [value, setValue] = useState<number>(1500000);
   return (
     <PixelNumberInput
@@ -135,11 +365,38 @@ export function Default() {
       min={0}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(1500000);
+</script>
+
+<template>
+  <PixelNumberInput v-model="value" label="Population" thousands-separator="," :min="0" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`<pxl-number-input label="Population" [(value)]="value" thousandsSeparator="," [min]="0" />\`,
+})
+export class ThousandsSeparator {
+  readonly value = signal(1500000);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-hide-controls">
-        <h4>Hide Controls</h4>
-        <pre className="docs-code"><code>{`export function HideControls() {
+        <Subheading>Hide Controls</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Hide Controls code'}
+          react={`import { useState } from 'react';
+import { PixelNumberInput } from '@pxlkit/ui-kit';
+
+export function HideControls() {
   const [value, setValue] = useState<number>(42);
   return (
     <PixelNumberInput
@@ -151,11 +408,38 @@ export function Default() {
       max={120}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(42);
+</script>
+
+<template>
+  <PixelNumberInput v-model="value" label="Age" hide-controls :min="0" :max="120" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`<pxl-number-input label="Age" [(value)]="value" hideControls [min]="0" [max]="120" />\`,
+})
+export class HideControls {
+  readonly value = signal(42);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-error">
-        <h4>With Error</h4>
-        <pre className="docs-code"><code>{`export function WithError() {
+        <Subheading>With Error</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Error code'}
+          react={`import { useState } from 'react';
+import { PixelNumberInput } from '@pxlkit/ui-kit';
+
+export function WithError() {
   const [value, setValue] = useState<number>(150);
   return (
     <PixelNumberInput
@@ -168,14 +452,51 @@ export function Default() {
       tone="red"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(150);
+</script>
+
+<template>
+  <PixelNumberInput
+    v-model="value"
+    label="Score"
+    :min="0"
+    :max="100"
+    error="Score must be between 0 and 100"
+    tone="red"
+  />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`
+    <pxl-number-input
+      label="Score"
+      [(value)]="value"
+      [min]="0"
+      [max]="100"
+      error="Score must be between 0 and 100"
+      tone="red"
+    />
+  \`,
+})
+export class WithError {
+  readonly value = signal(150);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-slider">PixelSlider</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-slider' : '#pixel-slider'}>PixelSlider</a></li>
       </ul>
     </section>
     </section>

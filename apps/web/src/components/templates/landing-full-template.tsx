@@ -360,7 +360,7 @@ function StickyNav() {
       <PixelContainer as="div" maxWidth="xl" padding={{ x: 'lg', y: 'none' }}>
         <PixelCluster gap={4} align="center" justify="between" className="py-3">
           <a href="#top" className="inline-flex items-center gap-2">
-            <PxlKitIcon icon={Grid} size={20} colorful />
+            <PxlKitIcon icon={Grid} size={20} colorful decorative />
             <span className="font-pixel text-sm text-retro-text">Pixelpad</span>
             <PixelBadge tone="green" size="sm">v2.4</PixelBadge>
           </a>
@@ -387,7 +387,7 @@ function StickyNav() {
               tone="green"
               variant="solid"
               size="sm"
-              iconRight={<PxlKitIcon icon={ArrowRight} size={12} />}
+              iconRight={<PxlKitIcon icon={ArrowRight} size={12} decorative />}
             >
               Get started
             </PixelButton>
@@ -431,13 +431,13 @@ function HeroSection() {
             <PixelBadge
               tone="cyan"
               size="sm"
-              iconLeft={<AnimatedPxlKitIcon icon={SparkleStar} size={12} colorful />}
+              iconLeft={<AnimatedPxlKitIcon icon={SparkleStar} size={12} colorful decorative />}
             >
               AI suggested
             </PixelBadge>
           </PixelFloat>
           <PixelFloat duration={3200} distance={8}>
-            <PxlKitIcon icon={Lightning} size={28} colorful />
+            <PxlKitIcon icon={Lightning} size={28} colorful decorative />
           </PixelFloat>
         </div>
       </div>
@@ -457,7 +457,7 @@ function HeroSection() {
         <PixelButton
           tone="green"
           size="lg"
-          iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+          iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
         >
           Get started — free forever
         </PixelButton>
@@ -470,17 +470,17 @@ function HeroSection() {
       meta={
         <PixelCluster gap={4} align="center" className="text-retro-muted font-mono text-xs">
           <span className="inline-flex items-center gap-1.5">
-            <PxlKitIcon icon={CheckCircle} size={12} colorful />
+            <PxlKitIcon icon={CheckCircle} size={12} colorful decorative />
             No credit card
           </span>
           <span className="text-retro-border">|</span>
           <span className="inline-flex items-center gap-1.5">
-            <PxlKitIcon icon={ShieldCheck} size={12} colorful />
+            <PxlKitIcon icon={ShieldCheck} size={12} colorful decorative />
             SOC 2 Type II
           </span>
           <span className="text-retro-border">|</span>
           <span className="inline-flex items-center gap-1.5">
-            <PxlKitIcon icon={Verified} size={12} colorful />
+            <PxlKitIcon icon={Verified} size={12} colorful decorative />
             85k devs shipping
           </span>
         </PixelCluster>
@@ -506,7 +506,7 @@ function TrustedBySection() {
           {TRUSTED_BY.map((logo) => (
             <PixelBadge key={logo} tone="neutral" variant="soft" size="md">
               <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={Grid} size={12} colorful />
+                <PxlKitIcon icon={Grid} size={12} colorful decorative />
                 {logo}
               </span>
             </PixelBadge>
@@ -534,7 +534,7 @@ function BentoSection() {
         <PixelBento columns={3} gap={5}>
           <PixelBentoCell span="2x2" kind="feature" tone="cyan">
             <PixelCluster gap={2} align="center">
-              <PxlKitIcon icon={MagicWand} size={28} colorful />
+              <PxlKitIcon icon={MagicWand} size={28} colorful decorative />
               <PixelBadge tone="purple" variant="soft" size="sm">Flagship</PixelBadge>
             </PixelCluster>
             <h3 className="font-pixel text-base text-retro-text leading-snug">
@@ -567,7 +567,7 @@ function BentoSection() {
           </PixelBentoCell>
 
           <PixelBentoCell span="2x1" kind="compact" tone="purple">
-            <PxlKitIcon icon={Shield} size={32} colorful />
+            <PxlKitIcon icon={Shield} size={32} colorful decorative />
             <div className="flex flex-col">
               <span className="font-pixel text-sm text-retro-text">Encrypted by default</span>
               <span className="font-mono text-xs text-retro-muted">
@@ -577,7 +577,7 @@ function BentoSection() {
           </PixelBentoCell>
 
           <PixelBentoCell span="1x1" kind="compact" tone="red">
-            <PxlKitIcon icon={Lightning} size={28} colorful />
+            <PxlKitIcon icon={Lightning} size={28} colorful decorative />
             <div className="flex flex-col">
               <span className="font-pixel text-xs text-retro-text">400ms cold-start</span>
               <span className="font-mono text-[11px] text-retro-muted">on any repo size</span>
@@ -608,7 +608,7 @@ function FeatureGridSection() {
             <PixelFeatureCard
               key={f.title}
               tone={f.tone}
-              icon={<PxlKitIcon icon={f.icon} size={28} colorful />}
+              icon={<PxlKitIcon icon={f.icon} size={28} colorful decorative />}
               title={f.title}
               description={f.desc}
               descriptionLines={3}
@@ -656,7 +656,7 @@ function DeepDiveSection() {
                     key={b}
                     className="inline-flex items-center gap-2 font-mono text-sm text-retro-text"
                   >
-                    <PxlKitIcon icon={Check} size={12} colorful />
+                    <PxlKitIcon icon={Check} size={12} colorful decorative />
                     {b}
                   </span>
                 ))}
@@ -672,9 +672,9 @@ function DeepDiveSection() {
               <div className="flex h-full w-full items-center justify-center bg-retro-surface/40">
                 <PixelFloat duration={3000 + i * 300} distance={8}>
                   {isAnimatedIcon(f.accent) ? (
-                    <AnimatedPxlKitIcon icon={f.accent} size={84} colorful />
+                    <AnimatedPxlKitIcon icon={f.accent} size={84} colorful decorative />
                   ) : (
-                    <PxlKitIcon icon={f.accent} size={84} colorful />
+                    <PxlKitIcon icon={f.accent} size={84} colorful decorative />
                   )}
                 </PixelFloat>
               </div>
@@ -758,7 +758,7 @@ function PricingSection() {
               <PixelPricingCard
                 tone={plan.tone}
                 highlight={plan.popular}
-                icon={<PxlKitIcon icon={plan.icon} size={28} colorful />}
+                icon={<PxlKitIcon icon={plan.icon} size={28} colorful decorative />}
                 name={plan.name}
                 description={plan.description}
                 price={plan.price}
@@ -768,7 +768,7 @@ function PricingSection() {
                     tone={plan.tone}
                     size="md"
                     className="w-full justify-center"
-                    iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                    iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
                   >
                     {plan.cta}
                   </PixelButton>
@@ -787,7 +787,7 @@ function PricingSection() {
 
         <div className="mt-10 text-center">
           <p className="inline-flex items-center gap-2 font-mono text-xs text-retro-muted">
-            <PxlKitIcon icon={ShieldCheck} size={14} colorful />
+            <PxlKitIcon icon={ShieldCheck} size={14} colorful decorative />
             30-day money-back guarantee · Cancel any time · No vendor lock-in
           </p>
         </div>
@@ -884,7 +884,7 @@ function CtaSection() {
         <PixelStack gap={5} align="center" className="text-center">
           <PixelBadge tone="green" variant="soft" size="md">
             <span className="inline-flex items-center gap-1.5">
-              <PxlKitIcon icon={Sparkles} size={12} colorful />
+              <PxlKitIcon icon={Sparkles} size={12} colorful decorative />
               Free forever for solo devs
             </span>
           </PixelBadge>
@@ -904,7 +904,7 @@ function CtaSection() {
             <PixelButton
               tone="green"
               size="lg"
-              iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+              iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
             >
               Start free
             </PixelButton>
@@ -915,12 +915,12 @@ function CtaSection() {
 
           <PixelCluster gap={4} justify="center" className="mt-2 text-retro-muted font-mono text-xs">
             <span className="inline-flex items-center gap-1.5">
-              <PxlKitIcon icon={Bell} size={12} colorful />
+              <PxlKitIcon icon={Bell} size={12} colorful decorative />
               Onboarding in &lt; 10 minutes
             </span>
             <span className="text-retro-border">|</span>
             <span className="inline-flex items-center gap-1.5">
-              <PxlKitIcon icon={Star} size={12} colorful />
+              <PxlKitIcon icon={Star} size={12} colorful decorative />
               4.8 on G2 (1.2k reviews)
             </span>
           </PixelCluster>
@@ -940,7 +940,7 @@ function FooterSection() {
         <PixelGrid cols={{ base: 1, sm: 2, lg: 4 }} gap={8}>
           <PixelStack gap={3} align="start">
             <a href="#top" className="inline-flex items-center gap-2">
-              <PxlKitIcon icon={Grid} size={20} colorful />
+              <PxlKitIcon icon={Grid} size={20} colorful decorative />
               <span className="font-pixel text-sm text-retro-text">Pixelpad</span>
             </a>
             <p className="font-mono text-xs text-retro-muted leading-relaxed max-w-[28ch]">
@@ -949,17 +949,17 @@ function FooterSection() {
             <PixelCluster gap={3} align="center">
               <PixelTooltip content="Source code" position="top">
                 <a href="#" aria-label="Source code" className="opacity-60 hover:opacity-100 transition-opacity">
-                  <PxlKitIcon icon={ExternalLink} size={16} colorful />
+                  <PxlKitIcon icon={ExternalLink} size={16} colorful decorative />
                 </a>
               </PixelTooltip>
               <PixelTooltip content="Community" position="top">
                 <a href="#" aria-label="Community" className="opacity-60 hover:opacity-100 transition-opacity">
-                  <PxlKitIcon icon={ChatBubble} size={16} colorful />
+                  <PxlKitIcon icon={ChatBubble} size={16} colorful decorative />
                 </a>
               </PixelTooltip>
               <PixelTooltip content="Contact" position="top">
                 <a href="#" aria-label="Email us" className="opacity-60 hover:opacity-100 transition-opacity">
-                  <PxlKitIcon icon={Mail} size={16} colorful />
+                  <PxlKitIcon icon={Mail} size={16} colorful decorative />
                 </a>
               </PixelTooltip>
             </PixelCluster>
@@ -995,13 +995,13 @@ function FooterSection() {
           <PixelCluster gap={3} align="center">
             <PixelBadge tone="green" variant="soft" size="sm">
               <span className="inline-flex items-center gap-1">
-                <PxlKitIcon icon={ShieldCheck} size={10} colorful />
+                <PxlKitIcon icon={ShieldCheck} size={10} colorful decorative />
                 SOC 2 Type II
               </span>
             </PixelBadge>
             <PixelBadge tone="cyan" variant="soft" size="sm">
               <span className="inline-flex items-center gap-1">
-                <PxlKitIcon icon={Globe} size={10} colorful />
+                <PxlKitIcon icon={Globe} size={10} colorful decorative />
                 99.99% uptime
               </span>
             </PixelBadge>

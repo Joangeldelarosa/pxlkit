@@ -19,7 +19,7 @@ export default defineManifest({
   description:
     'Controlled boolean checkbox with a chunky pixel check mark, tone-aware fill, and optional form serialization.',
   highlights: [
-    'Fully controlled via checked + onChange(next: boolean)',
+    'Controlled — `checked` + `onChange` (React), `v-model:checked` (Vue), `[(checked)]` or forms (Angular) — or uncontrolled with `defaultChecked`',
     'Seven tones via the shared toneMap palette',
     'Pixel and linear surface variants share the same API',
     'Hidden mirror input lets it participate in native <form> submissions when name is set',
@@ -45,7 +45,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus to the next focusable element in the tab order.' },
     ],
     notes:
-      'Rendered as a <button type="button"> with role="checkbox" and aria-checked reflecting the boolean state. aria-disabled and aria-required mirror the disabled and required props. When a name prop is supplied a hidden <input> is emitted alongside so the value participates in native <form> submissions only while checked.',
+      'Rendered as a <button type="button"> with role="checkbox" and aria-checked reflecting the boolean state. aria-disabled and aria-required mirror the disabled and required props. When a name prop is supplied a hidden <input> is emitted alongside so the value participates in native <form> submissions only while checked. Keyboard focus shows on the box: a ring in the tone on the linear surface, the box\'s edge on the pixel surface, whose cut corners would clip a ring.',
   },
   related: ['PixelRadioGroup', 'PixelSwitch', 'PixelToggle'],
   apiStability: 'stable',

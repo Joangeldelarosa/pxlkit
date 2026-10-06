@@ -18,7 +18,7 @@ export default defineManifest({
   description:
     'Single-select segmented control for toggling between a small set of mutually exclusive options inline.',
   highlights: [
-    'Controlled via value + onChange(next: string) over a list of options.',
+    'Controlled — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — over a list of options.',
     'Compact horizontal layout for 2-5 options that share visual real estate.',
     'Seven tones and pixel/linear surfaces share the kit-wide design tokens.',
     'Optional name emits a hidden input so it serializes inside native forms.',

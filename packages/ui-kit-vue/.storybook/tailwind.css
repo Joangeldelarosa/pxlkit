@@ -1,0 +1,9 @@
+/*
+ * The Vue kit's stylesheet, with Tailwind also reading the sources the
+ * Storybook renders from — the kit's and its core's — so no build is needed
+ * for their classes.
+ */
+@import "../styles.css";
+@source "../src";
+@source "../examples";
+@source "../../ui-kit-core/src";

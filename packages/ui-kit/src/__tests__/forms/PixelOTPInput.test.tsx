@@ -146,4 +146,17 @@ describe('PixelOTPInput', () => {
     expect(updated[0].value).toBe('9');
     expect(updated[3].value).toBe('9');
   });
+
+  // Regression: the cells carried the text field's `w-full`, which Tailwind
+  // emits after their own width, so each cell spanned the whole row.
+  it("sizes each cell as a square of its size, without a text field's full width", () => {
+    for (const [size, width] of [['sm', 'w-8'], ['md', 'w-10'], ['lg', 'w-12']] as const) {
+      const { container, unmount } = render(<PixelOTPInput length={2} size={size} />);
+      for (const cell of getCells(container)) {
+        expect(cell.className.split(' ')).toContain(width);
+        expect(cell.className.split(' ')).not.toContain('w-full');
+      }
+      unmount();
+    }
+  });
 });

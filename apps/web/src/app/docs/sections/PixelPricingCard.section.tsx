@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPricingCardDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelPricingCardDocsMeta = {
@@ -17,13 +23,103 @@ export const PixelPricingCardDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsSectionProps): React.ReactElement {
+/** PixelPricingCard's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelPricingCard } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelPricingCard',
+        props: [
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the price, the feature marks and, highlighted, the chrome.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Icon above the name, in the tone.' },
+          { name: 'name', type: 'string', required: true, description: 'Plan name.' },
+          { name: 'description', type: 'string', description: 'Muted line under the name.' },
+          { name: 'descriptionLines', type: "2 | 3 | 'none'", default: '2', description: "Clamp the description to N lines. Defaults to 2; use 'none' to let long copy flow." },
+          { name: 'price', type: '{ amount: string | number; period?: string; strikethrough?: string | number }', required: true, description: 'Price, billing period and old price.' },
+          { name: 'priceBadge', type: 'React.ReactNode', description: 'Promo badge rendered beside the price (e.g. a discount PixelBadge).' },
+          { name: 'popular', type: '{ label?: string; tone?: ToneKey }', description: 'Ribbon over the top edge: its label (`POPULAR`) and tone (gold).' },
+          { name: 'features', type: '{ label: string; tooltip?: string; included?: boolean; highlight?: boolean }[]', description: 'The feature list.' },
+          { name: 'cta', type: 'React.ReactNode', description: 'Call to action under the features.' },
+          { name: 'highlight', type: 'boolean', default: 'false', description: 'Tints the border and background and adds a glow.' },
+          { name: 'footer', type: 'React.ReactNode', description: 'Fine print under the call to action.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Render with surface-aware border + radius chrome. Defaults to true — a pricing card needs visible chrome.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelPricingCard } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelPricingCard',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Plan name.' },
+          { name: 'price', type: 'PricingCardPrice', required: true, description: 'Price, billing period and old price.' },
+          { name: 'description', type: 'string', description: 'Muted line under the name.' },
+          { name: 'descriptionLines', type: "2 | 3 | 'none'", default: '2', description: 'Lines the description is clamped to, or `none` to let it flow.' },
+          { name: 'popular', type: 'PricingCardPopular', description: 'Ribbon over the top edge: its label (`POPULAR`) and tone (gold).' },
+          { name: 'features', type: 'PricingCardFeature[]', description: 'The feature list.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the price, the feature marks and, highlighted, the chrome.' },
+          { name: 'highlight', type: 'boolean', default: 'false', description: 'Tints the border and background and adds a glow.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Surface border, radius and background.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'Icon above the name, in the tone.' },
+          { name: 'price-badge', description: 'Badge beside the price (a discount).' },
+          { name: 'cta', description: 'Call to action under the features.' },
+          { name: 'footer', description: 'Fine print under the call to action.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<article>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelPricingCard } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelPricingCard',
+        selector: 'pxl-pricing-card',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Plan name.' },
+          { name: 'price', type: 'PricingCardPrice', required: true, description: 'Price, billing period and old price.' },
+          { name: 'description', type: 'string', description: 'Muted line under the name.' },
+          { name: 'descriptionLines', type: "2 | 3 | 'none'", default: '2', accepts: "2 | 3 | 'none' | '2' | '3'", description: 'Lines the description is clamped to, or `none` to let it flow.' },
+          { name: 'popular', type: 'PricingCardPopular', description: 'Ribbon over the top edge: its label (`POPULAR`) and tone (gold).' },
+          { name: 'features', type: 'PricingCardFeature[]', description: 'The feature list.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Icon above the name, in the tone.' },
+          { name: 'priceBadge', type: 'string | TemplateRef<any>', description: 'Badge beside the price (a discount).' },
+          { name: 'cta', type: 'string | TemplateRef<any>', description: 'Call to action under the features.' },
+          { name: 'footer', type: 'string | TemplateRef<any>', description: 'Fine print under the call to action.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the price, the feature marks and, highlighted, the chrome.' },
+          { name: 'highlight', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Tints the border and background and adds a glow.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Surface border, radius and background.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelPricingCardDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelPricingCardDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-pricing-card-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-pricing-card-heading'>PixelPricingCard</h2>
+      <Title id='pixel-pricing-card-heading'>PixelPricingCard</Title>
       <p className="docs-lead">Pricing tier card with tone-driven highlight, optional popular ribbon, feature list, and CTA slot.</p>
       <ul className="docs-highlights">
-        <li>Surface-aware borders, fonts, and radii via useEffectiveSurface</li>
+        <li>Surface-aware borders, fonts, and radii (pixel / linear)</li>
         <li>Tone tokens drive price color, highlight glow, and feature checks</li>
         <li>Optional popular ribbon with its own tone override</li>
         <li>Feature list supports included/excluded states with tooltip + a11y labels</li>
@@ -34,12 +130,12 @@ export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsS
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-pricing-card-api">
+      <Heading id="pixel-pricing-card-api">API</Heading>
+      <FrameworkApi label={'PixelPricingCard API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-pricing-card-a11y">
-      <h3 id="pixel-pricing-card-a11y">Accessibility</h3>
+      <Heading id="pixel-pricing-card-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>semantic article</code></li>
@@ -47,9 +143,11 @@ export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsS
       <p className="docs-aria-notes">Renders as &lt;article&gt;. Strikethrough price and excluded features are announced via sr-only labels. CTA inherits its own a11y from the consumer-provided node.</p>
     </section>
     <section aria-labelledby="pixel-pricing-card-usage">
-      <h3 id="pixel-pricing-card-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelPricingCard } from '@pxlkit/ui-kit';
-import { PixelBadge } from '@pxlkit/ui-kit';
+      <Heading id="pixel-pricing-card-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelPricingCard usage'}
+        react={`import { PixelPricingCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -66,14 +164,58 @@ export function Default() {
       ]}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelPricingCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPricingCard
+    tone="cyan"
+    name="Starter"
+    description="Everything you need to ship your first project."
+    :price="{ amount: '$19', period: '/mo' }"
+    :features="[
+      { label: '10 projects' },
+      { label: 'Basic analytics' },
+      { label: 'Email support' },
+      { label: 'Priority support', included: false },
+    ]"
+  />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelPricingCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPricingCard],
+  template: \`
+    <pxl-pricing-card
+      tone="cyan"
+      name="Starter"
+      description="Everything you need to ship your first project."
+      [price]="{ amount: '$19', period: '/mo' }"
+      [features]="[
+        { label: '10 projects' },
+        { label: 'Basic analytics' },
+        { label: 'Email support' },
+        { label: 'Priority support', included: false },
+      ]"
+    />
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelPricingCard } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelPricingCard
       tone="cyan"
@@ -88,11 +230,56 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPricingCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPricingCard
+    tone="cyan"
+    name="Starter"
+    description="Everything you need to ship your first project."
+    :price="{ amount: '$19', period: '/mo' }"
+    :features="[
+      { label: '10 projects' },
+      { label: 'Basic analytics' },
+      { label: 'Email support' },
+      { label: 'Priority support', included: false },
+    ]"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPricingCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPricingCard],
+  template: \`
+    <pxl-pricing-card
+      tone="cyan"
+      name="Starter"
+      description="Everything you need to ship your first project."
+      [price]="{ amount: '$19', period: '/mo' }"
+      [features]="[
+        { label: '10 projects' },
+        { label: 'Basic analytics' },
+        { label: 'Email support' },
+        { label: 'Priority support', included: false },
+      ]"
+    />
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-price-badge">
-        <h4>With price badge</h4>
-        <pre className="docs-code"><code>{`export function WithPriceBadge() {
+        <Subheading>With price badge</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With price badge code'}
+          react={`import { PixelPricingCard, PixelBadge } from '@pxlkit/ui-kit';
+
+export function WithPriceBadge() {
   return (
     <PixelPricingCard
       tone="green"
@@ -108,11 +295,52 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge, PixelPricingCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPricingCard
+    tone="green"
+    name="Team"
+    description="Annual billing with every collaboration feature unlocked, plus hands-on onboarding for larger workspaces — the description flows freely with descriptionLines set to 'none'."
+    description-lines="none"
+    :price="{ amount: '$39', period: '/mo', strikethrough: '$59' }"
+    :features="[{ label: 'Unlimited projects' }, { label: 'SSO + audit log', highlight: true }, { label: 'Priority support' }]"
+  >
+    <template #price-badge><PixelBadge tone="green" size="sm">-33%</PixelBadge></template>
+  </PixelPricingCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge, PixelPricingCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge, PixelPricingCard],
+  template: \`
+    <pxl-pricing-card
+      tone="green"
+      name="Team"
+      description="Annual billing with every collaboration feature unlocked, plus hands-on onboarding for larger workspaces — the description flows freely with descriptionLines set to 'none'."
+      descriptionLines="none"
+      [price]="{ amount: '$39', period: '/mo', strikethrough: '$59' }"
+      [priceBadge]="discount"
+      [features]="[{ label: 'Unlimited projects' }, { label: 'SSO + audit log', highlight: true }, { label: 'Priority support' }]"
+    />
+    <ng-template #discount><pxl-badge tone="green" size="sm">-33%</pxl-badge></ng-template>
+  \`,
+})
+export class WithPriceBadge {}`}
+        />
       </article>
       <article className="docs-example" id="example-popular">
-        <h4>Popular (highlighted)</h4>
-        <pre className="docs-code"><code>{`export function Popular() {
+        <Subheading>Popular (highlighted)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Popular (highlighted) code'}
+          react={`import { PixelPricingCard } from '@pxlkit/ui-kit';
+
+export function Popular() {
   return (
     <PixelPricingCard
       tone="gold"
@@ -128,14 +356,48 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPricingCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPricingCard
+    tone="gold"
+    highlight
+    name="Pro"
+    description="For teams that want more power and priority."
+    :price="{ amount: '$49', period: '/mo', strikethrough: '$79' }"
+    :popular="{ label: 'POPULAR', tone: 'gold' }"
+    :features="[{ label: 'Unlimited projects' }, { label: 'Advanced analytics' }, { label: 'Priority support' }]"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPricingCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPricingCard],
+  template: \`
+    <pxl-pricing-card
+      tone="gold"
+      highlight
+      name="Pro"
+      description="For teams that want more power and priority."
+      [price]="{ amount: '$49', period: '/mo', strikethrough: '$79' }"
+      [popular]="{ label: 'POPULAR', tone: 'gold' }"
+      [features]="[{ label: 'Unlimited projects' }, { label: 'Advanced analytics' }, { label: 'Priority support' }]"
+    />
+  \`,
+})
+export class Popular {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-card">PixelCard</a></li>
-        <li><a href="#pixel-feature-card">PixelFeatureCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-card' : '#pixel-card'}>PixelCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-feature-card' : '#pixel-feature-card'}>PixelFeatureCard</a></li>
       </ul>
     </section>
     </section>

@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCalendarGridDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCalendarGridDocsMeta = {
@@ -17,35 +23,123 @@ export const PixelCalendarGridDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelCalendarGridDocsSection({ className }: PixelCalendarGridDocsSectionProps): React.ReactElement {
+/** PixelCalendarGrid's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCalendarGrid } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCalendarGrid',
+        props: [
+          { name: 'value', type: 'Date | null', description: 'The picked day, `null` for none; leave unset for an uncontrolled grid.' },
+          { name: 'defaultValue', type: 'Date | null', description: 'Initial day while uncontrolled.' },
+          { name: 'onChange', type: '(date: Date) => void', description: 'Called with the day picked, at its start.' },
+          { name: 'minDate', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'maxDate', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'disabledDates', type: 'Date[] | ((d: Date) => boolean)', description: 'Days that cannot be picked: a list, or a test of each day.' },
+          { name: 'renderDay', type: '(d: Date) => React.ReactNode', description: "Draws a day's cell content in place of its number." },
+          { name: 'month', type: 'Date', description: "The month on show (any day of it); leave unset to start on the picked day's, else today's." },
+          { name: 'onMonthChange', type: '(m: Date) => void', description: 'Called with the first day of the month shown next (the navigation buttons, or focus leaving the month).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'rangePreview', type: '{ from?: Date; to?: Date; hover?: Date }', description: 'A range to highlight: from `from` to `to`, or to `hover` while `to` is not picked.' },
+          { name: 'data-testid', type: 'string', description: 'Optional hook for tests.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCalendarGrid } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCalendarGrid',
+        props: [
+          { name: 'modelValue', type: 'Date | null', binding: 'v-model', description: 'The picked day (`v-model`); leave unset for an uncontrolled grid.' },
+          { name: 'defaultValue', type: 'Date | null', description: 'Initial day while uncontrolled.' },
+          { name: 'minDate', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'maxDate', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'disabledDates', type: 'Date[] | ((date: Date) => boolean)', description: 'Days that cannot be picked: a list, or a test of each day.' },
+          { name: 'month', type: 'Date', binding: 'v-model:month', description: 'The month on show (`v-model:month`, any day of it); leave unset to follow the picked day, else today.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'rangePreview', type: 'CalendarRangePreview', description: 'A range to highlight: from `from` to `to`, or to `hover` while `to` is not picked.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'date: Date', description: 'The day picked, at its start.' },
+          { name: 'update:month', payload: 'month: Date', description: 'The first day of the month shown next (the navigation buttons, or focus leaving the month).' },
+        ],
+        slots: [
+          { name: 'day', props: '{ date: Date }', description: "The content of a day's cell, in place of its number." },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCalendarGrid } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCalendarGrid',
+        selector: 'pxl-calendar-grid',
+        props: [
+          { name: 'value', type: 'Date | null', binding: '[(value)]', description: 'The picked day (`[(value)]`), `null` for none; leave unset for an uncontrolled grid.' },
+          { name: 'defaultValue', type: 'Date | null', description: 'Initial day while uncontrolled.' },
+          { name: 'minDate', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'maxDate', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'disabledDates', type: 'Date[] | ((date: Date) => boolean)', description: 'Days that cannot be picked: a list, or a test of each day.' },
+          { name: 'month', type: 'Date', binding: '[(month)]', description: "The month on show (`[(month)]`, any day of it); leave unset to start on the picked day's, else today's." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'rangePreview', type: 'CalendarRangePreview', description: 'A range to highlight: from `from` to `to`, or to `hover` while `to` is not picked.' },
+          { name: 'renderDay', type: 'TemplateRef<{ $implicit: Date }>', description: "Draws a day's cell content in place of its number; its context is the day." },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'Date | null', description: 'The new `value`: the event half of `[(value)]`.' },
+          { name: 'monthChange', payload: 'Date', description: 'The new `month`: the event half of `[(month)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`Date`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelCalendarGridDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCalendarGridDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-calendar-grid-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-calendar-grid-heading'>PixelCalendarGrid</h2>
+      <Title id='pixel-calendar-grid-heading'>PixelCalendarGrid</Title>
       <p className="docs-lead">Standalone month grid for date selection — usable inline or composed inside date pickers and range pickers.</p>
       <ul className="docs-highlights">
-        <li>Controlled or uncontrolled month navigation via month / onMonthChange</li>
+        <li>Controlled or uncontrolled month navigation: <code>month</code> + <code>onMonthChange</code> (React), <code>v-model:month</code> (Vue), <code>[(month)]</code> (Angular)</li>
         <li>Min/max date bounds plus custom disabledDates (array or predicate)</li>
         <li>Optional rangePreview prop highlights start/end + in-range cells</li>
         <li>Full keyboard nav: Arrows, Home/End, PageUp/PageDown, Enter/Space</li>
-        <li>Surface-aware via useEffectiveSurface — inherits container theme</li>
+        <li>Surface-aware (pixel / linear) — follows the nearest PxlKitSurfaceProvider</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-calendar-grid-api">
+      <Heading id="pixel-calendar-grid-api">API</Heading>
+      <FrameworkApi label={'PixelCalendarGrid API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-calendar-grid-a11y">
-      <h3 id="pixel-calendar-grid-a11y">Accessibility</h3>
+      <Heading id="pixel-calendar-grid-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>grid</code></li>
       </ul>
-      <p className="docs-aria-notes">role=grid with columnheader weekday cells and gridcell day buttons; aria-selected marks the chosen day; aria-disabled marks out-of-bounds or disabled dates.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">role=grid with columnheader weekday cells and gridcell day buttons; aria-selected marks the chosen day, aria-current=&quot;date&quot; marks today, and aria-disabled marks out-of-bounds or disabled dates. Moves skip disabled days and stop at min/max. One enabled day is in the tab order. Week start, month and weekday names follow PxlKitLocaleProvider.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -87,12 +181,22 @@ export function PixelCalendarGridDocsSection({ className }: PixelCalendarGridDoc
           </tr>
           <tr>
             <td><kbd>PageUp</kbd></td>
-            <td>Move focus to previous month</td>
+            <td>Move focus to the same day of the previous month (its last day when shorter)</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
             <td><kbd>PageDown</kbd></td>
-            <td>Move focus to next month</td>
+            <td>Move focus to the same day of the next month (its last day when shorter)</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+PageUp</kbd></td>
+            <td>Move focus to the same day of the previous year</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+PageDown</kbd></td>
+            <td>Move focus to the same day of the next year</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
@@ -109,35 +213,119 @@ export function PixelCalendarGridDocsSection({ className }: PixelCalendarGridDoc
       </table>
     </section>
     <section aria-labelledby="pixel-calendar-grid-usage">
-      <h3 id="pixel-calendar-grid-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React, { useState } from 'react'
-import { PixelCalendarGrid } from '@pxlkit/ui-kit'
+      <Heading id="pixel-calendar-grid-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCalendarGrid usage'}
+        react={`import { useState } from 'react';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [value, setValue] = useState<Date | null>(null)
   return <PixelCalendarGrid value={value} onChange={setValue} />
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-vue';
+
+const value = ref<Date | null>(null);
+</script>
+
+<template>
+  <PixelCalendarGrid v-model="value" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCalendarGrid],
+  template: \`<pxl-calendar-grid [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal<Date | null>(null);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <p>Shows the current month and marks today, by the clock of whatever renders it: a server render can differ from the browser&#39;s (a page built on another day, another time zone) and fail to hydrate. For a stable server render pass month (and value or defaultValue), or render a current-month calendar in the browser only: next/dynamic with ssr: false (Next.js), ClientOnly (Nuxt), @defer (Angular).</p>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [value, setValue] = useState<Date | null>(null)
   return <PixelCalendarGrid value={value} onChange={setValue} />
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-vue';
+
+const value = ref<Date | null>(null);
+</script>
+
+<template>
+  <PixelCalendarGrid v-model="value" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCalendarGrid],
+  template: \`<pxl-calendar-grid [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal<Date | null>(null);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-selected-date">
-        <h4>With Selected Date</h4>
-        <pre className="docs-code"><code>{`export function WithSelectedDate() {
+        <Subheading>With Selected Date</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Selected Date code'}
+          react={`import { useState } from 'react';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit';
+
+export function WithSelectedDate() {
   const [value, setValue] = useState<Date | null>(new Date())
   return <PixelCalendarGrid value={value} onChange={setValue} />
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-vue';
+
+const value = ref<Date | null>(new Date());
+</script>
+
+<template>
+  <PixelCalendarGrid v-model="value" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCalendarGrid],
+  template: \`<pxl-calendar-grid [(value)]="value" />\`,
+})
+export class WithSelectedDate {
+  readonly value = signal<Date | null>(new Date());
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-min-max">
-        <h4>With Min/Max Bounds</h4>
-        <pre className="docs-code"><code>{`export function WithMinMax() {
+        <Subheading>With Min/Max Bounds</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Min/Max Bounds code'}
+          react={`import { useState } from 'react';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit';
+
+export function WithMinMax() {
   const today = new Date()
   const min = new Date(today.getFullYear(), today.getMonth(), 1)
   const max = new Date(today.getFullYear(), today.getMonth() + 1, 0)
@@ -150,11 +338,44 @@ export function Default() {
       maxDate={max}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-vue';
+
+const today = new Date();
+const min = new Date(today.getFullYear(), today.getMonth(), 1);
+const max = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+const value = ref<Date | null>(null);
+</script>
+
+<template>
+  <PixelCalendarGrid v-model="value" :min-date="min" :max-date="max" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCalendarGrid],
+  template: \`<pxl-calendar-grid [(value)]="value" [minDate]="min" [maxDate]="max" />\`,
+})
+export class WithMinMax {
+  private readonly today = new Date();
+  readonly min = new Date(this.today.getFullYear(), this.today.getMonth(), 1);
+  readonly max = new Date(this.today.getFullYear(), this.today.getMonth() + 1, 0);
+  readonly value = signal<Date | null>(null);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-disabled-weekends">
-        <h4>Disabled Weekends</h4>
-        <pre className="docs-code"><code>{`export function WithDisabledWeekends() {
+        <Subheading>Disabled Weekends</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled Weekends code'}
+          react={`import { useState } from 'react';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit';
+
+export function WithDisabledWeekends() {
   const [value, setValue] = useState<Date | null>(null)
   return (
     <PixelCalendarGrid
@@ -163,22 +384,72 @@ export function Default() {
       disabledDates={(d) => d.getDay() === 0 || d.getDay() === 6}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-vue';
+
+const value = ref<Date | null>(null);
+const isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6;
+</script>
+
+<template>
+  <PixelCalendarGrid v-model="value" :disabled-dates="isWeekend" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCalendarGrid],
+  template: \`<pxl-calendar-grid [(value)]="value" [disabledDates]="isWeekend" />\`,
+})
+export class WithDisabledWeekends {
+  readonly value = signal<Date | null>(null);
+  readonly isWeekend = (date: Date) => date.getDay() === 0 || date.getDay() === 6;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-range-preview">
-        <h4>Range Preview</h4>
-        <pre className="docs-code"><code>{`export function RangePreview() {
+        <Subheading>Range Preview</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Range Preview code'}
+          react={`import { PixelCalendarGrid } from '@pxlkit/ui-kit';
+
+export function RangePreview() {
   const from = new Date()
   const to = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 5)
   return <PixelCalendarGrid rangePreview={{ from, to }} />
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-vue';
+
+const from = new Date();
+const to = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 5);
+</script>
+
+<template>
+  <PixelCalendarGrid :range-preview="{ from, to }" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCalendarGrid],
+  template: \`<pxl-calendar-grid [rangePreview]="{ from, to }" />\`,
+})
+export class RangePreview {
+  readonly from = new Date();
+  readonly to = new Date(this.from.getFullYear(), this.from.getMonth(), this.from.getDate() + 5);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-date-picker">PixelDatePicker</a></li>
-        <li><a href="#pixel-date-range-picker">PixelDateRangePicker</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-date-picker' : '#pixel-date-picker'}>PixelDatePicker</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-date-range-picker' : '#pixel-date-range-picker'}>PixelDateRangePicker</a></li>
       </ul>
     </section>
     </section>

@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelShakeDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelShakeDocsMeta = {
@@ -17,29 +23,103 @@ export const PixelShakeDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelShakeDocsSection({ className }: PixelShakeDocsSectionProps): React.ReactElement {
+/** PixelShake's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelShake } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelShake',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to shake.' },
+          { name: 'duration', type: 'number', default: '450', description: 'Animation duration in milliseconds. Default `450`.' },
+          { name: 'distance', type: 'number', default: '2', description: 'Horizontal travel distance in pixels. Default `2`.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`. Default `1`." },
+          { name: 'easing', type: 'string', default: "'linear'", description: "CSS `animation-timing-function`. Default `'linear'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelShake } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelShake',
+        props: [
+          { name: 'duration', type: 'number', default: '450', description: 'Animation duration in milliseconds.' },
+          { name: 'distance', type: 'number', default: '2', description: 'Horizontal travel distance in pixels.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'linear'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to shake.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelShake } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelShake',
+        selector: 'pxl-shake',
+        props: [
+          { name: 'duration', type: 'number', default: '450', accepts: 'unknown', description: 'Animation duration in milliseconds.' },
+          { name: 'distance', type: 'number', default: '2', accepts: 'unknown', description: 'Horizontal travel distance in pixels.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', accepts: "number | 'infinite' | `${number}`", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'linear'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelShakeDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelShakeDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-shake-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-shake-heading'>PixelShake</h2>
+      <Title id='pixel-shake-heading'>PixelShake</Title>
       <p className="docs-lead">Quick horizontal shake animation, ideal for validation errors or attention cues.</p>
       <ul className="docs-highlights">
         <li>Configurable duration, distance, repeat count, and easing</li>
         <li>Trigger on mount, hover, click, focus, in-view, or controlled boolean</li>
         <li>Respects prefers-reduced-motion automatically</li>
-        <li>onComplete callback fires after the final iteration</li>
-        <li>Forwards ref to the wrapping div</li>
+        <li>Signals the end of its last iteration: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-shake-api">
+      <Heading id="pixel-shake-api">API</Heading>
+      <FrameworkApi label={'PixelShake API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-shake-a11y">
-      <h3 id="pixel-shake-a11y">Accessibility</h3>
+      <Heading id="pixel-shake-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -47,8 +127,11 @@ export function PixelShakeDocsSection({ className }: PixelShakeDocsSectionProps)
       <p className="docs-aria-notes">Animation is automatically disabled when the user has requested reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-shake-usage">
-      <h3 id="pixel-shake-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelShake } from '@pxlkit/ui-kit';
+      <Heading id="pixel-shake-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelShake usage'}
+        react={`import { PixelShake } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -56,48 +139,150 @@ export function Default() {
       <span>Shake on mount</span>
     </PixelShake>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelShake } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelShake>
+    <span>Shake on mount</span>
+  </PixelShake>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelShake } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelShake],
+  template: \`
+    <pxl-shake>
+      <span>Shake on mount</span>
+    </pxl-shake>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelShake } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelShake>
       <span>Shake on mount</span>
     </PixelShake>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelShake } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelShake>
+    <span>Shake on mount</span>
+  </PixelShake>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelShake } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelShake],
+  template: \`
+    <pxl-shake>
+      <span>Shake on mount</span>
+    </pxl-shake>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-on-hover">
-        <h4>On Hover</h4>
-        <pre className="docs-code"><code>{`export function OnHover() {
+        <Subheading>On Hover</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'On Hover code'}
+          react={`import { PixelShake } from '@pxlkit/ui-kit';
+
+export function OnHover() {
   return (
     <PixelShake trigger="hover" repeat="infinite" duration={300}>
       <span>Hover to shake</span>
     </PixelShake>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelShake } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelShake trigger="hover" repeat="infinite" :duration="300">
+    <span>Hover to shake</span>
+  </PixelShake>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelShake } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelShake],
+  template: \`
+    <pxl-shake trigger="hover" repeat="infinite" [duration]="300">
+      <span>Hover to shake</span>
+    </pxl-shake>
+  \`,
+})
+export class OnHover {}`}
+        />
       </article>
       <article className="docs-example" id="example-strong-shake">
-        <h4>Strong Shake</h4>
-        <pre className="docs-code"><code>{`export function StrongShake() {
+        <Subheading>Strong Shake</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Strong Shake code'}
+          react={`import { PixelShake } from '@pxlkit/ui-kit';
+
+export function StrongShake() {
   return (
     <PixelShake distance={6} duration={600} repeat={3}>
       <span>Stronger shake</span>
     </PixelShake>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelShake } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelShake :distance="6" :duration="600" :repeat="3">
+    <span>Stronger shake</span>
+  </PixelShake>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelShake } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelShake],
+  template: \`
+    <pxl-shake [distance]="6" [duration]="600" [repeat]="3">
+      <span>Stronger shake</span>
+    </pxl-shake>
+  \`,
+})
+export class StrongShake {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-bounce">PixelBounce</a></li>
-        <li><a href="#pixel-pulse">PixelPulse</a></li>
-        <li><a href="#pixel-glitch">PixelGlitch</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bounce' : '#pixel-bounce'}>PixelBounce</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pulse' : '#pixel-pulse'}>PixelPulse</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-glitch' : '#pixel-glitch'}>PixelGlitch</a></li>
       </ul>
     </section>
     </section>

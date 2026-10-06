@@ -4,7 +4,6 @@ const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/social @pxlkit/
 
 const testimonialCards = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import {
   PixelTestimonialCard,
   PixelFadeIn,
@@ -78,7 +77,6 @@ export function TestimonialCards() {
 
 const largeQuote = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { SocialStar } from '@pxlkit/social';
 import { SparkleStar } from '@pxlkit/gamification';
@@ -97,15 +95,16 @@ export function LargeQuote() {
         <PixelStack gap={6} align="center" className="text-center">
           {/* Decoration */}
           <PixelCluster gap={2} justify="center">
-            <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful />
-            <AnimatedPxlKitIcon icon={SparkleStar} size={20} colorful />
-            <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful />
+            <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful decorative />
+            <AnimatedPxlKitIcon icon={SparkleStar} size={20} colorful decorative />
+            <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful decorative />
           </PixelCluster>
 
           {/* Stars */}
           <PixelCluster gap={1} justify="center">
+            <span className="sr-only">Rated 5 out of 5</span>
             {Array.from({ length: 5 }).map((_, i) => (
-              <PxlKitIcon key={i} icon={SocialStar} size={18} colorful />
+              <PxlKitIcon key={i} icon={SocialStar} size={18} colorful decorative />
             ))}
           </PixelCluster>
 
@@ -132,7 +131,6 @@ export function LargeQuote() {
 
 const testimonialSlider = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { useState } from 'react';
 import {
   PixelTestimonialCard,

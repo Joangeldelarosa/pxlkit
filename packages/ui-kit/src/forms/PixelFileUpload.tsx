@@ -2,8 +2,21 @@
 
 import React, { forwardRef, useCallback, useId, useRef, useState } from 'react';
 import {
+  addFiles,
+  fieldDescribedBy,
+  fieldMessageId,
+  fileRemoveLabel,
+  fileUploadClasses,
+  fileUploadIcons,
+  fileUploadPrompt,
+  formatFileSize,
+  isImageFile,
+  removeFileAt,
+  type FileUploadClasses,
+} from '@pxlkit/ui-kit-core';
+import {
   Size, Surface, cn,
-  toneMap, focusRing, surfaceClasses, useEffectiveSurface,
+  useEffectiveSurface,
   CloseIcon, FieldShell,
 } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
@@ -18,22 +31,41 @@ export type PixelFileRejection = { file: File; reasons: string[] };
 
 /** Public prop bag for {@link PixelFileUpload}. */
 export interface PixelFileUploadProps {
+  /** Files; leave unset for an uncontrolled field. */
   value?: File[];
+  /** Initial files while uncontrolled. */
   defaultValue?: File[];
+  /** Called with the new files, after each choice, drop or removal. */
   onChange?: (files: File[]) => void;
+  /**
+   * Types the field takes: MIME types, `type/*` wildcards and `.ext` extensions, comma-separated.
+   */
   accept?: string;
+  /** Files add up; without it each choice replaces the last. */
   multiple?: boolean;
   /** Bytes per file. */
   maxSize?: number;
+  /** Most files the field holds. */
   maxFiles?: number;
+  /** Shows the dropzone; `false` shows a browse button instead. */
   dropzone?: boolean;
+  /**
+   * Draws a file's row in place of the default one: gets the file, and a function that removes it.
+   */
   renderItem?: (file: File, remove: () => void) => React.ReactNode;
+  /** Called with the files turned down by a choice or a drop, with their reasons. */
   onReject?: (rejections: PixelFileRejection[]) => void;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Padding and type size of the dropzone. */
   size?: Size;
+  /** Label above the field, pointing at the file input. */
   label?: string;
+  /** Helper text below the field; hidden while `error` is set. */
   hint?: string;
+  /** Error message below the field; turns the dropzone red. */
   error?: string;
+  /** Disables choosing, dropping and removing files. */
   disabled?: boolean;
   /**
    * Deprecated form-serialization hint. Files are not serializable through
@@ -45,35 +77,10 @@ export interface PixelFileUploadProps {
    * the file input still uses it via the `id` prop fallback path.
    */
   name?: string;
+  /** `id` of the file input; generated when left out. */
   id?: string;
+  /** Extra classes on the root element. */
   className?: string;
-}
-
-const SIZE_PAD: Record<Size, string> = {
-  sm: 'p-4 text-xs',
-  md: 'p-6 text-sm',
-  lg: 'p-8 text-sm',
-};
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-  return `${(bytes / 1024 / 1024 / 1024).toFixed(1)} GB`;
-}
-
-/** True if `mime` matches the `accept` filter (RFC2616 + ".ext" + "image/*"). */
-function matchesAccept(file: File, accept?: string): boolean {
-  if (!accept) return true;
-  const parts = accept.split(',').map((p) => p.trim().toLowerCase()).filter(Boolean);
-  if (parts.length === 0) return true;
-  const mime = (file.type || '').toLowerCase();
-  const name = file.name.toLowerCase();
-  return parts.some((p) => {
-    if (p.startsWith('.')) return name.endsWith(p);
-    if (p.endsWith('/*')) return mime.startsWith(p.slice(0, -1));
-    return mime === p;
-  });
 }
 
 export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(function PixelFileUpload(
@@ -101,7 +108,6 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const reactId = useId();
   const inputId = id ?? `pxl-file-${reactId}`;
 
@@ -117,31 +123,7 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
   /** Run validation + cap + merge, then push results out. */
   const ingest = useCallback((incoming: File[]) => {
     if (disabled || incoming.length === 0) return;
-
-    const rejections: PixelFileRejection[] = [];
-    const accepted: File[] = [];
-
-    for (const f of incoming) {
-      const reasons: string[] = [];
-      if (!matchesAccept(f, accept)) reasons.push('accept');
-      if (typeof maxSize === 'number' && f.size > maxSize) reasons.push('size');
-      if (reasons.length > 0) {
-        rejections.push({ file: f, reasons });
-      } else {
-        accepted.push(f);
-      }
-    }
-
-    // Compose next value depending on multiple + maxFiles cap.
-    const current = multiple ? (files ?? []) : [];
-    let next = multiple ? [...current, ...accepted] : accepted.slice(-1);
-
-    if (typeof maxFiles === 'number' && next.length > maxFiles) {
-      const extras = next.slice(maxFiles);
-      next = next.slice(0, maxFiles);
-      for (const f of extras) rejections.push({ file: f, reasons: ['maxFiles'] });
-    }
-
+    const { files: next, rejections } = addFiles(files ?? [], incoming, { accept, multiple, maxSize, maxFiles });
     if (rejections.length > 0) onReject?.(rejections);
     setFiles(next);
   }, [accept, disabled, files, maxFiles, maxSize, multiple, onReject, setFiles]);
@@ -190,47 +172,35 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
   }, [disabled, handleBrowse]);
 
   const removeAt = useCallback((idx: number) => {
-    const current = files ?? [];
-    const next = current.filter((_, i) => i !== idx);
-    setFiles(next);
+    setFiles(removeFileAt(files ?? [], idx));
   }, [files, setFiles]);
 
-  const tone = error ? 'red' : 'cyan';
-  const t = toneMap[tone];
+  const c = fileUploadClasses(surface, { size, invalid: !!error, dragActive, disabled: !!disabled });
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
-      <div ref={ref} className={cn('space-y-3', className)} data-pxl-name={name || undefined}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId} messageId={fieldMessageId(inputId)}>
+      <div ref={ref} className={cn(c.root, className)} data-pxl-name={name || undefined}>
         {dropzone && (
           <div
             data-pxl-dropzone="true"
             role="button"
             tabIndex={disabled ? -1 : 0}
             aria-disabled={disabled || undefined}
-            aria-describedby={`${inputId}-msg`}
+            aria-describedby={fieldDescribedBy(inputId, { hint, error })}
             onClick={handleBrowse}
             onKeyDown={handleKeyDown}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragEnter={handleDragOver}
             onDragLeave={handleDragLeave}
-            className={cn(
-              'flex flex-col items-center justify-center gap-2 text-center outline-none cursor-pointer',
-              'border-dashed bg-retro-surface/20 text-retro-muted',
-              s.border, s.radiusLg, s.font, s.transition,
-              SIZE_PAD[size],
-              focusRing, t.ring,
-              dragActive ? cn(t.border, t.soft, t.text) : 'border-retro-border/60',
-              error && 'border-retro-red/60',
-              disabled && 'opacity-50 cursor-not-allowed',
-            )}
+            className={c.dropzone}
           >
-            <UploadIcon className={cn('h-5 w-5', dragActive && t.text)} />
-            <div className="flex flex-col">
-              <span className={cn('font-medium', dragActive ? t.text : 'text-retro-text')}>
-                {dragActive ? 'Drop to upload' : 'Drop files or click to browse'}
+            <OutlineIcon paths={fileUploadIcons.upload} className={c.dropzoneIcon} />
+            <div className={c.dropzoneText}>
+              <span className={c.prompt}>
+                {fileUploadPrompt(dragActive)}
               </span>
-              {accept && <span className="text-[10px] text-retro-muted break-all max-w-full">Accepts: {accept}</span>}
+              {accept && <span className={c.accepts}>Accepts: {accept}</span>}
             </div>
           </div>
         )}
@@ -251,31 +221,26 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
           multiple={multiple}
           disabled={disabled}
           onChange={handleInputChange}
-          className="sr-only"
+          className={c.input}
           tabIndex={dropzone ? -1 : 0}
           aria-hidden={dropzone || undefined}
+          aria-describedby={dropzone ? undefined : fieldDescribedBy(inputId, { hint, error })}
         />
 
+        {/*
+          The browse button is a second label of the file input, which stays
+          the one control: one tab stop, named by both labels, described by
+          the hint or error, and opened by a click on either label.
+        */}
         {!dropzone && (
-          <button
-            type="button"
-            onClick={handleBrowse}
-            disabled={disabled}
-            className={cn(
-              'inline-flex items-center gap-2 px-3 h-10 text-sm font-medium',
-              s.border, s.radius, s.transition, s.font,
-              t.text, t.border, t.bg, t.hover,
-              focusRing, t.ring,
-              disabled && 'opacity-50 cursor-not-allowed',
-            )}
-          >
-            <UploadIcon className="h-4 w-4" />
+          <label htmlFor={inputId} className={c.button}>
+            <OutlineIcon paths={fileUploadIcons.upload} className={c.buttonIcon} />
             <span>Choose file{multiple ? 's' : ''}</span>
-          </button>
+          </label>
         )}
 
         {files && files.length > 0 && (
-          <ul className="space-y-2">
+          <ul className={c.list}>
             {files.map((f, idx) => {
               const key = `${f.name}-${f.size}-${idx}`;
               const remove = () => removeAt(idx);
@@ -290,29 +255,19 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
                 <li
                   key={key}
                   data-pxl-file-item="true"
-                  className={cn(
-                    'flex items-center gap-3 p-2 pr-3',
-                    s.border, s.radius, s.font,
-                    'border-retro-border/60 bg-retro-surface/40',
-                  )}
+                  className={c.item}
                 >
-                  <FilePreview file={f} surface={surface} />
-                  <div className="flex-1 min-w-0">
-                    <p className="truncate text-xs text-retro-text">{f.name}</p>
-                    <p className="text-[10px] text-retro-muted">{formatBytes(f.size)}</p>
+                  <FilePreview file={f} classes={c} />
+                  <div className={c.itemText}>
+                    <p className={c.itemName}>{f.name}</p>
+                    <p className={c.itemSize}>{formatFileSize(f.size)}</p>
                   </div>
                   <button
                     type="button"
-                    aria-label={`Remove ${f.name}`}
+                    aria-label={fileRemoveLabel(f)}
                     onClick={remove}
                     disabled={disabled}
-                    className={cn(
-                      'inline-flex items-center justify-center h-7 w-7 shrink-0',
-                      s.border, s.radius, s.transition,
-                      'text-retro-muted border-retro-border/60 hover:text-retro-red hover:border-retro-red/60',
-                      focusRing,
-                      disabled && 'opacity-50 cursor-not-allowed',
-                    )}
+                    className={c.remove}
                   >
                     <CloseIcon />
                   </button>
@@ -332,9 +287,8 @@ PixelFileUpload.displayName = 'PixelFileUpload';
    Internals.
    ────────────────────────────────────────────────────────────────────────── */
 
-function FilePreview({ file, surface }: { file: File; surface: Surface }) {
-  const s = surfaceClasses(surface);
-  const isImage = file.type.startsWith('image/');
+function FilePreview({ file, classes: c }: { file: File; classes: FileUploadClasses }) {
+  const isImage = isImageFile(file);
   const [url, setUrl] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -347,35 +301,24 @@ function FilePreview({ file, surface }: { file: File; surface: Surface }) {
 
   if (isImage && url) {
     return (
-      <span className={cn('inline-block h-10 w-10 overflow-hidden shrink-0', s.border, s.radius, 'border-retro-border/60')}>
+      <span className={c.preview}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt={file.name} className="h-full w-full object-cover" />
+        <img src={url} alt={file.name} className={c.previewImage} />
       </span>
     );
   }
 
   return (
-    <span className={cn('inline-flex h-10 w-10 items-center justify-center shrink-0 bg-retro-bg/60 text-retro-muted', s.border, s.radius, 'border-retro-border/60')}>
-      <FileIcon className="h-4 w-4" />
+    <span className={c.previewIcon}>
+      <OutlineIcon paths={fileUploadIcons.file} className={c.previewGlyph} />
     </span>
   );
 }
 
-function UploadIcon({ className }: { className?: string }) {
+function OutlineIcon({ paths, className }: { paths: readonly string[]; className?: string }) {
   return (
     <svg viewBox="0 0 16 16" className={className} fill="none" stroke="currentColor" strokeWidth="2" shapeRendering="crispEdges" aria-hidden>
-      <path d="M8 11V3" />
-      <path d="M4 7l4-4 4 4" />
-      <path d="M3 13h10" />
-    </svg>
-  );
-}
-
-function FileIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 16 16" className={className} fill="none" stroke="currentColor" strokeWidth="2" shapeRendering="crispEdges" aria-hidden>
-      <path d="M4 2h6l3 3v9H4z" />
-      <path d="M10 2v3h3" />
+      {paths.map((d) => <path key={d} d={d} />)}
     </svg>
   );
 }

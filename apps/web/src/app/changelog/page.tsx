@@ -1,39 +1,22 @@
-import type { Metadata } from 'next';
 import { PixelChangelogTemplate } from '@/components/templates/changelog-template';
+import { JsonLd } from '@/components/JsonLd';
+import { pageMetadata } from '@/lib/seo';
+import { breadcrumbList } from '@/lib/structured-data';
 
-export const metadata: Metadata = {
-  title: 'Changelog — Every Pxlkit Release | Pxlkit',
+export const metadata = pageMetadata({
+  path: '/changelog',
+  title: 'Changelog — Every Pxlkit Release',
   description:
-    'Release notes for @pxlkit/ui-kit. Track every wave, every component, every fix — filter by version and category.',
-  alternates: { canonical: 'https://pxlkit.xyz/changelog' },
-  openGraph: {
-    type: 'website',
-    title: 'Changelog — Every Pxlkit Release | Pxlkit',
-    description:
-      'Release notes for @pxlkit/ui-kit. Track every wave, every component, every fix.',
-    url: 'https://pxlkit.xyz/changelog',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1280,
-        height: 640,
-        alt: 'Pxlkit changelog — Every shipped wave with filterable categories',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Changelog — Every Pxlkit Release | Pxlkit',
-    description:
-      'Release notes for @pxlkit/ui-kit. Track every wave, every component, every fix.',
-    images: ['/og-twitter.png'],
-  },
-};
+    'Pxlkit release notes: 2.2.0 brings the React UI kit to Vue and Angular. Every release since 1.6, filterable by version and change type.',
+  imageAlt: 'Pxlkit changelog — every release of the retro pixel-art UI kit for React',
+  keywords: ['pxlkit changelog', 'pxlkit release notes', 'react ui kit changelog', 'pxlkit 2.2'],
+});
 
 export default function ChangelogPage() {
   return (
     <div className="min-h-screen bg-retro-bg text-retro-text">
-      <PixelChangelogTemplate />
+      <JsonLd data={breadcrumbList([{ name: 'Changelog', path: '/changelog' }])} />
+      <PixelChangelogTemplate headingAs="h1" />
     </div>
   );
 }

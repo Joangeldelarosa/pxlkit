@@ -125,6 +125,9 @@ export const CATEGORY_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
     'cube',
     'minecraft',
   ],
+  // Framework bindings must name the framework they target.
+  vue: ['vue', 'nuxt'],
+  angular: ['angular'],
 };
 
 const DEFAULT_KEYWORDS: readonly string[] = [

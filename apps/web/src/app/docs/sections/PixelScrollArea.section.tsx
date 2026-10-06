@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelScrollAreaDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelScrollAreaDocsMeta = {
@@ -17,16 +23,92 @@ export const PixelScrollAreaDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSectionProps): React.ReactElement {
+/** PixelScrollArea's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelScrollArea } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelScrollArea',
+        props: [
+          { name: 'maxHeight', type: 'string | number', description: 'Height cap before the content scrolls: pixels, or any CSS length.' },
+          { name: 'variant', type: "'auto' | 'always' | 'scroll' | 'hover'", description: 'Canonical structural variant (scrollbar visibility mode).' },
+          { name: 'type', type: "'auto' | 'always' | 'scroll' | 'hover'", deprecated: 'Use `variant` instead. Retained as alias for one minor.' },
+          { name: 'offsetScrollbars', type: 'boolean', default: 'false', description: "Keep the scrollbar's room reserved, so content never shifts." },
+          { name: 'scrollbarSize', type: 'number', description: 'Scrollbar thickness in pixels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+          { name: 'aria-label', type: 'string', description: "Accessible name for the scrollable region. Required for keyboard users to understand what they've landed on. Provide either `aria-label` or `aria-labelledby`. In dev, a missing label logs a warning." },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the region, in place of `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The content that scrolls.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelScrollArea } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelScrollArea',
+        props: [
+          { name: 'maxHeight', type: 'string | number', description: 'Height cap before the content scrolls: pixels, or any CSS length.' },
+          { name: 'variant', type: "'auto' | 'always' | 'scroll' | 'hover'", description: 'When the scrollbar shows.' },
+          { name: 'type', type: "'auto' | 'always' | 'scroll' | 'hover'", deprecated: 'Use `variant`.' },
+          { name: 'offsetScrollbars', type: 'boolean', default: 'false', description: "Keep the scrollbar's room reserved, so content never shifts." },
+          { name: 'scrollbarSize', type: 'number', description: 'Scrollbar thickness in pixels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The content that scrolls.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelScrollArea } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelScrollArea',
+        selector: 'pxl-scroll-area',
+        props: [
+          { name: 'maxHeight', type: 'string | number', description: 'Height cap before the content scrolls: pixels, or any CSS length.' },
+          { name: 'variant', type: "'auto' | 'always' | 'scroll' | 'hover'", description: 'When the scrollbar shows.' },
+          { name: 'type', type: "'auto' | 'always' | 'scroll' | 'hover'", deprecated: 'Use `variant`.' },
+          { name: 'offsetScrollbars', type: 'boolean', default: 'false', accepts: 'unknown', description: "Keep the scrollbar's room reserved, so content never shifts." },
+          { name: 'scrollbarSize', type: 'number', accepts: 'number | `${number}`', description: 'Scrollbar thickness in pixels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border and radius.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelScrollAreaDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelScrollAreaDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-scroll-area-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-scroll-area-heading'>PixelScrollArea</h2>
+      <Title id='pixel-scroll-area-heading'>PixelScrollArea</Title>
       <p className="docs-lead">Surface-aware scroll container with styled scrollbar, configurable visibility and dimensions.</p>
       <ul className="docs-highlights">
-        <li>Surface-aware scrollbar palette (retro / pixel) via useEffectiveSurface</li>
+        <li>Surface-aware scrollbar palette (pixel / linear)</li>
         <li>Scrollbar visibility modes: auto, always, scroll, hover</li>
-        <li>`maxHeight` caps content before scrolling kicks in</li>
-        <li>`scrollbarSize` and `offsetScrollbars` (stable gutter) for layout stability</li>
+        <li><code>maxHeight</code> caps content before scrolling kicks in</li>
+        <li><code>scrollbarSize</code> and <code>offsetScrollbars</code> (stable gutter) for layout stability</li>
         <li>Focusable region (tabIndex 0) with focus-visible ring and dev-time a11y warning</li>
       </ul>
     <dl className="docs-meta">
@@ -34,18 +116,18 @@ export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSec
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-scroll-area-api">
+      <Heading id="pixel-scroll-area-api">API</Heading>
+      <FrameworkApi label={'PixelScrollArea API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-scroll-area-a11y">
-      <h3 id="pixel-scroll-area-a11y">Accessibility</h3>
+      <Heading id="pixel-scroll-area-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>scrollable-region</code></li>
       </ul>
       <p className="docs-aria-notes">Region is focusable (tabIndex 0, role=&quot;region&quot;) so keyboard users can scroll. Provide aria-label or aria-labelledby so screen-reader users know what they have landed on; a dev-time warning fires if none is set.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -79,8 +161,11 @@ export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-scroll-area-usage">
-      <h3 id="pixel-scroll-area-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelScrollArea } from '@pxlkit/ui-kit';
+      <Heading id="pixel-scroll-area-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelScrollArea usage'}
+        react={`import { PixelScrollArea } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -94,14 +179,50 @@ export function Default() {
       </div>
     </PixelScrollArea>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelScrollArea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelScrollArea aria-label="Sample scrollable region" :max-height="160">
+    <div class="space-y-2 p-3">
+      <p v-for="i in 12" :key="i" class="text-sm text-retro-muted">Scroll item {{ i }}</p>
+    </div>
+  </PixelScrollArea>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelScrollArea } from '@pxlkit/ui-kit-angular';
+
+const upTo = (count: number) => Array.from({ length: count }, (_, i) => i + 1);
+
+@Component({
+  imports: [PixelScrollArea],
+  template: \`
+    <pxl-scroll-area aria-label="Sample scrollable region" [maxHeight]="160">
+      <div class="space-y-2 p-3">
+        @for (i of items; track i) {
+          <p class="text-sm text-retro-muted">Scroll item {{ i }}</p>
+        }
+      </div>
+    </pxl-scroll-area>
+  \`,
+})
+export class Default {
+  readonly items = upTo(12);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelScrollArea } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelScrollArea aria-label="Sample scrollable region" maxHeight={160}>
       <div className="space-y-2 p-3">
@@ -113,11 +234,48 @@ export function Default() {
       </div>
     </PixelScrollArea>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelScrollArea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelScrollArea aria-label="Sample scrollable region" :max-height="160">
+    <div class="space-y-2 p-3">
+      <p v-for="i in 12" :key="i" class="text-sm text-retro-muted">Scroll item {{ i }}</p>
+    </div>
+  </PixelScrollArea>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelScrollArea } from '@pxlkit/ui-kit-angular';
+
+const upTo = (count: number) => Array.from({ length: count }, (_, i) => i + 1);
+
+@Component({
+  imports: [PixelScrollArea],
+  template: \`
+    <pxl-scroll-area aria-label="Sample scrollable region" [maxHeight]="160">
+      <div class="space-y-2 p-3">
+        @for (i of items; track i) {
+          <p class="text-sm text-retro-muted">Scroll item {{ i }}</p>
+        }
+      </div>
+    </pxl-scroll-area>
+  \`,
+})
+export class Default {
+  readonly items = upTo(12);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-always-visible">
-        <h4>Always Visible</h4>
-        <pre className="docs-code"><code>{`export function AlwaysVisible() {
+        <Subheading>Always Visible</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Always Visible code'}
+          react={`import { PixelScrollArea } from '@pxlkit/ui-kit';
+
+export function AlwaysVisible() {
   return (
     <PixelScrollArea
       aria-label="Always-visible scrollbar"
@@ -134,11 +292,48 @@ export function Default() {
       </div>
     </PixelScrollArea>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelScrollArea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelScrollArea aria-label="Always-visible scrollbar" type="always" :max-height="140" offset-scrollbars>
+    <div class="space-y-2 p-3">
+      <p v-for="i in 10" :key="i" class="text-sm text-retro-muted">Row {{ i }}</p>
+    </div>
+  </PixelScrollArea>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelScrollArea } from '@pxlkit/ui-kit-angular';
+
+const upTo = (count: number) => Array.from({ length: count }, (_, i) => i + 1);
+
+@Component({
+  imports: [PixelScrollArea],
+  template: \`
+    <pxl-scroll-area aria-label="Always-visible scrollbar" type="always" [maxHeight]="140" offsetScrollbars>
+      <div class="space-y-2 p-3">
+        @for (i of items; track i) {
+          <p class="text-sm text-retro-muted">Row {{ i }}</p>
+        }
+      </div>
+    </pxl-scroll-area>
+  \`,
+})
+export class AlwaysVisible {
+  readonly items = upTo(10);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-scrollbar-size">
-        <h4>Custom Scrollbar Size</h4>
-        <pre className="docs-code"><code>{`export function CustomScrollbarSize() {
+        <Subheading>Custom Scrollbar Size</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Custom Scrollbar Size code'}
+          react={`import { PixelScrollArea } from '@pxlkit/ui-kit';
+
+export function CustomScrollbarSize() {
   return (
     <PixelScrollArea
       aria-label="Custom scrollbar size"
@@ -155,15 +350,47 @@ export function Default() {
       </div>
     </PixelScrollArea>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelScrollArea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelScrollArea aria-label="Custom scrollbar size" type="hover" :max-height="140" :scrollbar-size="10">
+    <div class="space-y-2 p-3">
+      <p v-for="i in 10" :key="i" class="text-sm text-retro-muted">Hover row {{ i }}</p>
+    </div>
+  </PixelScrollArea>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelScrollArea } from '@pxlkit/ui-kit-angular';
+
+const upTo = (count: number) => Array.from({ length: count }, (_, i) => i + 1);
+
+@Component({
+  imports: [PixelScrollArea],
+  template: \`
+    <pxl-scroll-area aria-label="Custom scrollbar size" type="hover" [maxHeight]="140" [scrollbarSize]="10">
+      <div class="space-y-2 p-3">
+        @for (i of items; track i) {
+          <p class="text-sm text-retro-muted">Hover row {{ i }}</p>
+        }
+      </div>
+    </pxl-scroll-area>
+  \`,
+})
+export class CustomScrollbarSize {
+  readonly items = upTo(10);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-box">PixelBox</a></li>
-        <li><a href="#pixel-stack">PixelStack</a></li>
-        <li><a href="#pixel-section">PixelSection</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-box' : '#pixel-box'}>PixelBox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stack' : '#pixel-stack'}>PixelStack</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-section' : '#pixel-section'}>PixelSection</a></li>
       </ul>
     </section>
     </section>

@@ -1,11 +1,15 @@
 import React, { forwardRef, useId, useState } from 'react';
 import {
+  accordionClasses,
+  accordionIds,
+  accordionInitialOpen,
+  accordionItemClasses,
+  toggleAccordionItem,
+} from '@pxlkit/ui-kit-core';
+import {
   AccordionItem,
   ChevronDownIcon,
   Surface,
-  cn,
-  focusRing,
-  surfaceClasses,
   useEffectiveSurface,
 } from '../common';
 
@@ -30,56 +34,39 @@ export const PixelAccordion = forwardRef<HTMLDivElement, PixelAccordionProps>(fu
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const baseId = useId();
-  const [openIds, setOpenIds] = useState<Set<string>>(
-    () => new Set(!collapsedByDefault && items[0] ? [items[0].id] : []),
-  );
+  const [openIds, setOpenIds] = useState<string[]>(() => accordionInitialOpen(items, collapsedByDefault));
 
   const toggle = (id: string) => {
-    setOpenIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else {
-        if (!allowMultiple) next.clear();
-        next.add(id);
-      }
-      return next;
-    });
+    setOpenIds((prev) => toggleAccordionItem(prev, id, allowMultiple));
   };
 
   return (
-    <div ref={ref} className="space-y-1.5">
+    <div ref={ref} className={accordionClasses}>
       {items.map((item) => {
-        const isOpen = openIds.has(item.id);
-        const headerId = `${baseId}-h-${item.id}`;
-        const panelId = `${baseId}-p-${item.id}`;
+        const isOpen = openIds.includes(item.id);
+        const ids = accordionIds(baseId, item.id);
+        const classes = accordionItemClasses(surface, isOpen);
         return (
-          <div key={item.id} className={cn('bg-retro-surface/40', s.border, s.radius, 'border-retro-border/40')}>
+          <div key={item.id} className={classes.item}>
             <button
-              id={headerId}
+              id={ids.header}
               type="button"
               aria-expanded={isOpen}
-              aria-controls={panelId}
-              className={cn(
-                'flex w-full items-center justify-between px-3 py-2.5 text-left text-sm text-retro-text outline-none transition-colors hover:bg-retro-surface/60',
-                s.font, focusRing, 'focus-visible:ring-retro-cyan/30',
-              )}
+              aria-controls={ids.panel}
+              className={classes.trigger}
               onClick={() => toggle(item.id)}
             >
               <span>{item.title}</span>
-              <ChevronDownIcon className={cn('text-retro-muted transition-transform duration-200', isOpen && 'rotate-180')} />
+              <ChevronDownIcon className={classes.chevron} />
             </button>
             {isOpen && (
               // No role="region": the component cannot guarantee unique panel
               // names across instances, and duplicate region landmarks trip
               // axe's landmark-unique rule (APG also discourages region here
-              // to avoid landmark proliferation).
-              <div
-                id={panelId}
-                aria-labelledby={headerId}
-                className="border-t border-retro-border/30 px-3 py-2.5 text-sm text-retro-muted"
-              >
+              // to avoid landmark proliferation). Without a role the panel
+              // takes no name either: ARIA prohibits aria-labelledby on it.
+              <div id={ids.panel} className={classes.panel}>
                 {item.content}
               </div>
             )}

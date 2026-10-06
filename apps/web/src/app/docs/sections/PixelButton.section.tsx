@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelButtonDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelButtonDocsMeta = {
@@ -17,35 +23,113 @@ export const PixelButtonDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProps): React.ReactElement {
+/** PixelButton's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelButton } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelButton',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: 'Full Variant union — `solid` | `soft` | `outline` | `ghost`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to nearest provider.' },
+          { name: 'iconLeft', type: 'React.ReactNode', description: 'Leading icon node; replaced by a spinner while `loading` is true.' },
+          { name: 'iconRight', type: 'React.ReactNode', description: 'Trailing icon node.' },
+          { name: 'loading', type: 'boolean', description: 'When true, swaps the left icon for a spinner and force-disables the button.' },
+          { name: 'fullWidth', type: 'boolean', description: "Stretch to fill the parent's inline axis (`w-full`)." },
+          { name: 'asChild', type: 'boolean', description: 'Render the children as the root element (Radix Slot pattern). Expects a SINGLE React element child; receives merged className, ref, and onClick. Useful for `<Link>` / `<a>` wrappers without sacrificing the styling.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`).',
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelButton } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelButton',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: '`solid` | `soft` | `outline` | `ghost`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to the nearest provider.' },
+          { name: 'loading', type: 'boolean', default: 'false', description: 'Swaps the left icon for a spinner and disables the button.' },
+          { name: 'fullWidth', type: 'boolean', default: 'false', description: "Stretch to fill the parent's inline axis (`w-full`)." },
+          { name: 'asChild', type: 'boolean', default: 'false', description: 'Render the single element of the default slot as the root instead of a `<button>`; it receives the button classes and every attribute and listener. Useful for `<a>` / `<RouterLink>` wrappers.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Native `disabled`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Button label.' },
+          { name: 'icon-left', description: 'Leading icon; replaced by a spinner while `loading`.' },
+          { name: 'icon-right', description: 'Trailing icon.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelButton } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelButton',
+        selector: 'button[pxlButton], a[pxlButton]',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: '`solid` | `soft` | `outline` | `ghost`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to the nearest provider.' },
+          { name: 'iconLeft', type: 'string | TemplateRef<any>', description: 'Leading icon; replaced by a spinner while `loading`.' },
+          { name: 'iconRight', type: 'string | TemplateRef<any>', description: 'Trailing icon.' },
+          { name: 'loading', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Swaps the left icon for a spinner and disables the button.' },
+          { name: 'fullWidth', type: 'boolean', default: 'false', accepts: 'unknown', description: "Stretch to fill the parent's inline axis (`w-full`)." },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Native `disabled` (buttons only).' },
+        ],
+        notes: [
+          'Goes on a native `<button>` or `<a>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelButtonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelButtonDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-button-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-button-heading'>PixelButton</h2>
-      <p className="docs-lead">Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and an asChild slot pattern for wrapping links or routers.</p>
+      <Title id='pixel-button-heading'>PixelButton</Title>
+      <p className="docs-lead">Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and a link form for anchors and router links (<code>asChild</code> in React and Vue, <code>a[pxlButton]</code> in Angular).</p>
       <ul className="docs-highlights">
         <li>Four variants — solid, soft, outline, ghost — across seven tones</li>
         <li>Loading state pins the rendered width to prevent collapse when text swaps to spinner</li>
-        <li>asChild slot pattern lets you wrap &lt;a&gt;/&lt;Link&gt; while keeping all styling</li>
+        <li>Styles a link or router link as the button: <code>asChild</code> in React and Vue, <code>&lt;a pxlButton&gt;</code> in Angular</li>
         <li>Pixel and linear surfaces inherit from PxlKitSurfaceProvider</li>
-        <li>Forwards refs and accepts every native &lt;button&gt; attribute</li>
+        <li>Accepts every native &lt;button&gt; attribute</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>actions</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-button-api">
+      <Heading id="pixel-button-api">API</Heading>
+      <FrameworkApi label={'PixelButton API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-button-a11y">
-      <h3 id="pixel-button-a11y">Accessibility</h3>
+      <Heading id="pixel-button-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders a native &lt;button&gt; by default so keyboard semantics come for free. When using asChild with an anchor, the consumer is responsible for ensuring the wrapped element exposes button-equivalent semantics if non-navigational. Loading auto-disables the control; disabled buttons skip shadow/transform affordances.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Renders a native &lt;button&gt; by default so keyboard semantics come for free. When it styles an anchor (<code>asChild</code>, or <code>a[pxlButton]</code> in Angular), the consumer is responsible for ensuring the wrapped element exposes button-equivalent semantics if non-navigational. Loading auto-disables the control and holds it still, with no hover or press feedback; a disabled button also drops its shadow.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -69,25 +153,69 @@ export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProp
       </table>
     </section>
     <section aria-labelledby="pixel-button-usage">
-      <h3 id="pixel-button-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelButton } from '@pxlkit/ui-kit';
+      <Heading id="pixel-button-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelButton usage'}
+        react={`import { PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelButton>Click me</PixelButton>;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelButton>Click me</PixelButton>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`<button pxlButton>Click me</button>\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelButton>Click me</PixelButton>;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelButton>Click me</PixelButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`<button pxlButton>Click me</button>\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton tone="green">Green</PixelButton>
@@ -99,11 +227,50 @@ export function Default() {
       <PixelButton tone="neutral">Neutral</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton tone="green">Green</PixelButton>
+    <PixelButton tone="cyan">Cyan</PixelButton>
+    <PixelButton tone="gold">Gold</PixelButton>
+    <PixelButton tone="red">Red</PixelButton>
+    <PixelButton tone="purple">Purple</PixelButton>
+    <PixelButton tone="pink">Pink</PixelButton>
+    <PixelButton tone="neutral">Neutral</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton tone="green">Green</button>
+      <button pxlButton tone="cyan">Cyan</button>
+      <button pxlButton tone="gold">Gold</button>
+      <button pxlButton tone="red">Red</button>
+      <button pxlButton tone="purple">Purple</button>
+      <button pxlButton tone="pink">Pink</button>
+      <button pxlButton tone="neutral">Neutral</button>
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PixelButton size="sm">Small</PixelButton>
@@ -111,11 +278,42 @@ export function Default() {
       <PixelButton size="lg">Large</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-2">
+    <PixelButton size="sm">Small</PixelButton>
+    <PixelButton size="md">Medium</PixelButton>
+    <PixelButton size="lg">Large</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap items-center gap-2">
+      <button pxlButton size="sm">Small</button>
+      <button pxlButton size="md">Medium</button>
+      <button pxlButton size="lg">Large</button>
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-variants">
-        <h4>Variants</h4>
-        <pre className="docs-code"><code>{`export function Variants() {
+        <Subheading>Variants</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Variants code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Variants() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton variant="solid">Solid</PixelButton>
@@ -124,22 +322,88 @@ export function Default() {
       <PixelButton variant="ghost">Ghost</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton variant="solid">Solid</PixelButton>
+    <PixelButton variant="soft">Soft</PixelButton>
+    <PixelButton variant="outline">Outline</PixelButton>
+    <PixelButton variant="ghost">Ghost</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton variant="solid">Solid</button>
+      <button pxlButton variant="soft">Soft</button>
+      <button pxlButton variant="outline">Outline</button>
+      <button pxlButton variant="ghost">Ghost</button>
+    </div>
+  \`,
+})
+export class Variants {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton surface="pixel">Pixel</PixelButton>
       <PixelButton surface="linear">Linear</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton surface="pixel">Pixel</PixelButton>
+    <PixelButton surface="linear">Linear</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton surface="pixel">Pixel</button>
+      <button pxlButton surface="linear">Linear</button>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icons">
-        <h4>With icons</h4>
-        <pre className="docs-code"><code>{`export function WithIcons() {
+        <Subheading>With icons</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With icons code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+const Arrow = () => (
+  <span aria-hidden className="inline-block h-3.5 w-3.5">→</span>
+);
+
+export function WithIcons() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton iconLeft={<Arrow />}>Leading</PixelButton>
@@ -147,60 +411,207 @@ export function Default() {
       <PixelButton iconLeft={<Arrow />} iconRight={<Arrow />}>Both</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton>
+      <template #icon-left><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+      Leading
+    </PixelButton>
+    <PixelButton>
+      Trailing
+      <template #icon-right><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+    </PixelButton>
+    <PixelButton>
+      <template #icon-left><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+      Both
+      <template #icon-right><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+    </PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton [iconLeft]="arrow">Leading</button>
+      <button pxlButton [iconRight]="arrow">Trailing</button>
+      <button pxlButton [iconLeft]="arrow" [iconRight]="arrow">Both</button>
+    </div>
+    <ng-template #arrow><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></ng-template>
+  \`,
+})
+export class WithIcons {}`}
+        />
       </article>
       <article className="docs-example" id="example-loading">
-        <h4>Loading</h4>
-        <pre className="docs-code"><code>{`export function Loading() {
+        <Subheading>Loading</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Loading code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Loading() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton loading>Saving</PixelButton>
       <PixelButton loading tone="cyan" variant="outline">Loading</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton loading>Saving</PixelButton>
+    <PixelButton loading tone="cyan" variant="outline">Loading</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton loading>Saving</button>
+      <button pxlButton loading tone="cyan" variant="outline">Loading</button>
+    </div>
+  \`,
+})
+export class Loading {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton disabled>Disabled</PixelButton>
       <PixelButton disabled variant="outline">Disabled outline</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton disabled>Disabled</PixelButton>
+    <PixelButton disabled variant="outline">Disabled outline</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton disabled>Disabled</button>
+      <button pxlButton disabled variant="outline">Disabled outline</button>
+    </div>
+  \`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-full-width">
-        <h4>Full width</h4>
-        <pre className="docs-code"><code>{`export function FullWidth() {
+        <Subheading>Full width</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Full width code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function FullWidth() {
   return (
     <div className="w-full max-w-sm">
       <PixelButton fullWidth>Full width</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="w-full max-w-sm">
+    <PixelButton full-width>Full width</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="w-full max-w-sm">
+      <button pxlButton fullWidth>Full width</button>
+    </div>
+  \`,
+})
+export class FullWidth {}`}
+        />
       </article>
       <article className="docs-example" id="example-as-child">
-        <h4>As child (link)</h4>
-        <pre className="docs-code"><code>{`export function AsChild() {
+        <Subheading>As child (link)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'As child (link) code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function AsChild() {
   return (
     <PixelButton asChild tone="cyan">
-      <a href="https://pxlkit.dev" target="_blank" rel="noreferrer">
+      <a href="https://pxlkit.xyz" target="_blank" rel="noreferrer">
         External link
       </a>
     </PixelButton>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelButton as-child tone="cyan">
+    <a href="https://pxlkit.xyz" target="_blank" rel="noreferrer">External link</a>
+  </PixelButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <a pxlButton tone="cyan" href="https://pxlkit.xyz" target="_blank" rel="noreferrer">External link</a>
+  \`,
+})
+export class AsChild {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-icon-button">PixelIconButton</a></li>
-        <li><a href="#pxl-kit-button">PxlKitButton</a></li>
-        <li><a href="#pixel-split-button">PixelSplitButton</a></li>
-        <li><a href="#pixel-bare-button">PixelBareButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-icon-button' : '#pixel-icon-button'}>PixelIconButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pxl-kit-button' : '#pxl-kit-button'}>PxlKitButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-split-button' : '#pixel-split-button'}>PixelSplitButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-button' : '#pixel-bare-button'}>PixelBareButton</a></li>
       </ul>
     </section>
     </section>

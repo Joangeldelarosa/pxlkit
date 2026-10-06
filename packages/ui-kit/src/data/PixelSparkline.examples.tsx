@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelSparkline } from './PixelSparkline';
 
 const sample = [

@@ -6,7 +6,12 @@ import { Heart } from '@pxlkit/social';
 import { BrandMark } from './Logo';
 import { UI_KIT_VERSION_LABEL } from '@/lib/pxlkit-version';
 
-export function Footer() {
+/**
+ * The site footer. `year` is the copyright year the server rendered: a year
+ * read from the browser's clock would differ from a page built in an earlier
+ * year, and fail to hydrate.
+ */
+export function Footer({ year }: { year: number }) {
   return (
     <footer className="border-t border-retro-border/50 bg-retro-surface/30 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -17,16 +22,16 @@ export function Footer() {
               <BrandMark size={26} />
             </Link>
             <p className="text-retro-muted text-sm font-mono max-w-sm">
-              The retro React toolkit with MIT code packages and licensed icon assets.
-              Ship pixel-perfect interfaces with components, icons, and 3D effects — all from code.
+              The retro pixel-art toolkit for React — now also for Vue and Angular. MIT code packages,
+              licensed icon assets: components, icons and 3D effects, all from code.
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h3 className="font-pixel text-[10px] text-retro-text mb-4">
+            <h2 className="font-pixel text-[10px] text-retro-text mb-4">
               RESOURCES
-            </h3>
+            </h2>
             <ul className="space-y-2 font-mono text-sm">
               <li>
                 <Link href="/ui-kit" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
@@ -59,6 +64,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/changelog" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
+                  Changelog
+                </Link>
+              </li>
+              <li>
                 <Link href="/skills" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
                   Claude Code Skills
                 </Link>
@@ -82,9 +92,9 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-pixel text-[10px] text-retro-text mb-4">
+            <h2 className="font-pixel text-[10px] text-retro-text mb-4">
               COMMUNITY
-            </h3>
+            </h2>
             <ul className="space-y-2 font-mono text-sm">
               <li>
                 <a
@@ -122,7 +132,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-retro-border/30 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-retro-muted text-xs font-mono">
-            Split licensing • MIT code + asset terms © {new Date().getFullYear()} Pxlkit Contributors
+            Split licensing • MIT code + asset terms © {year} Pxlkit Contributors
           </p>
           <div className="flex flex-col items-center sm:items-end gap-1">
             <p className="text-retro-muted/50 text-xs font-mono">

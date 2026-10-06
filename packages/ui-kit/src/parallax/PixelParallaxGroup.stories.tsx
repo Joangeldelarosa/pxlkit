@@ -8,7 +8,7 @@
  * to overwrite it (a hand-authored *.stories.tsx is detected).
  */
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Component from './PixelParallaxGroup';
 import manifest from './PixelParallaxGroup.manifest';
 import * as examples from './PixelParallaxGroup.examples';

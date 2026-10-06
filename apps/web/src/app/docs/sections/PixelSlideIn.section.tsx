@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSlideInDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSlideInDocsMeta = {
@@ -17,29 +23,113 @@ export const PixelSlideInDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelSlideInDocsSection({ className }: PixelSlideInDocsSectionProps): React.ReactElement {
+/** PixelSlideIn's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSlideIn } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSlideIn',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to slide in.' },
+          { name: 'from', type: "'up' | 'down' | 'left' | 'right'", default: "'down'", description: "Edge to slide from. Default `'down'`." },
+          { name: 'duration', type: 'number', default: '350', description: 'Animation duration in milliseconds. Default `350`.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Animation delay in milliseconds. Default `0`.' },
+          { name: 'distance', type: 'number', default: '10', description: 'Translate distance in pixels. Default `10`.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`. Default `1`." },
+          { name: 'easing', type: 'string', default: "'ease'", description: "CSS `animation-timing-function`. Default `'ease'`." },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: "CSS `animation-fill-mode`. Default `'both'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSlideIn } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSlideIn',
+        props: [
+          { name: 'from', type: "'up' | 'down' | 'left' | 'right'", default: "'down'", description: 'Edge to slide from.' },
+          { name: 'duration', type: 'number', default: '350', description: 'Animation duration in milliseconds.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Animation delay in milliseconds.' },
+          { name: 'distance', type: 'number', default: '10', description: 'Translate distance in pixels.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease'", description: 'CSS `animation-timing-function`.' },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: 'CSS `animation-fill-mode`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to slide in.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSlideIn } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSlideIn',
+        selector: 'pxl-slide-in',
+        props: [
+          { name: 'from', type: "'up' | 'down' | 'left' | 'right'", default: "'down'", description: 'Edge to slide from.' },
+          { name: 'duration', type: 'number', default: '350', accepts: 'unknown', description: 'Animation duration in milliseconds.' },
+          { name: 'delay', type: 'number', default: '0', accepts: 'unknown', description: 'Animation delay in milliseconds.' },
+          { name: 'distance', type: 'number', default: '10', accepts: 'unknown', description: 'Translate distance in pixels.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', accepts: "number | 'infinite' | `${number}`", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease'", description: 'CSS `animation-timing-function`.' },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: 'CSS `animation-fill-mode`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelSlideInDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSlideInDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-slide-in-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-slide-in-heading'>PixelSlideIn</h2>
+      <Title id='pixel-slide-in-heading'>PixelSlideIn</Title>
       <p className="docs-lead">Translates children in from one of four edges with configurable distance, duration, and trigger.</p>
       <ul className="docs-highlights">
         <li>Slide from up, down, left, or right edges</li>
         <li>Mount, hover, click, or in-view triggers</li>
         <li>Configurable duration, delay, distance, easing, and fill-mode</li>
         <li>Iteration count supports finite or infinite repeats</li>
-        <li>Respects prefers-reduced-motion via useReducedMotion</li>
+        <li>Respects prefers-reduced-motion automatically</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-slide-in-api">
+      <Heading id="pixel-slide-in-api">API</Heading>
+      <FrameworkApi label={'PixelSlideIn API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-slide-in-a11y">
-      <h3 id="pixel-slide-in-a11y">Accessibility</h3>
+      <Heading id="pixel-slide-in-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>prefers-reduced-motion</code></li>
@@ -47,8 +137,11 @@ export function PixelSlideInDocsSection({ className }: PixelSlideInDocsSectionPr
       <p className="docs-aria-notes">Animation is suppressed when the user prefers reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-slide-in-usage">
-      <h3 id="pixel-slide-in-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelSlideIn } from '@pxlkit/ui-kit';
+      <Heading id="pixel-slide-in-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSlideIn usage'}
+        react={`import { PixelSlideIn } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,14 +151,40 @@ export function Default() {
       </div>
     </PixelSlideIn>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelSlideIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSlideIn>
+    <div style="padding: 16px; background: #111; color: #fff">Slides in from below on mount</div>
+  </PixelSlideIn>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSlideIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlideIn],
+  template: \`
+    <pxl-slide-in>
+      <div style="padding: 16px; background: #111; color: #fff">Slides in from below on mount</div>
+    </pxl-slide-in>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSlideIn } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelSlideIn>
       <div style={{ padding: 16, background: '#111', color: '#fff' }}>
@@ -73,11 +192,38 @@ export function Default() {
       </div>
     </PixelSlideIn>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSlideIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSlideIn>
+    <div style="padding: 16px; background: #111; color: #fff">Slides in from below on mount</div>
+  </PixelSlideIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSlideIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlideIn],
+  template: \`
+    <pxl-slide-in>
+      <div style="padding: 16px; background: #111; color: #fff">Slides in from below on mount</div>
+    </pxl-slide-in>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-from-left">
-        <h4>From Left</h4>
-        <pre className="docs-code"><code>{`export function FromLeft() {
+        <Subheading>From Left</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'From Left code'}
+          react={`import { PixelSlideIn } from '@pxlkit/ui-kit';
+
+export function FromLeft() {
   return (
     <PixelSlideIn from="left" duration={500} distance={20}>
       <div style={{ padding: 16, background: '#0EA5E9', color: '#000' }}>
@@ -85,11 +231,38 @@ export function Default() {
       </div>
     </PixelSlideIn>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSlideIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSlideIn from="left" :duration="500" :distance="20">
+    <div style="padding: 16px; background: #0EA5E9; color: #000">Slides in from the left</div>
+  </PixelSlideIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSlideIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlideIn],
+  template: \`
+    <pxl-slide-in from="left" [duration]="500" [distance]="20">
+      <div style="padding: 16px; background: #0EA5E9; color: #000">Slides in from the left</div>
+    </pxl-slide-in>
+  \`,
+})
+export class FromLeft {}`}
+        />
       </article>
       <article className="docs-example" id="example-on-hover">
-        <h4>On Hover</h4>
-        <pre className="docs-code"><code>{`export function OnHover() {
+        <Subheading>On Hover</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'On Hover code'}
+          react={`import { PixelSlideIn } from '@pxlkit/ui-kit';
+
+export function OnHover() {
   return (
     <PixelSlideIn trigger="hover" from="right" duration={300}>
       <div style={{ padding: 16, background: '#222', color: '#0EA5E9' }}>
@@ -97,15 +270,37 @@ export function Default() {
       </div>
     </PixelSlideIn>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSlideIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSlideIn trigger="hover" from="right" :duration="300">
+    <div style="padding: 16px; background: #222; color: #0EA5E9">Hover to slide in from the right</div>
+  </PixelSlideIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSlideIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlideIn],
+  template: \`
+    <pxl-slide-in trigger="hover" from="right" [duration]="300">
+      <div style="padding: 16px; background: #222; color: #0EA5E9">Hover to slide in from the right</div>
+    </pxl-slide-in>
+  \`,
+})
+export class OnHover {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-fade-in">PixelFadeIn</a></li>
-        <li><a href="#pixel-zoom-in">PixelZoomIn</a></li>
-        <li><a href="#pixel-bounce">PixelBounce</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-fade-in' : '#pixel-fade-in'}>PixelFadeIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-zoom-in' : '#pixel-zoom-in'}>PixelZoomIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bounce' : '#pixel-bounce'}>PixelBounce</a></li>
       </ul>
     </section>
     </section>

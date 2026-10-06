@@ -1,46 +1,26 @@
 'use client';
 
 import React, { forwardRef, useEffect } from 'react';
-import { cn, Surface, Tone, Variant, useEffectiveSurface, surfaceClasses } from '../common';
-import { tone as toneTokens } from '../tokens';
-
-type BoxPadding = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-type BoxRadius = 'none' | 'sm' | 'md' | 'lg' | 'full';
-type BoxAs =
-  | 'div'
-  | 'section'
-  | 'article'
-  | 'aside'
-  | 'header'
-  | 'footer'
-  | 'main'
-  | 'nav';
-
-const paddingMap: Record<BoxPadding, string> = {
-  none: 'p-0',
-  xs: 'px-2 py-1',
-  sm: 'px-3 py-2',
-  md: 'px-4 py-3',
-  lg: 'px-6 py-4',
-  xl: 'px-8 py-6',
-};
-
-const radiusMap: Record<BoxRadius, string> = {
-  none: 'rounded-none',
-  sm: 'rounded-sm',
-  md: 'rounded-md',
-  lg: 'rounded-lg',
-  full: 'rounded-full',
-};
-
-const LANDMARK_TAGS = new Set<BoxAs>(['section', 'nav', 'aside', 'main']);
+import {
+  boxClasses,
+  boxLandmarkWarning,
+  type BoxElement,
+  type BoxPadding,
+  type BoxRadius,
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, Tone, Variant, useEffectiveSurface } from '../common';
 
 export interface PixelBoxProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'color'> {
+  /** Tone of the fill and border. */
   tone?: Tone;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** `solid` and `soft` fill; `outline` and `ghost` stay transparent. */
   variant?: Variant;
+  /** Padding scale. */
   padding?: BoxPadding;
+  /** Fixed radius; the surface's large radius when unset. */
   radius?: BoxRadius;
   /**
    * Whether to render a border. Defaults to `true` when `variant === 'outline'`
@@ -50,8 +30,13 @@ export interface PixelBoxProps
    * `nav`, `aside`, `main`), supply `aria-label` or `aria-labelledby` for a11y.
    */
   border?: boolean;
+  /**
+   * Surface drop shadow. On pixel it shows with a `radius` only: the
+   * default corners are cut, and a drop shadow cannot show past them.
+   */
   shadow?: boolean;
-  as?: BoxAs;
+  /** Element to render. */
+  as?: BoxElement;
 }
 
 /**
@@ -80,51 +65,24 @@ export const PixelBox = forwardRef<HTMLDivElement, PixelBoxProps>(function Pixel
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const Comp = (as ?? 'div') as 'div';
-  const t = toneTokens[tone];
-
-  const variantBg =
-    variant === 'solid'
-      ? t.bg
-      : variant === 'soft'
-        ? t.soft
-        : null;
-
-  const variantBorder =
-    variant === 'solid' || variant === 'soft' || variant === 'outline'
-      ? t.border
-      : null;
-
-  // Outline without a border is meaningless. Make border implicit-on for the
-  // outline variant when the consumer hasn't explicitly opted out.
-  const wantsBorder = border ?? variant === 'outline';
-  const showBorder = wantsBorder && variantBorder;
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') return;
-    if (!as || !LANDMARK_TAGS.has(as)) return;
     const r = rest as Record<string, unknown>;
-    if (r['aria-label'] || r['aria-labelledby'] || r['title']) return;
+    const warning = boxLandmarkWarning(as, {
+      label: r['aria-label'],
+      labelledBy: r['aria-labelledby'],
+      title: r['title'],
+    });
     // eslint-disable-next-line no-console
-    console.warn(
-      `[pxlkit] PixelBox as="${as}" is a landmark/sectioning element but has no accessible name. ` +
-        `Add aria-label, aria-labelledby, or title.`,
-    );
+    if (warning) console.warn(warning);
   }, [as, rest]);
 
   return (
     <Comp
       ref={ref}
-      className={cn(
-        paddingMap[padding],
-        radius ? radiusMap[radius] : s.radiusLg,
-        variantBg,
-        showBorder && s.border,
-        showBorder && variantBorder,
-        shadow && s.shadow,
-        className,
-      )}
+      className={cn(boxClasses(surface, { tone, variant, padding, radius, border, shadow }), className)}
       {...rest}
     >
       {children}

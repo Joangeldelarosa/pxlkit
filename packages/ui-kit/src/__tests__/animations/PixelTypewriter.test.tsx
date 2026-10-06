@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import { PixelTypewriter } from '../../animations/PixelTypewriter';
@@ -103,6 +103,12 @@ describe('PixelTypewriter', () => {
     expect(el.className).toContain('custom');
   });
 
+  it('keeps the font and colour of the text around it with tone="inherit"', () => {
+    const { container } = render(<PixelTypewriter label="x" tone="inherit" className="custom" />);
+    const el = container.firstElementChild as HTMLElement;
+    expect(el.className).toBe('custom');
+  });
+
   it('shows the full text immediately (no caret) when the user prefers reduced motion', () => {
     const ctl = mockMatchMedia(true);
     try {
@@ -130,5 +136,41 @@ describe('PixelTypewriter', () => {
     act(() => { vi.advanceTimersByTime(200); });
     expect(visual(el).textContent).toBe('');
     expect(srOnly(el).textContent).toBe('NOPE');
+  });
+
+  it('types once while its parent re-renders with a new onComplete callback', () => {
+    const completions = vi.fn();
+    function Parent() {
+      const [completed, setCompleted] = useState(0);
+      return (
+        <>
+          <PixelTypewriter
+            label="HI"
+            speed={10}
+            onComplete={() => {
+              completions();
+              setCompleted((count) => count + 1);
+            }}
+          />
+          <output>{completed}</output>
+        </>
+      );
+    }
+    const { container } = render(<Parent />);
+    const el = container.firstElementChild as HTMLElement;
+    act(() => { vi.advanceTimersByTime(20); });
+    expect(visual(el).textContent).toBe('HI');
+    act(() => { vi.advanceTimersByTime(200); });
+    expect(visual(el).textContent).toBe('HI');
+    expect(completions).toHaveBeenCalledTimes(1);
+    expect(container.querySelector('output')!.textContent).toBe('1');
+  });
+
+  it('types once in view, at once where IntersectionObserver is missing', () => {
+    const { container } = render(<PixelTypewriter label="SEEN" speed={10} trigger="inView" />);
+    const el = container.firstElementChild as HTMLElement;
+    expect(visual(el).textContent).toBe('▌');
+    act(() => { vi.advanceTimersByTime(40); });
+    expect(visual(el).textContent).toBe('SEEN');
   });
 });

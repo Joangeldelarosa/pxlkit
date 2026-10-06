@@ -19,7 +19,7 @@ export default defineManifest({
     'Configurable clamp behavior (strict, on-blur, or none) with min/max bounds',
     'Precision rounding avoids floating-point artifacts (e.g. 0.1 + 0.2)',
     'Optional prefix, suffix, and thousands-separator with parse-aware display',
-    'Surface/tone aware, controlled or uncontrolled via useControllableState',
+    'Surface/tone aware; controlled — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or uncontrolled with `defaultValue`',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

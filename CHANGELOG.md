@@ -5,10 +5,64 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [ui-kit 2.2.0 / core 1.4.0 / vue 0.1.0 / angular 0.1.0] - 2026-10-05 — The UI kit and the icon components in Vue and Angular
 
 ### Added
 
+- **Vue and Angular support.** Two new MIT packages render the icons with the same
+  markup and behaviour as the React components:
+  - `@pxlkit/vue` (0.1.0) — Vue 3.3+ components `PxlKitIcon`, `AnimatedPxlKitIcon`,
+    `ParallaxPxlKitIcon` and `PixelToast`; SSR- and hydration-safe (Nuxt, Vite SSR).
+  - `@pxlkit/angular` (0.1.0) — Angular 20–22 standalone, signal-based components
+    `<pxl-icon>`, `<pxl-animated-icon>`, `<pxl-parallax-icon>` and `<pxl-toast>`,
+    published in the Angular Package Format; zoneless and zone.js applications,
+    server rendering and hydration.
+  React ↔ Vue and React ↔ Angular parity suites compare the rendered DOM on the server,
+  on mount, after input changes and frame by frame while animating.
+- **`@pxlkit/ui-kit-core`.** The framework-neutral core of the UI kit, shared by the
+  React, Vue and Angular kits: design tokens, the surface system and control scale,
+  the Tailwind CSS v4 theme, class recipes, the pixel glyphs as data, locale data, DOM
+  behaviour (`trapFocus`, the stacking `lockScroll`, focus return, Floating UI
+  positioning) and preference helpers (dark mode, media queries, failure-tolerant
+  `localStorage`). Safe on the server; its one dependency is `@floating-ui/dom`.
+- **The UI kit for Vue and Angular.** `@pxlkit/ui-kit-vue` (Vue 3 single-file
+  components) and `@pxlkit/ui-kit-angular` (standalone, signal-based Angular 20–22
+  components) render the React kit's markup and classes and behave the same way. A
+  parity harness (`scripts/parity`) renders every manifest example in React and in the
+  port and compares a canonical DOM — on mount, on the server and after every step of
+  scripted interactions, focus and scroll lock included. The porting rules are in
+  `docs/ui-kit-porting.md` (ADR-0006).
+- **React, Vue and Angular code on the site.** The component reference (`/docs`) shows
+  each example's code, and the usage lead, in every framework whose kit implements the
+  component, as tabs that remember the reader's pick across the site; the generated
+  sections of `/ui-kit` do the same. Each snippet is self-contained: the example with the
+  imports and helpers it uses. The guides on `/docs` — getting started, installing the
+  packs, the icon, animated and parallax components, toasts and the UI kit's setup — give
+  their code in the three frameworks too, and the toast guide uses the kit's published
+  `PxlKitToastProvider` with `useToast()` / `injectToast()` instead of the site's own provider.
+  `/ui-kit` shows one example per component in the three frameworks — the one the site picks
+  in `showcase-examples.ts`, else the first — in place of hand-written React snippets, some of
+  which used props the kit does not have (`PixelChip`'s `onRemove`). Its getting started,
+  surface, locale and animation guides give their code in the three frameworks, with a table
+  of how React props read in Vue and Angular; its toast sections show the kit's toast card and
+  a playground on the kit's provider, and `/docs` documents the icon components' `PixelToast`.
+  Snippets merge the imports that end up from the same package.
+- **The site and the READMEs: React first, Vue and Angular new.** Titles, descriptions,
+  headings, structured data, the web manifest, the Open Graph image and the READMEs present Pxlkit
+  as a React UI kit, with the Vue and Angular editions as what 2.2 adds. The root README opens with
+  the UI kit's quick start — install, Tailwind CSS v4 in the build, the stylesheet, a first
+  component, React first — and maps the new packages. `/ui-kit` gains Vue and Angular setup
+  sections (`/ui-kit#vue`, `/ui-kit#angular`); the landing FAQ, whose answers are now in the HTML,
+  answers whether Pxlkit is a React library, whether it works with Vue or Angular and whether the
+  templates exist for them; `/icons` gives each icon's code in the three frameworks; and `/skills`
+  says the plugin writes React.
+- **`/llms.txt`.** The site in plain text: what Pxlkit is, the install line per framework, the
+  Tailwind CSS v4 step, and links to the docs, the packages and the licensing.
+- **`@pxlkit/core/vanilla` and the shared rendering engine.** A React-free entry point
+  exports the icon data model, every utility and the engine the three frameworks build on:
+  `renderIconSvg` / `renderIconDataUri`, `createAnimatedIconPlayer`,
+  `createParallaxController` and `resolvePixelToastView`. The icon packs and
+  `@pxlkit/voxel` now import their types from it, so non-React installs never pull React.
 - **Claude Code plugin v1.0.0.** A `pxlkit` plugin ships from this repo, installable with
   `claude plugin marketplace add Joangeldelarosa/pxlkit && claude plugin install pxlkit@pxlkit`.
   Five skills: `/pxlkit:start` (compatibility check and setup), `/pxlkit:imagine`
@@ -27,12 +81,333 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that does not exist.
 - `npm run release:bump-plugin -- --version X.Y.Z`, which keeps the plugin manifest
   and marketplace entry in step with the kit during a release.
+- **Storybooks for Vue and Angular, on Storybook 10.** `npm run storybook:vue` and
+  `npm run storybook:angular` open Storybooks of the Vue and Angular kits beside the React
+  one, under the same titles and story names, so a story id opens the same example in all
+  three. `npm run docs:build` generates their stories from the kits' examples
+  (`generate-port-stories`): every component, with each example's code on its docs page and,
+  in Vue, a props table read from the components' types. The React Storybook moves from 8.6
+  to 10 — which Angular 20 needs — with controls, actions, backgrounds, viewport and
+  interactions now in Storybook's core.
+- **An API reference for every component, in React, Vue and Angular.** Each `/docs` component
+  section lists the component's props — type, default, whether it is required, description and
+  deprecation — under the same framework tabs as its code, in place of "No props documented
+  yet." In Vue it also lists the events and their payloads, the slots and their props and the
+  `v-model` bindings; in Angular the selector, the inputs (with what a transform accepts), the
+  outputs, the `[(x)]` bindings, projected content and form-control support. Compound
+  components list their parts, and every framework says what the component passes on (native
+  attributes, `ref`, attribute fallthrough). `npm run docs:build` reads it from the kits'
+  sources (`scripts/build-docs/extract-api.ts`, in a worker thread), and coherence gate 38
+  (`api-reference`) fails when a section shows another API than the sources have.
+- **A page for every component.** Each of the 111 components has its own statically built page,
+  `/docs/components/<slug>`, rendering its docs section on the server: the React API table and the
+  React code of every example are in the HTML, with Vue and Angular under the same tabs, and the
+  component's name is the page's one h1. Each page has its own title and description (React first,
+  within 60 and 155 characters, written by `npm run docs:build` from the manifest), a breadcrumb
+  trail with its BreadcrumbList, and links to the previous and next component in its category and
+  back to its `/docs` entry, which links to the page. The sitemap lists the 111 pages, and gate 38
+  checks that the pages' data matches the manifests.
+- **Decorative icons.** `PxlKitIcon`, `AnimatedPxlKitIcon` and `ParallaxPxlKitIcon` take `decorative`
+  in React, Vue and Angular: an icon beside text that already says what it means renders `alt=""`
+  (the parallax icon's container `aria-hidden`), so screen readers skip it and its name stays out
+  of the page's text. `PixelToast`'s icon is decorative, the title naming the toast. The site marks
+  the icons beside its buttons, links, navigation, headings, badges, cards, template previews and
+  toasts decorative, as well as its ornaments and the icons of buttons and links named by their own
+  label (205 icons), so a button reads "Browse all 6 templates" instead of "Browse all 6 templates
+  arrow-right", and its icon-only buttons have names of their own. The templates' code to copy
+  follows the same rule (81 icons decorative) and names the icons that carry meaning: "Included"
+  and "Not included" in the pricing comparison, the likes, views and comments counts, a star
+  rating's "Rated 5 out of 5", and a notifications button's unread count.
+- **Doc comments for the kits' props and slots.** About 500 props across 65 React components and
+  the slots and props of 37 Vue components gained descriptions (comments only), which editors
+  show on hover and the API reference prints; TSDoc coverage (gate 27) rose from 50% to 99%.
+- **A heading level for the hero, one heading for the glitch.** In the three kits `PixelHeroSection`
+  takes `as` (`h1`–`h6`), so a hero inside a page that has its `h1` takes `as="h2"`, and `PixelGlitch`
+  takes `label` and `as`, so a glitch headline is one heading with its text in it once.
+
+### Changed
+
+- `@pxlkit/ui-kit` is tree-shakeable — one ES module per source module, shared chunks and
+  `"sideEffects": ["*.css"]`; an app importing one component bundles 6.0 KB of the kit instead of
+  362.3 KB — and every built file starts with `'use client'`, so Next.js App Router Server
+  Components render it directly. The Vue kit's `defineComponent` components are marked pure, so
+  bundlers drop the ones an app does not import.
+- Docs: the manifests' highlights, descriptions and accessibility notes name each framework's API,
+  since the component reference shows them for React, Vue and Angular.
+- Coherence gate 06 (`consistency-version`) checks that each icon pack reads its `version` from
+  `package.json` — a literal that differs is a blocker, a matching one major — and the packs now do,
+  so their exported version cannot drift from the published one.
+- Site: structured data in the server HTML of every page — the organization and the site
+  everywhere, the home page's packages and FAQ, `/ui-kit`'s application with its React, Vue and
+  Angular sources, a breadcrumb trail elsewhere — and every page sets its canonical URL and link
+  previews. The stat cards' figures are in the HTML, the sitemap dates pages by release instead of
+  by build, the social images and app icons match their declared sizes, `/changelog` has one h1 and
+  an anchor per release, `/templates/preview` is not indexed, `/toast` redirects permanently to
+  `/ui-kit#use-toast`, and pages can be zoomed. An unused copy of the voxel world engine
+  (`components/ProceduralTerrain.tsx`, 2,341 lines) is gone.
+- Docs (`/docs`, `/ui-kit` and the kits' READMEs): the Tailwind CSS v4 build step for Next.js,
+  Vite, Nuxt and Angular; Next.js App Router setup; Nuxt; Angular's `app.config`, server rendering
+  and hydration, overlays and form controls; dark mode with the anti-flash script
+  (`pxlkit:dark-mode`); body styles; fonts; the toast `@source` line; calendars under server
+  rendering; and upgrading from 2.1.
+- Tooling: gates 31 and 34 read the root CHANGELOG's release section for what a release added when
+  the kit's own section lists only changes and fixes. Plugin 1.0.1: the setup reference's
+  anti-flash script uses the kit's key and default and gains the Tailwind CSS build step, App
+  Router guidance, fonts from `@pxlkit/ui-kit-core`, `duration` / `hotkey` and a verify command;
+  `/pxlkit:start` sends Vue and Angular projects to their kits. The three Storybooks carry the
+  framework in their title and description.
+- npm metadata: every package has a homepage, an issue tracker, its repository directory, a
+  description of 155 characters or fewer that names its framework, and keywords.
+- `@pxlkit/core`: `react` and `react-dom` are optional peer dependencies — only the
+  React components need them.
+- `@pxlkit/ui-kit`: tokens, class maps, the theme stylesheet, locale data and the focus
+  trap, scroll lock, dark mode, media query and storage logic now come from
+  `@pxlkit/ui-kit-core` — the public API is unchanged. `styles.css` imports the shared
+  theme and registers the kit's compiled classes with Tailwind (`@source`), so the
+  utilities the components use are generated without any `@source` line of your own.
+  It brings Tailwind itself, so `@import "@pxlkit/ui-kit/styles.css";` replaces
+  `@import "tailwindcss";` instead of following it — the READMEs, the site and the
+  plugin's setup reference now say so, and drop the per-package-manager `@source` recipes.
+- `@pxlkit/ui-kit`: the animation components' keyframes ship in the theme stylesheet
+  (`styles.css`) instead of a `<style id="pxl-anims">` element they added to the page after
+  mounting, so server-rendered animations have their keyframes from the first paint and a
+  Content Security Policy needs no inline styles for them.
+- `@pxlkit/ui-kit` examples: `PxlKitSurfaceProvider` now demonstrates buttons inheriting
+  the provider's surface and a per-component override.
+- Coherence tooling: gate 08 (`consistency-pkgjson`) requires the `@pxlkit/vue` and
+  `@pxlkit/angular` descriptions to name their framework, and gate 36's digest also
+  covers the React component props, which moved to `packages/core/src/components/types.ts`.
+
+### Deprecated
+
+- `@pxlkit/core` `ParallaxLayer.offsetX` / `offsetY`: no renderer has ever applied them.
+  They stay in the type until the next major so existing icon data keeps type-checking.
 
 ### Fixed
 
+- `@pxlkit/core` `ParallaxPxlKitIcon`: after a click burst the layers now spring back
+  to their resting spread instead of staying exploded until the next re-render.
+- `@pxlkit/core` `AnimatedPxlKitIcon`: `ping-pong` playback no longer stalls on its
+  first frame under load, switching icons commits the new first frame before paint,
+  and `NaN` `speed` / `fps` values are ignored.
+- `@pxlkit/ui-kit`: `PixelModal`, `PixelDrawer` and `PixelSheet` move focus into the
+  dialog when they open — `PixelPortal` re-mounted its content after the first client
+  render, dropping the focus the trap had set — and `PixelPopover` returns focus to its
+  trigger when its content closes while holding focus.
+- `@pxlkit/ui-kit`: `PixelChipGroup` arrow keys select instead of toggling (they could clear
+  the group); a clickable, deletable `PixelChip` no longer nests a button in a button, which
+  broke hydration; `PixelAvatar` falls back to its initials when the image fails; avatars,
+  the avatar group's "+N" and `PixelBadgeGroup`'s dialog get valid accessible names; and
+  `PixelPopover` sets `aria-controls` on its trigger while open.
+- `@pxlkit/ui-kit`: `PixelDropdown` opens from the keyboard on its closed trigger, as
+  documented, and keeps items in order when one is enabled; the linear `PixelAlertDialog`'s
+  pending spinner respects reduced motion.
+- `@pxlkit/ui-kit`: clearing an uncontrolled `PixelInput` empties the field, `PixelNumberInput`
+  shows arrow-key steps while focused, and `PixelSelect` exposes the highlighted option to
+  screen readers (`aria-controls`, `aria-activedescendant`).
+- `@pxlkit/ui-kit`: `PixelDropdown` follows the ARIA menu button pattern (focus in the menu
+  with `aria-activedescendant`, focus returned to the trigger, `menuitemcheckbox` /
+  `menuitemradio` with `aria-checked`, a named menu), and `PixelTooltip` closes on Escape in
+  every mode (WCAG 1.4.13) and describes the focused element.
+- `@pxlkit/ui-kit`: form fields' hints and errors are announced: `aria-describedby` pointed at a
+  message without an id (`PixelInput`) or was missing (ten other fields).
+- `@pxlkit/ui-kit`: `PixelMenubar` follows the ARIA menubar pattern (focus in the open menu
+  with `aria-activedescendant`, submenus usable from the keyboard, Escape closing the submenu
+  first, focus returned to the menu button, one tab stop on the button last used), and
+  `PixelStepper` draws its active step's ring, whose class Tailwind never generated.
+- `@pxlkit/ui-kit`: toasts hold their countdown until both the pointer and focus have left,
+  show their countdown bar from the start, keep a focused stack expanded and the newest toast
+  in front at the bottom of the screen, and `toast({ id: undefined, … })` returns an id that
+  dismisses the toast.
+- `@pxlkit/ui-kit`: `PixelSpinner` spins and toasts animate in — the stylesheet defined neither
+  the spinner's keyframes nor the toast's entrance utilities.
+- `@pxlkit/ui-kit`: `PixelStepper` steps get valid roles and names (clickable steps are buttons,
+  the others read their position and state as hidden text), and `PixelAccordion` /
+  `PixelCollapsible` panels drop an `aria-labelledby` that ARIA does not allow without a role.
+- `@pxlkit/ui-kit`: `PixelHeroSection`'s `headlineEffect` had no effect. `'typewriter'` types
+  the headline out — screen readers get it whole from the start — and `'glitch'` plays
+  `PixelGlitch` over it, in every kit; both hold still when the reader prefers reduced motion.
+  `PixelTypewriter` takes `tone="inherit"` for this: it keeps the font and colour of the text
+  around it.
+- `@pxlkit/ui-kit`: `PixelSplitButton`'s menu follows the WAI-ARIA menu button pattern, as
+  `PixelDropdown`'s does. It never took focus, had no keyboard support, no name and no Escape,
+  and its options were tab stops: it now takes focus as it opens, is named by the chevron
+  (`aria-labelledby`, `aria-controls`) and points `aria-activedescendant` at the highlighted
+  option; the arrows, Home, End and typeahead move the highlight, Enter and Space choose it,
+  ArrowDown / ArrowUp on the chevron open the menu on its first / last option, and Escape, Tab
+  and choosing return focus to the chevron.
+- `@pxlkit/ui-kit`: `PixelParallaxLayer` and `PixelMouseParallax` hold still when the reader
+  prefers reduced motion, as their docs said they did.
+- `@pxlkit/ui-kit`: a link `PixelCard` (`href`) passes `onKeyDown` to its `<a>`, which it
+  dropped; a consumer's `onKeyDown` on an interactive `PixelFeatureCard` runs first and can
+  keep Enter and Space from activating it, instead of replacing the card's own handler; and
+  `PixelTestimonialCard`'s verified badge is an image named "Verified" — an `aria-label` on a
+  plain `<span>`, which ARIA does not allow.
+- `@pxlkit/ui-kit`: `PixelNavigationMenu` follows the WAI-ARIA disclosure navigation
+  pattern — a `<nav>` with a list of links and `<button aria-expanded aria-controls>`
+  disclosures — instead of application-menu roles (`menubar`, `menuitem`, `menu`) whose
+  panels held links. Each panel follows its button, so Tab moves into it; only a mouse opens
+  a panel by pointing, so a tap opens it once instead of opening and closing it; a click keeps
+  a panel open as the pointer leaves; Escape closes it and returns focus to its button, and
+  ArrowDown moves into it.
+- `@pxlkit/ui-kit`: toasts are announced through two live regions the viewport keeps
+  (`role="status"` and `role="alert"`), filled as a toast arrives or an update changes its
+  text or tone — a failed promise is announced at once — instead of each card being a live
+  region inserted already filled. `PxlKitToastProvider` takes a `duration` (the auto-dismiss
+  delay, `0` for none; a promise's error toast stays at least 6 s) and a `hotkey` (F8 by
+  default) that moves focus to the toasts; countdowns hold while the page is hidden or the
+  window is in the background (WCAG 2.2.1); and dismissing the focused toast moves focus to
+  the next one, or back where it came from.
+- `@pxlkit/ui-kit`: `trigger="inView"` animations play where `IntersectionObserver` is
+  missing instead of throwing, and follow the latest of several intersection changes; a
+  second click on a `trigger="click"` animation no longer throws where the Web Animations
+  API is missing; and `PixelTypewriter` types its text once while the parent re-renders with
+  a new `onComplete` function — it started over on every render, so
+  `onComplete={() => setState(…)}` typed forever.
+- `@pxlkit/ui-kit`: the legacy `.pixel-border` utility draws its outer border, and on the site
+  the builder grid's cell borders and the text selection highlight show: all three read theme
+  variables that were never defined (`--color-retro-border-base`, `--color-retro-green-base`).
+- `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
+  the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
+- `@pxlkit/ui-kit`: `PixelForm.Control` keeps its child's `ref` beside its own. It replaced
+  it — with `null` when the Control had no ref — so React Hook Form, whose `field.ref` reaches
+  the control through `{...field}`, could not focus the first invalid field on submit, and
+  `setFocus()` did nothing.
+- `@pxlkit/ui-kit`: `PixelSlider` counts its steps from `min`, as a native range input does:
+  with `min={5}` and `step={10}` it takes 5, 15, 25… where it snapped to multiples of 10, so
+  a key press from 5 jumped to 20. Decimal steps give exact values (`0.3`, not
+  `0.30000000000000004`), a `max` that is not on a step tops out at the last step before it,
+  and the ticks sit on the steps.
+- `@pxlkit/ui-kit`: `PixelCarousel` renders where Embla cannot run — no `matchMedia`,
+  `IntersectionObserver` or `ResizeObserver` (jsdom test suites, old WebViews) — staying on
+  its first slide; it threw on mount.
+- `@pxlkit/ui-kit`: `PixelTable` and `PixelDataTable` announce their loading status, whose
+  `role="status"` sat in an `aria-hidden` row, and rows with `onRowClick` take focus and
+  activate with Enter or Space, as the manifest says; they were mouse-only. `PixelDataTable`'s
+  rows-per-page select shows a page size other than 5, 10, 20 or 50 instead of the first option.
+- `@pxlkit/ui-kit`: `PixelDataTable` no longer throws when `pagination` is bound and then
+  unbound — it shows every row again, without the pagination bar — and `PixelSparkline`,
+  `PixelAreaChart` and `PixelBarChart` leave out values that are not finite numbers instead of
+  drawing nothing and reading "range NaN to NaN": the other points keep their places, and the
+  summary counts and ranges the finite ones, reading "1 point" for one where it read "1 points".
+- `@pxlkit/ui-kit`: `PixelCalendarGrid`, `PixelDatePicker` and `PixelDateRangePicker` follow the
+  WAI-ARIA date grid: PageUp / PageDown keep the day of the month (the last day of a shorter
+  month; from January 31 they reached March 3), Shift+PageUp / Shift+PageDown move a year,
+  moves skip disabled days instead of losing focus on them, exactly one day is in the tab order
+  (the grid dropped out of it after the month buttons, and the range picker had two), today
+  carries `aria-current="date"`, and the week start, month and weekday names follow
+  `PxlKitLocaleProvider`. The pickers' popovers are named dialogs that take focus as they open,
+  their weekday headers sit in a row, and the range picker keeps focus in its own popover and
+  on the trigger after its clear target.
+- `@pxlkit/ui-kit`: `PixelCombobox` opens on Enter instead of selecting the first option unseen;
+  `PixelMultiSelect`'s search field points `aria-activedescendant` and `aria-controls` at the
+  listbox, and Space types a space in it; `PixelColorInput` moves focus into its popover as it
+  opens.
+- `@pxlkit/ui-kit`: `PixelDateRangePicker` and `PixelMultiSelect` no longer put controls
+  inside their trigger button, where assistive technology never reaches them (axe
+  `nested-interactive`) and the keyboard could not reach a chip's remove mark. The range
+  picker's clear button sits beside its trigger, over its end; the multi-select is a field
+  of chips with "Remove …" buttons, the combobox and a clear button, each in the tab order —
+  in every kit.
+- `@pxlkit/ui-kit`: `PixelButton asChild` and `PixelPopover.Trigger` no longer make React 19 log
+  "Accessing element.ref was removed in React 19": they read a child's `ref` from its props, as
+  React 19 passes it.
+- Site: the component reference lists every manifest example. Five whose ids did not
+  spell their export's name — four of `PixelInput`'s and `PixelBreadcrumb`'s
+  `with-onclick` — were left out.
+- `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined
+  `--font-mono`, so monospace text fell back to the system stack although the kit's
+  fonts URL loads JetBrains Mono.
+- `pxlkit` plugin: the `/pxlkit:start` preflight no longer asks kits from 2.2 for an
+  `@source` line, and flags `tailwindcss` imported next to the kit's stylesheet, which
+  loads Tailwind's base styles twice. `check-updates.mjs` no longer runs its update
+  check when imported, which ended its test process before the tests reported.
+- `@pxlkit/core`: the `ParallaxLayer` docs said each layer moves by its `depth`; the
+  renderers place layers by their order in `layers` and tilt the whole stack, and the docs
+  and the plugin's icon spec now say so.
 - `docs/runbooks/ship-a-release.md` documented two commands that do not exist
   (`release:bump` and `registry:build`) and used `pnpm` in an npm repository. The
   runbook now describes what the release actually does.
+- Site: the copy button of the code blocks shows when it takes keyboard focus; it only
+  appeared on hover.
+- Site: section titles read "… | Pxlkit" once — the root layout's title template added a
+  second suffix to the titles that carried their own — and the Open Graph image and frame
+  showed 54 components instead of the kit's count.
+- `@pxlkit/ui-kit`: keyboard focus shows on every control. On the pixel surface a cut corner
+  (`.pxl-corner-*`) is a `clip-path`, which clipped the focus ring, so most pixel controls showed
+  no focus; they now light up their edge inside their corners. `PixelRadioGroup` and
+  `PixelSplitButton`'s chevron gain a focus style; the split button's halves and
+  `PixelInputGroup`'s controls show focus inside the frame that clips them; `PixelChipGroup`
+  tells focus from selection and shows its selection on the pixel surface; `PixelFileUpload`
+  without a dropzone has one tab stop, whose focus its browse button shows. Focus shows in
+  forced-colors (high-contrast) mode, `PixelCheckbox`'s linear ring takes its tone and
+  `PixelBreadcrumb`'s focus underline is thicker.
+- `@pxlkit/ui-kit`: a `scrollable` `PixelTabs` list scrolls instead of wrapping its tabs onto new
+  rows, and `PixelOTPInput`'s cells keep their size instead of spanning the row.
+- `@pxlkit/ui-kit`: classes a component adds to override its own defaults take effect. Classes are
+  joined without merging, so of two classes for one property Tailwind's stylesheet order decides,
+  and here the default won: `PixelEqualHeightGrid` stretched its items with `rowAlign="top"`; a
+  toned `PixelCard` kept the neutral background; `PixelSplitButton`'s primary half kept a border,
+  cut corners and a shadow inside its frame; the × of `PixelChip` and `PixelMultiSelect`'s chips,
+  the check marks of `PixelSelect` and `PixelMultiSelect` and `PixelTestimonialCard`'s verified
+  mark kept the glyph's size; `PixelCollapsible`'s header kept a button's padding; a vertical
+  `PixelCarousel`'s dots sat 12px low; a right-aligned `PixelTimeline` entry was padded on both
+  sides; `PixelSidebar`'s active item had no border; and `PixelInputGroup`'s controls kept a
+  border of their own on the pixel surface.
+- `@pxlkit/ui-kit`: likewise, the linear `PixelSection` title is 14px; `PixelHeroSection`'s and
+  `PixelSectionHeader`'s eyebrows are spaced 0.18em, as written, not by the display font;
+  `PixelDatePicker` and `PixelDateRangePicker` mute their placeholder; `PixelCalendarGrid` sets a
+  range in cyan; `PixelFileUpload` lights up while a file is dragged over it; the linear search
+  rules of `PixelMultiSelect` and `PixelCommand` are 1px; `PixelMultiSelect` mutes its unselected
+  options; and disabled options and items of `PixelCombobox`, `PixelMultiSelect`, `PixelMenubar`
+  and a disabled `PixelFileUpload` show the not-allowed cursor.
+- `@pxlkit/ui-kit`: a right-aligned `PixelTimeline` runs its rail under the middle of its `md` and
+  `lg` bullets, mirroring the left side, and `PixelCarousel`'s arrows stay put while pressed on the
+  pixel surface: the press offset replaced the translate that centred them, so they jumped about
+  20px; they now nudge 2px like the other pixel controls.
+- `@pxlkit/ui-kit`: pages hydrate for readers who prefer reduced motion. `useMediaQuery` read
+  `matchMedia` in the render that hydrates server markup, so `useReducedMotion` returned `true`
+  there and the components that stop animating for those readers rendered other markup than the
+  server had sent (React error #418). Both hooks now run on `useSyncExternalStore`: the render
+  that hydrates uses `defaultValue` and the reader's value follows right after. The Vue and
+  Angular kits hydrate the same way.
+- Site: pages hydrate without React error #418 for readers who prefer reduced motion (`/ui-kit`,
+  `/skills`, `/templates`, `/toast`) and, on every page, for readers who picked the light theme,
+  whose stored theme the render that hydrates read. The footer's copyright year comes from the
+  server render instead of the reader's clock, which differs once the year turns, and the landing
+  hero holds still from its first render after a client-side navigation for readers who prefer
+  reduced motion.
+- `@pxlkit/ui-kit` (and the Vue and Angular kits): on the pixel surface, buttons, icon buttons,
+  interactive feature cards and boxes carry no drop shadow. Their cut corners clipped it, and inside
+  them it drew a second copy of the label, icon and border, visible in the light theme; the buttons
+  still move on hover and press. On the linear surface the hero headline, the section header title
+  and the pricing amount are bold, as intended — the display face's semibold won over them. The
+  glitch hero headline renders one `<h1>` instead of three, a `.dark` palette override reaches the
+  utilities, server-rendered animations hold still from the first paint for readers who prefer
+  reduced motion, and the examples compile under strict TypeScript and link to pxlkit.xyz.
+- `@pxlkit/ui-kit` (and the Vue and Angular kits): `PixelDrawer` slides in from its side, as its
+  classes always asked — the stylesheet never defined the keyframes they named, so the panel
+  appeared at once. A loading `PixelButton` holds still under the pointer, like a disabled one.
+  `PixelSkeleton`, an indeterminate `PixelProgress` and the spinners of a loading button, input,
+  stepper step and toast hold still for readers who prefer reduced motion, from the
+  server-rendered markup on, as `PixelSpinner` does. On the pixel surface `PixelKbd` shows its
+  depth as a thicker bottom edge; its drop shadow fell outside the cut corners. Class lists that
+  set one property twice (a linear ribbon's or divider label's letter-spacing, the text fields'
+  border width and font family) set it once; they render as before. On the linear surface
+  `PixelProgress` fills its track with the tone's solid colour, as the pixel blocks do — its 18%
+  tint stood out from the track by only 1.2:1 to 1.5:1 — and `PixelAvatarGroup`'s "+N" is
+  semibold, like the avatars' initials.
+- Site and README claims: "zero runtime deps" (the kits need Tailwind CSS v4), the Indie license's
+  "lifetime updates" (a lifetime license with the updates available at purchase, as
+  `COMMERCIAL_TERMS` says), 6 icon packs and 6 tones (there are 7 of each), a hard-coded gate count,
+  an unmeasured coverage figure, "WCAG 2.1 AA" stated as conformance (the kits are built for it),
+  `@pxlkit/voxel` shown as published (an early preview, not yet on npm), an
+  `@pxlkit/ui-kit/templates` import that does not exist, and template copy that called Tailwind CSS
+  optional or attribution never required. Four Open Graph images that returned 404 point at the
+  site's image, and a social profile that returned 404 is no longer linked.
+- Site: the live `PixelCalendarGrid` demo on `/ui-kit` and the dashboard template render in the
+  browser only, behind a placeholder of the same height, so a page built on one day and read in
+  another month hydrates; a template preview's glitch heading is one `<h2>`, not three.
 
 ## [ui-kit 2.1.1] - 2026-08-08 — Bordered surface-token fix
 

@@ -1,84 +1,35 @@
 import type { Metadata } from 'next';
+import { JsonLd } from '@/components/JsonLd';
+import { pageMetadata } from '@/lib/seo';
+import { breadcrumbList } from '@/lib/structured-data';
 
-export const metadata: Metadata = {
-  title: 'Voxel World Demo — 3D Engine Preview (Coming Soon) | Pxlkit',
+export const metadata: Metadata = pageMetadata({
+  path: '/explore',
+  title: 'Voxel World Demo — 3D Engine Preview (Coming Soon)',
   description:
-    'Preview the @pxlkit/voxel 3D engine demo: procedural terrain, biomes & day/night cycles in React. Coming soon — explore the interactive tech preview.',
+    'Try the @pxlkit/voxel demo: procedural terrain, biomes and day/night cycles in React. An early preview, not yet on npm — explore it in the browser.',
+  socialDescription:
+    'Interactive preview of the @pxlkit/voxel 3D engine: procedural terrain, biomes, day/night cycles, built with Three.js and React Three Fiber. Early preview, not yet on npm.',
+  imageAlt: 'Pxlkit voxel engine preview — procedural terrain, biomes and day/night cycles',
   keywords: [
     'voxel engine demo',
     'voxel world preview',
-    '3d engine demo',
-    'voxel game demo',
     'procedural terrain demo',
-    'coming soon game engine',
-    'pxlkit voxel preview',
-    'react game engine demo',
-    'three.js demo',
+    'procedural world generation',
+    'biome generation',
+    'day night cycle',
+    'three.js voxel',
     'react three fiber demo',
     'webgl demo',
-    'browser 3d demo',
-    'procedural generation demo',
-    'voxel engine',
-    'voxel game engine',
-    'react game engine',
-    'three.js game engine',
-    'react three fiber game engine',
-    'webgl game engine',
-    'browser game engine',
-    'procedural terrain',
-    'procedural biomes',
-    'procedural world generation',
-    'chunk-based rendering',
-    'voxel terrain',
-    'biome generation',
-    'day night cycle game',
-    'voxel sandbox',
-    'minecraft-like engine',
-    'browser voxel game',
-    'react three fiber',
-    'three.js voxel',
-    'react 3d world',
     'pxlkit voxel',
-    'pxlkit explore',
-    'pxlkit 3d',
-    'pxlkit game engine',
-    'mit game engine',
-    'indie game engine',
-    'typescript game engine',
   ],
-  openGraph: {
-    type: 'website',
-    title: 'Voxel World Demo — 3D Engine Preview (Coming Soon) | Pxlkit',
-    description:
-      'Interactive preview of the @pxlkit/voxel 3D engine: procedural terrain, biomes, day/night cycles. Coming soon — built with Three.js & React Three Fiber.',
-    url: 'https://pxlkit.xyz/explore',
-    images: [
-      {
-        url: '/og/explore.png',
-        width: 1280,
-        height: 640,
-        alt: 'Pxlkit voxel 3D engine preview — procedural terrain, biomes, day/night cycles',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Voxel World Demo — 3D Engine Preview (Coming Soon) | Pxlkit',
-    description:
-      'Preview the Pxlkit voxel 3D engine demo: procedural terrain, biomes & day/night cycles in React. Coming soon.',
-    images: ['/og/explore.png'],
-  },
-  alternates: {
-    canonical: 'https://pxlkit.xyz/explore',
-  },
-  other: {
-    'article:author': 'Pxlkit',
-    'og:updated_time': new Date().toISOString(),
-    'og:type': 'website',
-    'og:site_name': 'Pxlkit',
-  },
-};
+});
 
 export default function ExploreLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <JsonLd data={breadcrumbList([{ name: 'Explore', path: '/explore' }])} />
+      {children}
+    </>
+  );
 }

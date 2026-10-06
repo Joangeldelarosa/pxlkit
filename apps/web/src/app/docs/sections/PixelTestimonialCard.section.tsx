@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTestimonialCardDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTestimonialCardDocsMeta = {
@@ -17,10 +23,94 @@ export const PixelTestimonialCardDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelTestimonialCardDocsSection({ className }: PixelTestimonialCardDocsSectionProps): React.ReactElement {
+/** PixelTestimonialCard's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTestimonialCard } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTestimonialCard',
+        props: [
+          { name: 'quote', type: 'string', required: true, description: 'The quote, set between curly quotation marks.' },
+          { name: 'name', type: 'string', required: true, description: 'Who said it.' },
+          { name: 'role', type: 'string', description: 'Their role, before the company.' },
+          { name: 'company', type: 'string', description: 'Their company.' },
+          { name: 'avatar', type: '{ src?: string; name: string; tone?: ToneKey }', description: 'Photo, or the name and tone of the initials; the initials of `name` without one.' },
+          { name: 'stars', type: 'number', description: 'Star rating out of 5; none for 0 or unset.' },
+          { name: 'verified', type: 'boolean', default: 'false', description: 'Shows the VERIFIED badge.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the initials.' },
+          { name: 'variant', type: "'card' | 'quote' | 'slider'", default: "'card'", description: '`card` draws the surface chrome; `quote` and `slider` leave it out.' },
+          { name: 'quoteSize', type: "'compact' | 'normal' | 'long'", default: "'normal'", description: 'Minimum height of the quote.' },
+          { name: 'actions', type: 'React.ReactNode', description: 'Actions under the quote (a link to the full story).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTestimonialCard } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTestimonialCard',
+        props: [
+          { name: 'quote', type: 'string', required: true, description: 'The quote, set between curly quotation marks.' },
+          { name: 'name', type: 'string', required: true, description: 'Who said it.' },
+          { name: 'role', type: 'string', description: 'Their role, before the company.' },
+          { name: 'company', type: 'string', description: 'Their company.' },
+          { name: 'avatar', type: 'TestimonialAvatar', description: 'Photo, or the name and tone of the initials; the initials of `name` without one.' },
+          { name: 'stars', type: 'number', description: 'Star rating out of 5; none for 0 or unset.' },
+          { name: 'verified', type: 'boolean', default: 'false', description: 'Shows the VERIFIED badge.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the initials.' },
+          { name: 'variant', type: "'card' | 'quote' | 'slider'", default: "'card'", description: '`card` draws the surface chrome; `quote` and `slider` leave it out.' },
+          { name: 'quoteSize', type: "'compact' | 'normal' | 'long'", default: "'normal'", description: 'Minimum height of the quote.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'actions', description: 'Actions under the quote (a link to the full story).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<article>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTestimonialCard } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTestimonialCard',
+        selector: 'pxl-testimonial-card',
+        props: [
+          { name: 'quote', type: 'string', required: true, description: 'The quote, set between curly quotation marks.' },
+          { name: 'name', type: 'string', required: true, description: 'Who said it.' },
+          { name: 'role', type: 'string', description: 'Their role, before the company.' },
+          { name: 'company', type: 'string', description: 'Their company.' },
+          { name: 'avatar', type: 'TestimonialAvatar', description: 'Photo, or the name and tone of the initials; the initials of `name` without one.' },
+          { name: 'stars', type: 'number', accepts: 'unknown', description: 'Star rating out of 5; none for 0 or unset.' },
+          { name: 'verified', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows the VERIFIED badge.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the initials.' },
+          { name: 'variant', type: "'card' | 'quote' | 'slider'", default: "'card'", description: '`card` draws the surface chrome; `quote` and `slider` leave it out.' },
+          { name: 'quoteSize', type: "'compact' | 'normal' | 'long'", default: "'normal'", description: 'Minimum height of the quote.' },
+          { name: 'actions', type: 'string | TemplateRef<any>', description: 'Actions under the quote (a link to the full story).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelTestimonialCardDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelTestimonialCardDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-testimonial-card-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-testimonial-card-heading'>PixelTestimonialCard</h2>
+      <Title id='pixel-testimonial-card-heading'>PixelTestimonialCard</Title>
       <p className="docs-lead">Surface-aware testimonial card with quote, attribution, avatar, star rating and verified badge.</p>
       <ul className="docs-highlights">
         <li>Semantic article + blockquote markup for accessible social proof</li>
@@ -33,12 +123,12 @@ export function PixelTestimonialCardDocsSection({ className }: PixelTestimonialC
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-testimonial-card-api">
+      <Heading id="pixel-testimonial-card-api">API</Heading>
+      <FrameworkApi label={'PixelTestimonialCard API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-testimonial-card-a11y">
-      <h3 id="pixel-testimonial-card-a11y">Accessibility</h3>
+      <Heading id="pixel-testimonial-card-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>semantic blockquote + cite</code></li>
@@ -47,8 +137,11 @@ export function PixelTestimonialCardDocsSection({ className }: PixelTestimonialC
       <p className="docs-aria-notes">Renders as &lt;article&gt; with a &lt;blockquote&gt; for the testimonial body; verified badge exposes an aria-label.</p>
     </section>
     <section aria-labelledby="pixel-testimonial-card-usage">
-      <h3 id="pixel-testimonial-card-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelTestimonialCard } from '@pxlkit/ui-kit';
+      <Heading id="pixel-testimonial-card-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelTestimonialCard usage'}
+        react={`import { PixelTestimonialCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -61,14 +154,50 @@ export function Default() {
       verified
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelTestimonialCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTestimonialCard
+    quote="pxlkit dropped the polish ceiling. Our marketing site felt like a product launch in a week."
+    name="Marisol Quintero"
+    role="Head of Design"
+    company="Northbeam"
+    :stars="5"
+    verified
+  />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelTestimonialCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTestimonialCard],
+  template: \`
+    <pxl-testimonial-card
+      quote="pxlkit dropped the polish ceiling. Our marketing site felt like a product launch in a week."
+      name="Marisol Quintero"
+      role="Head of Design"
+      company="Northbeam"
+      [stars]="5"
+      verified
+    />
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelTestimonialCard } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelTestimonialCard
       quote="pxlkit dropped the polish ceiling. Our marketing site felt like a product launch in a week."
@@ -79,11 +208,48 @@ export function Default() {
       verified
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTestimonialCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTestimonialCard
+    quote="pxlkit dropped the polish ceiling. Our marketing site felt like a product launch in a week."
+    name="Marisol Quintero"
+    role="Head of Design"
+    company="Northbeam"
+    :stars="5"
+    verified
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTestimonialCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTestimonialCard],
+  template: \`
+    <pxl-testimonial-card
+      quote="pxlkit dropped the polish ceiling. Our marketing site felt like a product launch in a week."
+      name="Marisol Quintero"
+      role="Head of Design"
+      company="Northbeam"
+      [stars]="5"
+      verified
+    />
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-avatar-and-tone">
-        <h4>With avatar + tone</h4>
-        <pre className="docs-code"><code>{`export function WithAvatarAndTone() {
+        <Subheading>With avatar + tone</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With avatar + tone code'}
+          react={`import { PixelTestimonialCard } from '@pxlkit/ui-kit';
+
+export function WithAvatarAndTone() {
   return (
     <PixelTestimonialCard
       tone="cyan"
@@ -95,11 +261,50 @@ export function Default() {
       stars={4}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTestimonialCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTestimonialCard
+    tone="cyan"
+    quote="The retro surface tokens just clicked with our brand. Zero CSS surgery, all signal."
+    name="Diego Salas"
+    role="Staff Engineer"
+    company="Halcyon Labs"
+    :avatar="{ name: 'Diego Salas', tone: 'cyan' }"
+    :stars="4"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTestimonialCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTestimonialCard],
+  template: \`
+    <pxl-testimonial-card
+      tone="cyan"
+      quote="The retro surface tokens just clicked with our brand. Zero CSS surgery, all signal."
+      name="Diego Salas"
+      role="Staff Engineer"
+      company="Halcyon Labs"
+      [avatar]="{ name: 'Diego Salas', tone: 'cyan' }"
+      [stars]="4"
+    />
+  \`,
+})
+export class WithAvatarAndTone {}`}
+        />
       </article>
       <article className="docs-example" id="example-compact-quote">
-        <h4>Compact quote</h4>
-        <pre className="docs-code"><code>{`export function CompactQuote() {
+        <Subheading>Compact quote</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Compact quote code'}
+          react={`import { PixelTestimonialCard } from '@pxlkit/ui-kit';
+
+export function CompactQuote() {
   return (
     <PixelTestimonialCard
       quoteSize="compact"
@@ -110,13 +315,45 @@ export function Default() {
       verified
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTestimonialCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTestimonialCard
+    quote-size="compact"
+    quote="Short. Sharp. Shipped."
+    name="Ana Pereira"
+    role="PM"
+    tone="gold"
+    verified
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTestimonialCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTestimonialCard],
+  template: \`
+    <pxl-testimonial-card
+      quoteSize="compact"
+      quote="Short. Sharp. Shipped."
+      name="Ana Pereira"
+      role="PM"
+      tone="gold"
+      verified
+    />
+  \`,
+})
+export class CompactQuote {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-star-rating">PixelStarRating</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-star-rating' : '#pixel-star-rating'}>PixelStarRating</a></li>
       </ul>
     </section>
     </section>

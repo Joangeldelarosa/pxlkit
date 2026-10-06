@@ -22,7 +22,7 @@ export default defineManifest({
   since: '1.7.0',
   status: 'stable',
   description:
-    'Feature highlight card with toned icon frame, optional badge, title, clamped description, and footer — renders as <article>, role="button", or <a href> with full-card click target.',
+    'Feature highlight card with toned icon frame, optional badge, title, clamped description, and footer — renders as `<article>`, `role="button"`, or `<a href>` with full-card click target.',
   highlights: [
     'Toned icon frame (48/56/64/80px) with surface-aware border and soft background',
     'Optional badge slot above the icon with independent tone',
@@ -53,7 +53,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus to the card when interactive or anchored' },
     ],
     notes:
-      'Semantic <article> by default. When interactive without href, the root becomes <div role="button" tabIndex={0}> with Enter/Space activation parity (<article> does not permit role="button"). When href is set, the root renders as a native <a> with the entire card as the click target — nesting interactive children (PixelButton, PixelTextLink) inside footer is invalid HTML in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.',
+      'Semantic <article> by default. When interactive without href, the root becomes <div role="button" tabindex="0"> with Enter/Space activation parity (<article> does not permit role="button"). When href is set, the root renders as a native <a> with the entire card as the click target — nesting interactive children (PixelButton, PixelTextLink) inside footer is invalid HTML in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.',
   },
   related: ['PixelCard', 'PixelStatCard', 'PixelPricingCard', 'PixelTestimonialCard'],
   apiStability: 'stable',

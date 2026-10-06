@@ -25,7 +25,7 @@ export default defineManifest({
     'Configurable siblings to widen or tighten the visible window around the current page.',
     'Prev/Next buttons auto-disable at the edges (page 1 and last page).',
     'Localised prevLabel, nextLabel, and ariaLabel for i18n.',
-    'Pixel and linear surfaces follow ambient surface context.',
+    'Pixel and linear surfaces follow the nearest PxlKitSurfaceProvider.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelColorSwatchDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelColorSwatchDocsMeta = {
@@ -17,10 +23,61 @@ export const PixelColorSwatchDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelColorSwatchDocsSection({ className }: PixelColorSwatchDocsSectionProps): React.ReactElement {
+/** PixelColorSwatch's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelColorSwatch } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelColorSwatch',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name for the token (e.g. "Cyan 500").' },
+          { name: 'cssVar', type: 'string', required: true, description: 'CSS variable to preview (e.g. "--retro-cyan").' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelColorSwatch',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name of the token (e.g. "Cyan 500").' },
+          { name: 'cssVar', type: 'string', required: true, description: 'CSS variable to preview (e.g. "--color-retro-cyan").' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelColorSwatch',
+        selector: 'pxl-color-swatch',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name of the token (e.g. "Cyan 500").' },
+          { name: 'cssVar', type: 'string', required: true, description: 'CSS variable to preview (e.g. "--color-retro-cyan").' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelColorSwatchDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelColorSwatchDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-color-swatch-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-color-swatch-heading'>PixelColorSwatch</h2>
+      <Title id='pixel-color-swatch-heading'>PixelColorSwatch</Title>
       <p className="docs-lead">Design-token preview tile that renders a CSS custom property as a color sample alongside its human name and variable identifier.</p>
       <ul className="docs-highlights">
         <li>Pairs a 32px color chip with token name + CSS variable label for at-a-glance audits</li>
@@ -33,12 +90,12 @@ export function PixelColorSwatchDocsSection({ className }: PixelColorSwatchDocsS
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-color-swatch-api">
+      <Heading id="pixel-color-swatch-api">API</Heading>
+      <FrameworkApi label={'PixelColorSwatch API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-color-swatch-a11y">
-      <h3 id="pixel-color-swatch-a11y">Accessibility</h3>
+      <Heading id="pixel-color-swatch-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>img</code></li>
@@ -46,25 +103,69 @@ export function PixelColorSwatchDocsSection({ className }: PixelColorSwatchDocsS
       <p className="docs-aria-notes">Non-interactive presentational block. The visible token name + cssVar string provide the textual description of the color sample for screen readers; no separate alt text is required because the chip itself carries no semantic meaning beyond the adjacent label.</p>
     </section>
     <section aria-labelledby="pixel-color-swatch-usage">
-      <h3 id="pixel-color-swatch-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelColorSwatch } from '@pxlkit/ui-kit';
+      <Heading id="pixel-color-swatch-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelColorSwatch usage'}
+        react={`import { PixelColorSwatch } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelColorSwatch name="cyan" css-var="--color-retro-cyan" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorSwatch],
+  template: \`<pxl-color-swatch name="cyan" cssVar="--color-retro-cyan" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelColorSwatch } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelColorSwatch name="cyan" css-var="--color-retro-cyan" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorSwatch],
+  template: \`<pxl-color-swatch name="cyan" cssVar="--color-retro-cyan" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-palette">
-        <h4>Palette</h4>
-        <pre className="docs-code"><code>{`export function Palette() {
+        <Subheading>Palette</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Palette code'}
+          react={`import { PixelColorSwatch } from '@pxlkit/ui-kit';
+
+export function Palette() {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl">
       <PixelColorSwatch name="green" cssVar="--color-retro-green" />
@@ -75,22 +176,88 @@ export function Default() {
       <PixelColorSwatch name="pink" cssVar="--color-retro-pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl">
+    <PixelColorSwatch name="green" css-var="--color-retro-green" />
+    <PixelColorSwatch name="cyan" css-var="--color-retro-cyan" />
+    <PixelColorSwatch name="gold" css-var="--color-retro-gold" />
+    <PixelColorSwatch name="purple" css-var="--color-retro-purple" />
+    <PixelColorSwatch name="red" css-var="--color-retro-red" />
+    <PixelColorSwatch name="pink" css-var="--color-retro-pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorSwatch],
+  template: \`
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl">
+      <pxl-color-swatch name="green" cssVar="--color-retro-green" />
+      <pxl-color-swatch name="cyan" cssVar="--color-retro-cyan" />
+      <pxl-color-swatch name="gold" cssVar="--color-retro-gold" />
+      <pxl-color-swatch name="purple" cssVar="--color-retro-purple" />
+      <pxl-color-swatch name="red" cssVar="--color-retro-red" />
+      <pxl-color-swatch name="pink" cssVar="--color-retro-pink" />
+    </div>
+  \`,
+})
+export class Palette {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelColorSwatch } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-4">
       <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" surface="pixel" />
       <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" surface="linear" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-4">
+    <PixelColorSwatch name="cyan" css-var="--color-retro-cyan" surface="pixel" />
+    <PixelColorSwatch name="cyan" css-var="--color-retro-cyan" surface="linear" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorSwatch],
+  template: \`
+    <div class="flex flex-col gap-4">
+      <pxl-color-swatch name="cyan" cssVar="--color-retro-cyan" surface="pixel" />
+      <pxl-color-swatch name="cyan" cssVar="--color-retro-cyan" surface="linear" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-surface-tokens">
-        <h4>Surface Tokens</h4>
-        <pre className="docs-code"><code>{`export function SurfaceTokens() {
+        <Subheading>Surface Tokens</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surface Tokens code'}
+          react={`import { PixelColorSwatch } from '@pxlkit/ui-kit';
+
+export function SurfaceTokens() {
   return (
     <div className="grid grid-cols-2 gap-3 max-w-md">
       <PixelColorSwatch name="surface" cssVar="--color-retro-surface" />
@@ -99,13 +266,41 @@ export function Default() {
       <PixelColorSwatch name="muted" cssVar="--color-retro-muted" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3 max-w-md">
+    <PixelColorSwatch name="surface" css-var="--color-retro-surface" />
+    <PixelColorSwatch name="border" css-var="--color-retro-border" />
+    <PixelColorSwatch name="text" css-var="--color-retro-text" />
+    <PixelColorSwatch name="muted" css-var="--color-retro-muted" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorSwatch],
+  template: \`
+    <div class="grid grid-cols-2 gap-3 max-w-md">
+      <pxl-color-swatch name="surface" cssVar="--color-retro-surface" />
+      <pxl-color-swatch name="border" cssVar="--color-retro-border" />
+      <pxl-color-swatch name="text" cssVar="--color-retro-text" />
+      <pxl-color-swatch name="muted" cssVar="--color-retro-muted" />
+    </div>
+  \`,
+})
+export class SurfaceTokens {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-color-input">PixelColorInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-color-input' : '#pixel-color-input'}>PixelColorInput</a></li>
       </ul>
     </section>
     </section>

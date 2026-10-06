@@ -1,4 +1,4 @@
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * ✅✅ DoubleCheck — two overlapping checkmarks ("read" / "confirmed"). The back

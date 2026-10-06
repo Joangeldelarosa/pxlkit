@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBounceDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBounceDocsMeta = {
@@ -17,15 +23,90 @@ export const PixelBounceDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelBounceDocsSection({ className }: PixelBounceDocsSectionProps): React.ReactElement {
+/** PixelBounce's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBounce } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBounce',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to bounce.' },
+          { name: 'duration', type: 'number', default: '800', description: 'Animation duration in milliseconds. Default `800`.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", description: "Iteration count: a number or `'infinite'`. Default `'infinite'`." },
+          { name: 'height', type: 'number', default: '8', description: 'Peak bounce height in pixels. Default `8`.' },
+          { name: 'easing', type: 'string', default: "'ease'", description: "CSS `animation-timing-function`. Default `'ease'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBounce } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBounce',
+        props: [
+          { name: 'duration', type: 'number', default: '800', description: 'Animation duration in milliseconds.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'height', type: 'number', default: '8', description: 'Peak bounce height in pixels.' },
+          { name: 'easing', type: 'string', default: "'ease'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to bounce.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBounce } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBounce',
+        selector: 'pxl-bounce',
+        props: [
+          { name: 'duration', type: 'number', default: '800', accepts: 'unknown', description: 'Animation duration in milliseconds.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", accepts: "number | 'infinite' | `${number}`", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'height', type: 'number', default: '8', accepts: 'unknown', description: 'Peak bounce height in pixels.' },
+          { name: 'easing', type: 'string', default: "'ease'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelBounceDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBounceDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-bounce-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-bounce-heading'>PixelBounce</h2>
+      <Title id='pixel-bounce-heading'>PixelBounce</Title>
       <p className="docs-lead">Vertical bounce animation with damped follow-through for any inline content.</p>
       <ul className="docs-highlights">
         <li>Configurable bounce height, duration, easing, and repeat count</li>
         <li>Trigger modes: mount, hover, focus, viewport</li>
-        <li>Forwards refs and merges with internal trigger observers</li>
+        <li>Signals the end of its last iteration: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
         <li>Respects prefers-reduced-motion automatically</li>
       </ul>
     <dl className="docs-meta">
@@ -33,12 +114,12 @@ export function PixelBounceDocsSection({ className }: PixelBounceDocsSectionProp
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-bounce-api">
+      <Heading id="pixel-bounce-api">API</Heading>
+      <FrameworkApi label={'PixelBounce API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bounce-a11y">
-      <h3 id="pixel-bounce-a11y">Accessibility</h3>
+      <Heading id="pixel-bounce-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -46,8 +127,11 @@ export function PixelBounceDocsSection({ className }: PixelBounceDocsSectionProp
       <p className="docs-aria-notes">Animation is suppressed when the user has requested reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-bounce-usage">
-      <h3 id="pixel-bounce-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelBounce } from '@pxlkit/ui-kit';
+      <Heading id="pixel-bounce-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBounce usage'}
+        react={`import { PixelBounce } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -55,48 +139,150 @@ export function Default() {
       <span>Bounce</span>
     </PixelBounce>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelBounce } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBounce>
+    <span>Bounce</span>
+  </PixelBounce>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBounce } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBounce],
+  template: \`
+    <pxl-bounce>
+      <span>Bounce</span>
+    </pxl-bounce>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBounce } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelBounce>
       <span>Bounce</span>
     </PixelBounce>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBounce } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBounce>
+    <span>Bounce</span>
+  </PixelBounce>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBounce } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBounce],
+  template: \`
+    <pxl-bounce>
+      <span>Bounce</span>
+    </pxl-bounce>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-taller-bounce">
-        <h4>Taller Bounce</h4>
-        <pre className="docs-code"><code>{`export function TallerBounce() {
+        <Subheading>Taller Bounce</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Taller Bounce code'}
+          react={`import { PixelBounce } from '@pxlkit/ui-kit';
+
+export function TallerBounce() {
   return (
     <PixelBounce height={16} duration={1000}>
       <span>Higher Jump</span>
     </PixelBounce>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBounce } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBounce :height="16" :duration="1000">
+    <span>Higher Jump</span>
+  </PixelBounce>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBounce } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBounce],
+  template: \`
+    <pxl-bounce [height]="16" [duration]="1000">
+      <span>Higher Jump</span>
+    </pxl-bounce>
+  \`,
+})
+export class TallerBounce {}`}
+        />
       </article>
       <article className="docs-example" id="example-hover-trigger">
-        <h4>Hover Trigger</h4>
-        <pre className="docs-code"><code>{`export function HoverTrigger() {
+        <Subheading>Hover Trigger</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Hover Trigger code'}
+          react={`import { PixelBounce } from '@pxlkit/ui-kit';
+
+export function HoverTrigger() {
   return (
     <PixelBounce trigger="hover" repeat={1}>
       <span>Hover me</span>
     </PixelBounce>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBounce } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBounce trigger="hover" :repeat="1">
+    <span>Hover me</span>
+  </PixelBounce>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBounce } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBounce],
+  template: \`
+    <pxl-bounce trigger="hover" [repeat]="1">
+      <span>Hover me</span>
+    </pxl-bounce>
+  \`,
+})
+export class HoverTrigger {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-shake">PixelShake</a></li>
-        <li><a href="#pixel-pulse">PixelPulse</a></li>
-        <li><a href="#pixel-float">PixelFloat</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-shake' : '#pixel-shake'}>PixelShake</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pulse' : '#pixel-pulse'}>PixelPulse</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-float' : '#pixel-float'}>PixelFloat</a></li>
       </ul>
     </section>
     </section>

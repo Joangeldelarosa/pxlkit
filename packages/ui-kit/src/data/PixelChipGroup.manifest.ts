@@ -12,7 +12,7 @@ export default defineManifest({
   description:
     'Controlled chip row with single-select (radiogroup) or multi-select (group of checkboxes) — wraps each PixelChip in a semantic toggle button.',
   highlights: [
-    'Controlled value/onChange API drives selection — chips stay presentational.',
+    'Selection is bound — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or starts from `defaultValue`; chips stay presentational.',
     'Single mode renders role=radiogroup with roving tabindex + arrow / Home / End navigation.',
     'Multi mode renders role=checkbox per chip with aria-checked and Space/Enter toggle.',
     'Surface-aware: forwards pixel or linear surface to chip wrappers for consistent borders.',
@@ -39,7 +39,7 @@ export default defineManifest({
       { key: 'End', does: 'Focuses and selects the last chip.', when: 'single mode (radiogroup)' },
     ],
     notes:
-      'Each child chip must declare a string `value` prop. In single (radiogroup) mode an accessible name (aria-label or aria-labelledby) is required so screen readers announce the group; multi mode renders a bare div unless a name is provided. The wrapping button owns role/aria-checked/tabindex; the PixelChip child remains purely visual.',
+      'Each child chip must declare a string `value` prop. In single (radiogroup) mode an accessible name (aria-label or aria-labelledby) is required so screen readers announce the group; multi mode renders a bare div unless a name is provided. The wrapping button owns role/aria-checked/tabindex; the PixelChip child remains purely visual. Selection and keyboard focus read apart: the linear surface rings a selected chip and sets the focus ring off it; the pixel surface frames a selected chip inside its border and lights up the chip\'s edge for focus.',
   },
   related: ['PixelChip', 'PixelBadgeGroup', 'PixelBadge'],
   apiStability: 'stable',

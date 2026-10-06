@@ -16,12 +16,12 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Inline <code> element with tone tinting and surface-aware framing for highlighting commands, identifiers, and short snippets in flowing prose.',
+    'Inline `<code>` element with tone tinting and surface-aware framing for highlighting commands, identifiers, and short snippets in flowing prose.',
   highlights: [
     'Semantic <code> root so assistive tech announces the inline-code role.',
     'Tone-tinted border, background, and text for at-a-glance categorisation (neutral, cyan, green, gold, red, purple, pink).',
     'Surface-aware: pixel chamfered border + pixel font, or linear pill.',
-    'Composable inline — accepts any ReactNode children for icons or multi-token snippets.',
+    'Composable inline — takes any inline content, such as icons or multi-token snippets.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

@@ -1,9 +1,11 @@
-import React from 'react';
+import { cn } from '../common';
 import { PixelEqualHeightGrid } from './PixelEqualHeightGrid';
 
-function Card({ title, body }: { title: string; body: string }) {
+// PixelEqualHeightGrid lays out the rows of each item through its
+// className, so the card passes it on to its root.
+function Card({ title, body, className }: { title: string; body: string; className?: string }) {
   return (
-    <div className="border border-retro-border p-4">
+    <div className={cn('border border-retro-border p-4', className)}>
       <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
       <p className="text-sm text-retro-muted">{body}</p>
       <div className="mt-2 text-xs text-retro-muted">Footer</div>

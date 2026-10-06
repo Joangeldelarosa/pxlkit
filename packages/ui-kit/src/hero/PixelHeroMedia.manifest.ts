@@ -13,7 +13,7 @@ export default defineManifest({
     'Four ratio presets (1/1, 4/5, 16/10, 16/9) reserve layout to prevent CLS',
     'Optional framed border driven by surface + tone tokens',
     'Renders as semantic figure/figcaption when caption is provided',
-    'Surface-aware via useEffectiveSurface for light/dark contexts',
+    'Surface-aware (pixel / linear) frame and corners',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

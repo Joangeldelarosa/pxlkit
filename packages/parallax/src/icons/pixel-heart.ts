@@ -1,4 +1,4 @@
-import type { AnimatedPxlKitData, ParallaxPxlKitData } from '@pxlkit/core';
+import type { AnimatedPxlKitData, ParallaxPxlKitData } from '@pxlkit/core/vanilla';
 
 const PixelHeartSparkle: AnimatedPxlKitData = {
   name: 'pixel-heart-sparkle',

@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPaginationDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelPaginationDocsMeta = {
@@ -17,35 +23,108 @@ export const PixelPaginationDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelPaginationDocsSection({ className }: PixelPaginationDocsSectionProps): React.ReactElement {
+/** PixelPagination's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelPagination } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelPagination',
+        props: [
+          { name: 'page', type: 'number', required: true, description: 'Current page (1-indexed).' },
+          { name: 'total', type: 'number', required: true, description: 'Total number of pages.' },
+          { name: 'onChange', type: '(next: number) => void', required: true, description: 'Fires when the user picks a new page.' },
+          { name: 'siblings', type: 'number', default: '1', description: 'Sibling pages to show around the current. Defaults to 1.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface treatment override.' },
+          { name: 'ariaLabel', type: 'string', default: "'Pagination'", description: 'Accessible label for the nav region.' },
+          { name: 'prevLabel', type: 'string', default: "'Prev'", description: 'Localised label for the Prev button.' },
+          { name: 'nextLabel', type: 'string', default: "'Next'", description: 'Localised label for the Next button.' },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelPagination } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelPagination',
+        props: [
+          { name: 'page', type: 'number', required: true, binding: 'v-model:page', description: 'Current page, from 1 (`v-model:page`).' },
+          { name: 'total', type: 'number', required: true, description: 'Number of pages.' },
+          { name: 'siblings', type: 'number', default: '1', description: 'Pages shown on each side of the current one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Pagination'", description: 'Accessible name of the landmark.' },
+          { name: 'prevLabel', type: 'string', default: "'Prev'", description: 'Label of the previous-page button.' },
+          { name: 'nextLabel', type: 'string', default: "'Next'", description: 'Label of the next-page button.' },
+        ],
+        events: [
+          { name: 'update:page', payload: 'page: number', description: 'The page the user picked, for `v-model:page`.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<nav>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelPagination } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelPagination',
+        selector: 'pxl-pagination',
+        props: [
+          { name: 'page', type: 'number', required: true, binding: '[(page)]', description: 'Current page, from 1 (`[(page)]`).' },
+          { name: 'total', type: 'number', required: true, accepts: 'unknown', description: 'Number of pages.' },
+          { name: 'siblings', type: 'number', default: '1', accepts: 'unknown', description: 'Pages shown on each side of the current one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Pagination'", description: 'Accessible name of the landmark.' },
+          { name: 'prevLabel', type: 'string', default: "'Prev'", description: 'Label of the previous-page button.' },
+          { name: 'nextLabel', type: 'string', default: "'Next'", description: 'Label of the next-page button.' },
+        ],
+        events: [
+          { name: 'pageChange', payload: 'number', description: 'The new `page`: the event half of `[(page)]`.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelPaginationDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelPaginationDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-pagination-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-pagination-heading'>PixelPagination</h2>
+      <Title id='pixel-pagination-heading'>PixelPagination</Title>
       <p className="docs-lead">Windowed page-number navigator with Prev/Next, ellipses, and first/last anchors for navigating long paginated collections.</p>
       <ul className="docs-highlights">
         <li>Windowed page list with ellipses to handle large totals without overflow.</li>
         <li>Configurable siblings to widen or tighten the visible window around the current page.</li>
         <li>Prev/Next buttons auto-disable at the edges (page 1 and last page).</li>
         <li>Localised prevLabel, nextLabel, and ariaLabel for i18n.</li>
-        <li>Pixel and linear surfaces follow ambient surface context.</li>
+        <li>Pixel and linear surfaces follow the nearest PxlKitSurfaceProvider.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-pagination-api">
+      <Heading id="pixel-pagination-api">API</Heading>
+      <FrameworkApi label={'PixelPagination API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-pagination-a11y">
-      <h3 id="pixel-pagination-a11y">Accessibility</h3>
+      <Heading id="pixel-pagination-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>navigation</code></li>
       </ul>
       <p className="docs-aria-notes">Rendered as a &lt;nav&gt; landmark with a configurable aria-label. The current page button carries aria-current=&quot;page&quot;; ellipses are aria-hidden so screen readers skip decorative gaps. Prev/Next buttons disable at the edges instead of being removed, preserving layout and predictable tab order.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -74,63 +153,254 @@ export function PixelPaginationDocsSection({ className }: PixelPaginationDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-pagination-usage">
-      <h3 id="pixel-pagination-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-pagination-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelPagination usage'}
+        react={`import { useState } from 'react';
 import { PixelPagination } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [page, setPage] = useState(1);
   return <PixelPagination page={page} total={10} onChange={setPage} />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPagination } from '@pxlkit/ui-kit-vue';
+
+const page = ref(1);
+</script>
+
+<template>
+  <PixelPagination v-model:page="page" :total="10" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelPagination } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPagination],
+  template: \`<pxl-pagination [(page)]="page" [total]="10" />\`,
+})
+export class Default {
+  readonly page = signal(1);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelPagination } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [page, setPage] = useState(1);
   return <PixelPagination page={page} total={10} onChange={setPage} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPagination } from '@pxlkit/ui-kit-vue';
+
+const page = ref(1);
+</script>
+
+<template>
+  <PixelPagination v-model:page="page" :total="10" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPagination } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPagination],
+  template: \`<pxl-pagination [(page)]="page" [total]="10" />\`,
+})
+export class Default {
+  readonly page = signal(1);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-many-pages">
-        <h4>Many Pages</h4>
-        <pre className="docs-code"><code>{`export function ManyPages() {
+        <Subheading>Many Pages</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Many Pages code'}
+          react={`import { useState } from 'react';
+import { PixelPagination } from '@pxlkit/ui-kit';
+
+export function ManyPages() {
   const [page, setPage] = useState(5);
   return <PixelPagination page={page} total={50} onChange={setPage} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPagination } from '@pxlkit/ui-kit-vue';
+
+const page = ref(5);
+</script>
+
+<template>
+  <PixelPagination v-model:page="page" :total="50" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPagination } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPagination],
+  template: \`<pxl-pagination [(page)]="page" [total]="50" />\`,
+})
+export class ManyPages {
+  readonly page = signal(5);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-mid-window">
-        <h4>Mid Window</h4>
-        <pre className="docs-code"><code>{`export function MidWindow() {
+        <Subheading>Mid Window</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Mid Window code'}
+          react={`import { useState } from 'react';
+import { PixelPagination } from '@pxlkit/ui-kit';
+
+export function MidWindow() {
   const [page, setPage] = useState(10);
   return <PixelPagination page={page} total={20} onChange={setPage} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPagination } from '@pxlkit/ui-kit-vue';
+
+const page = ref(10);
+</script>
+
+<template>
+  <PixelPagination v-model:page="page" :total="20" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPagination } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPagination],
+  template: \`<pxl-pagination [(page)]="page" [total]="20" />\`,
+})
+export class MidWindow {
+  readonly page = signal(10);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-more-siblings">
-        <h4>More Siblings</h4>
-        <pre className="docs-code"><code>{`export function MoreSiblings() {
+        <Subheading>More Siblings</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'More Siblings code'}
+          react={`import { useState } from 'react';
+import { PixelPagination } from '@pxlkit/ui-kit';
+
+export function MoreSiblings() {
   const [page, setPage] = useState(8);
   return <PixelPagination page={page} total={20} onChange={setPage} siblings={2} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPagination } from '@pxlkit/ui-kit-vue';
+
+const page = ref(8);
+</script>
+
+<template>
+  <PixelPagination v-model:page="page" :total="20" :siblings="2" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPagination } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPagination],
+  template: \`<pxl-pagination [(page)]="page" [total]="20" [siblings]="2" />\`,
+})
+export class MoreSiblings {
+  readonly page = signal(8);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <Subheading>Pixel Surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel Surface code'}
+          react={`import { useState } from 'react';
+import { PixelPagination } from '@pxlkit/ui-kit';
+
+export function PixelSurface() {
   const [page, setPage] = useState(3);
   return <PixelPagination page={page} total={12} onChange={setPage} surface="pixel" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPagination } from '@pxlkit/ui-kit-vue';
+
+const page = ref(3);
+</script>
+
+<template>
+  <PixelPagination v-model:page="page" :total="12" surface="pixel" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPagination } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPagination],
+  template: \`<pxl-pagination [(page)]="page" [total]="12" surface="pixel" />\`,
+})
+export class PixelSurface {
+  readonly page = signal(3);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-linear-surface">
-        <h4>Linear Surface</h4>
-        <pre className="docs-code"><code>{`export function LinearSurface() {
+        <Subheading>Linear Surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Linear Surface code'}
+          react={`import { useState } from 'react';
+import { PixelPagination } from '@pxlkit/ui-kit';
+
+export function LinearSurface() {
   const [page, setPage] = useState(3);
   return <PixelPagination page={page} total={12} onChange={setPage} surface="linear" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPagination } from '@pxlkit/ui-kit-vue';
+
+const page = ref(3);
+</script>
+
+<template>
+  <PixelPagination v-model:page="page" :total="12" surface="linear" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPagination } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPagination],
+  template: \`<pxl-pagination [(page)]="page" [total]="12" surface="linear" />\`,
+})
+export class LinearSurface {
+  readonly page = signal(3);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-localised-labels">
-        <h4>Localised Labels</h4>
-        <pre className="docs-code"><code>{`export function LocalisedLabels() {
+        <Subheading>Localised Labels</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Localised Labels code'}
+          react={`import { useState } from 'react';
+import { PixelPagination } from '@pxlkit/ui-kit';
+
+export function LocalisedLabels() {
   const [page, setPage] = useState(2);
   return (
     <PixelPagination
@@ -142,33 +412,131 @@ export function Default() {
       ariaLabel="Paginación"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPagination } from '@pxlkit/ui-kit-vue';
+
+const page = ref(2);
+</script>
+
+<template>
+  <PixelPagination
+    v-model:page="page"
+    :total="8"
+    prev-label="Anterior"
+    next-label="Siguiente"
+    aria-label="Paginación"
+  />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPagination } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPagination],
+  template: \`
+    <pxl-pagination
+      [(page)]="page"
+      [total]="8"
+      prevLabel="Anterior"
+      nextLabel="Siguiente"
+      ariaLabel="Paginación"
+    />
+  \`,
+})
+export class LocalisedLabels {
+  readonly page = signal(2);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-first-page">
-        <h4>First Page</h4>
-        <pre className="docs-code"><code>{`export function FirstPage() {
+        <Subheading>First Page</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'First Page code'}
+          react={`import { PixelPagination } from '@pxlkit/ui-kit';
+
+export function FirstPage() {
   return <PixelPagination page={1} total={10} onChange={() => {}} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPagination } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPagination :page="1" :total="10" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPagination } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPagination],
+  template: \`<pxl-pagination [page]="1" [total]="10" />\`,
+})
+export class FirstPage {}`}
+        />
       </article>
       <article className="docs-example" id="example-last-page">
-        <h4>Last Page</h4>
-        <pre className="docs-code"><code>{`export function LastPage() {
+        <Subheading>Last Page</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Last Page code'}
+          react={`import { PixelPagination } from '@pxlkit/ui-kit';
+
+export function LastPage() {
   return <PixelPagination page={10} total={10} onChange={() => {}} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPagination } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPagination :page="10" :total="10" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPagination } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPagination],
+  template: \`<pxl-pagination [page]="10" [total]="10" />\`,
+})
+export class LastPage {}`}
+        />
       </article>
       <article className="docs-example" id="example-single-page">
-        <h4>Single Page</h4>
-        <pre className="docs-code"><code>{`export function SinglePage() {
+        <Subheading>Single Page</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Single Page code'}
+          react={`import { PixelPagination } from '@pxlkit/ui-kit';
+
+export function SinglePage() {
   return <PixelPagination page={1} total={1} onChange={() => {}} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPagination } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPagination :page="1" :total="1" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPagination } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPagination],
+  template: \`<pxl-pagination [page]="1" [total]="1" />\`,
+})
+export class SinglePage {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-breadcrumb">PixelBreadcrumb</a></li>
-        <li><a href="#pixel-table">PixelTable</a></li>
-        <li><a href="#pixel-data-table">PixelDataTable</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-breadcrumb' : '#pixel-breadcrumb'}>PixelBreadcrumb</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-table' : '#pixel-table'}>PixelTable</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-data-table' : '#pixel-data-table'}>PixelDataTable</a></li>
       </ul>
     </section>
     </section>

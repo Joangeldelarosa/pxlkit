@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDateRangePickerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelDateRangePickerDocsMeta = {
@@ -17,13 +23,117 @@ export const PixelDateRangePickerDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePickerDocsSectionProps): React.ReactElement {
+/** PixelDateRangePicker's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelDateRangePicker } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelDateRangePicker',
+        props: [
+          { name: 'value', type: 'DateRangeValue', description: 'The range; leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'DateRangeValue', description: 'Initial range while uncontrolled.' },
+          { name: 'onChange', type: '(next: DateRangeValue) => void', description: 'Called with the range after every change: its start alone after a first pick, `{}` once cleared.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'presets', type: '{ label: string; value: { from: Date; to: Date } }[]', description: 'Quick picks of whole ranges, shown above the months.' },
+          { name: 'numberOfMonths', type: '1 | 2', default: '2', description: 'Months shown side by side.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'placeholder', type: 'string', default: "'Select date range'", description: 'Text shown while no range is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: "Adds a clear button over the trigger's end and a Clear button under the months while a range is set." },
+          { name: 'name', type: 'string', description: 'Form field name — hidden inputs submit `name.from` and `name.to` as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'data-testid', type: 'string', description: '`data-testid` of the trigger.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelDateRangePicker } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelDateRangePicker',
+        props: [
+          { name: 'modelValue', type: 'DateRangeValue', binding: 'v-model', description: 'The range (`v-model`); leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'DateRangeValue', description: 'Initial range while uncontrolled.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'presets', type: 'PixelDateRangePickerPreset[]', description: 'Quick picks of whole ranges, shown above the months.' },
+          { name: 'numberOfMonths', type: '1 | 2', default: '2', description: 'Months shown side by side.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'placeholder', type: 'string', default: "'Select date range'", description: 'Text shown while no range is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: "Adds a clear button over the trigger's end and a Clear button under the months while a range is set." },
+          { name: 'name', type: 'string', description: 'Form field name — hidden inputs submit `name.from` and `name.to` as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'range: DateRangeValue', description: 'The range after every change: its start alone after a first pick, `{}` once cleared.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+          'Its template ref exposes `element`: the trigger button.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelDateRangePicker } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelDateRangePicker',
+        selector: 'pxl-date-range-picker',
+        props: [
+          { name: 'value', type: 'DateRangeValue', binding: '[(value)]', description: 'The range (`[(value)]`); leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'DateRangeValue', description: 'Initial range while uncontrolled.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'presets', type: 'PixelDateRangePickerPreset[]', description: 'Quick picks of whole ranges, shown above the months.' },
+          { name: 'numberOfMonths', type: '1 | 2', default: '2', description: 'Months shown side by side.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'placeholder', type: 'string', default: "'Select date range'", description: 'Text shown while no range is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', accepts: 'unknown', description: "Adds a clear button over the trigger's end and a Clear button under the months while a range is set." },
+          { name: 'name', type: 'string', description: 'Form field name — hidden inputs submit `name.from` and `name.to` as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the trigger; its hint / error is added while one shows.' },
+          { name: 'data-testid', type: 'string', description: '`data-testid` of the trigger.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'DateRangeValue', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`DateRangeValue`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelDateRangePickerDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelDateRangePickerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-date-range-picker-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-date-range-picker-heading'>PixelDateRangePicker</h2>
+      <Title id='pixel-date-range-picker-heading'>PixelDateRangePicker</Title>
       <p className="docs-lead">Accessible date range picker with one or two-month grid, hover preview, presets, and min/max constraints.</p>
       <ul className="docs-highlights">
-        <li>Controlled and uncontrolled usage via value/defaultValue + onChange</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code></li>
         <li>One or two-month calendar with hover preview while picking</li>
         <li>Auto-swap of from/to when the second pick precedes the first</li>
         <li>Optional quick-select presets and clearable trigger</li>
@@ -34,21 +144,22 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-date-range-picker-api">
+      <Heading id="pixel-date-range-picker-api">API</Heading>
+      <FrameworkApi label={'PixelDateRangePicker API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-date-range-picker-a11y">
-      <h3 id="pixel-date-range-picker-a11y">Accessibility</h3>
+      <Heading id="pixel-date-range-picker-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>two-month grid (role=grid)</code></li>
         <li><code>aria-label on day cells</code></li>
         <li><code>start/end announced</code></li>
         <li><code>presets keyboard-reachable</code></li>
+        <li><code>clear button beside the trigger</code></li>
       </ul>
-      <p className="docs-aria-notes">Each calendar panel uses role=grid with a labelled aria-live month header; day cells expose aria-selected for range edges and aria-disabled for out-of-bound days. Presets render as native buttons reachable via Tab.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Opening moves focus to the range start, else today; Escape, a preset and picking the end return it to the trigger. The popover is a dialog named &quot;Choose date range&quot;. Each calendar panel uses role=grid with a labelled aria-live month header; day cells expose aria-selected for range edges, aria-current=&quot;date&quot; for today and aria-disabled for out-of-bound days, and one day of the two months is in the tab order. Presets render as native buttons reachable via Tab. With clearable and a range set, a native &quot;Clear range&quot; button lies over the end of the trigger, beside it rather than inside (a button cannot contain a button): it is the next tab stop, clears the range, closes an open popover and moves focus to the trigger.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -90,12 +201,22 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
           </tr>
           <tr>
             <td><kbd>PageUp</kbd></td>
-            <td>Move focus to the previous month</td>
+            <td>Move focus to the same day of the previous month (its last day when shorter)</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
             <td><kbd>PageDown</kbd></td>
-            <td>Move focus to the next month</td>
+            <td>Move focus to the same day of the next month (its last day when shorter)</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+PageUp</kbd></td>
+            <td>Move focus to the same day of the previous year</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+PageDown</kbd></td>
+            <td>Move focus to the same day of the next year</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
@@ -108,13 +229,26 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
             <td>Select the focused day (start, then end)</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
+          <tr>
+            <td><kbd>Tab</kbd></td>
+            <td>Move from the trigger to its clear button while a range is set</td>
+            <td>clearable</td>
+          </tr>
+          <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Clear the range and focus the trigger, without opening the popover</td>
+            <td>clear button focused</td>
+          </tr>
         </tbody>
       </table>
     </section>
     <section aria-labelledby="pixel-date-range-picker-usage">
-      <h3 id="pixel-date-range-picker-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelDateRangePicker, DateRangeValue } from '@pxlkit/ui-kit';
+      <Heading id="pixel-date-range-picker-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelDateRangePicker usage'}
+        react={`import { useState } from 'react';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [range, setRange] = useState<DateRangeValue>({});
@@ -126,14 +260,41 @@ export function Default() {
       placeholder="Select date range"
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit-vue';
+
+const range = ref<DateRangeValue>({});
+</script>
+
+<template>
+  <PixelDateRangePicker v-model="range" label="Date range" placeholder="Select date range" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDateRangePicker],
+  template: \`<pxl-date-range-picker label="Date range" placeholder="Select date range" [(value)]="range" />\`,
+})
+export class Default {
+  readonly range = signal<DateRangeValue>({});
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <p>The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today&#39;s mark can differ from the browser&#39;s.</p>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [range, setRange] = useState<DateRangeValue>({});
   return (
     <PixelDateRangePicker
@@ -143,11 +304,38 @@ export function Default() {
       placeholder="Select date range"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit-vue';
+
+const range = ref<DateRangeValue>({});
+</script>
+
+<template>
+  <PixelDateRangePicker v-model="range" label="Date range" placeholder="Select date range" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDateRangePicker],
+  template: \`<pxl-date-range-picker label="Date range" placeholder="Select date range" [(value)]="range" />\`,
+})
+export class Default {
+  readonly range = signal<DateRangeValue>({});
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-presets">
-        <h4>With Presets</h4>
-        <pre className="docs-code"><code>{`export function WithPresets() {
+        <Subheading>With Presets</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Presets code'}
+          react={`import { useState } from 'react';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit';
+
+export function WithPresets() {
   const [range, setRange] = useState<DateRangeValue>({});
   const today = new Date();
   const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -167,11 +355,64 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit-vue';
+
+const range = ref<DateRangeValue>({});
+const today = new Date();
+const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+const last7 = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
+const last30 = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 29);
+const next7 = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+const presets = [
+  { label: 'Last 7 days', value: { from: last7, to: start } },
+  { label: 'Last 30 days', value: { from: last30, to: start } },
+  { label: 'Next 7 days', value: { from: start, to: next7 } },
+];
+</script>
+
+<template>
+  <PixelDateRangePicker v-model="range" label="Reporting period" clearable :presets="presets" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDateRangePicker],
+  template: \`<pxl-date-range-picker label="Reporting period" clearable [presets]="presets" [(value)]="range" />\`,
+})
+export class WithPresets {
+  readonly range = signal<DateRangeValue>({});
+  private readonly today = new Date();
+  private readonly start = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate());
+  readonly presets = [
+    {
+      label: 'Last 7 days',
+      value: { from: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() - 6), to: this.start },
+    },
+    {
+      label: 'Last 30 days',
+      value: { from: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() - 29), to: this.start },
+    },
+    {
+      label: 'Next 7 days',
+      value: { from: this.start, to: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 7) },
+    },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-single-month">
-        <h4>Single Month</h4>
-        <pre className="docs-code"><code>{`export function SingleMonth() {
+        <Subheading>Single Month</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Single Month code'}
+          react={`import { useState } from 'react';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit';
+
+export function SingleMonth() {
   const [range, setRange] = useState<DateRangeValue>({});
   return (
     <PixelDateRangePicker
@@ -183,15 +424,50 @@ export function Default() {
       clearable
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit-vue';
+
+const range = ref<DateRangeValue>({});
+</script>
+
+<template>
+  <PixelDateRangePicker
+    v-model="range"
+    label="Single-month view"
+    hint="Compact one-month calendar"
+    :number-of-months="1"
+    clearable
+  />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDateRangePicker],
+  template: \`
+    <pxl-date-range-picker
+      label="Single-month view"
+      hint="Compact one-month calendar"
+      [numberOfMonths]="1"
+      clearable
+      [(value)]="range"
+    />
+  \`,
+})
+export class SingleMonth {
+  readonly range = signal<DateRangeValue>({});
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-date-picker">PixelDatePicker</a></li>
-        <li><a href="#pixel-calendar-grid">PixelCalendarGrid</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-date-picker' : '#pixel-date-picker'}>PixelDatePicker</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-calendar-grid' : '#pixel-calendar-grid'}>PixelCalendarGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
       </ul>
     </section>
     </section>

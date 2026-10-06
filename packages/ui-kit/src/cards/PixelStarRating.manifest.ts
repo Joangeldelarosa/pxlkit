@@ -17,9 +17,9 @@ export default defineManifest({
     'Pixel-art star rating display with optional interactive selection and surface-aware styling.',
   highlights: [
     'Renders the @pxlkit/gamification Star at 16/20/24px with crisp nearest-neighbour scaling',
-    'Gold or green tone tokens for readonly and interactive states, surface-aware via useEffectiveSurface',
+    'Gold or green tone tokens for readonly and interactive states, surface-aware (pixel / linear)',
     'Optional showCount label renders "N/M" beside the stars',
-    'Interactive mode exposes per-star buttons with onChange callback',
+    'Interactive mode exposes per-star buttons; bind the rating with `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular)',
     'Polymorphic starIcon prop swaps in any sibling-pack glyph without forking',
   ],
   examples: [

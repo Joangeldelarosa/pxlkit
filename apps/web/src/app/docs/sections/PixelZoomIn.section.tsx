@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelZoomInDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelZoomInDocsMeta = {
@@ -17,28 +23,109 @@ export const PixelZoomInDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelZoomInDocsSection({ className }: PixelZoomInDocsSectionProps): React.ReactElement {
+/** PixelZoomIn's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelZoomIn } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelZoomIn',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to zoom in.' },
+          { name: 'duration', type: 'number', default: '320', description: 'Animation duration in milliseconds. Default `320`.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Animation delay in milliseconds. Default `0`.' },
+          { name: 'startScale', type: 'number', default: '0.92', description: 'Starting `scale()` factor. Default `0.92`.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`. Default `1`." },
+          { name: 'easing', type: 'string', default: "'cubic-bezier(.2,.9,.2,1)'", description: "CSS `animation-timing-function`. Default `'cubic-bezier(.2,.9,.2,1)'`." },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: "CSS `animation-fill-mode`. Default `'both'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelZoomIn } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelZoomIn',
+        props: [
+          { name: 'duration', type: 'number', default: '320', description: 'Animation duration in milliseconds.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Animation delay in milliseconds.' },
+          { name: 'startScale', type: 'number', default: '0.92', description: 'Starting `scale()` factor.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'cubic-bezier(.2,.9,.2,1)'", description: 'CSS `animation-timing-function`.' },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: 'CSS `animation-fill-mode`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to zoom in.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelZoomIn } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelZoomIn',
+        selector: 'pxl-zoom-in',
+        props: [
+          { name: 'duration', type: 'number', default: '320', accepts: 'unknown', description: 'Animation duration in milliseconds.' },
+          { name: 'delay', type: 'number', default: '0', accepts: 'unknown', description: 'Animation delay in milliseconds.' },
+          { name: 'startScale', type: 'number', default: '0.92', accepts: 'unknown', description: 'Starting `scale()` factor.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', accepts: "number | 'infinite' | `${number}`", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'cubic-bezier(.2,.9,.2,1)'", description: 'CSS `animation-timing-function`.' },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: 'CSS `animation-fill-mode`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelZoomInDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelZoomInDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-zoom-in-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-zoom-in-heading'>PixelZoomIn</h2>
+      <Title id='pixel-zoom-in-heading'>PixelZoomIn</Title>
       <p className="docs-lead">Scales children from a starting scale factor to 1 with a fade-in animation.</p>
       <ul className="docs-highlights">
         <li>Configurable duration, delay, easing, and start scale</li>
         <li>Supports mount, hover, and view-based triggers</li>
-        <li>Respects prefers-reduced-motion via shared animation hook</li>
-        <li>Forwards ref to the wrapping div and fires onComplete after final iteration</li>
+        <li>Respects prefers-reduced-motion automatically</li>
+        <li>Signals the end of its last iteration: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-zoom-in-api">
+      <Heading id="pixel-zoom-in-api">API</Heading>
+      <FrameworkApi label={'PixelZoomIn API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-zoom-in-a11y">
-      <h3 id="pixel-zoom-in-a11y">Accessibility</h3>
+      <Heading id="pixel-zoom-in-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -46,8 +133,11 @@ export function PixelZoomInDocsSection({ className }: PixelZoomInDocsSectionProp
       <p className="docs-aria-notes">Animation is suppressed when the user requests reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-zoom-in-usage">
-      <h3 id="pixel-zoom-in-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelZoomIn } from '@pxlkit/ui-kit';
+      <Heading id="pixel-zoom-in-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelZoomIn usage'}
+        react={`import { PixelZoomIn } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -57,14 +147,40 @@ export function Default() {
       </div>
     </PixelZoomIn>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelZoomIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelZoomIn>
+    <div style="padding: 16px; background: #0EA5E9; color: #fff; border-radius: 8px">Zoom in content</div>
+  </PixelZoomIn>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelZoomIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelZoomIn],
+  template: \`
+    <pxl-zoom-in>
+      <div style="padding: 16px; background: #0EA5E9; color: #fff; border-radius: 8px">Zoom in content</div>
+    </pxl-zoom-in>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelZoomIn } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelZoomIn>
       <div style={{ padding: 16, background: '#0EA5E9', color: '#fff', borderRadius: 8 }}>
@@ -72,11 +188,38 @@ export function Default() {
       </div>
     </PixelZoomIn>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelZoomIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelZoomIn>
+    <div style="padding: 16px; background: #0EA5E9; color: #fff; border-radius: 8px">Zoom in content</div>
+  </PixelZoomIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelZoomIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelZoomIn],
+  template: \`
+    <pxl-zoom-in>
+      <div style="padding: 16px; background: #0EA5E9; color: #fff; border-radius: 8px">Zoom in content</div>
+    </pxl-zoom-in>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-start-scale">
-        <h4>Custom Start Scale</h4>
-        <pre className="docs-code"><code>{`export function CustomStartScale() {
+        <Subheading>Custom Start Scale</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Custom Start Scale code'}
+          react={`import { PixelZoomIn } from '@pxlkit/ui-kit';
+
+export function CustomStartScale() {
   return (
     <PixelZoomIn startScale={0.6} duration={500}>
       <div style={{ padding: 16, background: '#A855F7', color: '#fff', borderRadius: 8 }}>
@@ -84,11 +227,38 @@ export function Default() {
       </div>
     </PixelZoomIn>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelZoomIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelZoomIn :start-scale="0.6" :duration="500">
+    <div style="padding: 16px; background: #A855F7; color: #fff; border-radius: 8px">Bigger zoom from 0.6</div>
+  </PixelZoomIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelZoomIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelZoomIn],
+  template: \`
+    <pxl-zoom-in [startScale]="0.6" [duration]="500">
+      <div style="padding: 16px; background: #A855F7; color: #fff; border-radius: 8px">Bigger zoom from 0.6</div>
+    </pxl-zoom-in>
+  \`,
+})
+export class CustomStartScale {}`}
+        />
       </article>
       <article className="docs-example" id="example-hover-trigger">
-        <h4>Hover Trigger</h4>
-        <pre className="docs-code"><code>{`export function HoverTrigger() {
+        <Subheading>Hover Trigger</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Hover Trigger code'}
+          react={`import { PixelZoomIn } from '@pxlkit/ui-kit';
+
+export function HoverTrigger() {
   return (
     <PixelZoomIn trigger="hover" repeat="infinite" duration={600}>
       <button style={{ padding: 12, background: '#111', color: '#fff', borderRadius: 6 }}>
@@ -96,14 +266,36 @@ export function Default() {
       </button>
     </PixelZoomIn>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelZoomIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelZoomIn trigger="hover" repeat="infinite" :duration="600">
+    <button style="padding: 12px; background: #111; color: #fff; border-radius: 6px">Hover me</button>
+  </PixelZoomIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelZoomIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelZoomIn],
+  template: \`
+    <pxl-zoom-in trigger="hover" repeat="infinite" [duration]="600">
+      <button style="padding: 12px; background: #111; color: #fff; border-radius: 6px">Hover me</button>
+    </pxl-zoom-in>
+  \`,
+})
+export class HoverTrigger {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-fade-in">PixelFadeIn</a></li>
-        <li><a href="#pixel-slide-in">PixelSlideIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-fade-in' : '#pixel-fade-in'}>PixelFadeIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-slide-in' : '#pixel-slide-in'}>PixelSlideIn</a></li>
       </ul>
     </section>
     </section>

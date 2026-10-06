@@ -15,7 +15,7 @@ export default defineManifest({
     'Configurable global shortcut (default mod+k) toggles the palette open from anywhere',
     'Grouped items with headings, icons, keywords for search, and per-item keyboard hints',
     'Full keyboard navigation: ArrowUp/Down, Home/End, Enter to select, Escape to close',
-    'Surface-aware chrome (pixel vs linear) inherited from theme context',
+    'Surface-aware chrome (pixel vs linear) from the nearest PxlKitSurfaceProvider',
     'Combobox + listbox a11y pattern with aria-activedescendant for assistive tech',
   ],
   examples: [

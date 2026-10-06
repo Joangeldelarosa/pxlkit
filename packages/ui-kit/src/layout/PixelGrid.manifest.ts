@@ -18,8 +18,8 @@ export default defineManifest({
     'Numeric or responsive column spec (base/sm/md/lg/xl)',
     'Asymmetric colGap/rowGap via stack-gap tokens',
     'autoFit / autoFill with configurable minColWidth',
-    'Polymorphic via `as`; inherits semantics from rendered element',
-    'Surface-aware transition classes via useEffectiveSurface',
+    'Polymorphic via `as` (in Angular, the element you put `pxlGrid` on); inherits semantics from rendered element',
+    'Surface-aware transition classes',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

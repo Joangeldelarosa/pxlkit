@@ -39,7 +39,7 @@ export default defineManifest({
     wcag: '2.1 AA',
     patterns: ['img'],
     notes:
-      'Avatar is a presentational identity badge. The user name is exposed via `title`; when `status` is set the status word is appended into the accessible name (no live region — status dots are not transient announcements). When `src` is provided the inner <img> uses the same accessible name as its alt text.',
+      'Avatar is a presentational identity badge. The user name is exposed via `title`; when `status` is set the frame becomes role="img" named by the user name plus the status word (no live region — status dots are not transient announcements). When `src` is provided the inner <img> uses the same accessible name as its alt text.',
   },
   related: ['PixelAvatarGroup', 'PixelBadge', 'PixelChip'],
   apiStability: 'stable',

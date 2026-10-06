@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelEqualHeightGridDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelEqualHeightGridDocsMeta = {
@@ -17,38 +23,125 @@ export const PixelEqualHeightGridDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightGridDocsSectionProps): React.ReactElement {
+/** PixelEqualHeightGrid's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelEqualHeightGrid',
+        props: [
+          { name: 'rowAlign', type: "'top' | 'stretch'", default: "'stretch'", description: "`stretch` gives every item of a row the row's height; `top` keeps their own." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'as', type: 'keyof React.JSX.IntrinsicElements', description: 'Element to render.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `align`.',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelEqualHeightGrid',
+        props: [
+          { name: 'rowAlign', type: "'top' | 'stretch'", default: "'stretch'", description: "`stretch` gives every item of a row the row's height; `top` keeps their own." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'as', type: 'string', default: "'div'", description: 'Element to render.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', default: "'16rem'", description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+        ],
+        slots: [
+          { name: 'default', description: 'The items: each element or component, laid out as header, body and footer.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelEqualHeightGrid',
+        selector: '[pxlEqualHeightGrid]',
+        props: [
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', accepts: "1 | 2 | 3 | 4 | 5 | 6 | 12 | '1' | '2' | '3' | '4' | '5' | '6' | '12' | GridResponsiveColumns", description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', accepts: "1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'", description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', default: 'false', accepts: 'unknown', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', default: 'false', accepts: 'unknown', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', default: "'16rem'", description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'rowAlign', type: "'top' | 'stretch'", default: "'stretch'", description: "`stretch` gives every item of a row the row's height; `top` keeps their own." },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelEqualHeightGridDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelEqualHeightGridDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-equal-height-grid-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-equal-height-grid-heading'>PixelEqualHeightGrid</h2>
+      <Title id='pixel-equal-height-grid-heading'>PixelEqualHeightGrid</Title>
       <p className="docs-lead">Grid wrapper that forces equal-height children via a 3-row subgrid (header / body / footer).</p>
       <ul className="docs-highlights">
-        <li>Inherits PixelGrid props (cols, gap, surface, etc.) minus align (forced to stretch)</li>
-        <li>Clones children with grid-rows-[auto_1fr_auto] so footers align across the row</li>
-        <li>Surface-aware via useEffectiveSurface for consistent borders and transitions</li>
-        <li>rowAlign=&quot;top&quot; opts out of stretching while keeping equal-height children</li>
+        <li>Inherits PixelGrid props (cols, gap, surface, etc.) minus align, which rowAlign sets</li>
+        <li>Gives each child grid-rows-[auto_1fr_auto] so footers align across the row</li>
+        <li>Surface-aware borders and transitions</li>
+        <li>rowAlign=&quot;top&quot; keeps each item at its own height, at the top of its row</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-equal-height-grid-api">
+      <Heading id="pixel-equal-height-grid-api">API</Heading>
+      <FrameworkApi label={'PixelEqualHeightGrid API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-equal-height-grid-a11y">
-      <h3 id="pixel-equal-height-grid-a11y">Accessibility</h3>
+      <Heading id="pixel-equal-height-grid-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
-      <p className="docs-aria-notes">Inherits semantics from the underlying PixelGrid element (defaults to &lt;div&gt;). Use the `as` prop to render a more semantic container when appropriate.</p>
+      <p className="docs-aria-notes">Inherits semantics from the underlying PixelGrid element (defaults to &lt;div&gt;). Use the <code>as</code> prop to render a more semantic container when appropriate.</p>
     </section>
     <section aria-labelledby="pixel-equal-height-grid-usage">
-      <h3 id="pixel-equal-height-grid-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+      <Heading id="pixel-equal-height-grid-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelEqualHeightGrid usage'}
+        react={`import { cn, PixelEqualHeightGrid } from '@pxlkit/ui-kit';
 
-function Card({ title, body }: { title: string; body: string }) {
+function Card({ title, body, className }: { title: string; body: string; className?: string }) {
   return (
-    <div className="border border-retro-border p-4">
+    <div className={cn('border border-retro-border p-4', className)}>
       <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
       <p className="text-sm text-retro-muted">{body}</p>
       <div className="mt-2 text-xs text-retro-muted">Footer</div>
@@ -64,14 +157,72 @@ export function Default() {
       <Card title="Three" body="Medium length copy here." />
     </PixelEqualHeightGrid>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-vue';
+
+const cards = [
+  { title: 'One', body: 'Short copy.' },
+  { title: 'Two', body: 'A longer body that forces the row to grow taller than the first card.' },
+  { title: 'Three', body: 'Medium length copy here.' },
+];
+</script>
+
+<template>
+  <PixelEqualHeightGrid :cols="{ base: 1, sm: 3 }" :gap="4">
+    <div v-for="card in cards" :key="card.title" class="border border-retro-border p-4">
+      <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+      <p class="text-sm text-retro-muted">{{ card.body }}</p>
+      <div class="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  </PixelEqualHeightGrid>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEqualHeightGrid],
+  template: \`
+    <div pxlEqualHeightGrid [cols]="{ base: 1, sm: 3 }" [gap]="4">
+      @for (card of cards; track card.title) {
+        <div class="border border-retro-border p-4">
+          <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+          <p class="text-sm text-retro-muted">{{ card.body }}</p>
+          <div class="mt-2 text-xs text-retro-muted">Footer</div>
+        </div>
+      }
+    </div>
+  \`,
+})
+export class Default {
+  readonly cards = [
+    { title: 'One', body: 'Short copy.' },
+    { title: 'Two', body: 'A longer body that forces the row to grow taller than the first card.' },
+    { title: 'Three', body: 'Medium length copy here.' },
+  ];
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { cn, PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+
+function Card({ title, body, className }: { title: string; body: string; className?: string }) {
+  return (
+    <div className={cn('border border-retro-border p-4', className)}>
+      <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
+      <p className="text-sm text-retro-muted">{body}</p>
+      <div className="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  );
+}
+
+export function Default() {
   return (
     <PixelEqualHeightGrid cols={{ base: 1, sm: 3 }} gap={4}>
       <Card title="One" body="Short copy." />
@@ -79,11 +230,70 @@ export function Default() {
       <Card title="Three" body="Medium length copy here." />
     </PixelEqualHeightGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-vue';
+
+const cards = [
+  { title: 'One', body: 'Short copy.' },
+  { title: 'Two', body: 'A longer body that forces the row to grow taller than the first card.' },
+  { title: 'Three', body: 'Medium length copy here.' },
+];
+</script>
+
+<template>
+  <PixelEqualHeightGrid :cols="{ base: 1, sm: 3 }" :gap="4">
+    <div v-for="card in cards" :key="card.title" class="border border-retro-border p-4">
+      <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+      <p class="text-sm text-retro-muted">{{ card.body }}</p>
+      <div class="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  </PixelEqualHeightGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEqualHeightGrid],
+  template: \`
+    <div pxlEqualHeightGrid [cols]="{ base: 1, sm: 3 }" [gap]="4">
+      @for (card of cards; track card.title) {
+        <div class="border border-retro-border p-4">
+          <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+          <p class="text-sm text-retro-muted">{{ card.body }}</p>
+          <div class="mt-2 text-xs text-retro-muted">Footer</div>
+        </div>
+      }
+    </div>
+  \`,
+})
+export class Default {
+  readonly cards = [
+    { title: 'One', body: 'Short copy.' },
+    { title: 'Two', body: 'A longer body that forces the row to grow taller than the first card.' },
+    { title: 'Three', body: 'Medium length copy here.' },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-row-align-top">
-        <h4>Row Align Top</h4>
-        <pre className="docs-code"><code>{`export function RowAlignTop() {
+        <Subheading>Row Align Top</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Row Align Top code'}
+          react={`import { cn, PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+
+function Card({ title, body, className }: { title: string; body: string; className?: string }) {
+  return (
+    <div className={cn('border border-retro-border p-4', className)}>
+      <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
+      <p className="text-sm text-retro-muted">{body}</p>
+      <div className="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  );
+}
+
+export function RowAlignTop() {
   return (
     <PixelEqualHeightGrid cols={{ base: 1, sm: 3 }} gap={4} rowAlign="top">
       <Card title="One" body="Short copy." />
@@ -91,24 +301,125 @@ export function Default() {
       <Card title="Three" body="Medium length copy here." />
     </PixelEqualHeightGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-vue';
+
+const cards = [
+  { title: 'One', body: 'Short copy.' },
+  { title: 'Two', body: 'A longer body that would otherwise stretch siblings.' },
+  { title: 'Three', body: 'Medium length copy here.' },
+];
+</script>
+
+<template>
+  <PixelEqualHeightGrid :cols="{ base: 1, sm: 3 }" :gap="4" row-align="top">
+    <div v-for="card in cards" :key="card.title" class="border border-retro-border p-4">
+      <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+      <p class="text-sm text-retro-muted">{{ card.body }}</p>
+      <div class="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  </PixelEqualHeightGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEqualHeightGrid],
+  template: \`
+    <div pxlEqualHeightGrid [cols]="{ base: 1, sm: 3 }" [gap]="4" rowAlign="top">
+      @for (card of cards; track card.title) {
+        <div class="border border-retro-border p-4">
+          <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+          <p class="text-sm text-retro-muted">{{ card.body }}</p>
+          <div class="mt-2 text-xs text-retro-muted">Footer</div>
+        </div>
+      }
+    </div>
+  \`,
+})
+export class RowAlignTop {
+  readonly cards = [
+    { title: 'One', body: 'Short copy.' },
+    { title: 'Two', body: 'A longer body that would otherwise stretch siblings.' },
+    { title: 'Three', body: 'Medium length copy here.' },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <Subheading>Pixel Surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel Surface code'}
+          react={`import { cn, PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+
+function Card({ title, body, className }: { title: string; body: string; className?: string }) {
+  return (
+    <div className={cn('border border-retro-border p-4', className)}>
+      <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
+      <p className="text-sm text-retro-muted">{body}</p>
+      <div className="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  );
+}
+
+export function PixelSurface() {
   return (
     <PixelEqualHeightGrid cols={2} gap={4} surface="pixel">
       <Card title="Pixel A" body="Surface-aware grid item." />
       <Card title="Pixel B" body="Renders with the pixel surface tokens applied to the grid." />
     </PixelEqualHeightGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-vue';
+
+const cards = [
+  { title: 'Pixel A', body: 'Surface-aware grid item.' },
+  { title: 'Pixel B', body: 'Renders with the pixel surface tokens applied to the grid.' },
+];
+</script>
+
+<template>
+  <PixelEqualHeightGrid :cols="2" :gap="4" surface="pixel">
+    <div v-for="card in cards" :key="card.title" class="border border-retro-border p-4">
+      <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+      <p class="text-sm text-retro-muted">{{ card.body }}</p>
+      <div class="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  </PixelEqualHeightGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEqualHeightGrid],
+  template: \`
+    <div pxlEqualHeightGrid [cols]="2" [gap]="4" surface="pixel">
+      @for (card of cards; track card.title) {
+        <div class="border border-retro-border p-4">
+          <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+          <p class="text-sm text-retro-muted">{{ card.body }}</p>
+          <div class="mt-2 text-xs text-retro-muted">Footer</div>
+        </div>
+      }
+    </div>
+  \`,
+})
+export class PixelSurface {
+  readonly cards = [
+    { title: 'Pixel A', body: 'Surface-aware grid item.' },
+    { title: 'Pixel B', body: 'Renders with the pixel surface tokens applied to the grid.' },
+  ];
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-grid">PixelGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-grid' : '#pixel-grid'}>PixelGrid</a></li>
       </ul>
     </section>
     </section>

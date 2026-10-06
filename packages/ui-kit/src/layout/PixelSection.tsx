@@ -5,22 +5,18 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, surfaceClasses, useEffectiveSurface } from '../common';
+import { sectionClasses } from '@pxlkit/ui-kit-core';
+import { Surface, useEffectiveSurface } from '../common';
 import { usePxlKitLocale } from '../locale';
 import { PixelCenter } from './PixelCenter';
-import {
-  sectionRhythm,
-  pageGutter,
-  type ContainerWidth,
-  type PageGutter,
-  type SectionRhythmKey,
-} from '../tokens';
+import { type ContainerWidth, type PageGutter, type SectionRhythmKey } from '../tokens';
 
 export interface PixelSectionProps {
   /** Title rendered as an uppercase heading row at the top of the section. */
   title?: string;
   /** Optional subtitle below the title. */
   subtitle?: string;
+  /** Section content. */
   children: React.ReactNode;
   /** Surface variant. Falls back to nearest <PxlKitSurface>. */
   surface?: Surface;
@@ -48,15 +44,15 @@ export const PixelSection = forwardRef<HTMLElement, PixelSectionProps>(function 
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
+  const c = sectionClasses(surface, { bordered, verticalPadding, container, horizontalGutter });
   const { upper } = usePxlKitLocale();
 
   const inner = (
     <>
       {title && (
         <div className="mb-4">
-          <h3 className={cn('text-xs text-retro-green', surface === 'pixel' ? 'font-pixel' : 'font-semibold text-sm')}>{upper(title)}</h3>
-          {subtitle && <p className={cn('mt-2 text-sm text-retro-muted', s.font)}>{subtitle}</p>}
+          <h3 className={c.title}>{upper(title)}</h3>
+          {subtitle && <p className={c.subtitle}>{subtitle}</p>}
         </div>
       )}
       {children}
@@ -64,18 +60,7 @@ export const PixelSection = forwardRef<HTMLElement, PixelSectionProps>(function 
   );
 
   return (
-    <section
-      ref={ref}
-      className={cn(
-        'p-4 sm:p-6',
-        bordered && 'bg-retro-card/40',
-        bordered && s.border,
-        bordered && s.radiusLg,
-        bordered && 'border-retro-border/40',
-        sectionRhythm[verticalPadding],
-        !container && pageGutter[horizontalGutter],
-      )}
-    >
+    <section ref={ref} className={c.section}>
       {container ? (
         <PixelCenter maxWidth={container} gutter={horizontalGutter} surface={surface}>
           {inner}

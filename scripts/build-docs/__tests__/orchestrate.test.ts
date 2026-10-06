@@ -408,12 +408,16 @@ describe("PIPELINE_STEPS", () => {
     const names = PIPELINE_STEPS.map((s) => s.name);
     expect(names).toEqual([
       "scan",
+      // extract-api reads the kits' APIs for generate-docs-page, in a worker
+      // thread that runs beside the steps between them.
+      "extract-api",
       "extract-bundle",
       "generate-registry",
       // generate-skill-refs digests the freshly generated registry, so it must
       // stay pinned immediately after generate-registry.
       "generate-skill-refs",
       "generate-stories",
+      "generate-port-stories",
       "generate-showcase",
       "generate-docs-page",
       "generate-readme-package",

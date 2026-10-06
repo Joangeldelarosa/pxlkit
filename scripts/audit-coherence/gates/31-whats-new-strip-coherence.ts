@@ -16,6 +16,8 @@ interface ReadOptions {
   registry?: string | null;
   uiKitPackage?: { version?: string } | null;
   uiKitChangelog?: string | null;
+  /** The root CHANGELOG.md, where a release that spans packages lists what it added. */
+  rootChangelog?: string | null;
 }
 
 export async function loadInputs(repoRoot: string): Promise<{
@@ -23,13 +25,15 @@ export async function loadInputs(repoRoot: string): Promise<{
   registry: string | null;
   uiKitPackage: { version?: string } | null;
   uiKitChangelog: string | null;
+  rootChangelog: string | null;
 }> {
   const strip = await tryRead(join(repoRoot, STRIP_PATH));
   const registry = await tryRead(join(repoRoot, 'packages/ui-kit/src/registry.ts'));
   const pkgRaw = await tryRead(join(repoRoot, 'packages/ui-kit/package.json'));
   const uiKitPackage = pkgRaw ? (JSON.parse(pkgRaw) as { version?: string }) : null;
   const uiKitChangelog = await tryRead(join(repoRoot, 'packages/ui-kit/CHANGELOG.md'));
-  return { strip, registry, uiKitPackage, uiKitChangelog };
+  const rootChangelog = await tryRead(join(repoRoot, 'CHANGELOG.md'));
+  return { strip, registry, uiKitPackage, uiKitChangelog, rootChangelog };
 }
 
 async function tryRead(path: string): Promise<string | null> {
@@ -62,7 +66,7 @@ export function isVersionPropDriven(strip: string): boolean {
 
 export function evaluate(opts: ReadOptions): DriftItem[] {
   const drift: DriftItem[] = [];
-  const { strip, registry, uiKitPackage, uiKitChangelog } = opts;
+  const { strip, registry, uiKitPackage, uiKitChangelog, rootChangelog } = opts;
 
   if (!strip) {
     drift.push({
@@ -108,12 +112,13 @@ export function evaluate(opts: ReadOptions): DriftItem[] {
   }
 
   // Accepted versions: the current package version, plus — when the current
-  // version is a version-only patch with no "### Added" entries — the
-  // advertised release (most recent version that HAS Added entries). The
-  // strip legitimately keeps advertising that release's content.
+  // version is a version-only patch with no "### Added" entries, in the kit's
+  // CHANGELOG or the root one — the advertised release (most recent version
+  // that HAS Added entries). The strip legitimately keeps advertising that
+  // release's content.
   const accepted = new Set([version]);
   if (uiKitChangelog) {
-    const advertised = resolveAdvertisedRelease(uiKitChangelog, version);
+    const advertised = resolveAdvertisedRelease(uiKitChangelog, version, { rootChangelog });
     if (advertised?.isFallback) accepted.add(advertised.version);
   }
 

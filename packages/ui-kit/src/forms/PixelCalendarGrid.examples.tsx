@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { PixelCalendarGrid } from './PixelCalendarGrid'
 
 export function Default() {

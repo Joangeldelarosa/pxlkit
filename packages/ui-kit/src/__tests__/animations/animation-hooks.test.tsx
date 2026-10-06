@@ -1,7 +1,8 @@
 import React from 'react';
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { act, renderHook } from '@testing-library/react';
+import { act, fireEvent, render, renderHook } from '@testing-library/react';
 import { useAnimationTrigger } from '../../animations/_internal/animation-hooks';
+import type { AnimationTrigger } from '../../animations/types';
 import { mockMatchMedia, type MatchMediaController } from './matchmedia-mock';
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -18,7 +19,18 @@ afterEach(() => {
   ctl?.restore();
   ctl = null;
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
+
+/** An element animated the way every Pixel* component wires the hook. */
+function Animated({ trigger, onComplete }: { trigger: AnimationTrigger; onComplete?: () => void }) {
+  const { ref, active, handlers, handleAnimEnd } = useAnimationTrigger(trigger, onComplete);
+  return (
+    <div ref={ref} data-testid="animated" data-active={String(active)} {...handlers} onAnimationEnd={handleAnimEnd}>
+      <span>child</span>
+    </div>
+  );
+}
 
 describe('useAnimationTrigger — trigger modes (no reduced-motion preference)', () => {
   it("'mount' is active immediately and reports reducedMotion=false", () => {
@@ -163,5 +175,79 @@ describe('useAnimationTrigger — prefers-reduced-motion override', () => {
     });
     expect(result.current.active).toBe(true);
     expect(result.current.reducedMotion).toBe(false);
+  });
+});
+
+describe('useAnimationTrigger — environments without the browser APIs it uses', () => {
+  it("plays 'inView' content at once where IntersectionObserver is missing (jsdom, old WebViews)", () => {
+    expect(typeof IntersectionObserver).toBe('undefined');
+    const { getByTestId } = render(<Animated trigger="inView" />);
+    expect(getByTestId('animated').dataset.active).toBe('true');
+  });
+
+  it("follows an IntersectionObserver for 'inView', and stops when unmounted", () => {
+    let report: IntersectionObserverCallback = () => {};
+    const observer = { observe: vi.fn(), disconnect: vi.fn() };
+    vi.stubGlobal(
+      'IntersectionObserver',
+      vi.fn(function (callback: IntersectionObserverCallback) {
+        report = callback;
+        return observer;
+      }),
+    );
+    const intersect = (isIntersecting: boolean) =>
+      act(() => report([{ isIntersecting } as IntersectionObserverEntry], observer as unknown as IntersectionObserver));
+    const { getByTestId, unmount } = render(<Animated trigger="inView" />);
+    const el = getByTestId('animated');
+    expect(observer.observe).toHaveBeenCalledWith(el);
+    expect(el.dataset.active).toBe('false');
+    intersect(true);
+    expect(el.dataset.active).toBe('true');
+    intersect(false);
+    expect(el.dataset.active).toBe('false');
+    unmount();
+    expect(observer.disconnect).toHaveBeenCalledOnce();
+  });
+
+  it('restarts the running animations on a click during a click-triggered run', () => {
+    const { getByTestId } = render(<Animated trigger="click" />);
+    const el = getByTestId('animated');
+    const animation = { cancel: vi.fn(), play: vi.fn() };
+    const getAnimations = vi.fn(() => [animation]);
+    Object.assign(el, { getAnimations });
+    fireEvent.click(el);
+    expect(getAnimations).not.toHaveBeenCalled();
+    fireEvent.click(el);
+    expect(getAnimations).toHaveBeenCalledWith({ subtree: true });
+    expect(animation.cancel).toHaveBeenCalledOnce();
+    expect(animation.play).toHaveBeenCalledOnce();
+    expect(el.dataset.active).toBe('true');
+  });
+
+  it('keeps playing on a second click where the Web Animations API is missing', () => {
+    const errors = vi.fn();
+    window.addEventListener('error', errors);
+    try {
+      const { getByTestId } = render(<Animated trigger="click" />);
+      const el = getByTestId('animated');
+      expect(el.getAnimations).toBeUndefined();
+      fireEvent.click(el);
+      fireEvent.click(el);
+      expect(errors).not.toHaveBeenCalled();
+      expect(el.dataset.active).toBe('true');
+    } finally {
+      window.removeEventListener('error', errors);
+    }
+  });
+
+  it('calls the latest onComplete, without a new callback ending or restarting anything', () => {
+    const first = vi.fn();
+    const latest = vi.fn();
+    const { getByTestId, rerender } = render(<Animated trigger="mount" onComplete={first} />);
+    rerender(<Animated trigger="mount" onComplete={latest} />);
+    fireEvent.animationEnd(getByTestId('animated'));
+    getByTestId('animated').dispatchEvent(new Event('webkitAnimationEnd', { bubbles: true }));
+    expect(first).not.toHaveBeenCalled();
+    expect(latest).toHaveBeenCalledOnce();
   });
 });

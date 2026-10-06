@@ -24,8 +24,10 @@
  *   - hand-authored files are only written through explicit contracts: the
  *     marker blocks (<!-- COMPONENTS:START/END -->, <!-- WORKSPACES:START/END -->)
  *     replace just the delimited region, and CHANGELOG.md is only created as
- *     a one-time seed when the package has none. Everything else emits to a
- *     `.generated.*` (or sibling `_generated/`) location.
+ *     a one-time seed when the package has none. The Vue and Angular kits'
+ *     `stories/` folders hold only generated files, which are rewritten whole.
+ *     Everything else emits to a `.generated.*` (or sibling `_generated/`)
+ *     location.
  */
 
 import path from "node:path";
@@ -50,8 +52,10 @@ import {
 } from "./extract-bundle-size.js";
 import { GenerateRegistryGenerator } from "./generate-registry.js";
 import { GenerateStoriesGenerator } from "./generate-stories.js";
+import { GeneratePortStoriesGenerator } from "./generate-port-stories.js";
 import { GenerateShowcaseGenerator } from "./generate-showcase.js";
 import { GenerateDocsPageGenerator } from "./generate-docs-page.js";
+import { ExtractApiGenerator } from "./extract-api.js";
 import { GenerateReadmePackageGenerator } from "./generate-readme-package.js";
 import { GenerateRootReadmeGenerator } from "./generate-root-readme.js";
 import { ChangelogGenerator } from "./generate-changelog.js";
@@ -137,6 +141,10 @@ export function defaultPipelineSteps(repoRoot: string): StepDescriptor[] {
   const out = defaultOutRoots(repoRoot);
   return [
     { name: "scan", factory: () => new ScanManifestsGenerator(), required: true },
+    // extract-api starts reading every component's API from the three kits'
+    // sources in a worker thread, so the steps below run meanwhile;
+    // generate-docs-page waits for it and renders it in the sections.
+    { name: "extract-api", factory: () => new ExtractApiGenerator() },
     // extract-bundle measures gzipped per-component bundle size. Optional —
     // it spawns esbuild and depends on the target package being installed, so
     // a failure here must not abort the rest of the docs pipeline.
@@ -157,6 +165,8 @@ export function defaultPipelineSteps(repoRoot: string): StepDescriptor[] {
       required: false,
     },
     { name: "generate-stories", factory: () => new GenerateStoriesGenerator() },
+    // The Vue and Angular Storybooks' stories, from the ports' examples.
+    { name: "generate-port-stories", factory: () => new GeneratePortStoriesGenerator() },
     { name: "generate-showcase", factory: () => new GenerateShowcaseGenerator() },
     { name: "generate-docs-page", factory: () => new GenerateDocsPageGenerator(out.docsPage) },
     { name: "generate-readme-package", factory: () => new GenerateReadmePackageGenerator() },
@@ -191,7 +201,9 @@ const STEP_ALIASES: Record<string, string> = {
   "skill-refs": "generate-skill-refs",
   skills: "generate-skill-refs",
   stories: "generate-stories",
+  "port-stories": "generate-port-stories",
   showcase: "generate-showcase",
+  api: "extract-api",
   "docs-page": "generate-docs-page",
   docs: "generate-docs-page",
   "readme-package": "generate-readme-package",
@@ -405,13 +417,16 @@ export default orchestrate;
 
 // ---------------------------------------------------------------------------
 // Watch mode — poll manifest sources at a fixed interval and re-run the
-// pipeline whenever a *.manifest.ts or *.examples.tsx changes.
+// pipeline whenever a *.manifest.ts or *.examples.tsx changes, or one of the
+// Vue and Angular kits' examples (the docs pages show their code too).
 // Single-flight: a new run is queued only after the previous one finishes.
 // ---------------------------------------------------------------------------
 
 const WATCH_GLOB = [
   "packages/*/src/**/*.manifest.ts",
   "packages/*/src/**/*.examples.tsx",
+  "packages/ui-kit-vue/examples/**/*.vue",
+  "packages/ui-kit-angular/examples/**/*.examples.ts",
 ];
 const WATCH_IGNORE = ["**/node_modules/**", "**/dist/**"];
 

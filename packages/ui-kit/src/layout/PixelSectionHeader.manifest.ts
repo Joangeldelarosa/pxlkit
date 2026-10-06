@@ -17,11 +17,11 @@ export default defineManifest({
   description:
     'Section header with eyebrow, title, description, and actions — rhythm-aware and surface-aware.',
   highlights: [
-    'Configurable heading level (h1–h4) preserves document outline',
+    'Configurable heading level (h1–h6) preserves document outline',
     'Size and spacing scales (sm/md/lg, tight/normal/loose) use shared rhythm tokens',
     'Optional eyebrow is decorative (aria-hidden) with sr-only restatement in the heading',
     'Tone-aware title coloring via ToneKey',
-    'Surface-aware typography via useEffectiveSurface',
+    'Surface-aware typography',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

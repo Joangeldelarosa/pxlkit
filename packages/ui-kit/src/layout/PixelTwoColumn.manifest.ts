@@ -20,7 +20,7 @@ export default defineManifest({
     'Responsive stacking below sm, md, or lg breakpoints',
     'Reverse order toggle to flip visual order without changing markup semantics',
     'Token-based gap scale via stackGap for consistent rhythm',
-    'Surface-aware transitions through useEffectiveSurface',
+    'Surface-aware transitions',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSegmentedDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSegmentedDocsMeta = {
@@ -17,13 +23,95 @@ export const PixelSegmentedDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelSegmentedDocsSection({ className }: PixelSegmentedDocsSectionProps): React.ReactElement {
+/** PixelSegmented's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSegmented } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSegmented',
+        props: [
+          { name: 'label', type: 'string', description: 'Caption rendered above the segmented control. Omitted when empty.' },
+          { name: 'value', type: 'string', required: true, description: 'Active option value.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'Segment items.' },
+          { name: 'onChange', type: '(next: string) => void', required: true, description: 'Fires with the new value when a segment is clicked.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every segment.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: "Visual tone for the active segment. Default: `'green'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'name', type: 'string', description: 'Form-serialization name.' },
+          { name: 'required', type: 'boolean', description: 'Marks the field as required for native form validation.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name for the group; use it when no visible `label` is rendered.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSegmented } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSegmented',
+        props: [
+          { name: 'label', type: 'string', description: 'Caption above the segments; omitted when empty.' },
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Selected value (`v-model`); leave unset for an uncontrolled control.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'The segments.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every segment.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the selected segment.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'required', type: 'boolean', default: 'false', description: 'Marks the field as required for native form validation.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name of the segments when no visible `label` is shown.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The value of the segment the user picked.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSegmented } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSegmented',
+        selector: 'pxl-segmented',
+        props: [
+          { name: 'label', type: 'string', description: 'Caption above the segments; omitted when empty.' },
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Selected value (`[(value)]`); leave unset for an uncontrolled control.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'The segments.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables every segment.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the selected segment.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the field as required for native form validation.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the segments when no visible `label` is shown.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelSegmentedDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSegmentedDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-segmented-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-segmented-heading'>PixelSegmented</h2>
+      <Title id='pixel-segmented-heading'>PixelSegmented</Title>
       <p className="docs-lead">Single-select segmented control for toggling between a small set of mutually exclusive options inline.</p>
       <ul className="docs-highlights">
-        <li>Controlled via value + onChange(next: string) over a list of options.</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — over a list of options.</li>
         <li>Compact horizontal layout for 2-5 options that share visual real estate.</li>
         <li>Seven tones and pixel/linear surfaces share the kit-wide design tokens.</li>
         <li>Optional name emits a hidden input so it serializes inside native forms.</li>
@@ -34,18 +122,18 @@ export function PixelSegmentedDocsSection({ className }: PixelSegmentedDocsSecti
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-segmented-api">
+      <Heading id="pixel-segmented-api">API</Heading>
+      <FrameworkApi label={'PixelSegmented API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-segmented-a11y">
-      <h3 id="pixel-segmented-a11y">Accessibility</h3>
+      <Heading id="pixel-segmented-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>radiogroup</code></li>
       </ul>
       <p className="docs-aria-notes">Each option renders as a &lt;button&gt; with aria-pressed reflecting the active selection, and aria-disabled mirroring the disabled prop. When name is set a hidden &lt;input&gt; mirrors the current value so the control participates in native &lt;form&gt; submissions. The implementation uses aria-pressed (toggle-button semantics) rather than role=&quot;radio&quot; on each button.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -74,8 +162,11 @@ export function PixelSegmentedDocsSection({ className }: PixelSegmentedDocsSecti
       </table>
     </section>
     <section aria-labelledby="pixel-segmented-usage">
-      <h3 id="pixel-segmented-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-segmented-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSegmented usage'}
+        react={`import { useState } from 'react';
 import { PixelSegmented } from '@pxlkit/ui-kit';
 
 const VIEWS = [
@@ -94,14 +185,58 @@ export function Default() {
       onChange={setValue}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSegmented } from '@pxlkit/ui-kit-vue';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+const value = ref('grid');
+</script>
+
+<template>
+  <PixelSegmented v-model="value" label="View" :options="VIEWS" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelSegmented } from '@pxlkit/ui-kit-angular';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+@Component({
+  imports: [PixelSegmented],
+  template: \`<pxl-segmented label="View" [options]="views" [(value)]="value" />\`,
+})
+export class Default {
+  readonly views = VIEWS;
+  readonly value = signal('grid');
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelSegmented } from '@pxlkit/ui-kit';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+export function Default() {
   const [value, setValue] = useState('grid');
   return (
     <PixelSegmented
@@ -111,11 +246,56 @@ export function Default() {
       onChange={setValue}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSegmented } from '@pxlkit/ui-kit-vue';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+const value = ref('grid');
+</script>
+
+<template>
+  <PixelSegmented v-model="value" label="View" :options="VIEWS" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSegmented } from '@pxlkit/ui-kit-angular';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+@Component({
+  imports: [PixelSegmented],
+  template: \`<pxl-segmented label="View" [options]="views" [(value)]="value" />\`,
+})
+export class Default {
+  readonly views = VIEWS;
+  readonly value = signal('grid');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
+        <Subheading>Controlled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import { useState } from 'react';
+import { PixelSegmented } from '@pxlkit/ui-kit';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+export function Controlled() {
   const [value, setValue] = useState('list');
   return (
     <div className="space-y-2">
@@ -129,11 +309,64 @@ export function Default() {
       <p className="text-xs text-retro-muted">Picked: {value}</p>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSegmented } from '@pxlkit/ui-kit-vue';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+const value = ref('list');
+</script>
+
+<template>
+  <div class="space-y-2">
+    <PixelSegmented v-model="value" label="Active view" :options="VIEWS" tone="cyan" />
+    <p class="text-xs text-retro-muted">Picked: {{ value }}</p>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSegmented } from '@pxlkit/ui-kit-angular';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+@Component({
+  imports: [PixelSegmented],
+  template: \`
+    <div class="space-y-2">
+      <pxl-segmented label="Active view" [options]="views" [(value)]="value" tone="cyan" />
+      <p class="text-xs text-retro-muted">Picked: {{ value() }}</p>
+    </div>
+  \`,
+})
+export class Controlled {
+  readonly views = VIEWS;
+  readonly value = signal('list');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { useState } from 'react';
+import { PixelSegmented } from '@pxlkit/ui-kit';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+export function Tones() {
   const [value, setValue] = useState('grid');
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -146,11 +379,74 @@ export function Default() {
       <PixelSegmented label="Pink" tone="pink" value={value} options={VIEWS} onChange={setValue} />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSegmented } from '@pxlkit/ui-kit-vue';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+const value = ref('grid');
+</script>
+
+<template>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <PixelSegmented v-model="value" label="Neutral" tone="neutral" :options="VIEWS" />
+    <PixelSegmented v-model="value" label="Green" tone="green" :options="VIEWS" />
+    <PixelSegmented v-model="value" label="Cyan" tone="cyan" :options="VIEWS" />
+    <PixelSegmented v-model="value" label="Gold" tone="gold" :options="VIEWS" />
+    <PixelSegmented v-model="value" label="Red" tone="red" :options="VIEWS" />
+    <PixelSegmented v-model="value" label="Purple" tone="purple" :options="VIEWS" />
+    <PixelSegmented v-model="value" label="Pink" tone="pink" :options="VIEWS" />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSegmented } from '@pxlkit/ui-kit-angular';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+@Component({
+  imports: [PixelSegmented],
+  template: \`
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <pxl-segmented label="Neutral" tone="neutral" [options]="views" [(value)]="value" />
+      <pxl-segmented label="Green" tone="green" [options]="views" [(value)]="value" />
+      <pxl-segmented label="Cyan" tone="cyan" [options]="views" [(value)]="value" />
+      <pxl-segmented label="Gold" tone="gold" [options]="views" [(value)]="value" />
+      <pxl-segmented label="Red" tone="red" [options]="views" [(value)]="value" />
+      <pxl-segmented label="Purple" tone="purple" [options]="views" [(value)]="value" />
+      <pxl-segmented label="Pink" tone="pink" [options]="views" [(value)]="value" />
+    </div>
+  \`,
+})
+export class Tones {
+  readonly views = VIEWS;
+  readonly value = signal('grid');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { useState } from 'react';
+import { PixelSegmented } from '@pxlkit/ui-kit';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+export function Surfaces() {
   const [pixel, setPixel] = useState('grid');
   const [linear, setLinear] = useState('grid');
   return (
@@ -171,11 +467,65 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSegmented } from '@pxlkit/ui-kit-vue';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+const pixel = ref('grid');
+const linear = ref('grid');
+</script>
+
+<template>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <PixelSegmented v-model="pixel" label="Pixel surface" surface="pixel" :options="VIEWS" />
+    <PixelSegmented v-model="linear" label="Linear surface" surface="linear" :options="VIEWS" />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSegmented } from '@pxlkit/ui-kit-angular';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+@Component({
+  imports: [PixelSegmented],
+  template: \`
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <pxl-segmented label="Pixel surface" surface="pixel" [options]="views" [(value)]="pixel" />
+      <pxl-segmented label="Linear surface" surface="linear" [options]="views" [(value)]="linear" />
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly views = VIEWS;
+  readonly pixel = signal('grid');
+  readonly linear = signal('grid');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelSegmented } from '@pxlkit/ui-kit';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+export function Disabled() {
   return (
     <PixelSegmented
       label="View (locked)"
@@ -185,11 +535,53 @@ export function Default() {
       disabled
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSegmented } from '@pxlkit/ui-kit-vue';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+</script>
+
+<template>
+  <PixelSegmented label="View (locked)" model-value="grid" :options="VIEWS" disabled />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSegmented } from '@pxlkit/ui-kit-angular';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+@Component({
+  imports: [PixelSegmented],
+  template: \`<pxl-segmented label="View (locked)" value="grid" [options]="views" disabled />\`,
+})
+export class Disabled {
+  readonly views = VIEWS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-required">
-        <h4>Required</h4>
-        <pre className="docs-code"><code>{`export function Required() {
+        <Subheading>Required</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Required code'}
+          react={`import { useState } from 'react';
+import { PixelSegmented } from '@pxlkit/ui-kit';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+export function Required() {
   const [value, setValue] = useState('grid');
   return (
     <PixelSegmented
@@ -200,11 +592,56 @@ export function Default() {
       required
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSegmented } from '@pxlkit/ui-kit-vue';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+const value = ref('grid');
+</script>
+
+<template>
+  <PixelSegmented v-model="value" label="Choose a view" :options="VIEWS" required />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSegmented } from '@pxlkit/ui-kit-angular';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+@Component({
+  imports: [PixelSegmented],
+  template: \`<pxl-segmented label="Choose a view" [options]="views" [(value)]="value" required />\`,
+})
+export class Required {
+  readonly views = VIEWS;
+  readonly value = signal('grid');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-form-name">
-        <h4>With form name</h4>
-        <pre className="docs-code"><code>{`export function WithFormName() {
+        <Subheading>With form name</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With form name code'}
+          react={`import { useState } from 'react';
+import { PixelSegmented } from '@pxlkit/ui-kit';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+export function WithFormName() {
   const [value, setValue] = useState('grid');
   return (
     <form>
@@ -218,15 +655,54 @@ export function Default() {
       />
     </form>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSegmented } from '@pxlkit/ui-kit-vue';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+const value = ref('grid');
+</script>
+
+<template>
+  <form>
+    <PixelSegmented v-model="value" label="View" name="view" :options="VIEWS" required />
+  </form>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSegmented } from '@pxlkit/ui-kit-angular';
+
+const VIEWS = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+  { value: 'kanban', label: 'Kanban' },
+];
+
+@Component({
+  imports: [PixelSegmented],
+  template: \`
+    <form>
+      <pxl-segmented label="View" name="view" [options]="views" [(value)]="value" required />
+    </form>
+  \`,
+})
+export class WithFormName {
+  readonly views = VIEWS;
+  readonly value = signal('grid');
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-radio-group">PixelRadioGroup</a></li>
-        <li><a href="#pixel-toggle-group">PixelToggleGroup</a></li>
-        <li><a href="#pixel-tabs">PixelTabs</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-radio-group' : '#pixel-radio-group'}>PixelRadioGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toggle-group' : '#pixel-toggle-group'}>PixelToggleGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tabs' : '#pixel-tabs'}>PixelTabs</a></li>
       </ul>
     </section>
     </section>

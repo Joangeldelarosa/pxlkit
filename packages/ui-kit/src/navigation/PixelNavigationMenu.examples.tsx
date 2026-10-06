@@ -1,4 +1,3 @@
-import React from 'react'
 import { PixelNavigationMenu } from './PixelNavigationMenu'
 
 export function Default() {

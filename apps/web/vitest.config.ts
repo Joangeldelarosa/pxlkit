@@ -10,14 +10,16 @@ export default defineConfig({
     environment: 'happy-dom',
     include: ['src/**/*.test.{ts,tsx}'],
     setupFiles: ['./vitest.setup.ts'],
-    // 15s default. Procedural-terrain integration tests (highway / tunnel /
-    // bridge / water generation) routinely run 2-5s and the default 5000ms
-    // leaves no headroom for Node-20 CI variance — `highway.test.ts > water
-    // is rendered under bridge` hit 5198ms on the GitHub Actions Node 20
-    // matrix while passing locally and on Node 22. 15000ms gives ~3x buffer
-    // without masking genuinely hung tests.
-    testTimeout: 15000,
-    hookTimeout: 15000,
+    // Procedural-terrain integration tests (highway / tunnel / bridge / water
+    // generation) are CPU-bound: 2-5s on an idle runner. The default 5000ms
+    // left no headroom for Node-20 CI variance — `highway.test.ts > water is
+    // rendered under bridge` hit 5198ms on the GitHub Actions Node 20 matrix
+    // — and 15000ms no longer does either: CI's test step also runs the Vue
+    // and Angular UI kits' parity suites in parallel, which took the bridge
+    // tests to 15-18s on a 4-core machine. 60000ms keeps a margin without
+    // letting a hung test run for long.
+    testTimeout: 60000,
+    hookTimeout: 60000,
   },
   resolve: {
     alias: {

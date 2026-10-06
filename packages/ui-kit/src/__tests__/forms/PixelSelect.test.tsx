@@ -91,6 +91,26 @@ describe('PixelSelect — keyboard', () => {
     expect(onChange).toHaveBeenLastCalledWith('blue');
   });
 
+  it('points the trigger at the open listbox and its highlighted option (regression)', () => {
+    const { getByRole, getAllByRole } = render(<PixelSelect options={OPTIONS} />);
+    const trigger = getByRole('combobox');
+    fireEvent.click(trigger);
+    const listbox = getByRole('listbox');
+    expect(listbox.id).toBeTruthy();
+    expect(trigger.getAttribute('aria-controls')).toBe(listbox.id);
+    // Opened by a click, nothing is highlighted yet.
+    expect(trigger.hasAttribute('aria-activedescendant')).toBe(false);
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+    const opts = getAllByRole('option');
+    expect(new Set(opts.map((o) => o.id)).size).toBe(3);
+    expect(trigger.getAttribute('aria-activedescendant')).toBe(opts[0].id);
+    fireEvent.keyDown(trigger, { key: 'End' });
+    expect(trigger.getAttribute('aria-activedescendant')).toBe(opts[2].id);
+    fireEvent.keyDown(trigger, { key: 'Escape' });
+    expect(trigger.hasAttribute('aria-controls')).toBe(false);
+    expect(trigger.hasAttribute('aria-activedescendant')).toBe(false);
+  });
+
   it('Escape closes the listbox without selecting', () => {
     const onChange = vi.fn();
     const { getByRole, queryByRole } = render(
@@ -145,5 +165,31 @@ describe('PixelSelect — states & wiring', () => {
     expect(trigger.id).toBe('sel-1');
     expect(trigger.getAttribute('aria-describedby')).toBe('desc-1');
     expect(ref.current).toBe(trigger);
+  });
+});
+
+describe('PixelSelect — hint / error description (regression)', () => {
+  it('describes the trigger with the hint, then with the error, only while one shows', () => {
+    const { getByRole, rerender } = render(
+      <PixelSelect options={OPTIONS} label="Color" hint="Used for the badge" />,
+    );
+    const trigger = getByRole('combobox');
+    expect(trigger).toHaveAccessibleDescription('Used for the badge');
+    rerender(<PixelSelect options={OPTIONS} label="Color" hint="Used for the badge" error="Required field" />);
+    expect(trigger).toHaveAccessibleDescription('Required field');
+    rerender(<PixelSelect options={OPTIONS} label="Color" />);
+    expect(trigger).not.toHaveAttribute('aria-describedby');
+  });
+
+  it("keeps the consumer's aria-describedby and adds the message after it", () => {
+    const { getByRole } = render(
+      <>
+        <p id="color-note">Shown on your profile</p>
+        <PixelSelect options={OPTIONS} id="color" aria-describedby="color-note" error="Required field" />
+      </>,
+    );
+    const trigger = getByRole('combobox');
+    expect(trigger).toHaveAttribute('aria-describedby', 'color-note color-msg');
+    expect(trigger).toHaveAccessibleDescription('Shown on your profile Required field');
   });
 });

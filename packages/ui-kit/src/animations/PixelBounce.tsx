@@ -1,9 +1,10 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import { animationInlineClasses, bounceStyle } from '@pxlkit/ui-kit-core';
 import { cn } from '../common';
 import type { AnimationRepeat, AnimationTrigger } from './types';
-import { mergeRefs, repeatToCss, useAnimationTrigger, usePixelAnimations } from './_internal/animation-hooks';
+import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelBounce — vertical bounce with damped follow-through.
@@ -41,20 +42,12 @@ export const PixelBounce = forwardRef<HTMLDivElement, PixelBounceProps>(function
   },
   forwardedRef,
 ) {
-  usePixelAnimations();
   const { ref, active, handlers, handleAnimEnd } = useAnimationTrigger(trigger, onComplete);
   return (
     <div
       ref={mergeRefs(ref, forwardedRef)}
-      className={cn('inline-block', className)}
-      style={
-        active
-          ? {
-              animation: `pxl-bounce ${duration}ms ${easing} 0ms ${repeatToCss(repeat)} both`,
-              ['--pxl-bounce-height' as string]: `${height}px`,
-            }
-          : undefined
-      }
+      className={cn(animationInlineClasses, className)}
+      style={active ? bounceStyle({ duration, repeat, height, easing }) : undefined}
       {...handlers}
       onAnimationEnd={handleAnimEnd}
     >

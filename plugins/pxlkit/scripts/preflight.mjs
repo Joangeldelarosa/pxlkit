@@ -25,8 +25,13 @@ import path from 'node:path';
 /** Lowest React the kit's peerDependencies accept: ^18.2.0 || ^19.0.0. */
 const REACT_MIN_MAJOR = 18;
 const REACT_MIN_MINOR_ON_18 = 2;
-/** Tailwind v4 is required: styles.css is `@import "tailwindcss"` + `@theme`. */
+/** Tailwind v4 is required: styles.css imports `tailwindcss` and defines an `@theme`. */
 const TAILWIND_MIN_MAJOR = 4;
+/**
+ * The first kit release whose stylesheet registers the kit's classes with Tailwind
+ * itself. Earlier releases need an `@source` line of the app's own.
+ */
+const SELF_SOURCING_KIT = { major: 2, minor: 2 };
 
 /**
  * Extracts {major, minor} from an npm range such as `^18.2.0`, `~4.0.0-beta.1`,
@@ -91,7 +96,7 @@ export function classifyProject(pkgJson) {
   if (!tailwindRange) {
     blockers.push(
       'tailwindcss is not a dependency. The kit\'s styles.css is not self-contained — ' +
-        'it starts with `@import "tailwindcss"` and defines an `@theme`, so it needs a ' +
+        'it imports `tailwindcss` and defines an `@theme`, so it needs a ' +
         'Tailwind v4 pipeline to compile. Add Tailwind v4 first.',
     );
   } else {
@@ -115,7 +120,50 @@ export function classifyProject(pkgJson) {
   return { exitCode, blockers, missing, uiKitRange: deps['@pxlkit/ui-kit'] ?? null };
 }
 
-/** Detects the package manager from lockfiles, which decides the Tailwind `@source` path. */
+/**
+ * Whether a kit version (or range) predates the stylesheet registering its own
+ * classes, so the app needs an `@source` line for them. An unreadable version is
+ * taken as current: a fresh install gets the current kit.
+ */
+export function needsOwnSource(kitVersion) {
+  const floor = parseVersionFloor(kitVersion);
+  if (!floor) return false;
+  return (
+    floor.major < SELF_SOURCING_KIT.major ||
+    (floor.major === SELF_SOURCING_KIT.major && floor.minor < SELF_SOURCING_KIT.minor)
+  );
+}
+
+/**
+ * The setup steps still missing, from what `detectSetup` found and the kit version.
+ * Pure, like `classifyProject`, so the rules are testable without fixtures on disk.
+ */
+export function missingSetup(setup, kitVersion) {
+  const missing = [];
+  if (!setup.stylesImport) {
+    missing.push(
+      'The kit\'s stylesheet is not imported — without it the pixel surface silently degrades to plain boxes. ' +
+        'Add `@import "@pxlkit/ui-kit/styles.css";` to the stylesheet Tailwind processes, in place of `@import "tailwindcss"`.',
+    );
+  } else if (setup.tailwindImport) {
+    missing.push(
+      '`tailwindcss` is imported next to the kit\'s stylesheet, which already imports it, so Tailwind\'s base styles ' +
+        'load twice. Import the kit\'s stylesheet in place of `@import "tailwindcss"`.',
+    );
+  }
+  if (needsOwnSource(kitVersion) && !setup.tailwindSource) {
+    missing.push(
+      'Tailwind cannot see the kit\'s classes — @pxlkit/ui-kit below 2.2 needs an `@source` directive pointing at ' +
+        'the package (2.2 and later register their own).',
+    );
+  }
+  if (!setup.surfaceProvider) missing.push('PxlKitSurfaceProvider is not mounted (optional, but it is how surface is set globally).');
+  if (!setup.toastProvider) missing.push('PxlKitToastProvider is not mounted — useToast() throws without it.');
+  if (!setup.fonts) missing.push('The pixel fonts are not loaded — display type falls back to a system font.');
+  return missing;
+}
+
+/** Detects the package manager from lockfiles. */
 export function detectPackageManager(dir) {
   if (fs.existsSync(path.join(dir, 'pnpm-lock.yaml'))) return 'pnpm';
   if (fs.existsSync(path.join(dir, '.pnp.cjs')) || fs.existsSync(path.join(dir, '.pnp.js'))) return 'yarn-pnp';
@@ -142,6 +190,7 @@ function detectSetup(dir) {
     toastProvider: false,
     localeProvider: false,
     fonts: false,
+    tailwindImport: false,
     tailwindSource: false,
   };
 
@@ -177,6 +226,9 @@ function detectSetup(dir) {
       if (text.includes('PxlKitLocaleProvider')) results.localeProvider = true;
       if (text.includes('buildGoogleFontsUrl') || text.includes('Press+Start+2P')) results.fonts = true;
       if (text.includes('@source') && text.includes('ui-kit')) results.tailwindSource = true;
+      if (entry.name.endsWith('.css') && /@import\s+(?:url\(\s*)?["']tailwindcss["']/.test(text)) {
+        results.tailwindImport = true;
+      }
     }
   };
   for (const root of roots) walk(root, 0);
@@ -208,22 +260,10 @@ function main(argv) {
 
   const verdict = classifyProject(pkgJson);
   const setup = verdict.exitCode === 2 ? null : detectSetup(dir);
-  const missing = [...verdict.missing];
-
-  if (setup) {
-    if (!setup.stylesImport) {
-      missing.push(
-        "styles.css is not imported — without it the pixel surface silently degrades to plain boxes. " +
-          "Add: import '@pxlkit/ui-kit/styles.css'",
-      );
-    }
-    if (!setup.tailwindSource) {
-      missing.push('Tailwind cannot see the kit\'s classes — add an `@source` directive pointing at @pxlkit/ui-kit.');
-    }
-    if (!setup.surfaceProvider) missing.push('PxlKitSurfaceProvider is not mounted (optional, but it is how surface is set globally).');
-    if (!setup.toastProvider) missing.push('PxlKitToastProvider is not mounted — useToast() throws without it.');
-    if (!setup.fonts) missing.push('The pixel fonts are not loaded — display type falls back to a system font.');
-  }
+  // The installed version decides the setup rules; the declared range stands in
+  // when nothing is installed where Node would find it (Yarn PnP).
+  const kitVersion = readPackageJson(path.join(dir, 'node_modules', '@pxlkit', 'ui-kit'))?.version ?? verdict.uiKitRange;
+  const missing = [...verdict.missing, ...(setup ? missingSetup(setup, kitVersion) : [])];
 
   const report = {
     ok: verdict.exitCode === 0 && missing.length === 0,

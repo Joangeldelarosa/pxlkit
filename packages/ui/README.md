@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit" width="480" />
+  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit pixel-art icons" width="480" />
 </p>
 
 <h1 align="center">@pxlkit/ui</h1>
@@ -23,23 +23,64 @@
 
 ## Installation
 
+Install the pack next to the components for your framework:
+
 ```bash
-npm install @pxlkit/core @pxlkit/ui
+npm install @pxlkit/core @pxlkit/ui      # React
+npm install @pxlkit/vue @pxlkit/ui       # Vue 3
+npm install @pxlkit/angular @pxlkit/ui   # Angular
 ```
 
-> `@pxlkit/core` is required as a dependency for rendering components.
+> The pack is plain data (`PxlKitData` objects typed by `@pxlkit/core`); the React components in `@pxlkit/core`, [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) or [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) render it.
 
 ## Quick Start
+
+### React
 
 ```tsx
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { Home, LoadingSpinner } from '@pxlkit/ui';
 
 // Static UI icon
-<PxlKitIcon icon={Home} size={32} colorful />
+<PxlKitIcon icon={Home} size={32} />
 
 // Animated loading spinner
-<AnimatedPxlKitIcon icon={LoadingSpinner} size={32} colorful />
+<AnimatedPxlKitIcon icon={LoadingSpinner} size={32} />
+```
+
+### Vue
+
+```vue
+<script setup lang="ts">
+import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/vue';
+import { Home, LoadingSpinner } from '@pxlkit/ui';
+</script>
+
+<template>
+  <PxlKitIcon :icon="Home" :size="32" />
+  <AnimatedPxlKitIcon :icon="LoadingSpinner" :size="32" />
+</template>
+```
+
+### Angular
+
+```ts
+import { Component } from '@angular/core';
+import { AnimatedPxlKitIcon, PxlKitIcon } from '@pxlkit/angular';
+import { Home, LoadingSpinner } from '@pxlkit/ui';
+
+@Component({
+  selector: 'app-toolbar',
+  imports: [PxlKitIcon, AnimatedPxlKitIcon],
+  template: `
+    <pxl-icon [icon]="home" [size]="32" />
+    <pxl-animated-icon [icon]="loadingSpinner" [size]="32" />
+  `,
+})
+export class Toolbar {
+  protected readonly home = Home;
+  protected readonly loadingSpinner = LoadingSpinner;
+}
 ```
 
 ## Icons
@@ -97,26 +138,56 @@ import { Home, LoadingSpinner } from '@pxlkit/ui';
 
 ## Using the Icon Pack
 
+`UiPack.icons` holds every icon of the pack, static and animated; `isAnimatedIcon` tells them apart.
+
 ```tsx
+// React
 import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/core';
 import { UiPack } from '@pxlkit/ui';
 
-// Render all UI icons
 {UiPack.icons.map((icon) =>
   isAnimatedIcon(icon) ? (
-    <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} colorful />
+    <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} />
   ) : (
-    <PxlKitIcon key={icon.name} icon={icon} size={32} colorful />
-  )
+    <PxlKitIcon key={icon.name} icon={icon} size={32} />
+  ),
 )}
+```
+
+```vue
+<!-- Vue -->
+<script setup lang="ts">
+import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/vue';
+import { UiPack } from '@pxlkit/ui';
+</script>
+
+<template>
+  <template v-for="icon in UiPack.icons" :key="icon.name">
+    <AnimatedPxlKitIcon v-if="isAnimatedIcon(icon)" :icon="icon" :size="32" />
+    <PxlKitIcon v-else :icon="icon" :size="32" />
+  </template>
+</template>
+```
+
+```html
+<!-- Angular: the component exposes `icons = UiPack.icons` and `isAnimated = isAnimatedIcon` -->
+@for (icon of icons; track icon.name) {
+  @if (isAnimated(icon)) {
+    <pxl-animated-icon [icon]="icon" [size]="32" />
+  } @else {
+    <pxl-icon [icon]="icon" [size]="32" />
+  }
+}
 ```
 
 ## Related Packages
 
 | Package | Description |
 | --- | --- |
-| [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | Core rendering engine (required) |
-| [`@pxlkit/ui-kit`](https://www.npmjs.com/package/@pxlkit/ui-kit) | 54 retro React UI components |
+| [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | Rendering engine and React components |
+| [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) | Vue 3 components |
+| [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) | Angular standalone components |
+| [`@pxlkit/ui-kit`](https://www.npmjs.com/package/@pxlkit/ui-kit) | 111 retro React UI components |
 | [`@pxlkit/gamification`](https://www.npmjs.com/package/@pxlkit/gamification) | 51 icons — RPG, achievements, rewards |
 | [`@pxlkit/feedback`](https://www.npmjs.com/package/@pxlkit/feedback) | 33 icons — alerts, status, notifications |
 | [`@pxlkit/social`](https://www.npmjs.com/package/@pxlkit/social) | 43 icons — community, emojis, messaging |

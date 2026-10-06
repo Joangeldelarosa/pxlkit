@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStackDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelStackDocsMeta = {
@@ -17,38 +23,113 @@ export const PixelStackDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps): React.ReactElement {
+/** PixelStack's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelStack } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelStack',
+        props: [
+          { name: 'direction', type: "'col' | 'row'", default: "'col'", description: 'Main axis.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`).' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch' | 'baseline'", description: 'Cross-axis alignment.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'", description: 'Main-axis distribution.' },
+          { name: 'wrap', type: 'boolean', default: 'false', description: 'Wrap onto multiple lines.' },
+          { name: 'inline', type: 'boolean', default: 'false', description: '`inline-flex` instead of `flex`.' },
+          { name: 'as', type: 'keyof React.JSX.IntrinsicElements', description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelStack } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelStack',
+        props: [
+          { name: 'direction', type: "'col' | 'row'", default: "'col'", description: 'Main axis.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`).' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch' | 'baseline'", description: 'Cross-axis alignment.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'", description: 'Main-axis distribution.' },
+          { name: 'wrap', type: 'boolean', default: 'false', description: 'Wrap onto multiple lines.' },
+          { name: 'inline', type: 'boolean', default: 'false', description: '`inline-flex` instead of `flex`.' },
+          { name: 'as', type: 'string', default: "'div'", description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The items.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelStack } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelStack',
+        selector: '[pxlStack]',
+        props: [
+          { name: 'direction', type: "'col' | 'row'", default: "'col'", description: 'Main axis.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap token (`stackGap`).' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch' | 'baseline'", description: 'Cross-axis alignment.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'", description: 'Main-axis distribution.' },
+          { name: 'wrap', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Wrap onto multiple lines.' },
+          { name: 'inline', type: 'boolean', default: 'false', accepts: 'unknown', description: '`inline-flex` instead of `flex`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelStackDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelStackDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-stack-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-stack-heading'>PixelStack</h2>
+      <Title id='pixel-stack-heading'>PixelStack</Title>
       <p className="docs-lead">Polymorphic flex container with token-driven gap, direction, alignment, and surface-aware transitions.</p>
       <ul className="docs-highlights">
         <li>Direction toggle between column and row flex layouts</li>
         <li>Token-based gap scale via stackGap for consistent rhythm</li>
         <li>Alignment and justification helpers including baseline and space variants</li>
-        <li>Surface-aware transitions through useEffectiveSurface</li>
-        <li>Polymorphic via the `as` prop to render any intrinsic element</li>
+        <li>Surface-aware transitions</li>
+        <li>Polymorphic via the <code>as</code> prop to render any intrinsic element (in Angular, the element you put <code>pxlStack</code> on)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-stack-api">
+      <Heading id="pixel-stack-api">API</Heading>
+      <FrameworkApi label={'PixelStack API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stack-a11y">
-      <h3 id="pixel-stack-a11y">Accessibility</h3>
+      <Heading id="pixel-stack-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>polymorphic-flex-container</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the `as` prop when overridden.</p>
+      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the <code>as</code> prop when overridden.</p>
     </section>
     <section aria-labelledby="pixel-stack-usage">
-      <h3 id="pixel-stack-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelStack } from '@pxlkit/ui-kit';
+      <Heading id="pixel-stack-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelStack usage'}
+        react={`import { PixelStack } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,14 +139,44 @@ export function Default() {
       <div className="text-sm text-retro-muted">Third item</div>
     </PixelStack>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack :gap="4">
+    <div class="text-sm text-retro-muted">First item</div>
+    <div class="text-sm text-retro-muted">Second item</div>
+    <div class="text-sm text-retro-muted">Third item</div>
+  </PixelStack>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack [gap]="4">
+      <div class="text-sm text-retro-muted">First item</div>
+      <div class="text-sm text-retro-muted">Second item</div>
+      <div class="text-sm text-retro-muted">Third item</div>
+    </div>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelStack } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelStack gap={4}>
       <div className="text-sm text-retro-muted">First item</div>
@@ -73,11 +184,42 @@ export function Default() {
       <div className="text-sm text-retro-muted">Third item</div>
     </PixelStack>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack :gap="4">
+    <div class="text-sm text-retro-muted">First item</div>
+    <div class="text-sm text-retro-muted">Second item</div>
+    <div class="text-sm text-retro-muted">Third item</div>
+  </PixelStack>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack [gap]="4">
+      <div class="text-sm text-retro-muted">First item</div>
+      <div class="text-sm text-retro-muted">Second item</div>
+      <div class="text-sm text-retro-muted">Third item</div>
+    </div>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-row">
-        <h4>Row</h4>
-        <pre className="docs-code"><code>{`export function Row() {
+        <Subheading>Row</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Row code'}
+          react={`import { PixelStack } from '@pxlkit/ui-kit';
+
+export function Row() {
   return (
     <PixelStack direction="row" gap={3} align="center">
       <div className="text-sm text-retro-muted">Left</div>
@@ -85,22 +227,82 @@ export function Default() {
       <div className="text-sm text-retro-muted">Right</div>
     </PixelStack>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack direction="row" :gap="3" align="center">
+    <div class="text-sm text-retro-muted">Left</div>
+    <div class="text-sm text-retro-muted">Center</div>
+    <div class="text-sm text-retro-muted">Right</div>
+  </PixelStack>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack direction="row" [gap]="3" align="center">
+      <div class="text-sm text-retro-muted">Left</div>
+      <div class="text-sm text-retro-muted">Center</div>
+      <div class="text-sm text-retro-muted">Right</div>
+    </div>
+  \`,
+})
+export class Row {}`}
+        />
       </article>
       <article className="docs-example" id="example-space-between">
-        <h4>Space Between</h4>
-        <pre className="docs-code"><code>{`export function SpaceBetween() {
+        <Subheading>Space Between</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Space Between code'}
+          react={`import { PixelStack } from '@pxlkit/ui-kit';
+
+export function SpaceBetween() {
   return (
     <PixelStack direction="row" justify="between" align="center">
       <div className="text-sm text-retro-muted">Start</div>
       <div className="text-sm text-retro-muted">End</div>
     </PixelStack>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack direction="row" justify="between" align="center">
+    <div class="text-sm text-retro-muted">Start</div>
+    <div class="text-sm text-retro-muted">End</div>
+  </PixelStack>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack direction="row" justify="between" align="center">
+      <div class="text-sm text-retro-muted">Start</div>
+      <div class="text-sm text-retro-muted">End</div>
+    </div>
+  \`,
+})
+export class SpaceBetween {}`}
+        />
       </article>
       <article className="docs-example" id="example-wrapped">
-        <h4>Wrapped</h4>
-        <pre className="docs-code"><code>{`export function Wrapped() {
+        <Subheading>Wrapped</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Wrapped code'}
+          react={`import { PixelStack } from '@pxlkit/ui-kit';
+
+export function Wrapped() {
   return (
     <PixelStack direction="row" gap={2} wrap>
       <div className="text-sm text-retro-muted">Tag A</div>
@@ -109,26 +311,83 @@ export function Default() {
       <div className="text-sm text-retro-muted">Tag D</div>
     </PixelStack>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack direction="row" :gap="2" wrap>
+    <div class="text-sm text-retro-muted">Tag A</div>
+    <div class="text-sm text-retro-muted">Tag B</div>
+    <div class="text-sm text-retro-muted">Tag C</div>
+    <div class="text-sm text-retro-muted">Tag D</div>
+  </PixelStack>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack direction="row" [gap]="2" wrap>
+      <div class="text-sm text-retro-muted">Tag A</div>
+      <div class="text-sm text-retro-muted">Tag B</div>
+      <div class="text-sm text-retro-muted">Tag C</div>
+      <div class="text-sm text-retro-muted">Tag D</div>
+    </div>
+  \`,
+})
+export class Wrapped {}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <Subheading>Pixel Surface</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel Surface code'}
+          react={`import { PixelStack } from '@pxlkit/ui-kit';
+
+export function PixelSurface() {
   return (
     <PixelStack surface="pixel" gap={4}>
       <div className="text-sm text-retro-muted">Surface-aware item</div>
       <div className="text-sm text-retro-muted">Picks up pixel transition</div>
     </PixelStack>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack surface="pixel" :gap="4">
+    <div class="text-sm text-retro-muted">Surface-aware item</div>
+    <div class="text-sm text-retro-muted">Picks up pixel transition</div>
+  </PixelStack>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack surface="pixel" [gap]="4">
+      <div class="text-sm text-retro-muted">Surface-aware item</div>
+      <div class="text-sm text-retro-muted">Picks up pixel transition</div>
+    </div>
+  \`,
+})
+export class PixelSurface {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-cluster">PixelCluster</a></li>
-        <li><a href="#pixel-grid">PixelGrid</a></li>
-        <li><a href="#pixel-center">PixelCenter</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-cluster' : '#pixel-cluster'}>PixelCluster</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-grid' : '#pixel-grid'}>PixelGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-center' : '#pixel-center'}>PixelCenter</a></li>
       </ul>
     </section>
     </section>

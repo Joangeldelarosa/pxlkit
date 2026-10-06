@@ -1,9 +1,10 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import { animationInlineClasses, shakeStyle } from '@pxlkit/ui-kit-core';
 import { cn } from '../common';
 import type { AnimationRepeat, AnimationTrigger } from './types';
-import { mergeRefs, repeatToCss, useAnimationTrigger, usePixelAnimations } from './_internal/animation-hooks';
+import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelShake — quick horizontal shake. Pairs well with validation errors.
@@ -41,20 +42,12 @@ export const PixelShake = forwardRef<HTMLDivElement, PixelShakeProps>(function P
   },
   forwardedRef,
 ) {
-  usePixelAnimations();
   const { ref, active, handlers, handleAnimEnd } = useAnimationTrigger(trigger, onComplete);
   return (
     <div
       ref={mergeRefs(ref, forwardedRef)}
-      className={cn('inline-block', className)}
-      style={
-        active
-          ? {
-              animation: `pxl-shake ${duration}ms ${easing} 0ms ${repeatToCss(repeat)} both`,
-              ['--pxl-shake-distance' as string]: `${distance}px`,
-            }
-          : undefined
-      }
+      className={cn(animationInlineClasses, className)}
+      style={active ? shakeStyle({ duration, distance, repeat, easing }) : undefined}
       {...handlers}
       onAnimationEnd={handleAnimEnd}
     >

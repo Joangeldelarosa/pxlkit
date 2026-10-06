@@ -1,29 +1,28 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
 import {
-  sectionRhythm,
-  pageGutter,
-  ContainerWidth,
-  PageGutter,
-  SectionRhythmKey,
-} from '../tokens';
+  containerClasses,
+  resolveContainerPadding,
+  type ContainerElement,
+  type ContainerPadding,
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ContainerWidth } from '../tokens';
 import { PixelCenter } from './PixelCenter';
 
 export interface PixelContainerProps extends React.HTMLAttributes<HTMLElement> {
+  /** Width cap of the inner column (`containerWidth`). */
   maxWidth?: ContainerWidth;
-  padding?: SectionRhythmKey | { x?: PageGutter; y?: SectionRhythmKey };
+  /**
+   * Vertical rhythm (`sectionRhythm`), or `{ x, y }`: the gutter of the inner column (`pageGutter`)
+   * and the rhythm. Both default to `lg`.
+   */
+  padding?: ContainerPadding;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
-  as?: 'section' | 'main' | 'header' | 'footer' | 'article' | 'aside' | 'div';
-}
-
-function resolvePadding(
-  padding: PixelContainerProps['padding'],
-): { x: PageGutter; y: SectionRhythmKey } {
-  if (padding == null) return { x: 'lg', y: 'lg' };
-  if (typeof padding === 'string') return { x: 'lg', y: padding };
-  return { x: padding.x ?? 'lg', y: padding.y ?? 'lg' };
+  /** Element to render — a landmark wants an `aria-label` or `aria-labelledby`. */
+  as?: ContainerElement;
 }
 
 export const PixelContainer = forwardRef<HTMLElement, PixelContainerProps>(function PixelContainer(
@@ -39,14 +38,13 @@ export const PixelContainer = forwardRef<HTMLElement, PixelContainerProps>(funct
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const { x, y } = resolvePadding(padding);
+  const { x, y } = resolveContainerPadding(padding);
   const Comp = as as 'section';
 
   return (
     <Comp
       ref={ref}
-      className={cn('w-full', sectionRhythm[y], s.transition, className)}
+      className={cn(containerClasses(surface, y), className)}
       {...rest}
     >
       <PixelCenter maxWidth={maxWidth} gutter={x} surface={surface}>

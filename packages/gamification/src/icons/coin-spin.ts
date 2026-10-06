@@ -1,4 +1,4 @@
-import type { AnimatedPxlKitData } from '@pxlkit/core';
+import type { AnimatedPxlKitData } from '@pxlkit/core/vanilla';
 
 // ─── Coin Spin (8 frames) ──────────────────
 // A gold coin rotating smoothly.

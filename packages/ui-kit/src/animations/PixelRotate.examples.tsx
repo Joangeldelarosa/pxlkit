@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelRotate } from './PixelRotate';
 
 export function Default() {

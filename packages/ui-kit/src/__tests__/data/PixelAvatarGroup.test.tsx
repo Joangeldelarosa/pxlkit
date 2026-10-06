@@ -27,7 +27,7 @@ describe('PixelAvatarGroup', () => {
   });
 
   it('shows +N tile when count > max', () => {
-    const { getByLabelText, queryByTestId } = render(
+    const { getByText, queryByTestId } = render(
       <PixelAvatarGroup data-testid="group" max={3}>
         <Avatar label="A" />
         <Avatar label="B" />
@@ -40,8 +40,12 @@ describe('PixelAvatarGroup', () => {
     expect(queryByTestId('avatar-A')).toBeTruthy();
     expect(queryByTestId('avatar-B')).toBeTruthy();
     expect(queryByTestId('avatar-C')).toBeNull();
-    const overflow = getByLabelText('3 more users');
-    expect(overflow.textContent).toBe('+3');
+    // The visible "+3" is hidden from assistive tech, which reads the count
+    // as text instead of an aria-label on a generic div.
+    const tile = getByText('3 more users').parentElement as HTMLElement;
+    expect(getByText('3 more users').className).toBe('sr-only');
+    expect(tile.querySelector('[aria-hidden="true"]')!.textContent).toBe('+3');
+    expect(tile.hasAttribute('aria-label')).toBe(false);
   });
 
   it('size=lg applies lg size to children', () => {
@@ -67,5 +71,22 @@ describe('PixelAvatarGroup', () => {
     const group = getByTestId('group');
     // Children after the first should carry a negative left margin.
     expect(group.innerHTML).toMatch(/-ml-/);
+  });
+});
+
+describe('PixelAvatarGroup — "+N" font', () => {
+  it('sets the "+N" in the pixel face on pixel and in the surface font on linear, one family each', () => {
+    const family = (el: Element) => el.className.split(' ').filter((name) => /^font-(sans|serif|mono|pixel)$/.test(name));
+    for (const [surface, expected] of [['pixel', 'font-pixel'], ['linear', 'font-sans']] as const) {
+      const { getByText, unmount } = render(
+        <PixelAvatarGroup surface={surface} max={2}>
+          <Avatar label="A" />
+          <Avatar label="B" />
+          <Avatar label="C" />
+        </PixelAvatarGroup>,
+      );
+      expect(family(getByText('2 more users').parentElement!)).toEqual([expected]);
+      unmount();
+    }
   });
 });

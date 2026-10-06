@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPortalDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelPortalDocsMeta = {
@@ -17,40 +23,97 @@ export const PixelPortalDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProps): React.ReactElement {
+/** PixelPortal's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelPortal } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelPortal',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to render in the target.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Target element; `document.body` when left out.' },
+          { name: 'disabled', type: 'boolean', description: 'Keep the content in place.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelPortal } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelPortal',
+        props: [
+          { name: 'container', type: 'HTMLElement | null', description: 'Target element; `document.body` when left out.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Keep the content in place.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to render in the target.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelPortal } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelPortal',
+        selector: '[pxlPortal]',
+        props: [
+          { name: 'pxlPortalContainer', type: 'HTMLElement | null', description: 'Target element; `document.body` when left out.' },
+          { name: 'pxlPortalDisabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Keep the content in place.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelPortalDocsSection({ className, headingLevel = 2 }: PixelPortalDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-portal-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-portal-heading'>PixelPortal</h2>
-      <p className="docs-lead">SSR-safe portal primitive that renders children inline during SSR and first hydration, then swaps to a real createPortal after mount.</p>
+      <Title id='pixel-portal-heading'>PixelPortal</Title>
+      <p className="docs-lead">SSR-safe portal primitive: renders children inline on the server and while hydrating, then portals them into document.body or a container, keeping the focus set inside them.</p>
       <ul className="docs-highlights">
-        <li>SSR-safe: renders inline on the server and on first client paint to avoid hydration mismatches</li>
-        <li>Swaps to React.createPortal after mount, targeting document.body by default</li>
-        <li>Accepts a custom container element via the container prop</li>
-        <li>Can be disabled to keep children inline (useful for testing or conditional portaling)</li>
-        <li>Preserves React tree context so focus, events, and providers flow normally</li>
+        <li>SSR-safe: renders inline on the server and during hydration to avoid hydration mismatches</li>
+        <li>Focus set inside the content stays put as the content reaches its target</li>
+        <li>Targets document.body by default; the container prop picks another element</li>
+        <li>Can be disabled to keep its content inline (useful for testing or conditional portaling)</li>
+        <li>The content keeps its place in the component tree, so providers still reach it (in React, its events also bubble through that tree)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>overlay-foundation</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-portal-api">
+      <Heading id="pixel-portal-api">API</Heading>
+      <FrameworkApi label={'PixelPortal API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-portal-a11y">
-      <h3 id="pixel-portal-a11y">Accessibility</h3>
+      <Heading id="pixel-portal-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>SSR-safe portal</code></li>
-        <li><code>focus order preserved via React tree</code></li>
+        <li><code>context preserved through the component tree</code></li>
       </ul>
-      <p className="docs-aria-notes">Portal content remains in the React tree, so focus order, events, and context providers behave as if the children were rendered in place.</p>
+      <p className="docs-aria-notes">Portal content keeps its place in the component tree, so providers reach it as if it were rendered in place; in React, its events also bubble through that tree. Keyboard focus follows the document order, where the content sits in its target.</p>
     </section>
     <section aria-labelledby="pixel-portal-usage">
-      <h3 id="pixel-portal-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react'
-import { PixelPortal } from '@pxlkit/ui-kit'
+      <Heading id="pixel-portal-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelPortal usage'}
+        react={`import { PixelPortal } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,30 +121,97 @@ export function Default() {
       <div>Portaled content (renders into document.body after mount)</div>
     </PixelPortal>
   )
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelPortal } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPortal>
+    <div>Portaled content (renders into document.body after mount)</div>
+  </PixelPortal>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelPortal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPortal],
+  template: \`<div *pxlPortal>Portaled content (renders into document.body after mount)</div>\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelPortal } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelPortal>
       <div>Portaled content (renders into document.body after mount)</div>
     </PixelPortal>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPortal } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPortal>
+    <div>Portaled content (renders into document.body after mount)</div>
+  </PixelPortal>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPortal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPortal],
+  template: \`<div *pxlPortal>Portaled content (renders into document.body after mount)</div>\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled (inline)</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled (inline)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled (inline) code'}
+          react={`import { PixelPortal } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelPortal disabled>
       <div>Rendered inline — portal disabled</div>
     </PixelPortal>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPortal } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPortal disabled>
+    <div>Rendered inline — portal disabled</div>
+  </PixelPortal>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPortal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPortal],
+  template: \`
+    <ng-template pxlPortal pxlPortalDisabled>
+      <div>Rendered inline — portal disabled</div>
+    </ng-template>
+  \`,
+})
+export class Disabled {}`}
+        />
       </article>
     </section>
     </section>

@@ -1,27 +1,28 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
-import { containerWidth, pageGutter, ContainerWidth, PageGutter } from '../tokens';
-
-const textMap = {
-  left: 'text-left',
-  center: 'text-center',
-  right: 'text-right',
-} as const;
+import { centerClasses, type CenterAlign } from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ContainerWidth, PageGutter } from '../tokens';
 
 export interface PixelCenterProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'align'> {
+  /** Width cap (`containerWidth`). */
   maxWidth?: ContainerWidth;
+  /** Horizontal padding (`pageGutter`). */
   gutter?: PageGutter;
   /** Text alignment of the centered content (canonical). */
-  align?: 'left' | 'center' | 'right';
+  align?: CenterAlign;
   /**
    * @deprecated Use `align` instead. Retained as alias for one minor.
    */
-  text?: 'left' | 'center' | 'right';
+  text?: CenterAlign;
+  /** `inline-block` instead of `block`. */
   inline?: boolean;
+  /** Element to render. */
   as?: keyof React.JSX.IntrinsicElements;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Surface border and radius. */
   bordered?: boolean;
 }
 
@@ -42,21 +43,13 @@ export const PixelCenter = forwardRef<HTMLDivElement, PixelCenterProps>(function
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const Comp = (as ?? 'div') as 'div';
-  const resolvedAlign = align ?? text;
 
   return (
     <Comp
       ref={ref}
       className={cn(
-        inline ? 'inline-block' : 'block',
-        'mx-auto',
-        containerWidth[maxWidth],
-        pageGutter[gutter],
-        resolvedAlign && textMap[resolvedAlign],
-        bordered && s.border, bordered && s.radius, bordered && 'border-retro-border',
-        s.transition,
+        centerClasses(surface, { maxWidth, gutter, align: align ?? text, inline, bordered }),
         className,
       )}
       {...rest}

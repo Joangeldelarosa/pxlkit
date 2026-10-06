@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelStatGroup } from './PixelStatGroup';
 import { PixelStatCard } from '../cards/PixelStatCard';
 

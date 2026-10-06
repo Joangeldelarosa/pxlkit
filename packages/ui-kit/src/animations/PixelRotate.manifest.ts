@@ -11,7 +11,7 @@ export default defineManifest({
   highlights: [
     'Configurable duration, easing, repeat count, and animation direction',
     'Trigger modes: mount, hover, focus, viewport',
-    'Forwards refs and merges with internal trigger observers',
+    'Signals the end of its last iteration: `onComplete` (React), `@complete` (Vue), `(complete)` (Angular)',
     'Respects prefers-reduced-motion automatically',
   ],
   examples: [

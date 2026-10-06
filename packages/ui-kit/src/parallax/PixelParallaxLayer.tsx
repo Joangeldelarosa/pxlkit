@@ -5,15 +5,20 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React, { forwardRef, useEffect, useRef } from 'react';
+import { followScroll, parallaxLayerClasses, type ParallaxAxis } from '@pxlkit/ui-kit-core';
 import { cn } from '../common';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 export interface PixelParallaxLayerProps {
+  /** Content of the layer. */
   children: React.ReactNode;
   /** Parallax multiplier. 0 = no movement, 1 = full scroll speed, negative = reverse. */
   speed?: number;
   /** Axis to translate on. Default `"y"`. */
-  axis?: 'x' | 'y' | 'both';
+  axis?: ParallaxAxis;
+  /** Extra classes on the wrapper. */
   className?: string;
+  /** Inline styles of the wrapper. */
   style?: React.CSSProperties;
 }
 
@@ -28,11 +33,12 @@ export interface PixelParallaxLayerProps {
  *   - −0.3 = moves opposite direction (foreground float-up feel)
  *
  * The translation is computed with `transform: translate3d()` for GPU compositing.
+ * When the user prefers reduced motion the layer holds still.
  */
 export const PixelParallaxLayer = forwardRef<HTMLDivElement, PixelParallaxLayerProps>(
   function PixelParallaxLayer({ children, speed = 0.5, axis = 'y', className, style }, forwardedRef) {
     const innerRef = useRef<HTMLDivElement | null>(null);
-    const rafRef = useRef(0);
+    const reducedMotion = useReducedMotion();
 
     const setRef = (node: HTMLDivElement | null) => {
       innerRef.current = node;
@@ -42,33 +48,12 @@ export const PixelParallaxLayer = forwardRef<HTMLDivElement, PixelParallaxLayerP
 
     useEffect(() => {
       const el = innerRef.current;
-      if (!el) return;
-
-      function update() {
-        const scrollY = window.scrollY;
-        const rect = el!.getBoundingClientRect();
-        // offset relative to element's original position in viewport
-        const centerY = rect.top + scrollY + rect.height / 2;
-        const viewCenter = scrollY + window.innerHeight / 2;
-        const delta = (viewCenter - centerY) * speed;
-
-        if (axis === 'y') {
-          el!.style.transform = `translate3d(0, ${delta}px, 0)`;
-        } else if (axis === 'x') {
-          el!.style.transform = `translate3d(${delta}px, 0, 0)`;
-        } else {
-          el!.style.transform = `translate3d(${delta}px, ${delta}px, 0)`;
-        }
-
-        rafRef.current = requestAnimationFrame(update);
-      }
-
-      rafRef.current = requestAnimationFrame(update);
-      return () => cancelAnimationFrame(rafRef.current);
-    }, [speed, axis]);
+      if (!el || reducedMotion) return;
+      return followScroll(el, { speed, axis });
+    }, [speed, axis, reducedMotion]);
 
     return (
-      <div ref={setRef} className={cn('will-change-transform', className)} style={style}>
+      <div ref={setRef} className={cn(parallaxLayerClasses, className)} style={style}>
         {children}
       </div>
     );

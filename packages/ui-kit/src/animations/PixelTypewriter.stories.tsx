@@ -8,7 +8,7 @@
  * to overwrite it (a hand-authored *.stories.tsx is detected).
  */
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Component from './PixelTypewriter';
 import manifest from './PixelTypewriter.manifest';
 import * as examples from './PixelTypewriter.examples';

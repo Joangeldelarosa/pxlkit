@@ -1,9 +1,11 @@
 import React, { forwardRef, useRef, useState } from 'react';
+import { cornerShadowClasses } from '@pxlkit/ui-kit-core';
 import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 import {
   Tone, Size, Surface, Variant, cn,
   toneMap, sizeClass, focusRing, surfaceClasses, useEffectiveSurface,
 } from '../common';
+import { elementRef } from '../utils/element-ref';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelButton — versatile button with tones, sizes, icon slots, loading,
@@ -18,7 +20,7 @@ import {
 export interface PixelButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** Color tone (maps to `toneMap`). */
   tone?: Tone;
-  /** Visual size (`xs`–`xl`). */
+  /** Visual size. */
   size?: Size;
   /** Full Variant union — `solid` | `soft` | `outline` | `ghost`. */
   variant?: Variant;
@@ -70,6 +72,8 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
 ) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
+  // No drop shadow on pixel, whose cut corners clip it: the nudge and press alone.
+  const c = cornerShadowClasses(surface);
   const t = toneMap[tone];
   const isGhost = variant === 'ghost';
   const isOutline = variant === 'outline';
@@ -89,16 +93,20 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
     prevLoading.current = !!loading;
   }, [loading]);
 
+  // Hover and press feedback only while the button can be pressed: a disabled
+  // or loading one holds still, and a disabled one drops its shadow too.
+  const enabled = !rest.disabled;
+  const moves = enabled && !loading;
   const variantClasses = isGhost
     ? cn('border border-transparent bg-transparent', t.hover)
     : isOutline
-      ? cn(s.border, t.border, 'bg-transparent', t.hover, !rest.disabled && s.shadow, !rest.disabled && s.shadowHover)
+      ? cn(s.border, t.border, 'bg-transparent', t.hover, enabled && c.shadow, moves && c.shadowHover)
       : isSoft
-        ? cn(s.border, t.border, t.soft, t.hover, !rest.disabled && s.shadow, !rest.disabled && s.shadowHover)
-        : cn(s.border, t.border, t.bg, t.hover, !rest.disabled && s.shadow, !rest.disabled && s.shadowHover);
+        ? cn(s.border, t.border, t.soft, t.hover, enabled && c.shadow, moves && c.shadowHover)
+        : cn(s.border, t.border, t.bg, t.hover, enabled && c.shadow, moves && c.shadowHover);
 
   const mergedClassName = cn(
-    'inline-flex items-center justify-center font-medium outline-none disabled:opacity-50 disabled:cursor-not-allowed',
+    'inline-flex items-center justify-center font-medium focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
     s.font, s.radius, s.transition,
     sizeClass[size],
     focusRing,
@@ -106,7 +114,7 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
     t.text,
     fullWidth && 'w-full',
     variantClasses,
-    !rest.disabled && (isGhost || isOutline ? 'active:scale-[0.97]' : s.shadowActive),
+    moves && (isGhost || isOutline ? 'active:scale-[0.97]' : c.shadowActive),
     className,
   );
 
@@ -120,7 +128,7 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
         <span
           data-testid="pxl-button-spinner"
           aria-hidden
-          className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-r-transparent"
+          className="inline-block h-3.5 w-3.5 motion-safe:animate-spin rounded-full border-2 border-current border-r-transparent"
         />
       ) : (
         iconLeft
@@ -150,7 +158,7 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
         childProps.onClick?.(e);
         onClick?.(e as unknown as React.MouseEvent<HTMLButtonElement>);
       },
-      ref: mergeRefs(ref as React.Ref<HTMLElement>, (child as unknown as { ref?: React.Ref<HTMLElement> }).ref ?? null),
+      ref: mergeRefs(ref as React.Ref<HTMLElement>, elementRef<HTMLElement>(child) ?? null),
     } as Partial<typeof childProps> & { ref?: React.Ref<HTMLElement> });
   }
 

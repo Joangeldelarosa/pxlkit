@@ -178,4 +178,20 @@ describe('PixelCommand', () => {
     fireEvent.click(getByText('Go home'));
     expect(onA).toHaveBeenCalled();
   });
+
+  it('shows what its parent passes: its shortcut, Escape and the backdrop only ask', () => {
+    const onOpenChange = vi.fn();
+    const command = (open: boolean) => <PixelCommand open={open} onOpenChange={onOpenChange} groups={makeGroups()} />;
+    const { rerender, queryByRole } = render(command(false));
+    fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
+    fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
+    expect(onOpenChange.mock.calls).toEqual([[true], [true]]);
+    expect(queryByRole('dialog')).toBeNull();
+    rerender(command(true));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.click(document.querySelector('[data-pxl-overlay-backdrop]')!);
+    expect(onOpenChange.mock.calls).toEqual([[true], [true], [false], [false]]);
+    expect(queryByRole('dialog')).toBeTruthy();
+    expect(document.body.style.overflow).toBe('hidden');
+  });
 });

@@ -16,8 +16,11 @@ export interface WhatsNewItem {
 
 export interface WhatsNewStripProps {
   version: string;
+  /** The release date, `YYYY-MM-DD`. */
   date: string;
   items: WhatsNewItem[];
+  /** The release in one line, shown above the items. */
+  summary?: string;
   changelogHref?: string;
 }
 
@@ -27,7 +30,21 @@ const categoryTone: Record<string, 'cyan' | 'green' | 'purple' | 'gold' | 'red' 
   feedback: 'gold',
   layout: 'green',
   forms: 'red',
+  vue: 'green',
+  angular: 'red',
+  core: 'cyan',
+  icons: 'gold',
 };
+
+/** `2026-10-03` → `Oct 3, 2026`, the same on the server and in every browser (UTC). */
+function formatReleaseDate(date: string): string {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
+}
 
 function toneFor(category: string) {
   return categoryTone[category.toLowerCase()] ?? 'neutral';
@@ -43,6 +60,7 @@ export function WhatsNewStrip({
   version,
   date,
   items,
+  summary,
   changelogHref = '/changelog',
 }: WhatsNewStripProps) {
   return (
@@ -60,12 +78,16 @@ export function WhatsNewStrip({
             <span className="font-pixel text-xs uppercase tracking-wider text-retro-text">
               What&apos;s new
             </span>
-            <span className="text-xs text-retro-muted">{date}</span>
+            <time dateTime={date} className="text-xs text-retro-muted">
+              {formatReleaseDate(date)}
+            </time>
           </PixelCluster>
           <PixelTextLink href={changelogHref} tone="cyan" className="text-xs">
             See full changelog →
           </PixelTextLink>
         </PixelCluster>
+
+        {summary && <p className="mb-3 text-sm text-retro-text">{summary}</p>}
 
         <div
           className="-mx-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"

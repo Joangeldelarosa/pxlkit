@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelStack } from './PixelStack';
 
 export function Default() {

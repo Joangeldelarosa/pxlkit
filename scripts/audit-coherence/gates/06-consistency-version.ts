@@ -8,6 +8,10 @@
  *   2. The top-most `## X.Y.Z` heading in `CHANGELOG.md`
  *   3. The largest manifest `since` across that package's components
  *
+ * and that an icon pack's entry (`src/index.ts`, an `IconPack`) exports
+ * `package.json.version` itself, read from the file: a version written out
+ * there is left behind by the next release.
+ *
  * Any divergence is a blocker — these three are the contract surface between
  * authoring (manifests), release notes (changelog) and consumer install
  * (npm metadata). They MUST stay aligned.
@@ -134,6 +138,37 @@ export function collectManifestSinceVersions(
 }
 
 // ---------------------------------------------------------------------------
+// Icon packs — the version a pack's entry exports.
+// ---------------------------------------------------------------------------
+
+/** Where an icon pack's entry takes the `version` it exports from. */
+export type PackVersionSource = { kind: 'package-json' } | { kind: 'literal'; version: string };
+
+const ICON_PACK_DECLARATION = /:\s*IconPack\s*=\s*\{/;
+const PACKAGE_JSON_IMPORT = /^import\s+(\w+)\s+from\s+['"]\.\.\/package\.json['"]/m;
+const VERSION_LITERAL = /^\s*version:\s*['"]([^'"]*)['"]/m;
+
+/**
+ * How the entry of a package sets its icon pack's `version`: read from
+ * `../package.json` (`version: pkg.version`, or `const { version } = pkg;`
+ * and `version` in the pack), or written out. Null when the entry declares
+ * no `IconPack`, or one without a `version` either way.
+ */
+export function packVersionSource(entry: string): PackVersionSource | null {
+  if (!ICON_PACK_DECLARATION.test(entry)) return null;
+  const imported = PACKAGE_JSON_IMPORT.exec(entry)?.[1];
+  if (imported) {
+    const read = new RegExp(`^\\s*version:\\s*${imported}\\.version\\b`, 'm');
+    const destructured = new RegExp(`^const\\s*\\{\\s*version\\s*\\}\\s*=\\s*${imported}\\s*;`, 'm');
+    if (read.test(entry) || (destructured.test(entry) && /^\s*version\s*,?\s*$/m.test(entry))) {
+      return { kind: 'package-json' };
+    }
+  }
+  const literal = VERSION_LITERAL.exec(entry);
+  return literal ? { kind: 'literal', version: literal[1]! } : null;
+}
+
+// ---------------------------------------------------------------------------
 // Gate
 // ---------------------------------------------------------------------------
 
@@ -146,7 +181,7 @@ export class ConsistencyVersionGate extends Gate {
   id = 6;
   name = 'consistency-version';
   description =
-    "For each package: package.json.version === topmost entry of CHANGELOG.md === largest manifest.since across that package's components. Blocker on mismatch.";
+    "For each package: package.json.version === topmost entry of CHANGELOG.md === largest manifest.since across that package's components, and an icon pack exports package.json.version itself. Blocker on mismatch.";
 
   async run(ctx: AuditContext): Promise<GateResult> {
     const started = Date.now();
@@ -289,6 +324,25 @@ export class ConsistencyVersionGate extends Gate {
       });
     }
     const largestSince = pickLargest(sinceVersions);
+
+    // ----- the version an icon pack exports -----
+    const entryPath = path.join(pkgDir, 'src', 'index.ts');
+    if (await fs.pathExists(entryPath)) {
+      const source = packVersionSource(await fs.readFile(entryPath, 'utf8'));
+      if (source?.kind === 'literal') {
+        findings.push({
+          severity: source.version === pkgVersionRaw ? 'major' : 'blocker',
+          file: entryPath,
+          component: pkg.package,
+          message:
+            source.version === pkgVersionRaw
+              ? `the icon pack writes its version out ("${source.version}"): the next release leaves it behind package.json`
+              : `version mismatch: package.json="${pkgVersionRaw}" vs the icon pack's exported version="${source.version}"`,
+          suggestion:
+            "read it from package.json, outside the pack so bundlers can still drop it: `import packageJson from '../package.json';`, `const { version } = packageJson;` and `version` in the pack",
+        });
+      }
+    }
 
     // ----- cross-check -----
     if (changelogVersion && compareSemver(pkgVersion, changelogVersion) !== 0) {

@@ -1,9 +1,10 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import { animationInlineClasses, floatStyle } from '@pxlkit/ui-kit-core';
 import { cn } from '../common';
 import type { AnimationRepeat, AnimationTrigger } from './types';
-import { mergeRefs, repeatToCss, useAnimationTrigger, usePixelAnimations } from './_internal/animation-hooks';
+import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelFloat — gentle vertical sine loop, perfect for hero badges.
@@ -41,20 +42,12 @@ export const PixelFloat = forwardRef<HTMLDivElement, PixelFloatProps>(function P
   },
   forwardedRef,
 ) {
-  usePixelAnimations();
   const { ref, active, handlers, handleAnimEnd } = useAnimationTrigger(trigger, onComplete);
   return (
     <div
       ref={mergeRefs(ref, forwardedRef)}
-      className={cn('inline-block', className)}
-      style={
-        active
-          ? {
-              animation: `pxl-float ${duration}ms ${easing} 0ms ${repeatToCss(repeat)} both`,
-              ['--pxl-float-distance' as string]: `${distance}px`,
-            }
-          : undefined
-      }
+      className={cn(animationInlineClasses, className)}
+      style={active ? floatStyle({ duration, distance, repeat, easing }) : undefined}
       {...handlers}
       onAnimationEnd={handleAnimEnd}
     >

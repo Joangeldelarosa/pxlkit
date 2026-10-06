@@ -1,4 +1,4 @@
-<!-- GENERATED from @pxlkit/ui-kit v2.1.1 — do not edit; run npm run docs:build -->
+<!-- GENERATED from @pxlkit/ui-kit v2.2.0 — do not edit; run npm run docs:build -->
 
 # Icon authoring spec — `PxlKitData`
 
@@ -27,8 +27,11 @@ plus `frameDuration` (ms) and `trigger?: 'loop' | 'once' | 'hover' | 'appear' | 
 A per-frame palette merges over the base one. The legacy `loop: boolean` is deprecated
 and ignored when `trigger` is set.
 
-Parallax icons replace the grid with `layers: Array<{ icon, depth, offsetX?, offsetY? }>`
-ordered back to front. `depth: 0` anchors, `> 0` sits behind, `< 0` pops out.
+Parallax icons replace the grid with `layers: Array<{ icon, depth }>`, ordered back to
+front: the renderers space the layers evenly along the Z axis in array order and tilt the
+stack toward the pointer. `depth` records the intended place (`0` the anchor, `> 0`
+behind, `< 0` in front) but does not move anything, so keep it consistent with the
+order. `offsetX` / `offsetY` are deprecated: no renderer applies them.
 
 ## 2. What the validators enforce
 
@@ -143,6 +146,18 @@ Gotcha worth knowing before you debug it: `PxlKitIcon` renders the generated SVG
 data URI inside an `<img>`, so it can force nearest-neighbour scaling. That isolates it
 from the surrounding CSS context, which means **`currentColor` does not work** — with
 `appearance="solid"` you must pass an explicit `color`.
+
+Screen readers announce the `<img>` by its `alt`: the `aria-label` you pass, else the
+icon's `name` (an empty `aria-label` counts as none). When visible text beside the icon
+already says what it means — a button or link label, a heading, a list item — pass
+`decorative`: the icon renders `alt=""` and is skipped instead of read before the label.
+An icon that is a button's only content is its label, so it takes an `aria-label`.
+`AnimatedPxlKitIcon` and `ParallaxPxlKitIcon` take the same two props.
+
+```tsx
+<button><PxlKitIcon icon={Download} size={16} decorative /> Download</button>
+<button><PxlKitIcon icon={Trash} size={16} aria-label="Delete" /></button>
+```
 
 ## 7. Licensing
 

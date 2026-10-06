@@ -9,10 +9,24 @@
  * mirrors the existing showcase but with deeper docs detail:
  *   - Status / deprecation banner (when applicable)
  *   - Component name + description
- *   - Full Props table (name, type, required, default, description)
+ *   - API reference in React, Vue and Angular (extract-api.ts: props,
+ *     events, slots, bindings), under the same framework tabs as the code
  *   - A11y block (WCAG level, ARIA patterns, notes)
  *   - Keyboard bindings table (key, action, when)
- *   - Examples list (label + code block, when codeOverride is provided)
+ *   - Usage lead + examples: each example's code, self-contained, in React
+ *     and in every port (Vue, Angular) that implements the component in full
+ *
+ * and the usage-snippet modules the /ui-kit showcase reads: per component,
+ * the example the site picks for it in
+ * apps/web/src/app/ui-kit/showcase-examples.ts, else its usage lead; and the
+ * data of each component's own page, /docs/components/<slug>
+ * (_lib/component-pages.ts: its title, description and neighbours, and its
+ * section's loader).
+ *
+ * A section takes `headingLevel` (2 within /docs, where it is one entry of
+ * the reference; 1 as its component's page, where its heading is the page's
+ * h1 and its subsections follow one level up) and `links` (its related
+ * components as /docs anchors, or as their pages).
  *
  * Safety: NEVER overwrites hand-authored files. Always writes
  *   <Name>.section.tsx into a NEW `sections/` subtree; the orchestrator owns
@@ -48,7 +62,20 @@ import {
 } from "./_lib/generator-base.js";
 import { createLogger, type Logger } from "./_lib/logger.js";
 import { findComponentDirs } from "./_lib/scan-fs.js";
-import { extractExportFunctions, toUsageSnippet } from "./extract-example-source.js";
+import { selfContainedExamples } from "./extract-example-source.js";
+import { apiIndexFor, documentedNames, extractApi } from "./extract-api.js";
+import type { ComponentApi } from "./_lib/api-model.js";
+import { FRAMEWORK_API_MODULE, hasApi, renderApiBlock, renderApiConstant } from "./_lib/api-section.js";
+import { COMPONENT_PAGE_PREFIX, componentPageModules } from "./_lib/component-pages.js";
+import {
+  KIT_PORTS,
+  implementsInFull,
+  manifestExampleExports,
+  portComponents,
+  portKey,
+  type PortFramework,
+  type PortedComponent,
+} from "./_lib/ports.js";
 
 // ---------------------------------------------------------------------------
 // Public contract
@@ -71,11 +98,31 @@ export interface KeyboardEntry {
   when: string;
 }
 
+/**
+ * An example's code in each framework: React always, a port's once that kit
+ * implements the component in full (every manifest example).
+ */
+export interface FrameworkSources {
+  react: string;
+  vue?: string;
+  angular?: string;
+}
+
 export interface ExampleEntry {
   id: string;
   label: string;
   description: string;
-  code: string;
+  code: FrameworkSources;
+}
+
+/** What resolves a manifest's examples to code beyond the React examples module. */
+export interface ExampleSourcesInput {
+  /** The examples' export names, in manifest order, resolved by identity. */
+  exportNames?: readonly string[];
+  /** The Vue kit's example sources by export name. */
+  vue?: Readonly<Record<string, string>>;
+  /** The Angular kit's example sources by export name. */
+  angular?: Readonly<Record<string, string>>;
 }
 
 export interface DeprecationInfo {
@@ -104,6 +151,8 @@ export interface DocsPagePlanEntry {
   highlights: string[];
   /** Props normalized as a flat table. */
   props: PropEntry[];
+  /** The component's API per framework, read from the kits' sources; in place of `props` when set. */
+  api?: ComponentApi;
   /** WCAG level, e.g. "2.1 AA". */
   wcagLevel: string;
   /** ARIA patterns array. */
@@ -115,11 +164,11 @@ export interface DocsPagePlanEntry {
   /** Examples with code (may be empty). */
   examples: ExampleEntry[];
   /**
-   * Consumer-ready usage lead: the examples file's preamble (imports +
-   * shared data) plus its first export, with relative imports rewritten to
-   * the package specifier. Null when no examples file exists.
+   * Consumer-ready usage lead: the first example, self-contained (the
+   * imports and module helpers it uses), per framework. Null when the
+   * component has no example with code.
    */
-  usageSnippet: string | null;
+  usageSnippet: FrameworkSources | null;
   /** Related component names (may be empty). */
   related: string[];
   /** Tags (may be empty). */
@@ -230,11 +279,12 @@ export function normalizeKeyboard(manifest: PermissiveManifest): KeyboardEntry[]
 export function normalizeExamples(
   manifest: PermissiveManifest,
   exportSources: Record<string, string> = {},
+  sources: ExampleSourcesInput = {},
 ): ExampleEntry[] {
   const ex = manifest.examples as unknown;
   if (!Array.isArray(ex)) return [];
   const out: ExampleEntry[] = [];
-  for (const e of ex) {
+  for (const [index, e] of ex.entries()) {
     if (!e || typeof e !== "object") continue;
     const rec = e as Record<string, unknown>;
     const id = clean(rec.id);
@@ -247,17 +297,22 @@ export function normalizeExamples(
     // cannot survive serialization through a generated file.
     // NB: extracted source is multi-line — never run it through clean(),
     // which collapses all whitespace.
-    const extracted = exportSources[exportNameForExampleId(id || label)]?.trimEnd();
-    const code =
+    // The export is the example's Component, resolved by identity when the
+    // caller could (`sources.exportNames`); its id's spelling otherwise.
+    const exportName = sources.exportNames?.[index] ?? exportNameForExampleId(id || label);
+    const extracted = exportSources[exportName]?.trimEnd();
+    const react =
       clean(
         typeof rec.codeOverride === "string" ? rec.codeOverride : (rec.code as string | undefined),
       ) || extracted || "";
-    if (!code) continue;
+    if (!react) continue;
+    const vue = sources.vue?.[exportName]?.trimEnd();
+    const angular = sources.angular?.[exportName]?.trimEnd();
     out.push({
       id: id || slugFor(label),
       label,
       description: clean(rec.description),
-      code,
+      code: { react, ...(vue ? { vue } : {}), ...(angular ? { angular } : {}) },
     });
   }
   return out;
@@ -288,6 +343,7 @@ export function normalizeDeprecation(manifest: PermissiveManifest): DeprecationI
 export function planEntryFor(
   rec: ManifestRecord,
   outRoot: string,
+  sources: ExampleSourcesInput = {},
 ): DocsPagePlanEntry {
   const manifest = rec.manifest as PermissiveManifest;
   const name = manifest.name;
@@ -312,11 +368,13 @@ export function planEntryFor(
 
   // The SSOT examples are live components, so manifests carry no code
   // strings — usage code comes from the sibling `<Name>.examples.tsx`
-  // SOURCE: a consumer-ready lead snippet plus one verbatim block per
-  // exported example.
+  // SOURCE: one self-contained block per exported example (its imports and
+  // the module helpers it uses), the first of them also as the usage lead.
   const examplesSource = readExamplesSource(rec.manifestFile, name);
-  const exportSources = examplesSource ? extractExportFunctions(examplesSource) : {};
-  const usageSnippet = examplesSource ? toUsageSnippet(examplesSource) : null;
+  const exportSources = examplesSource
+    ? selfContainedExamples(examplesSource, { kind: "tsx", packageName: "@pxlkit/ui-kit" })
+    : {};
+  const examples = normalizeExamples(manifest, exportSources, sources);
 
   return {
     name,
@@ -332,8 +390,8 @@ export function planEntryFor(
     ariaPatterns,
     ariaNotes,
     keyboard: normalizeKeyboard(manifest),
-    examples: normalizeExamples(manifest, exportSources),
-    usageSnippet,
+    examples,
+    usageSnippet: examples[0]?.code ?? null,
     related: asStringArray(manifest.related),
     tags: asStringArray(manifest.tags),
     deprecation: normalizeDeprecation(manifest),
@@ -384,6 +442,20 @@ export function escapeJsxText(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
+/**
+ * Prose from a manifest or a doc comment as JSX text: escaped, with each
+ * markdown code span (`` `aria-expanded` ``) set in `<code>`. A backtick
+ * without a partner stays as written.
+ */
+export function renderInlineText(s: string): string {
+  const parts = s.split("`");
+  // An odd count of backticks leaves the last one unpaired: keep it literal.
+  const paired = parts.length % 2 === 1 ? parts : [...parts.slice(0, -2), `${parts[parts.length - 2]}\`${parts[parts.length - 1]}`];
+  return paired
+    .map((part, index) => (index % 2 === 1 ? `<code>${escapeJsxText(part)}</code>` : escapeJsxText(part)))
+    .join("");
+}
+
 /** JS template-literal-safe escape: protect backticks, backslashes, and ${. */
 export function escapeForTemplateLiteral(s: string): string {
   return s
@@ -400,7 +472,7 @@ function jsxAttr(s: string): string {
 function renderHighlights(highlights: string[]): string {
   if (highlights.length === 0) return "";
   const lis = highlights
-    .map((h) => `        <li>${escapeJsxText(h)}</li>`)
+    .map((h) => `        <li>${renderInlineText(h)}</li>`)
     .join("\n");
   return [
     `      <ul className="docs-highlights">`,
@@ -413,7 +485,7 @@ function renderDeprecationBanner(d: DeprecationInfo): string {
   if (!d.deprecated) return "";
   const parts: string[] = [];
   parts.push(`        <strong>Deprecated.</strong>`);
-  if (d.note) parts.push(`{' '}${escapeJsxText(d.note)}`);
+  if (d.note) parts.push(`{' '}${renderInlineText(d.note)}`);
   if (d.replacement) {
     parts.push(`{' '}Use <code>${escapeJsxText(d.replacement)}</code> instead.`);
   }
@@ -438,7 +510,7 @@ function renderPropsTable(props: PropEntry[]): string {
         `            <td><code>${escapeJsxText(p.name)}</code>${p.required ? `<span className="docs-required" aria-label="required">*</span>` : ""}</td>`,
         `            <td><code>${escapeJsxText(p.type)}</code></td>`,
         `            <td>${p.defaultValue ? `<code>${escapeJsxText(p.defaultValue)}</code>` : `<span className="docs-muted">—</span>`}</td>`,
-        `            <td>${escapeJsxText(p.description) || `<span className="docs-muted">—</span>`}</td>`,
+        `            <td>${renderInlineText(p.description) || `<span className="docs-muted">—</span>`}</td>`,
         `          </tr>`,
       ].join("\n"),
     )
@@ -467,8 +539,8 @@ function renderKeyboardTable(rows: KeyboardEntry[]): string {
       [
         `          <tr>`,
         `            <td><kbd>${escapeJsxText(r.key)}</kbd></td>`,
-        `            <td>${escapeJsxText(r.does)}</td>`,
-        `            <td>${r.when ? escapeJsxText(r.when) : `<span className="docs-muted">—</span>`}</td>`,
+        `            <td>${renderInlineText(r.does)}</td>`,
+        `            <td>${r.when ? renderInlineText(r.when) : `<span className="docs-muted">—</span>`}</td>`,
         `          </tr>`,
       ].join("\n"),
     )
@@ -492,7 +564,7 @@ function renderKeyboardTable(rows: KeyboardEntry[]): string {
 function renderA11ySection(entry: DocsPagePlanEntry): string {
   const lines: string[] = [];
   lines.push(`    <section aria-labelledby="${entry.slug}-a11y">`);
-  lines.push(`      <h3 id="${entry.slug}-a11y">Accessibility</h3>`);
+  lines.push(`      <Heading id="${entry.slug}-a11y">Accessibility</Heading>`);
   if (entry.wcagLevel) {
     lines.push(
       `      <p>WCAG target: <strong>${escapeJsxText(entry.wcagLevel)}</strong></p>`,
@@ -506,49 +578,65 @@ function renderA11ySection(entry: DocsPagePlanEntry): string {
     lines.push(`      </ul>`);
   }
   if (entry.ariaNotes) {
-    lines.push(`      <p className="docs-aria-notes">${escapeJsxText(entry.ariaNotes)}</p>`);
+    lines.push(`      <p className="docs-aria-notes">${renderInlineText(entry.ariaNotes)}</p>`);
   }
   const kbd = renderKeyboardTable(entry.keyboard);
   if (kbd) {
-    lines.push(`      <h4>Keyboard</h4>`);
+    lines.push(`      <Subheading>Keyboard</Subheading>`);
     lines.push(kbd);
   }
   lines.push(`    </section>`);
   return lines.join("\n");
 }
 
+/**
+ * The code in every framework it exists in, as a `<FrameworkCode>` element
+ * (apps/web/src/components/FrameworkCode.tsx): tabs that remember the
+ * reader's framework.
+ */
+function renderFrameworkCode(code: FrameworkSources, label: string, indent: string): string {
+  const sources = (["react", "vue", "angular"] as const)
+    .filter((framework) => code[framework])
+    .map((framework) => `${indent}  ${framework}={\`${escapeForTemplateLiteral(code[framework]!)}\`}`);
+  // A JS string in braces: JSX attribute strings take no escapes.
+  return [`${indent}<FrameworkCode`, `${indent}  variant="docs"`, `${indent}  label={${jsxAttr(label)}}`, ...sources, `${indent}/>`].join("\n");
+}
+
 function renderExamples(examples: ExampleEntry[]): string {
   if (examples.length === 0) return "";
   const blocks = examples
     .map((e) => {
-      const code = escapeForTemplateLiteral(e.code);
       const desc = e.description
         ? `        <p>${escapeJsxText(e.description)}</p>\n`
         : "";
       return [
         `      <article className="docs-example" id="example-${e.id}">`,
-        `        <h4>${escapeJsxText(e.label)}</h4>`,
-        desc + `        <pre className="docs-code"><code>{\`${code}\`}</code></pre>`,
+        `        <Subheading>${escapeJsxText(e.label)}</Subheading>`,
+        desc + renderFrameworkCode(e.code, `${e.label} code`, "        "),
         `      </article>`,
       ].join("\n");
     })
     .join("\n");
   return [
     `    <section aria-label="Examples">`,
-    `      <h3>Examples</h3>`,
+    `      <Heading>Examples</Heading>`,
     blocks,
     `    </section>`,
   ].join("\n");
 }
 
+/** Related components: their /docs anchors, or their pages (`links="pages"`). */
 function renderRelated(related: string[]): string {
   if (related.length === 0) return "";
   const items = related
-    .map((r) => `        <li><a href="#${slugFor(r)}">${escapeJsxText(r)}</a></li>`)
+    .map((r) => {
+      const slug = slugFor(r);
+      return `        <li><a href={links === 'pages' ? '${COMPONENT_PAGE_PREFIX}${slug}' : '#${slug}'}>${escapeJsxText(r)}</a></li>`;
+    })
     .join("\n");
   return [
     `    <section aria-label="Related components">`,
-    `      <h3>Related</h3>`,
+    `      <Heading>Related</Heading>`,
     `      <ul className="docs-related">`,
     items,
     `      </ul>`,
@@ -580,9 +668,20 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
   const lines: string[] = [];
   lines.push(FILE_BANNER);
   lines.push(`import * as React from 'react';`);
+  const api = hasApi(entry.api) ? entry.api : undefined;
+  if (api) {
+    lines.push(`import { FrameworkApi, type FrameworkApiReferences } from '${FRAMEWORK_API_MODULE}';`);
+  }
+  if (entry.usageSnippet || entry.examples.length > 0) {
+    lines.push(`import { FrameworkCode } from '@/components/FrameworkCode';`);
+  }
   lines.push(``);
   lines.push(`export interface ${entry.name}DocsSectionProps {`);
   lines.push(`  className?: string;`);
+  lines.push(`  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */`);
+  lines.push(`  headingLevel?: 1 | 2;`);
+  lines.push(`  /** Where its related components link: their entries on /docs, or their own pages. */`);
+  lines.push(`  links?: 'anchors' | 'pages';`);
   lines.push(`}`);
   lines.push(``);
   lines.push(
@@ -596,9 +695,11 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
   lines.push(`  deprecated: ${entry.deprecation.deprecated ? "true" : "false"},`);
   lines.push(`} as const;`);
   lines.push(``);
-  lines.push(
-    `export function ${entry.name}DocsSection({ className }: ${entry.name}DocsSectionProps): React.ReactElement {`,
-  );
+  if (api) {
+    lines.push(renderApiConstant(entry.name, api));
+    lines.push(``);
+  }
+  const signatureAt = lines.length;
   lines.push(`  return (`);
   // No `id` on the root: the /docs page wrapper owns the `#<slug>` anchor
   // (a literal <section id> the coverage-docs gate scans for) — emitting it
@@ -607,33 +708,35 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
     `    <section aria-labelledby={${jsxAttr(`${entry.slug}-heading`)}} className={className} data-status=${jsxAttr(entry.status)}>`,
   );
   lines.push(
-    `      <h2 id=${jsxAttr(`${entry.slug}-heading`)}>${escapeJsxText(entry.name)}</h2>`,
+    `      <Title id=${jsxAttr(`${entry.slug}-heading`)}>${escapeJsxText(entry.name)}</Title>`,
   );
 
   const banner = renderDeprecationBanner(entry.deprecation);
   if (banner) lines.push(banner);
 
   if (entry.description) {
-    lines.push(`      <p className="docs-lead">${escapeJsxText(entry.description)}</p>`);
+    lines.push(`      <p className="docs-lead">${renderInlineText(entry.description)}</p>`);
   }
   const highlights = renderHighlights(entry.highlights);
   if (highlights) lines.push(highlights);
 
   lines.push(renderMeta(entry));
 
-  lines.push(`    <section aria-label="Props">`);
-  lines.push(`      <h3>Props</h3>`);
-  lines.push(renderPropsTable(entry.props));
-  lines.push(`    </section>`);
+  if (api) {
+    lines.push(renderApiBlock(entry.name, entry.slug, api));
+  } else {
+    lines.push(`    <section aria-label="Props">`);
+    lines.push(`      <Heading>Props</Heading>`);
+    lines.push(renderPropsTable(entry.props));
+    lines.push(`    </section>`);
+  }
 
   lines.push(renderA11ySection(entry));
 
   if (entry.usageSnippet) {
     lines.push(`    <section aria-labelledby="${entry.slug}-usage">`);
-    lines.push(`      <h3 id="${entry.slug}-usage">Usage</h3>`);
-    lines.push(
-      `      <pre className="docs-code"><code>{\`${escapeForTemplateLiteral(entry.usageSnippet)}\`}</code></pre>`,
-    );
+    lines.push(`      <Heading id="${entry.slug}-usage">Usage</Heading>`);
+    lines.push(renderFrameworkCode(entry.usageSnippet, `${entry.name} usage`, "      "));
     lines.push(`    </section>`);
   }
 
@@ -648,6 +751,21 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
   lines.push(`}`);
   lines.push(``);
   lines.push(`export default ${entry.name}DocsSection;`);
+  // The signature and the heading elements, now that the body says which it uses.
+  const body = lines.slice(signatureAt).join("\n");
+  const params = ["className", "headingLevel = 2", ...(body.includes("{links === 'pages'") ? ["links = 'anchors'"] : [])];
+  const headings = [
+    `  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.`,
+    `  const Title = headingLevel === 1 ? 'h1' : 'h2';`,
+    `  const Heading = headingLevel === 1 ? 'h2' : 'h3';`,
+    ...(body.includes("<Subheading") ? [`  const Subheading = headingLevel === 1 ? 'h3' : 'h4';`] : []),
+  ];
+  lines.splice(
+    signatureAt,
+    0,
+    `export function ${entry.name}DocsSection({ ${params.join(", ")} }: ${entry.name}DocsSectionProps): React.ReactElement {`,
+    ...headings,
+  );
   lines.push(``);
   return lines.join("\n");
 }
@@ -692,36 +810,161 @@ export class GenerateDocsPageGenerator extends Generator {
   }
 
   async run(ctx: GeneratorContext): Promise<GeneratorResult> {
-    const entries = ctx.manifests.map((rec) => planEntryFor(rec, this.outRoot));
+    const ports = await readPorts(ctx.repoRoot);
+    const apis = await apiIndexFor(ctx);
+    const entries: DocsPagePlanEntry[] = [];
+    for (const rec of ctx.manifests) {
+      const entry = planEntryFor(rec, this.outRoot, await exampleSourcesOf(ctx.repoRoot, rec, ports));
+      entry.api = apis.get(entry.name);
+      entries.push(entry);
+    }
     const writes = entries.map((entry) => ({
       path: entry.outFile,
       content: renderSectionModule(entry),
     }));
-    writes.push({
-      path: ensurePosix(path.join(this.outRoot, "usage-snippets.generated.ts")),
-      content: renderUsageSnippetsModule(entries),
-    });
+    writes.push(...usageSnippetWrites(this.outRoot, entries, await readShowcaseExamples(ctx.repoRoot)));
+    writes.push(...componentPageWrites(this.outRoot, entries));
     return { writes };
   }
 }
 
+/** What each port implements, keyed like `portComponents`; read once per run. */
+export type PortsIndex = ReadonlyMap<PortFramework, ReadonlyMap<string, PortedComponent>>;
+
+export async function readPorts(repoRoot: string): Promise<PortsIndex> {
+  const out = new Map<PortFramework, ReadonlyMap<string, PortedComponent>>();
+  for (const port of KIT_PORTS) out.set(port.framework, await portComponents(repoRoot, port));
+  return out;
+}
+
+/**
+ * A manifest's examples' export names (by identity) and the ports' sources
+ * of them: the Vue kit's single-file components verbatim, the Angular kit's
+ * classes self-contained — from the kits that implement the component in
+ * full, as the READMEs and audit gate 37 count it.
+ */
+export async function exampleSourcesOf(
+  repoRoot: string,
+  rec: ManifestRecord,
+  ports: PortsIndex,
+): Promise<ExampleSourcesInput> {
+  const name = (rec.manifest as { name?: unknown }).name;
+  // A manifest without a name is planEntryFor's to report.
+  if (typeof name !== "string") return {};
+  const exportNames = await manifestExampleExports(rec);
+  const out: ExampleSourcesInput = { exportNames };
+  for (const port of KIT_PORTS) {
+    const component = ports.get(port.framework)?.get(portKey(port, name));
+    if (!implementsInFull(component, exportNames)) continue;
+    if (port.framework === "vue") {
+      out.vue = Object.fromEntries(
+        exportNames.map((example) => [
+          example,
+          fs.readFileSync(path.join(repoRoot, component.path, `${example}.vue`), "utf8"),
+        ]),
+      );
+    } else {
+      const classes = selfContainedExamples(fs.readFileSync(path.join(repoRoot, component.path), "utf8"), {
+        kind: "ts",
+      });
+      out.angular = Object.fromEntries(exportNames.map((example) => [example, classes[example]!]));
+    }
+  }
+  return out;
+}
+
+/** The site's module that picks each component's /ui-kit example, from the repo root. */
+export const SHOWCASE_EXAMPLES_SUBPATH = "apps/web/src/app/ui-kit/showcase-examples.ts";
+
+/** Component slug → the id of the manifest example a page outside the reference shows. */
+export type ShowcaseExamples = Readonly<Record<string, string>>;
+
+/** The site's picks (`SHOWCASE_EXAMPLES`), none where the repo has no such module. */
+export async function readShowcaseExamples(repoRoot: string): Promise<ShowcaseExamples> {
+  const file = path.join(repoRoot, SHOWCASE_EXAMPLES_SUBPATH);
+  if (!(await fs.pathExists(file))) return {};
+  const mod = (await import(pathToFileURL(file).href)) as { SHOWCASE_EXAMPLES?: ShowcaseExamples };
+  return mod.SHOWCASE_EXAMPLES ?? {};
+}
+
+/**
+ * Each component's usage snippet for pages outside the reference: the example
+ * `showcase` picks for it, else its usage lead. A pick naming a component or
+ * an example the manifests do not have throws, rather than fall back unseen.
+ */
+export function showcaseSnippets(
+  entries: readonly DocsPagePlanEntry[],
+  showcase: ShowcaseExamples = {},
+): Map<string, FrameworkSources> {
+  const bySlug = new Map(entries.map((entry) => [entry.slug, entry]));
+  for (const [slug, id] of Object.entries(showcase)) {
+    const entry = bySlug.get(slug);
+    if (!entry) throw new Error(`${SHOWCASE_EXAMPLES_SUBPATH}: no component has the slug "${slug}"`);
+    if (!entry.examples.some((example) => example.id === id)) {
+      throw new Error(
+        `${SHOWCASE_EXAMPLES_SUBPATH}: ${entry.name} has no example "${id}" (it has ${entry.examples.map((example) => example.id).join(", ")})`,
+      );
+    }
+  }
+  const out = new Map<string, FrameworkSources>();
+  for (const entry of entries) {
+    const picked = showcase[entry.slug];
+    const code = picked ? entry.examples.find((example) => example.id === picked)!.code : entry.usageSnippet;
+    if (code) out.set(entry.slug, code);
+  }
+  return out;
+}
+
 /**
  * Slug → consumer-ready usage snippet map for pages that surface a quick
- * "how do I use this" block outside the full /docs reference (e.g. the
- * /ui-kit showcase).
+ * "how do I use this" block outside the full /docs reference (the /ui-kit
+ * showcase): per component, the example `showcase` picks, else its usage
+ * lead (see `showcaseSnippets`). `USAGE_SNIPPETS` holds React's; with
+ * `framework`, the module holds that framework's (`USAGE_SNIPPETS_VUE`, …),
+ * in a module of its own so a page loads it only when a reader picks the
+ * framework.
  */
-export function renderUsageSnippetsModule(entries: DocsPagePlanEntry[]): string {
+export function renderUsageSnippetsModule(
+  entries: DocsPagePlanEntry[],
+  framework: keyof FrameworkSources = "react",
+  showcase: ShowcaseExamples = {},
+): string {
+  const snippets = showcaseSnippets(entries, showcase);
   const lines: string[] = [];
   lines.push(FILE_BANNER.trimEnd());
   lines.push(``);
-  lines.push(`export const USAGE_SNIPPETS: Record<string, string> = {`);
+  const name = framework === "react" ? "USAGE_SNIPPETS" : `USAGE_SNIPPETS_${framework.toUpperCase()}`;
+  lines.push(`export const ${name}: Record<string, string> = {`);
   for (const e of [...entries].sort((a, b) => a.slug.localeCompare(b.slug))) {
-    if (!e.usageSnippet) continue;
-    lines.push(`  '${e.slug}': \`${escapeForTemplateLiteral(e.usageSnippet)}\`,`);
+    const snippet = snippets.get(e.slug)?.[framework];
+    if (!snippet) continue;
+    lines.push(`  '${e.slug}': \`${escapeForTemplateLiteral(snippet)}\`,`);
   }
   lines.push(`};`);
   lines.push(``);
   return lines.join("\n");
+}
+
+/** The modules each component's page reads: its data, and its section's loader (_lib/component-pages.ts). */
+function componentPageWrites(outRoot: string, entries: DocsPagePlanEntry[]): Array<{ path: string; content: string }> {
+  return Object.entries(componentPageModules(entries, FILE_EXT)).map(([file, content]) => ({
+    path: ensurePosix(path.join(outRoot, file)),
+    content,
+  }));
+}
+
+/** The usage snippet modules: React's, then one per port. */
+function usageSnippetWrites(
+  outRoot: string,
+  entries: DocsPagePlanEntry[],
+  showcase: ShowcaseExamples,
+): Array<{ path: string; content: string }> {
+  return (["react", "vue", "angular"] as const).map((framework) => ({
+    path: ensurePosix(
+      path.join(outRoot, framework === "react" ? "usage-snippets.generated.ts" : `usage-snippets.${framework}.generated.ts`),
+    ),
+    content: renderUsageSnippetsModule(entries, framework, showcase),
+  }));
 }
 
 // ---------------------------------------------------------------------------
@@ -749,9 +992,12 @@ export async function generateDocsPage(
   let written = 0;
   let skipped = 0;
 
+  const ports = await readPorts(repoRoot);
+  const apis = await extractApi(repoRoot, documentedNames(manifests));
   for (const rec of manifests) {
     try {
-      const entry = planEntryFor(rec, outRoot);
+      const entry = planEntryFor(rec, outRoot, await exampleSourcesOf(repoRoot, rec, ports));
+      entry.api = apis.get(entry.name);
       entries.push(entry);
       if (opts.dryRun) {
         skipped++;
@@ -770,11 +1016,13 @@ export async function generateDocsPage(
   }
 
   if (!opts.dryRun && entries.length > 0) {
-    await writeOutput(
-      ensurePosix(path.join(outRoot, "usage-snippets.generated.ts")),
-      renderUsageSnippetsModule(entries),
-    );
-    written++;
+    for (const write of [
+      ...usageSnippetWrites(outRoot, entries, await readShowcaseExamples(repoRoot)),
+      ...componentPageWrites(outRoot, entries),
+    ]) {
+      await writeOutput(write.path, write.content);
+      written++;
+    }
   }
 
   return {

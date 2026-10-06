@@ -17,6 +17,8 @@ Thumbs.db
 yarn-error.log
 coverage/
 storybook-static/
+# Angular CLI cache (the Angular Storybook's workspace)
+.angular/
 # Test artifacts
 test-results/
 playwright-report/

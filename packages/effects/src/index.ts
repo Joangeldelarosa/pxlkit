@@ -13,7 +13,8 @@ export { Ripple } from './icons/ripple';
 export { NeonStrobe } from './icons/neon-strobe';
 export { PortalSpin } from './icons/portal-spin';
 
-import type { IconPack } from '@pxlkit/core';
+import type { IconPack } from '@pxlkit/core/vanilla';
+import packageJson from '../package.json';
 import { ExplosionBurst } from './icons/explosion-burst';
 import { RadarPing } from './icons/radar-ping';
 import { Flame } from './icons/flame';
@@ -26,6 +27,10 @@ import { Twinkle } from './icons/twinkle';
 import { Ripple } from './icons/ripple';
 import { NeonStrobe } from './icons/neon-strobe';
 import { PortalSpin } from './icons/portal-spin';
+
+// The published version: package.json is its one source. Read here, outside
+// the pack, so a bundler still drops the pack when nothing imports it.
+const { version } = packageJson;
 
 /**
  * The Effects icon pack.
@@ -50,6 +55,6 @@ export const EffectsPack: IconPack = {
     NeonStrobe,
     PortalSpin,
   ],
-  version: '1.2.3',
+  version,
   author: 'pxlkit',
 };

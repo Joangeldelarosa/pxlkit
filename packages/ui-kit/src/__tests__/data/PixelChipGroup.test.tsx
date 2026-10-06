@@ -64,4 +64,56 @@ describe('PixelChipGroup', () => {
     fireEvent.click(getByText('Bravo'));
     expect(onChange).toHaveBeenLastCalledWith([]);
   });
+
+  // Regression: arrow keys, Home and End toggled the chip they landed on, so
+  // at the ends (or on the selected chip) they cleared the selection instead
+  // of selecting.
+  it('single mode: arrows, Home and End select the chip they reach and never clear the selection', () => {
+    const onChange = vi.fn();
+    const { getByText } = render(
+      <PixelChipGroup value={['c']} onChange={onChange} aria-label="Letters">
+        <Chip value="a" label="Alpha" />
+        <Chip value="b" label="Bravo" />
+        <Chip value="c" label="Charlie" />
+      </PixelChipGroup>,
+    );
+    const charlie = getByText('Charlie').closest('button')!;
+    fireEvent.keyDown(charlie, { key: 'ArrowRight' });
+    fireEvent.keyDown(charlie, { key: 'End' });
+    expect(onChange).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(charlie);
+
+    fireEvent.keyDown(charlie, { key: 'Home' });
+    expect(onChange).toHaveBeenLastCalledWith(['a']);
+    expect(document.activeElement).toBe(getByText('Alpha').closest('button'));
+  });
+
+  // Regression: on the linear surface the selection ring and the focus ring
+  // were the same; on the pixel surface the cut corners clipped the selection
+  // ring, the only mark of a selected chip.
+  it('marks the selected chip apart from keyboard focus on both surfaces', () => {
+    const { getAllByRole } = render(
+      <>
+        <PixelChipGroup value={['a']} onChange={() => {}} aria-label="Pixel" surface="pixel">
+          <Chip value="a" label="Alpha" />
+          <Chip value="b" label="Bravo" />
+        </PixelChipGroup>
+        <PixelChipGroup value={['a']} onChange={() => {}} aria-label="Linear" surface="linear">
+          <Chip value="a" label="Alpha" />
+          <Chip value="b" label="Bravo" />
+        </PixelChipGroup>
+      </>,
+    );
+    const [pixelSelected, pixelOther, linearSelected, linearOther] = getAllByRole('radio').map((chip) => chip.className.split(' '));
+    // Pixel: a frame inside the selected chip, which the cut corners leave
+    // whole; focus lights up the chip's edge from a layer over the chip.
+    expect(pixelSelected).toEqual(expect.arrayContaining(['pxl-corner-sm', '*:outline-2', '*:-outline-offset-4', '*:outline-retro-cyan/60']));
+    expect(pixelSelected!.filter((c) => c.includes('ring'))).toEqual([]);
+    expect(pixelOther!.filter((c) => c.startsWith('*:'))).toEqual([]);
+    for (const chip of [pixelSelected!, pixelOther!]) expect(chip).toContain('focus-visible:after:pxl-focus-inset');
+    // Linear: the selection ring hugs the chip; the focus ring stands off it.
+    expect(linearSelected).toEqual(expect.arrayContaining(['ring-2', 'ring-retro-cyan/60', 'focus-visible:ring-offset-2']));
+    expect(linearOther).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:ring-offset-2']));
+    expect(linearOther).not.toContain('ring-2');
+  });
 });

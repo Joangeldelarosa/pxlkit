@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSkeletonDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSkeletonDocsMeta = {
@@ -17,55 +23,160 @@ export const PixelSkeletonDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSectionProps): React.ReactElement {
+/** PixelSkeleton's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSkeleton } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSkeleton',
+        props: [
+          { name: 'width', type: 'string', description: 'CSS width (e.g. `"100%"`, `"12rem"`).' },
+          { name: 'height', type: 'string', default: "'1rem'", description: 'CSS height (default `"1rem"`).' },
+          { name: 'rounded', type: 'boolean', default: 'false', description: 'When `true`, applies a pill/circle radius instead of the surface default.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; falls back to nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Loading'", description: 'Accessible label override; falls back to `"Loading"`.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `role`, `aria-label`.',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSkeleton } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSkeleton',
+        props: [
+          { name: 'width', type: 'string', description: 'CSS width (e.g. `"100%"`, `"12rem"`).' },
+          { name: 'height', type: 'string', default: "'1rem'", description: 'CSS height.' },
+          { name: 'rounded', type: 'boolean', default: 'false', description: 'A circle on the linear surface, a 2px chamfer on the pixel one, instead of the surface radius.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Loading'", description: 'Accessible label (`aria-label` works too).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSkeleton } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSkeleton',
+        selector: 'pxl-skeleton',
+        props: [
+          { name: 'width', type: 'string', description: 'CSS width (e.g. `"100%"`, `"12rem"`).' },
+          { name: 'height', type: 'string', default: "'1rem'", description: 'CSS height.' },
+          { name: 'rounded', type: 'boolean', default: 'false', accepts: 'unknown', description: 'A circle on the linear surface, a 2px chamfer on the pixel one, instead of the surface radius.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Loading'", description: 'Accessible label.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelSkeletonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSkeletonDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-skeleton-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-skeleton-heading'>PixelSkeleton</h2>
+      <Title id='pixel-skeleton-heading'>PixelSkeleton</Title>
       <p className="docs-lead">Animated loading placeholder that reserves layout space while async content resolves.</p>
       <ul className="docs-highlights">
         <li>Width/height props accept any CSS length so blocks can mirror the final content footprint.</li>
         <li>Pixel and linear surfaces match the rest of the kit — sharp pixel corners or smooth rounded fills.</li>
-        <li>`rounded` flips between square/avatar shapes (circle on linear, 2px chamfer on pixel).</li>
-        <li>Ships with `role=&quot;status&quot;` and an overridable `ariaLabel` for screen-reader-friendly loading.</li>
-        <li>Forwards refs and arbitrary div attributes — drop it anywhere a placeholder block is needed.</li>
+        <li><code>rounded</code> flips between square/avatar shapes (circle on linear, 2px chamfer on pixel).</li>
+        <li>Ships with <code>role=&quot;status&quot;</code> and an overridable <code>ariaLabel</code> for screen-reader-friendly loading.</li>
+        <li>Takes any native attribute — drop it anywhere a placeholder block is needed.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-skeleton-api">
+      <Heading id="pixel-skeleton-api">API</Heading>
+      <FrameworkApi label={'PixelSkeleton API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-skeleton-a11y">
-      <h3 id="pixel-skeleton-a11y">Accessibility</h3>
+      <Heading id="pixel-skeleton-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>status</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders with `role=&quot;status&quot;` and a polite implicit live region. Override `ariaLabel` when the placeholder represents a specific resource (e.g. &quot;Loading user profile&quot;) so assistive tech announces what is loading.</p>
+      <p className="docs-aria-notes">Renders with <code>role=&quot;status&quot;</code> and a polite implicit live region. Override <code>ariaLabel</code> when the placeholder represents a specific resource (e.g. &quot;Loading user profile&quot;) so assistive tech announces what is loading. The pulse plays only for a reader who allows motion: under <code>prefers-reduced-motion: reduce</code> the block holds still, from the server-rendered markup on.</p>
     </section>
     <section aria-labelledby="pixel-skeleton-usage">
-      <h3 id="pixel-skeleton-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelSkeleton } from '@pxlkit/ui-kit';
+      <Heading id="pixel-skeleton-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSkeleton usage'}
+        react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelSkeleton width="12rem" height="1rem" />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSkeleton width="12rem" height="1rem" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`<pxl-skeleton width="12rem" height="1rem" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelSkeleton width="12rem" height="1rem" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSkeleton width="12rem" height="1rem" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`<pxl-skeleton width="12rem" height="1rem" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-text-block">
-        <h4>Text Block</h4>
-        <pre className="docs-code"><code>{`export function TextBlock() {
+        <Subheading>Text Block</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Text Block code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function TextBlock() {
   return (
     <div className="flex flex-col gap-2">
       <PixelSkeleton width="14rem" height="0.75rem" />
@@ -73,11 +184,42 @@ export function Default() {
       <PixelSkeleton width="9rem" height="0.75rem" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-2">
+    <PixelSkeleton width="14rem" height="0.75rem" />
+    <PixelSkeleton width="11rem" height="0.75rem" />
+    <PixelSkeleton width="9rem" height="0.75rem" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`
+    <div class="flex flex-col gap-2">
+      <pxl-skeleton width="14rem" height="0.75rem" />
+      <pxl-skeleton width="11rem" height="0.75rem" />
+      <pxl-skeleton width="9rem" height="0.75rem" />
+    </div>
+  \`,
+})
+export class TextBlock {}`}
+        />
       </article>
       <article className="docs-example" id="example-rounded">
-        <h4>Rounded</h4>
-        <pre className="docs-code"><code>{`export function Rounded() {
+        <Subheading>Rounded</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Rounded code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function Rounded() {
   return (
     <div className="flex items-center gap-3">
       <PixelSkeleton width="2.5rem" height="2.5rem" rounded />
@@ -87,22 +229,86 @@ export function Default() {
       </div>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-3">
+    <PixelSkeleton width="2.5rem" height="2.5rem" rounded />
+    <div class="flex flex-col gap-1.5">
+      <PixelSkeleton width="8rem" height="0.75rem" />
+      <PixelSkeleton width="5rem" height="0.75rem" />
+    </div>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`
+    <div class="flex items-center gap-3">
+      <pxl-skeleton width="2.5rem" height="2.5rem" rounded />
+      <div class="flex flex-col gap-1.5">
+        <pxl-skeleton width="8rem" height="0.75rem" />
+        <pxl-skeleton width="5rem" height="0.75rem" />
+      </div>
+    </div>
+  \`,
+})
+export class Rounded {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelSkeleton surface="linear" width="14rem" height="1rem" />
       <PixelSkeleton surface="pixel" width="14rem" height="1rem" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelSkeleton surface="linear" width="14rem" height="1rem" />
+    <PixelSkeleton surface="pixel" width="14rem" height="1rem" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-skeleton surface="linear" width="14rem" height="1rem" />
+      <pxl-skeleton surface="pixel" width="14rem" height="1rem" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-card-placeholder">
-        <h4>Card Placeholder</h4>
-        <pre className="docs-code"><code>{`export function CardPlaceholder() {
+        <Subheading>Card Placeholder</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Card Placeholder code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function CardPlaceholder() {
   return (
     <div className="flex w-72 flex-col gap-3 rounded border border-retro-border/60 p-4">
       <PixelSkeleton width="100%" height="8rem" />
@@ -110,21 +316,68 @@ export function Default() {
       <PixelSkeleton width="60%" height="0.75rem" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex w-72 flex-col gap-3 rounded border border-retro-border/60 p-4">
+    <PixelSkeleton width="100%" height="8rem" />
+    <PixelSkeleton width="80%" height="0.875rem" />
+    <PixelSkeleton width="60%" height="0.75rem" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`
+    <div class="flex w-72 flex-col gap-3 rounded border border-retro-border/60 p-4">
+      <pxl-skeleton width="100%" height="8rem" />
+      <pxl-skeleton width="80%" height="0.875rem" />
+      <pxl-skeleton width="60%" height="0.75rem" />
+    </div>
+  \`,
+})
+export class CardPlaceholder {}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-label">
-        <h4>Custom Label</h4>
-        <pre className="docs-code"><code>{`export function CustomLabel() {
+        <Subheading>Custom Label</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Custom Label code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function CustomLabel() {
   return <PixelSkeleton width="10rem" height="1rem" ariaLabel="Loading user profile" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSkeleton width="10rem" height="1rem" aria-label="Loading user profile" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`<pxl-skeleton width="10rem" height="1rem" ariaLabel="Loading user profile" />\`,
+})
+export class CustomLabel {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-spinner">PixelSpinner</a></li>
-        <li><a href="#pixel-progress">PixelProgress</a></li>
-        <li><a href="#pixel-empty-state">PixelEmptyState</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-spinner' : '#pixel-spinner'}>PixelSpinner</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-progress' : '#pixel-progress'}>PixelProgress</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-empty-state' : '#pixel-empty-state'}>PixelEmptyState</a></li>
       </ul>
     </section>
     </section>

@@ -10,9 +10,9 @@ export default defineManifest({
   description:
     'Surface-aware polymorphic container with tone, variant, padding, radius, border, and shadow controls.',
   highlights: [
-    'Surface-aware tokens via useEffectiveSurface (retro / pixel)',
+    'Surface-aware tokens (pixel / linear)',
     'Tone + variant matrix (solid / soft / outline / ghost)',
-    'Polymorphic `as` for semantic landmarks (section, nav, aside, main, header, footer, article)',
+    'Polymorphic `as` for semantic landmarks (section, nav, aside, main, header, footer, article); in Angular, the element you put `pxlBox` on',
     'Dev-time a11y warning when rendered as a landmark without an accessible name',
     'Padding and radius scale tokens with sensible defaults',
   ],

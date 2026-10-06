@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelHeroMedia } from './PixelHeroMedia';
 
 const Placeholder = ({ label }: { label: string }) => (

@@ -119,9 +119,84 @@ describe('PixelButton — asChild', () => {
     expect(externalRef.current).toBe(a);
   });
 
+  it("hands the child's own ref the element without reading element.ref, which React 19 deprecates", () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const childRef = React.createRef<HTMLAnchorElement>();
+    const { getByTestId } = render(
+      <PixelButton asChild>
+        <a ref={childRef} href="/foo" data-testid="slot-link">
+          Go
+        </a>
+      </PixelButton>,
+    );
+    expect(childRef.current).toBe(getByTestId('slot-link'));
+    expect(error.mock.calls.flat().join('\n')).not.toMatch(/element\.ref/);
+    error.mockRestore();
+  });
+
   it('falls back to <button> when asChild is true but child is not a valid element', () => {
     const { getByRole } = render(<PixelButton asChild>plain text</PixelButton>);
     // text node isn't a valid React element → renders a button.
     expect(getByRole('button')).toBeTruthy();
+  });
+});
+
+describe('PixelButton — keyboard focus', () => {
+  it('rings keyboard focus, keeping an outline for forced-colors mode, which drops the ring', () => {
+    const classes = render(<PixelButton surface="linear">Go</PixelButton>).getByRole('button').className.split(' ');
+    expect(classes).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:outline-hidden']));
+    expect(classes.filter((c) => c.endsWith('outline-none'))).toEqual([]);
+  });
+});
+
+describe('PixelButton — shadows and moves', () => {
+  const DROP_SHADOWS = ['pxl-shadow', 'pxl-shadow-hover', 'pxl-shadow-active'];
+
+  it('moves a pixel button on hover and press without a drop shadow, which its cut corners would clip', () => {
+    const press = { solid: 'pxl-nudge-active', soft: 'pxl-nudge-active', outline: 'active:scale-[0.97]' } as const;
+    for (const [variant, pressed] of Object.entries(press) as Array<[keyof typeof press, string]>) {
+      const { getByRole, unmount } = render(<PixelButton variant={variant}>Go</PixelButton>);
+      const classes = getByRole('button').className.split(' ');
+      expect(classes).toEqual(expect.arrayContaining(['pxl-corner-sm', 'pxl-nudge-hover', pressed]));
+      for (const shadow of DROP_SHADOWS) expect(classes).not.toContain(shadow);
+      unmount();
+    }
+  });
+
+  it('keeps the linear shadows', () => {
+    const classes = render(<PixelButton surface="linear" variant="soft">Go</PixelButton>).getByRole('button').className.split(' ');
+    expect(classes).toEqual(expect.arrayContaining(['shadow-sm', 'hover:shadow-md', 'active:shadow-sm']));
+  });
+
+  it('holds a disabled button still, with no shadow', () => {
+    for (const surface of ['pixel', 'linear'] as const) {
+      const { getByRole, unmount } = render(<PixelButton surface={surface} variant="soft" disabled>Go</PixelButton>);
+      const classes = getByRole('button').className.split(' ');
+      for (const name of [...DROP_SHADOWS, 'pxl-nudge-hover', 'pxl-nudge-active', 'shadow-sm', 'hover:shadow-md', 'active:shadow-sm']) {
+        expect(classes).not.toContain(name);
+      }
+      unmount();
+    }
+  });
+});
+
+describe('PixelButton — loading', () => {
+  it('holds a loading button still: no hover or press feedback, its resting look kept', () => {
+    for (const surface of ['pixel', 'linear'] as const) {
+      const { getByRole, unmount } = render(<PixelButton surface={surface} variant="soft" loading>Save</PixelButton>);
+      const classes = getByRole('button').className.split(' ');
+      for (const name of ['pxl-nudge-hover', 'pxl-nudge-active', 'hover:shadow-md', 'active:shadow-sm']) expect(classes).not.toContain(name);
+      if (surface === 'linear') expect(classes).toContain('shadow-sm');
+      unmount();
+    }
+    const outline = render(<PixelButton variant="outline" loading>Save</PixelButton>).getByRole('button').className.split(' ');
+    expect(outline).not.toContain('active:scale-[0.97]');
+  });
+
+  it('turns its spinner only for a reader who allows motion, from the server markup on', () => {
+    const { getByTestId } = render(<PixelButton loading>Save</PixelButton>);
+    const spinner = getByTestId('pxl-button-spinner').className.split(' ');
+    expect(spinner).toContain('motion-safe:animate-spin');
+    expect(spinner).not.toContain('animate-spin');
   });
 });

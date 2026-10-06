@@ -19,12 +19,12 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Unstyled escape-hatch <textarea> passthrough for building custom multi-line inputs without the opinionated PixelTextarea chrome.',
+    'Unstyled escape-hatch `<textarea>` passthrough for building custom multi-line inputs without the opinionated PixelTextarea chrome.',
   highlights: [
     'Zero styling — pure passthrough to the native <textarea> element',
-    'Forwards every standard TextareaHTMLAttributes prop (value, rows, maxLength, etc.)',
-    'forwardRef-friendly: refs land on the underlying HTMLTextAreaElement',
-    'SSR-safe and tree-shakable; no runtime state or context',
+    'Takes every native textarea attribute (value, rows, maxlength, etc.)',
+    'Its element is the native <textarea>: a ref in React, `$el` in Vue, the `textarea[pxlBareTextarea]` element in Angular',
+    'SSR-safe and tree-shakable; no runtime state',
     'Ideal for composing bespoke field chrome while keeping native form semantics',
   ],
   examples: [
@@ -47,7 +47,7 @@ export default defineManifest({
       { key: 'Shift+Tab', does: 'Moves focus to the previous focusable element' },
     ],
     notes:
-      'Renders a native <textarea> so screen readers announce the textbox role with multiline semantics automatically. Because no chrome is applied, callers MUST supply a visible <label> (htmlFor) or an aria-label so the field has an accessible name. Pair with aria-required, aria-invalid, and aria-describedby for validation flows.',
+      'Renders a native <textarea> so screen readers announce the textbox role with multiline semantics automatically. Because no chrome is applied, callers MUST supply a visible <label> (`for`) or an aria-label so the field has an accessible name. Pair with aria-required, aria-invalid, and aria-describedby for validation flows.',
   },
   related: ['PixelTextarea', 'PixelBareInput', 'PixelBareButton'],
   apiStability: 'stable',

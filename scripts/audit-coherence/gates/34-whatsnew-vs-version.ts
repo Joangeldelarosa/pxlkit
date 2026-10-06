@@ -11,11 +11,13 @@ import {
 
 const GATE_ID = '34-whatsnew-vs-version';
 const DESCRIPTION =
-  'WhatsNewStrip items must advertise the components added in the advertised ui-kit release: the current version, or — for version-only patches with no "### Added" entries — the most recent release that has them. Prop-driven strips are checked against the items statically wired at their call sites.';
+  'WhatsNewStrip items must advertise the components added in the advertised ui-kit release: the current version — its "### Added" entries in packages/ui-kit/CHANGELOG.md, or else in the root CHANGELOG.md section of the release ("## [ui-kit <version> / …]") — or, for version-only patches with no "### Added" entries, the most recent release that has them. Prop-driven strips are checked against the items statically wired at their call sites.';
 
 const STRIP_PATH = 'apps/web/src/components/whats-new-strip.tsx';
 const PKG_PATH = 'packages/ui-kit/package.json';
 const CHANGELOG_PATH = 'packages/ui-kit/CHANGELOG.md';
+/** Releases that span packages are written up here, under `## [ui-kit <version> / …]`. */
+const ROOT_CHANGELOG_PATH = 'CHANGELOG.md';
 const WEB_SRC = 'apps/web/src';
 
 /** Minimum fraction of strip items that must come from the advertised release's Added set. */
@@ -24,6 +26,8 @@ const MIN_OVERLAP = 0.5;
 interface ReadOptions {
   strip?: string | null;
   changelog?: string | null;
+  /** The root CHANGELOG.md, read when the kit's own section of a release has no Added entries. */
+  rootChangelog?: string | null;
   uiKitPackage?: { version?: string } | null;
   /** Items statically wired at the strip's call sites (prop-driven strips). */
   consumerItems?: string[];
@@ -32,15 +36,17 @@ interface ReadOptions {
 export async function loadInputs(repoRoot: string): Promise<{
   strip: string | null;
   changelog: string | null;
+  rootChangelog: string | null;
   uiKitPackage: { version?: string } | null;
   consumerItems: string[];
 }> {
   const strip = await tryRead(join(repoRoot, STRIP_PATH));
   const changelog = await tryRead(join(repoRoot, CHANGELOG_PATH));
+  const rootChangelog = await tryRead(join(repoRoot, ROOT_CHANGELOG_PATH));
   const pkgRaw = await tryRead(join(repoRoot, PKG_PATH));
   const uiKitPackage = pkgRaw ? (JSON.parse(pkgRaw) as { version?: string }) : null;
   const consumerItems = await loadConsumerItems(join(repoRoot, WEB_SRC));
-  return { strip, changelog, uiKitPackage, consumerItems };
+  return { strip, changelog, rootChangelog, uiKitPackage, consumerItems };
 }
 
 async function tryRead(path: string): Promise<string | null> {
@@ -169,10 +175,11 @@ export function evaluate(opts: ReadOptions): DriftItem[] {
     return drift;
   }
 
-  // The advertised release: the current version when its section has Added
-  // entries; otherwise (version-only patch / republish) the most recent
+  // The advertised release: the current version when it has Added entries —
+  // in the kit's section, or else in the root CHANGELOG's section of the
+  // release; otherwise (version-only patch / republish) the most recent
   // release that has them — the strip legitimately advertises that one.
-  const advertised = resolveAdvertisedRelease(changelog, version);
+  const advertised = resolveAdvertisedRelease(changelog, version, { rootChangelog: opts.rootChangelog });
   if (!advertised) {
     drift.push({
       artifact: CHANGELOG_PATH,

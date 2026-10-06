@@ -1,4 +1,4 @@
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * ⭐ Star — a clean 5-pointed star, mirror-symmetric about the vertical centre

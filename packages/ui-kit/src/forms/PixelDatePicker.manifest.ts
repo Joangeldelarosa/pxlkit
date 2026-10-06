@@ -9,14 +9,20 @@ export default defineManifest({
   description:
     'Accessible date input with popover calendar grid, keyboard navigation, presets, and min/max constraints.',
   highlights: [
-    'Controlled and uncontrolled usage via value/defaultValue + onChange',
+    'Controlled — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or uncontrolled with `defaultValue`',
     'Popover calendar with roving tabindex and full keyboard navigation',
     'Min/max bounds plus disabledDates (array or predicate)',
     'Optional quick-select presets and clearable trigger',
     'Surface-aware styling with FieldShell label/hint/error wiring',
   ],
   examples: [
-    { id: 'default', label: 'Default', Component: Default },
+    {
+      id: 'default',
+      label: 'Default',
+      description:
+        'The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today\'s mark can differ from the browser\'s.',
+      Component: Default,
+    },
     { id: 'with-presets', label: 'With Presets', Component: WithPresets },
     { id: 'with-min-max', label: 'With Min/Max', Component: WithMinMax },
   ],
@@ -31,13 +37,15 @@ export default defineManifest({
       { key: 'ArrowDown', does: 'Move focus to the next week' },
       { key: 'Home', does: 'Move focus to the first day of the week' },
       { key: 'End', does: 'Move focus to the last day of the week' },
-      { key: 'PageUp', does: 'Move focus to the previous month' },
-      { key: 'PageDown', does: 'Move focus to the next month' },
+      { key: 'PageUp', does: 'Move focus to the same day of the previous month (its last day when shorter)' },
+      { key: 'PageDown', does: 'Move focus to the same day of the next month (its last day when shorter)' },
+      { key: 'Shift+PageUp', does: 'Move focus to the same day of the previous year' },
+      { key: 'Shift+PageDown', does: 'Move focus to the same day of the next year' },
       { key: 'Enter', does: 'Select the focused day and close the popover' },
       { key: 'Space', does: 'Select the focused day and close the popover' },
     ],
     notes:
-      'Day cells expose aria-selected and aria-disabled; the calendar grid uses role=grid with explicit role=row wrappers and an aria-live month label.',
+      'Opening moves focus to the picked day, else today; Escape, Enter and a pick return it to the trigger. The popover is a dialog named "Choose date". Day cells expose aria-selected, aria-current="date" (today) and aria-disabled; the calendar grid uses role=grid with explicit role=row wrappers and an aria-live month label. Moves skip disabled days and stop at min/max.',
   },
   related: ['PixelInput', 'PixelPopover', 'PixelSelect'],
   apiStability: 'stable',

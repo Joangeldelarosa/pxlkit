@@ -44,7 +44,8 @@ export { BouncingArrow } from './icons/bouncing-arrow';
 export { ShakingBell } from './icons/shaking-bell';
 export { SpinningGear } from './icons/spinning-gear';
 
-import type { IconPack } from '@pxlkit/core';
+import type { IconPack } from '@pxlkit/core/vanilla';
+import packageJson from '../package.json';
 import { Pencil } from './icons/pencil';
 import { Eraser } from './icons/eraser';
 import { PaintBucket } from './icons/paint-bucket';
@@ -87,6 +88,10 @@ import { BouncingArrow } from './icons/bouncing-arrow';
 import { ShakingBell } from './icons/shaking-bell';
 import { SpinningGear } from './icons/spinning-gear';
 
+// The published version: package.json is its one source. Read here, outside
+// the pack, so a bundler still drops the pack when nothing imports it.
+const { version } = packageJson;
+
 /**
  * The UI icon pack.
  * Contains 15 icons for interface controls, editor tools, and actions.
@@ -107,6 +112,6 @@ export const UiPack: IconPack = {
     // New animated
     LoadingSpinner, PulsingDot, BouncingArrow, ShakingBell, SpinningGear,
   ],
-  version: '1.2.5',
+  version,
   author: 'pxlkit',
 };

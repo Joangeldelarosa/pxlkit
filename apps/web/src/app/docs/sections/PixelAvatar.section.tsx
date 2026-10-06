@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAvatarDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelAvatarDocsMeta = {
@@ -17,55 +23,168 @@ export const PixelAvatarDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProps): React.ReactElement {
+/** PixelAvatar's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelAvatar } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelAvatar',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name. Used to derive initials and the accessible label.' },
+          { name: 'src', type: 'string', description: 'Optional image source. Falls back to initials on load failure.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: "Size token. Defaults to `'md'`." },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Tone tint for the initials fallback. Overrides `colorSeed`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'status', type: "'online' | 'away' | 'busy' | 'offline'", description: 'Status dot rendered in the bottom-right corner.' },
+          { name: 'shape', type: "'square' | 'circle' | 'rounded'", description: "Shape of the avatar frame. Defaults to `'circle'`." },
+          { name: 'colorSeed', type: 'string', description: 'Deterministic tone fallback derived from the seed via hash modulo a fixed tone palette. Overridden by an explicit `tone` prop.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelAvatar } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelAvatar',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name — the initials and the accessible name come from it.' },
+          { name: 'src', type: 'string', description: 'Image source; the initials stand in when it fails to load.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size token.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Tone of the initials fallback; wins over `colorSeed`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'status', type: "'online' | 'away' | 'busy' | 'offline'", description: 'Presence dot in the bottom-right corner, also added to the accessible name.' },
+          { name: 'shape', type: "'square' | 'circle' | 'rounded'", default: "'circle'", description: 'Shape of the frame.' },
+          { name: 'colorSeed', type: 'string', description: 'Seed (an email, a user id) that picks a stable tone while `tone` is unset.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelAvatar } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelAvatar',
+        selector: 'pxl-avatar',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name — the initials and the accessible name come from it.' },
+          { name: 'src', type: 'string', description: 'Image source; the initials stand in when it fails to load.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size token.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Tone of the initials fallback; wins over `colorSeed`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'status', type: "'online' | 'away' | 'busy' | 'offline'", description: 'Presence dot in the bottom-right corner, also added to the accessible name.' },
+          { name: 'shape', type: "'square' | 'circle' | 'rounded'", default: "'circle'", description: 'Shape of the frame.' },
+          { name: 'colorSeed', type: 'string', description: 'Seed (an email, a user id) that picks a stable tone while `tone` is unset.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelAvatarDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelAvatarDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-avatar-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-avatar-heading'>PixelAvatar</h2>
+      <Title id='pixel-avatar-heading'>PixelAvatar</Title>
       <p className="docs-lead">Displays a user identity as an initials-or-image badge with optional status dot, tone, shape, and deterministic colored fallback.</p>
       <ul className="docs-highlights">
         <li>Initials fallback locale-aware via PxlKitLocale (uppercases per locale rules)</li>
         <li>Five sizes (xs/sm/md/lg/xl) and three shapes (circle/rounded/square)</li>
         <li>Optional status dot (online/away/busy/offline) baked into the accessible name</li>
-        <li>Deterministic tinted fallback via `colorSeed` (djb2 hash → tone palette)</li>
-        <li>Lazy/async image loading when `src` is provided</li>
+        <li>Deterministic tinted fallback via <code>colorSeed</code> (djb2 hash → tone palette)</li>
+        <li>Lazy/async image loading when <code>src</code> is provided</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-avatar-api">
+      <Heading id="pixel-avatar-api">API</Heading>
+      <FrameworkApi label={'PixelAvatar API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-avatar-a11y">
-      <h3 id="pixel-avatar-a11y">Accessibility</h3>
+      <Heading id="pixel-avatar-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>img</code></li>
       </ul>
-      <p className="docs-aria-notes">Avatar is a presentational identity badge. The user name is exposed via `title`; when `status` is set the status word is appended into the accessible name (no live region — status dots are not transient announcements). When `src` is provided the inner &lt;img&gt; uses the same accessible name as its alt text.</p>
+      <p className="docs-aria-notes">Avatar is a presentational identity badge. The user name is exposed via <code>title</code>; when <code>status</code> is set the frame becomes role=&quot;img&quot; named by the user name plus the status word (no live region — status dots are not transient announcements). When <code>src</code> is provided the inner &lt;img&gt; uses the same accessible name as its alt text.</p>
     </section>
     <section aria-labelledby="pixel-avatar-usage">
-      <h3 id="pixel-avatar-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelAvatar } from '@pxlkit/ui-kit';
+      <Heading id="pixel-avatar-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelAvatar usage'}
+        react={`import { PixelAvatar } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelAvatar name="Joangel De La Rosa" />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAvatar name="Joangel De La Rosa" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`<pxl-avatar name="Joangel De La Rosa" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelAvatar name="Joangel De La Rosa" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAvatar name="Joangel De La Rosa" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`<pxl-avatar name="Joangel De La Rosa" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex items-end gap-3">
       <PixelAvatar name="Ana Lopez" size="xs" />
@@ -75,11 +194,46 @@ export function Default() {
       <PixelAvatar name="Ana Lopez" size="xl" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-end gap-3">
+    <PixelAvatar name="Ana Lopez" size="xs" />
+    <PixelAvatar name="Ana Lopez" size="sm" />
+    <PixelAvatar name="Ana Lopez" size="md" />
+    <PixelAvatar name="Ana Lopez" size="lg" />
+    <PixelAvatar name="Ana Lopez" size="xl" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex items-end gap-3">
+      <pxl-avatar name="Ana Lopez" size="xs" />
+      <pxl-avatar name="Ana Lopez" size="sm" />
+      <pxl-avatar name="Ana Lopez" size="md" />
+      <pxl-avatar name="Ana Lopez" size="lg" />
+      <pxl-avatar name="Ana Lopez" size="xl" />
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-wrap gap-3">
       <PixelAvatar name="Green User" tone="green" />
@@ -91,22 +245,90 @@ export function Default() {
       <PixelAvatar name="Neutral User" tone="neutral" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-3">
+    <PixelAvatar name="Green User" tone="green" />
+    <PixelAvatar name="Cyan User" tone="cyan" />
+    <PixelAvatar name="Gold User" tone="gold" />
+    <PixelAvatar name="Red User" tone="red" />
+    <PixelAvatar name="Purple User" tone="purple" />
+    <PixelAvatar name="Pink User" tone="pink" />
+    <PixelAvatar name="Neutral User" tone="neutral" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex flex-wrap gap-3">
+      <pxl-avatar name="Green User" tone="green" />
+      <pxl-avatar name="Cyan User" tone="cyan" />
+      <pxl-avatar name="Gold User" tone="gold" />
+      <pxl-avatar name="Red User" tone="red" />
+      <pxl-avatar name="Purple User" tone="purple" />
+      <pxl-avatar name="Pink User" tone="pink" />
+      <pxl-avatar name="Neutral User" tone="neutral" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex items-center gap-3">
       <PixelAvatar name="Pixel Surface" surface="pixel" />
       <PixelAvatar name="Linear Surface" surface="linear" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-3">
+    <PixelAvatar name="Pixel Surface" surface="pixel" />
+    <PixelAvatar name="Linear Surface" surface="linear" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex items-center gap-3">
+      <pxl-avatar name="Pixel Surface" surface="pixel" />
+      <pxl-avatar name="Linear Surface" surface="linear" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-shapes">
-        <h4>Shapes</h4>
-        <pre className="docs-code"><code>{`export function Shapes() {
+        <Subheading>Shapes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Shapes code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Shapes() {
   return (
     <div className="flex items-center gap-3">
       <PixelAvatar name="Circle Shape" shape="circle" />
@@ -114,11 +336,42 @@ export function Default() {
       <PixelAvatar name="Square Shape" shape="square" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-3">
+    <PixelAvatar name="Circle Shape" shape="circle" />
+    <PixelAvatar name="Rounded Shape" shape="rounded" />
+    <PixelAvatar name="Square Shape" shape="square" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex items-center gap-3">
+      <pxl-avatar name="Circle Shape" shape="circle" />
+      <pxl-avatar name="Rounded Shape" shape="rounded" />
+      <pxl-avatar name="Square Shape" shape="square" />
+    </div>
+  \`,
+})
+export class Shapes {}`}
+        />
       </article>
       <article className="docs-example" id="example-statuses">
-        <h4>Statuses</h4>
-        <pre className="docs-code"><code>{`export function Statuses() {
+        <Subheading>Statuses</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Statuses code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Statuses() {
   return (
     <div className="flex items-center gap-3">
       <PixelAvatar name="Online User" status="online" />
@@ -127,11 +380,44 @@ export function Default() {
       <PixelAvatar name="Offline User" status="offline" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-3">
+    <PixelAvatar name="Online User" status="online" />
+    <PixelAvatar name="Away User" status="away" />
+    <PixelAvatar name="Busy User" status="busy" />
+    <PixelAvatar name="Offline User" status="offline" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex items-center gap-3">
+      <pxl-avatar name="Online User" status="online" />
+      <pxl-avatar name="Away User" status="away" />
+      <pxl-avatar name="Busy User" status="busy" />
+      <pxl-avatar name="Offline User" status="offline" />
+    </div>
+  \`,
+})
+export class Statuses {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-image">
-        <h4>With Image</h4>
-        <pre className="docs-code"><code>{`export function WithImage() {
+        <Subheading>With Image</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Image code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function WithImage() {
   return (
     <PixelAvatar
       name="Joangel"
@@ -140,11 +426,32 @@ export function Default() {
       status="online"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAvatar name="Joangel" src="https://i.pravatar.cc/80?img=12" size="lg" status="online" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`<pxl-avatar name="Joangel" src="https://i.pravatar.cc/80?img=12" size="lg" status="online" />\`,
+})
+export class WithImage {}`}
+        />
       </article>
       <article className="docs-example" id="example-color-seed">
-        <h4>Color Seed</h4>
-        <pre className="docs-code"><code>{`export function ColorSeed() {
+        <Subheading>Color Seed</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Color Seed code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function ColorSeed() {
   return (
     <div className="flex items-center gap-3">
       <PixelAvatar name="Alice Adams" colorSeed="alice@example.com" />
@@ -153,15 +460,43 @@ export function Default() {
       <PixelAvatar name="Dave Diaz" colorSeed="dave@example.com" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-3">
+    <PixelAvatar name="Alice Adams" color-seed="alice@example.com" />
+    <PixelAvatar name="Bob Brown" color-seed="bob@example.com" />
+    <PixelAvatar name="Carol Chen" color-seed="carol@example.com" />
+    <PixelAvatar name="Dave Diaz" color-seed="dave@example.com" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex items-center gap-3">
+      <pxl-avatar name="Alice Adams" colorSeed="alice@example.com" />
+      <pxl-avatar name="Bob Brown" colorSeed="bob@example.com" />
+      <pxl-avatar name="Carol Chen" colorSeed="carol@example.com" />
+      <pxl-avatar name="Dave Diaz" colorSeed="dave@example.com" />
+    </div>
+  \`,
+})
+export class ColorSeed {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-avatar-group">PixelAvatarGroup</a></li>
-        <li><a href="#pixel-badge">PixelBadge</a></li>
-        <li><a href="#pixel-chip">PixelChip</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-avatar-group' : '#pixel-avatar-group'}>PixelAvatarGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge' : '#pixel-badge'}>PixelBadge</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-chip' : '#pixel-chip'}>PixelChip</a></li>
       </ul>
     </section>
     </section>

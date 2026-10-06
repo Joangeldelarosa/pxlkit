@@ -19,11 +19,11 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Single toast notification card with title, message, tone, optional icon/action, loading spinner, and an auto-dismiss countdown bar — usually rendered by PxlKitToastProvider via useToast().',
+    'Single toast notification card with title, message, tone, optional icon/action, loading spinner, and an auto-dismiss countdown bar — usually rendered by PxlKitToastProvider via useToast() (injectToast() in Angular).',
   highlights: [
     'Seven tones with matching border, text color, and HP-bar accent on pixel surface.',
-    'Auto-dismiss with a visual progress bar; hover/focus pauses the countdown.',
-    'Smart aria semantics — assertive role=alert for red/gold by default, polite role=status otherwise; overridable per toast.',
+    'Auto-dismiss with a visual progress bar; hover, focus, a hidden page or a background window pause the countdown.',
+    'Announced by PxlKitToastProvider — assertively for red/gold by default, politely otherwise; overridable per toast.',
     'Optional leading slot for icon, animatedIcon, or built-in loading spinner.',
     'Action slot for inline retry / undo buttons; dismiss button always present.',
   ],
@@ -40,14 +40,14 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: ['alert'],
+    patterns: [],
     keyboard: [
       { key: 'Tab', does: 'Move focus into the toast (action button, then dismiss button).' },
       { key: 'Enter', does: 'Activate the focused action or dismiss button.', when: 'Action or dismiss button focused.' },
       { key: 'Space', does: 'Activate the focused action or dismiss button.', when: 'Action or dismiss button focused.' },
     ],
     notes:
-      'Each card declares its own role (alert for assertive tones like red/gold, status for the rest) plus matching aria-live and aria-atomic="true" so screen readers announce title + message together. Hovering or focusing the card pauses the auto-dismiss timer to give assistive-tech users time to read. The dismiss button has aria-label="Dismiss notification" and a visible focus ring. The parent PxlKitToastProvider hosts a single role="region" landmark — toasts should not be nested inside another aria-live region to avoid double announcements.',
+      'The card is not a live region: `PxlKitToastProvider` announces each toast — its title and message — in the two live regions of its viewport, assertively (`role="alert"`) for critical tones like red/gold or `assertive` toasts, politely (`role="status"`) for the rest. A card rendered on its own is not announced. Hovering or focusing the card holds its auto-dismiss countdown, and so do a hidden page and a window in the background, to give everyone time to read it (WCAG 2.2.1). The dismiss button has `aria-label="Dismiss notification"` and a visible focus ring.',
   },
   related: ['PxlKitToastProvider', 'PixelAlert', 'PixelAlertDialog'],
   apiStability: 'stable',

@@ -1,35 +1,32 @@
 import type { Metadata } from 'next';
 import PixelLandingFullTemplate from '../../../components/templates/landing-full-template';
+import { TemplatePageHeader } from '@/components/TemplatePageHeader';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'SaaS Landing Template — Full Marketing Page Showcase | Pxlkit',
+export const metadata: Metadata = pageMetadata({
+  path: '/templates/landing-full',
+  title: 'Retro SaaS Landing Page Template for React',
   description:
-    'Complete SaaS landing template: sticky nav, split hero, bento grid, features, pricing, testimonials carousel, FAQ, CTA & footer. Drop-in retro.',
-  alternates: { canonical: 'https://pxlkit.xyz/templates/landing-full' },
-  openGraph: {
-    type: 'website',
-    title: 'SaaS Landing Template — Full Marketing Page Showcase | Pxlkit',
-    description:
-      'Complete SaaS marketing landing page composed with Pxlkit primitives: nav, hero, bento, features, pricing, testimonials, FAQ, CTA, footer.',
-    url: 'https://pxlkit.xyz/templates/landing-full',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1280,
-        height: 640,
-        alt: 'Pxlkit SaaS landing template — full marketing page composed with retro primitives',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'SaaS Landing Template — Full Marketing Page Showcase | Pxlkit',
-    description:
-      'Drop-in SaaS landing template: sticky nav, hero, bento, features, pricing, testimonials carousel, FAQ, CTA & footer.',
-    images: ['/og-twitter.png'],
-  },
-};
+    'A complete retro SaaS landing page in React: sticky nav, split hero, bento grid, features, pricing, testimonials carousel, FAQ, CTA and footer.',
+  imageAlt: 'Pxlkit SaaS landing template — a full marketing page built from the kit',
+  keywords: [
+    'saas landing page template react',
+    'landing page template react',
+    'retro landing page',
+    'hero section react',
+    'pricing section react',
+    'testimonials carousel react',
+    'faq section react',
+    'tailwind landing page',
+    'pxlkit templates',
+  ],
+});
 
 export default function LandingFullTemplatePage() {
-  return <PixelLandingFullTemplate />;
+  return (
+    <>
+      <TemplatePageHeader name="SaaS landing" path="/templates/landing-full" title="Retro SaaS landing page template" as="p" />
+      <PixelLandingFullTemplate />
+    </>
+  );
 }

@@ -67,7 +67,7 @@ export function TestimonialsCardsPreview() {
         description="Don't take our word for it — here's what our community has to say."
         actions={
           <PixelBadge tone="gold">
-            <PxlKitIcon icon={Crown} size={12} colorful />
+            <PxlKitIcon icon={Crown} size={12} colorful decorative />
             <span className="ml-1.5">Testimonials</span>
           </PixelBadge>
         }
@@ -116,14 +116,14 @@ export function TestimonialsLargeQuotePreview() {
         {/* Floating animated accent -- top-right */}
         <span className="absolute -top-4 right-4 sm:right-0 opacity-40 pointer-events-none">
           <PixelFloat duration={3200} distance={6}>
-            <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful />
+            <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful decorative />
           </PixelFloat>
         </span>
 
         {/* Floating animated accent -- bottom-left */}
         <span className="absolute -bottom-2 left-4 sm:left-0 opacity-30 pointer-events-none">
           <PixelFloat duration={2800} distance={5}>
-            <PxlKitIcon icon={Sparkles} size={22} colorful />
+            <PxlKitIcon icon={Sparkles} size={22} colorful decorative />
           </PixelFloat>
         </span>
 
@@ -161,13 +161,13 @@ export function TestimonialsLargeQuotePreview() {
         {/* Prev / Next navigation */}
         <div className="flex items-center justify-center gap-4 mt-8">
           <PixelButton tone="green" size="sm" onClick={goPrev} aria-label="Previous quote">
-            <PxlKitIcon icon={ArrowRight} size={14} className="rotate-180" />
+            <PxlKitIcon icon={ArrowRight} size={14} className="rotate-180" decorative />
           </PixelButton>
           <span className="font-mono text-xs text-retro-muted">
             {quoteIndex + 1} of {TESTIMONIALS.length}
           </span>
           <PixelButton tone="green" size="sm" onClick={goNext} aria-label="Next quote">
-            <PxlKitIcon icon={ArrowRight} size={14} />
+            <PxlKitIcon icon={ArrowRight} size={14} decorative />
           </PixelButton>
         </div>
 
@@ -236,7 +236,7 @@ export function TestimonialsSliderPreview() {
           {/* Navigation controls */}
           <div className="flex items-center justify-center gap-4">
             <PixelButton tone="green" size="sm" onClick={goPrev} aria-label="Previous testimonial">
-              <PxlKitIcon icon={ArrowRight} size={14} className="rotate-180" />
+              <PxlKitIcon icon={ArrowRight} size={14} className="rotate-180" decorative />
             </PixelButton>
 
             <div className="flex items-center gap-2">
@@ -253,7 +253,7 @@ export function TestimonialsSliderPreview() {
             </div>
 
             <PixelButton tone="green" size="sm" onClick={goNext} aria-label="Next testimonial">
-              <PxlKitIcon icon={ArrowRight} size={14} />
+              <PxlKitIcon icon={ArrowRight} size={14} decorative />
             </PixelButton>
           </div>
 

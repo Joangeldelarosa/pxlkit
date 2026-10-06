@@ -99,7 +99,7 @@ export const PixelTabsTrigger = forwardRef<HTMLButtonElement, PixelTabsTriggerPr
         onFocus={handleFocus}
         onClick={handleClick}
         className={cn(
-          'flex items-center gap-1.5 px-3 py-2 text-xs outline-none transition-colors',
+          'flex items-center gap-1.5 px-3 py-2 text-xs focus-visible:outline-hidden transition-colors',
           offset,
           s.font, tabRadius,
           s.border, sideBorder,

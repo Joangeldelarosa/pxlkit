@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import { badgeSizeClasses } from '@pxlkit/ui-kit-core';
 import {
   Tone, Size, Surface, cn,
   toneMap, surfaceClasses, useEffectiveSurface,
@@ -14,12 +15,6 @@ import { variantClasses, PixelBadgeVariant } from './_internal/variantClasses';
    ───────────────────────────────────────────────────────────────────────── */
 
 export type { PixelBadgeVariant } from './_internal/variantClasses';
-
-const badgeSizeCls: Record<Size, string> = {
-  sm: 'px-2 py-0.5 text-[11px] gap-1 tracking-wide',
-  md: 'px-2.5 py-1 text-xs gap-1.5 tracking-wide',
-  lg: 'px-3 py-1.5 text-sm gap-1.5 tracking-wide',
-};
 
 export interface PixelBadgeProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onClick'> {
   /** Badge content. */
@@ -59,12 +54,12 @@ export const PixelBadge = forwardRef<HTMLElement, PixelBadgeProps>(function Pixe
     s.border,
     s.radiusFull,
     s.font,
-    badgeSizeCls[size],
+    badgeSizeClasses[size],
     variantClasses(variant, tone),
     onClick && cn(
       'cursor-pointer transition-colors',
       toneMap[tone].hover,
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
+      'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
       toneMap[tone].ring,
     ),
     className,

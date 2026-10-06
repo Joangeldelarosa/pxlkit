@@ -1,0 +1,88 @@
+{
+  "name": "@pxlkit/angular",
+  "version": "0.1.0",
+  "description": "Angular standalone components for Pxlkit pixel art icons: static, animated and 3D parallax icons plus pixel toasts, on the shared rendering engine",
+  "license": "MIT",
+  "homepage": "https://pxlkit.xyz/icons",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/angular"
+  },
+  "type": "module",
+  "module": "./dist/fesm2022/pxlkit-angular.mjs",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/fesm2022/pxlkit-angular.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "clean": "rm -rf dist",
+    "lint": "ngc -p tsconfig.lint.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "@angular/common": ">=20.0.0 <23.0.0",
+    "@angular/core": ">=20.0.0 <23.0.0"
+  },
+  "dependencies": {
+    "@pxlkit/core": "^1.4.0"
+  },
+  "devDependencies": {
+    "@angular/common": "~20.3.0",
+    "@angular/compiler": "~20.3.0",
+    "@angular/compiler-cli": "~20.3.0",
+    "@angular/core": "~20.3.0",
+    "@angular/platform-browser": "~20.3.0",
+    "@angular/platform-server": "~20.3.0",
+    "@types/jsdom": "^28.0.3",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitest/coverage-v8": "^4.1.2",
+    "jsdom": "^29.0.1",
+    "ng-packagr": "~20.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rxjs": "~7.8.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.2",
+    "zone.js": "~0.15.0"
+  },
+  "keywords": [
+    "pxlkit",
+    "pixel-art",
+    "pixel-art-icons",
+    "angular",
+    "angular-components",
+    "angular-icons",
+    "standalone-components",
+    "signals",
+    "icons",
+    "svg-icons",
+    "animated-icons",
+    "parallax-3d",
+    "toast-notifications",
+    "retro",
+    "8bit",
+    "16bit",
+    "typescript",
+    "mit-license"
+  ],
+  "author": {
+    "name": "Joangel De La Rosa",
+    "url": "https://github.com/joangeldelarosa"
+  }
+}

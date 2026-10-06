@@ -1,0 +1,126 @@
+/**
+ * PixelSplitButton: the primary and select events, one-way options and
+ * disabled state, and synthetic clicks on disabled buttons. Rendering, the
+ * keyboard and focus are covered against React by the parity suite.
+ */
+import { enableAutoUnmount, mount } from '@vue/test-utils';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { nextTick } from 'vue';
+import { PixelSplitButton } from '../../index';
+
+const OPTIONS = [
+  { value: 'csv', label: 'Export CSV' },
+  { value: 'json', label: 'Export JSON' },
+];
+/** The border, corners, shadow, press offset and ring of a framed button. */
+const FRAME = [
+  'border',
+  'border-2',
+  'pxl-corner-sm',
+  'rounded-md',
+  'pxl-shadow',
+  'pxl-shadow-hover',
+  'pxl-shadow-active',
+  'shadow-sm',
+  'focus-visible:ring-2',
+];
+const chevron = () => document.querySelector<HTMLButtonElement>('[aria-haspopup="menu"]')!;
+const items = () => Array.from(document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'));
+
+// An open menu keeps page-wide listeners until it unmounts.
+enableAutoUnmount(afterEach);
+
+describe('PixelSplitButton', () => {
+  it('emits primary from the primary button and select with the value of the chosen option', async () => {
+    const wrapper = mount(PixelSplitButton, { props: { label: 'Export', options: OPTIONS }, attachTo: document.body });
+    await wrapper.find('button').trigger('click');
+    expect(wrapper.emitted('primary')).toEqual([[]]);
+    expect(document.querySelector('[role="menu"]')).toBeNull();
+
+    chevron().click();
+    await nextTick();
+    items()[1]!.click();
+    await nextTick();
+    expect(wrapper.emitted('select')).toEqual([['json']]);
+    expect(document.querySelector('[role="menu"]')).toBeNull();
+    expect(document.activeElement).toBe(chevron());
+  });
+
+  it('chooses the highlighted option with Enter', async () => {
+    const wrapper = mount(PixelSplitButton, { props: { label: 'Export', options: OPTIONS }, attachTo: document.body });
+    chevron().dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }));
+    await nextTick();
+    const menu = document.querySelector<HTMLElement>('[role="menu"]')!;
+    expect(document.activeElement).toBe(menu);
+    menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+    await nextTick();
+    expect(wrapper.emitted('select')).toEqual([['json']]);
+  });
+
+  it('renders the options it is given', async () => {
+    const wrapper = mount(PixelSplitButton, { props: { label: 'Export', options: OPTIONS }, attachTo: document.body });
+    chevron().click();
+    await nextTick();
+    await wrapper.setProps({ options: [...OPTIONS, { value: 'xml', label: 'Export XML' }] });
+    expect(items().map((item) => item.textContent?.trim())).toEqual(['Export CSV', 'Export JSON', 'Export XML']);
+    expect(wrapper.element.tagName).toBe('DIV');
+  });
+
+  it('ignores synthetic clicks while disabled, then works once enabled', async () => {
+    const wrapper = mount(PixelSplitButton, {
+      props: { label: 'Export', options: OPTIONS, disabled: true },
+      attachTo: document.body,
+    });
+    const [primary, toggle] = wrapper.findAll('button');
+    expect((primary!.element as HTMLButtonElement).disabled).toBe(true);
+    expect((toggle!.element as HTMLButtonElement).disabled).toBe(true);
+    primary!.element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    toggle!.element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await nextTick();
+    expect(wrapper.emitted('primary')).toBeUndefined();
+    expect(document.querySelector('[role="menu"]')).toBeNull();
+
+    await wrapper.setProps({ disabled: false });
+    chevron().click();
+    await nextTick();
+    expect(document.querySelector('[role="menu"]')).not.toBeNull();
+  });
+
+  it('stops its typeahead timer when it unmounts', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    try {
+      const wrapper = mount(PixelSplitButton, { props: { label: 'Export', options: OPTIONS }, attachTo: document.body });
+      chevron().click();
+      await nextTick();
+      const pending = vi.getTimerCount();
+      document.activeElement!.dispatchEvent(new KeyboardEvent('keydown', { key: 'j', bubbles: true }));
+      await nextTick();
+      expect(items()[1]!.getAttribute('data-highlighted')).toBe('true');
+      expect(vi.getTimerCount()).toBe(pending + 1);
+      wrapper.unmount();
+      expect(vi.getTimerCount()).toBe(pending);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  // Regression: the frame clips both halves (`overflow-hidden`), so the focus
+  // ring around either was cut off, and the chevron had none.
+  it('shows keyboard focus inside each half, on both surfaces', () => {
+    for (const surface of ['pixel', 'linear'] as const) {
+      const halves = mount(PixelSplitButton, { props: { label: 'Export', options: OPTIONS, surface } }).findAll('button');
+      expect(halves).toHaveLength(2);
+      for (const half of halves) expect(half.classes()).toContain('focus-visible:pxl-focus-inset');
+    }
+  });
+
+  // Regression: the primary half was a PixelButton with overrides merged in,
+  // and Tailwind emits the button's own `border-2` (pixel) and `shadow-sm`
+  // (linear) after them, so it kept a border and a shadow inside the frame.
+  it('leaves the border, corners and shadow to the frame, on both surfaces', () => {
+    for (const surface of ['pixel', 'linear'] as const) {
+      const primary = mount(PixelSplitButton, { props: { label: 'Export', options: OPTIONS, surface } }).find('button');
+      for (const frame of FRAME) expect(primary.classes()).not.toContain(frame);
+    }
+  });
+});

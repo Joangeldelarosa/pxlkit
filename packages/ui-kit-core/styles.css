@@ -1,0 +1,612 @@
+/*
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║  @pxlkit/ui-kit-core — Theme & Design Tokens                 ║
+ * ║                                                              ║
+ * ║  Tailwind CSS v4 (CSS-first configuration), shared by the    ║
+ * ║  React, Vue and Angular kits. Import it through your kit, in ║
+ * ║  place of @import "tailwindcss" (it brings Tailwind itself): ║
+ * ║    @import "@pxlkit/ui-kit/styles.css";          (React)     ║
+ * ║    @import "@pxlkit/ui-kit-vue/styles.css";      (Vue)       ║
+ * ║    @import "@pxlkit/ui-kit-angular/styles.css";  (Angular)   ║
+ * ║                                                              ║
+ * ║  HOW TO CUSTOMIZE:                                           ║
+ * ║  Override any --retro-* variable on :root (light) and .dark  ║
+ * ║  (dark) to change the palette. All components and utilities  ║
+ * ║  reference these tokens, in both themes — one change updates ║
+ * ║  everything.                                                 ║
+ * ║                                                              ║
+ * ║  Example (in your app's CSS, after importing this file):     ║
+ * ║    :root { --retro-primary: #2563eb; }                       ║
+ * ║    .dark { --retro-primary: #60a5fa; }                       ║
+ * ╚══════════════════════════════════════════════════════════════╝
+ */
+@import "tailwindcss";
+
+/* Class names composed by the shared recipes (tokens, tone maps, surfaces). */
+@source "./dist";
+
+/* ─── Design Tokens (Tailwind v4 @theme) ──────────────────────
+ * Maps CSS custom properties to Tailwind utility classes.
+ * e.g. --color-retro-bg → bg-retro-bg, text-retro-bg, etc.
+ * Values resolve at runtime via var() so they adapt to theme.
+ * ──────────────────────────────────────────────────────────── */
+@theme {
+  /* ── Surface & Layout Colors ── */
+  --color-retro-bg: var(--retro-bg);
+  --color-retro-surface: var(--retro-surface);
+  --color-retro-card: var(--retro-card);
+  --color-retro-text: var(--retro-text);
+  --color-retro-border: var(--retro-border);
+  /*
+   * Opaque border companion to `--retro-border`. Used wherever the soft
+   * border (`border-retro-border/40-60`) is invisible against the page
+   * background — most commonly in the light theme, where the soft border
+   * hits 1.4:1 contrast. Reach for `border-retro-border-strong` (or
+   * `/80-100`) when you need a visible card / input / chip edge in either
+   * theme; keep `border-retro-border` for subtle dividers.
+   */
+  --color-retro-border-strong: var(--retro-border-strong);
+
+  /* ── Semantic Colors ── */
+  --color-retro-primary: var(--retro-primary);
+  --color-retro-secondary: var(--retro-secondary);
+  --color-retro-accent: var(--retro-accent);
+  --color-retro-muted: var(--retro-muted);
+
+  /* ── Tone Colors (component system) ── */
+  --color-retro-green: var(--retro-green);
+  --color-retro-green-hover: var(--retro-green-hover);
+  --color-retro-cyan: var(--retro-cyan);
+  --color-retro-red: var(--retro-red);
+  --color-retro-gold: var(--retro-gold);
+  --color-retro-purple: var(--retro-purple);
+  --color-retro-pink: var(--retro-pink);
+
+  /* ── Typography ── */
+  --font-pixel: "Press Start 2P", monospace;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* ── Shadows (theme-aware via CSS variables) ── */
+  --shadow-retro: 4px 4px 0px 0px currentColor;
+  --shadow-retro-hover: 2px 2px 0px 0px currentColor;
+  --shadow-pixel: 4px 4px 0px 0px var(--retro-shadow-green);
+  --shadow-pixel-lg: 6px 6px 0px 0px var(--retro-shadow-green-lg);
+  --shadow-pixel-gold: 4px 4px 0px 0px var(--retro-shadow-gold);
+
+  /* ── Animations ── */
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-scanlines: scanlines 8s linear infinite;
+  /* A toast's entrance: it fades in, dropping into place. */
+  --animate-pxl-toast-in: pxl-toast-in 200ms ease-out;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes scanlines {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
+  }
+  @keyframes pxl-toast-in {
+    from { opacity: 0; transform: translateY(-0.5rem); }
+  }
+}
+
+/* ─── Keyframes named in inline styles ────────────────────────
+ * PixelSpinner sets its blade's `animation` inline, where Tailwind
+ * cannot see it, so these are plain keyframes, always emitted: a
+ * turn in eight 45° steps on the pixel surface, a smooth one on the
+ * linear surface.
+ * ──────────────────────────────────────────────────────────── */
+@keyframes pxl-spinner-steps {
+  to { transform: rotate(360deg); }
+}
+@keyframes pxl-spinner-smooth {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Keyframes of the animation components ───────────────────
+ * PixelFadeIn, PixelBounce, PixelGlitch and the other animation
+ * components name these in their inline `animation` as well, so they
+ * are plain keyframes too. Distances and scales come from custom
+ * properties set next to it (--pxl-bounce-height,
+ * --pxl-slide-distance, …), each with a default.
+ * ──────────────────────────────────────────────────────────── */
+@keyframes pxl-fade-in{from{opacity:0}to{opacity:1}}
+@keyframes pxl-slide-down{from{opacity:0;transform:translateY(calc(var(--pxl-slide-distance,10px)*-1))}to{opacity:1;transform:translateY(0)}}
+@keyframes pxl-slide-up{from{opacity:0;transform:translateY(var(--pxl-slide-distance,10px))}to{opacity:1;transform:translateY(0)}}
+@keyframes pxl-slide-left{from{opacity:0;transform:translateX(var(--pxl-slide-distance,10px))}to{opacity:1;transform:translateX(0)}}
+@keyframes pxl-slide-right{from{opacity:0;transform:translateX(calc(var(--pxl-slide-distance,10px)*-1))}to{opacity:1;transform:translateX(0)}}
+@keyframes pxl-bounce{0%,100%{transform:translateY(0)}35%{transform:translateY(calc(var(--pxl-bounce-height,8px)*-1))}60%{transform:translateY(calc(var(--pxl-bounce-height,8px)*-0.5))}80%{transform:translateY(calc(var(--pxl-bounce-height,8px)*-0.25))}}
+@keyframes pxl-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.97)}}
+@keyframes pxl-glitch{0%,75%,100%{clip-path:none;transform:translate(0);filter:none}9%,10%{clip-path:polygon(0 16%,100% 16%,100% 34%,0 34%);transform:translate(calc(var(--pxl-glitch-x,4px)*-1),0)}14%,15%{clip-path:none;transform:translate(0);filter:brightness(1.6) saturate(6) hue-rotate(90deg)}16%{filter:none}21%,22%{clip-path:polygon(0 56%,100% 56%,100% 72%,0 72%);transform:translate(var(--pxl-glitch-x,4px),0)}28%{clip-path:none;transform:translate(0)}42%,43%{clip-path:polygon(0 2%,100% 2%,100% 18%,0 18%);transform:translate(calc(var(--pxl-glitch-x,4px)*1.5),0)}48%,49%{clip-path:polygon(0 80%,100% 80%,100% 96%,0 96%);transform:translate(calc(var(--pxl-glitch-x,4px)*-0.8),0)}54%{clip-path:none;transform:translate(0)}}
+@keyframes pxl-glitch-r{0%,75%,100%{clip-path:none;transform:translate(0);opacity:0}9%{opacity:.65;clip-path:polygon(0 10%,100% 10%,100% 30%,0 30%);transform:translate(calc(var(--pxl-glitch-x,4px)*-1.8),0)}12%{clip-path:none;opacity:0}21%{opacity:.6;clip-path:polygon(0 50%,100% 50%,100% 68%,0 68%);transform:translate(calc(var(--pxl-glitch-x,4px)*1.4),0)}26%{clip-path:none;opacity:0}42%{opacity:.7;clip-path:polygon(0 0,100% 0,100% 14%,0 14%);transform:translate(calc(var(--pxl-glitch-x,4px)*-2),0)}46%{clip-path:none;opacity:0}}
+@keyframes pxl-glitch-c{0%,75%,100%{clip-path:none;transform:translate(0);opacity:0}10%{opacity:.55;clip-path:polygon(0 22%,100% 22%,100% 42%,0 42%);transform:translate(var(--pxl-glitch-x,4px),0)}14%{clip-path:none;opacity:0}23%{opacity:.5;clip-path:polygon(0 64%,100% 64%,100% 80%,0 80%);transform:translate(calc(var(--pxl-glitch-x,4px)*-1.2),0)}29%{clip-path:none;opacity:0}44%{opacity:.6;clip-path:polygon(0 6%,100% 6%,100% 20%,0 20%);transform:translate(calc(var(--pxl-glitch-x,4px)*1.6),0)}51%{clip-path:none;opacity:0}}
+@keyframes pxl-float{0%,100%{transform:translateY(0)}50%{transform:translateY(calc(var(--pxl-float-distance,6px)*-1))}}
+@keyframes pxl-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(calc(var(--pxl-shake-distance,2px)*-1))}40%{transform:translateX(var(--pxl-shake-distance,2px))}60%{transform:translateX(calc(var(--pxl-shake-distance,2px)*-1))}80%{transform:translateX(var(--pxl-shake-distance,2px))}}
+@keyframes pxl-rotate{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes pxl-zoom-in{from{opacity:0;transform:scale(var(--pxl-zoom-start,.92))}to{opacity:1;transform:scale(1)}}
+@keyframes pxl-flicker{0%,100%{opacity:1}8%{opacity:.85}16%{opacity:1}32%{opacity:.65}40%{opacity:1}58%{opacity:.8}66%{opacity:1}82%{opacity:.55}90%{opacity:1}}
+
+/* ─── PixelDrawer's entrance ──────────────────────────────────
+ * The panel slides in from off-screen on its side to its place.
+ * Its recipe names these in an arbitrary animation
+ * (`motion-safe:animate-[pxl-drawer-in-right_180ms_ease-out]`),
+ * for which Tailwind emits no keyframes, so they are plain ones.
+ * `motion-safe:` leaves a reader who prefers reduced motion a drawer
+ * that is simply there.
+ * ──────────────────────────────────────────────────────────── */
+@keyframes pxl-drawer-in-right {
+  from { transform: translateX(100%); }
+}
+@keyframes pxl-drawer-in-left {
+  from { transform: translateX(-100%); }
+}
+@keyframes pxl-drawer-in-top {
+  from { transform: translateY(-100%); }
+}
+@keyframes pxl-drawer-in-bottom {
+  from { transform: translateY(100%); }
+}
+
+/* ─── PixelGlitch on text ─────────────────────────────────────
+ * A glitch given a `label` holds that text once, in its content's
+ * layer. While it plays (.pxl-glitch-copies), its two colour copies
+ * are drawn here, on the wrapper's ::before and ::after from its
+ * data-text, under the text — with the keyframes, filters and shift
+ * the copies of other content get inline — so a heading's text is in
+ * the document once, for crawlers, copying and text extraction. The
+ * copies carry no text for assistive technology (the alternative text
+ * after "/" is empty): a browser that cannot leave it out draws none,
+ * and the content's layer glitches alone.
+ * ──────────────────────────────────────────────────────────── */
+@layer components {
+  @supports (content: "" / "") {
+    .pxl-glitch-copies {
+      isolation: isolate;
+    }
+    .pxl-glitch-copies::before,
+    .pxl-glitch-copies::after {
+      content: attr(data-text) / "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .pxl-glitch-copies::before {
+      filter: saturate(0) sepia(1) hue-rotate(-20deg) brightness(1.3);
+      animation: pxl-glitch-r var(--pxl-glitch-duration, 3000ms) steps(1) infinite;
+    }
+    .pxl-glitch-copies::after {
+      filter: saturate(0) sepia(1) hue-rotate(150deg) brightness(1.1);
+      animation: pxl-glitch-c var(--pxl-glitch-duration, 3000ms) steps(1) infinite;
+    }
+  }
+}
+
+/* ─── Reduced motion before hydration ─────────────────────────
+ * Server markup is rendered for a reader who allows motion, so the
+ * animation components and PixelSpinner's blade arrive with their
+ * inline `animation`, naming the keyframes above; once the page
+ * hydrates, a reader who prefers reduced motion gets them without it.
+ * Until then this holds them as they will render: still, at rest —
+ * fully visible, in place, unclipped — and without PixelGlitch's
+ * colour copies (the layers that play pxl-glitch-r / pxl-glitch-c, or
+ * the copies drawn for a text glitch).
+ * ──────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  [style*="animation"][style*="pxl-"] {
+    animation: none !important;
+  }
+  [style*="pxl-glitch-r"],
+  [style*="pxl-glitch-c"],
+  .pxl-glitch-copies::before,
+  .pxl-glitch-copies::after {
+    display: none !important;
+  }
+}
+
+/* ─── Theme Color Definitions ─────────────────────────────────
+ * Light theme: :root / :host (default)
+ * Dark theme:  .dark class on <html> or any ancestor
+ * Light override: .light class (for nested previews inside .dark)
+ *
+ * To customize, override these variables in your own CSS file
+ * AFTER importing your kit's styles.css:
+ *
+ *   @import "@pxlkit/ui-kit/styles.css";
+ *   :root  { --retro-green: #22c55e; --retro-bg: #fafaf9; }
+ *   .dark  { --retro-green: #4ade80; --retro-bg: #0c0a09; }
+ *
+ * The utilities (bg-retro-green, …) follow them in both themes and
+ * in .light / .dark islands. A value set on :root alone also reaches
+ * a <html class="dark"> (the same element): give .dark its own.
+ * ──────────────────────────────────────────────────────────── */
+@layer base {
+  :root, :host {
+    /* ── Light Theme ── */
+    --retro-bg: #F2F0EB;
+    --retro-surface: #E6E2DC;
+    --retro-card: #DCD8D0;
+    --retro-text: #1A1A2E;
+    --retro-border: #BEBAA2;
+    /* 3.6:1 against --retro-bg — passes WCAG non-text contrast on cards / inputs. */
+    --retro-border-strong: #8C8770;
+    --retro-primary: #4F46E5;
+    --retro-secondary: #FBBF24;
+    --retro-accent: #10B981;
+    --retro-muted: #646478;
+
+    --retro-green: #008C4B;
+    --retro-green-hover: #006E3A;
+    --retro-cyan: #24827A;
+    --retro-red: #C83741;
+    --retro-gold: #B48700;
+    --retro-purple: #8237C8;
+    --retro-pink: #C84678;
+
+    /* Shadow colors (light) */
+    --retro-shadow-green: rgba(0, 140, 75, 0.3);
+    --retro-shadow-green-lg: rgba(0, 140, 75, 0.2);
+    --retro-shadow-gold: rgba(180, 135, 0, 0.3);
+  }
+
+  .dark {
+    /* ── Dark Theme ── */
+    --retro-bg: #0A0A0F;
+    --retro-surface: #12121A;
+    --retro-card: #1A1A2E;
+    --retro-border: #2A2A3E;
+    /* 3.2:1 against --retro-bg — visible card / input edges in dark. */
+    --retro-border-strong: #4A4A66;
+    --retro-text: #E8E6E3;
+    --retro-primary: #818CF8;
+    --retro-secondary: #FCD34D;
+    --retro-accent: #34D399;
+    --retro-muted: #8888AA;
+
+    --retro-green: #00FF88;
+    --retro-green-hover: #00CC6A;
+    --retro-cyan: #4ECDC4;
+    --retro-red: #FF6B6B;
+    --retro-gold: #FFD700;
+    --retro-purple: #A855F7;
+    --retro-pink: #FF77A8;
+
+    /* Shadow colors (dark — neon glow) */
+    --retro-shadow-green: rgba(0, 255, 136, 0.3);
+    --retro-shadow-green-lg: rgba(0, 255, 136, 0.2);
+    --retro-shadow-gold: rgba(255, 215, 0, 0.3);
+
+    /*
+     * Tailwind v4 @theme re-declarations.
+     *
+     * Why: the utilities read --color-retro-*, which @theme declares on
+     * :root as var(--retro-*). A custom property resolves its var() on the
+     * element that declares it, and children inherit the resolved colour —
+     * NOT the var() expression. So below :root, --color-retro-* would keep
+     * the :root palette whatever --retro-* says there. Re-declaring them,
+     * through var(), on every .dark / .light boundary resolves them again
+     * against that element's --retro-* values: the theme's own, or yours
+     * when you override them (see "To customize" above).
+     */
+    --color-retro-bg: var(--retro-bg);
+    --color-retro-surface: var(--retro-surface);
+    --color-retro-card: var(--retro-card);
+    --color-retro-text: var(--retro-text);
+    --color-retro-border: var(--retro-border);
+    --color-retro-border-strong: var(--retro-border-strong);
+    --color-retro-primary: var(--retro-primary);
+    --color-retro-secondary: var(--retro-secondary);
+    --color-retro-accent: var(--retro-accent);
+    --color-retro-muted: var(--retro-muted);
+    --color-retro-green: var(--retro-green);
+    --color-retro-green-hover: var(--retro-green-hover);
+    --color-retro-cyan: var(--retro-cyan);
+    --color-retro-red: var(--retro-red);
+    --color-retro-gold: var(--retro-gold);
+    --color-retro-purple: var(--retro-purple);
+    --color-retro-pink: var(--retro-pink);
+  }
+
+  /* Explicit light theme — used inside nested previews to override
+     inherited dark-mode CSS variables from ancestor .dark elements.
+     It sets the light --retro-* values and re-declares --color-retro-*
+     through them (see the .dark comment above), so Tailwind utility
+     classes (which read --color-retro-*) resolve to the light palette
+     even when this .light element is nested inside a .dark ancestor. */
+  .light {
+    --retro-bg: #F2F0EB;
+    --retro-surface: #E6E2DC;
+    --retro-card: #DCD8D0;
+    --retro-text: #1A1A2E;
+    --retro-border: #BEBAA2;
+    --retro-border-strong: #8C8770;
+    --retro-primary: #4F46E5;
+    --retro-secondary: #FBBF24;
+    --retro-accent: #10B981;
+    --retro-muted: #646478;
+
+    --retro-green: #008C4B;
+    --retro-green-hover: #006E3A;
+    --retro-cyan: #24827A;
+    --retro-red: #C83741;
+    --retro-gold: #B48700;
+    --retro-purple: #8237C8;
+    --retro-pink: #C84678;
+
+    /* Shadow colors (light) */
+    --retro-shadow-green: rgba(0, 140, 75, 0.3);
+    --retro-shadow-green-lg: rgba(0, 140, 75, 0.2);
+    --retro-shadow-gold: rgba(180, 135, 0, 0.3);
+
+    /* Tailwind v4 @theme re-declarations — see .dark comment above. */
+    --color-retro-bg: var(--retro-bg);
+    --color-retro-surface: var(--retro-surface);
+    --color-retro-card: var(--retro-card);
+    --color-retro-text: var(--retro-text);
+    --color-retro-border: var(--retro-border);
+    --color-retro-border-strong: var(--retro-border-strong);
+    --color-retro-primary: var(--retro-primary);
+    --color-retro-secondary: var(--retro-secondary);
+    --color-retro-accent: var(--retro-accent);
+    --color-retro-muted: var(--retro-muted);
+    --color-retro-green: var(--retro-green);
+    --color-retro-green-hover: var(--retro-green-hover);
+    --color-retro-cyan: var(--retro-cyan);
+    --color-retro-red: var(--retro-red);
+    --color-retro-gold: var(--retro-gold);
+    --color-retro-purple: var(--retro-purple);
+    --color-retro-pink: var(--retro-pink);
+  }
+
+  /*
+   * Turkish locale support — when `lang="tr"` is set on any ancestor,
+   * CSS `text-transform: uppercase` will correctly convert:
+   *   i → İ (dotted capital I)
+   *   ı → I (dotless capital I)
+   *
+   * Browsers read the `lang` attribute to apply locale-specific rules.
+   * See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform
+   *
+   * Usage:
+   *   <html lang="tr">           — applies globally
+   *   <div lang="tr">            — applies to subtree
+   *   <PxlKitLocaleProvider locale="tr">  — sets lang + JS context
+   */
+}
+
+/* ─── Keyboard focus on the pixel surface ─────────────────────
+ * A cut corner (.pxl-corner-*) is a clip-path, which clips everything
+ * an element paints outside its border box — the focus ring included,
+ * a box-shadow drawn around the box. So pixel controls show keyboard
+ * focus inside: their 2px edge lights up in the text colour and keeps
+ * the cut corners. Every .pxl-corner-* element does so by itself (see
+ * below); `pxl-focus-inset` draws the same where the element that
+ * takes focus is not the one whose corners are cut, with any variant
+ * (`group-focus-visible:`, `has-[…]:`, `peer-focus-visible:`).
+ * Forced-colors mode paints a border and the text in one system
+ * colour, so there the edge lights up in the highlight colour.
+ * ──────────────────────────────────────────────────────────── */
+@utility pxl-focus-inset {
+  outline: 2px solid var(--pxl-focus-color, currentColor);
+  outline-offset: -2px;
+}
+
+@layer base {
+  @media (forced-colors: active) {
+    :root, :host {
+      --pxl-focus-color: Highlight;
+    }
+  }
+}
+
+/* ─── Utility Classes ─────────────────────────────────────────
+ * Retro pixel-art utility classes for borders, shadows, and FX.
+ * ──────────────────────────────────────────────────────────── */
+@layer utilities {
+  /*
+   * Pixel-art staircase corners — the signature look.
+   * Each corner is a single-step cut so the silhouette reads as a chunky
+   * octagonal pixel shape instead of a smooth curve. The cut is a clip-path:
+   * nothing the element paints outside it shows — no box-shadow, and no
+   * drop shadow either (.pxl-shadow), since a filter is applied before the
+   * clip. Give a cut-corner element its shadow from an unclipped wrapper.
+   */
+  .pxl-corner-sm {
+    /* 2px corner cut — buttons, inputs, chips, badges */
+    clip-path: polygon(
+      2px 0,
+      calc(100% - 2px) 0,
+      calc(100% - 2px) 2px,
+      100% 2px,
+      100% calc(100% - 2px),
+      calc(100% - 2px) calc(100% - 2px),
+      calc(100% - 2px) 100%,
+      2px 100%,
+      2px calc(100% - 2px),
+      0 calc(100% - 2px),
+      0 2px,
+      2px 2px
+    );
+  }
+  .pxl-corner-md {
+    /* 4px corner cut — cards, alerts, sections */
+    clip-path: polygon(
+      4px 0,
+      calc(100% - 4px) 0,
+      calc(100% - 4px) 2px,
+      calc(100% - 2px) 2px,
+      calc(100% - 2px) 4px,
+      100% 4px,
+      100% calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 2px),
+      calc(100% - 4px) calc(100% - 2px),
+      calc(100% - 4px) 100%,
+      4px 100%,
+      4px calc(100% - 2px),
+      2px calc(100% - 2px),
+      2px calc(100% - 4px),
+      0 calc(100% - 4px),
+      0 4px,
+      2px 4px,
+      2px 2px,
+      4px 2px
+    );
+  }
+  .pxl-corner-lg {
+    /* 6px two-step corner — modals, panels */
+    clip-path: polygon(
+      6px 0,
+      calc(100% - 6px) 0,
+      calc(100% - 6px) 2px,
+      calc(100% - 4px) 2px,
+      calc(100% - 4px) 4px,
+      calc(100% - 2px) 4px,
+      calc(100% - 2px) 6px,
+      100% 6px,
+      100% calc(100% - 6px),
+      calc(100% - 2px) calc(100% - 6px),
+      calc(100% - 2px) calc(100% - 4px),
+      calc(100% - 4px) calc(100% - 4px),
+      calc(100% - 4px) calc(100% - 2px),
+      calc(100% - 6px) calc(100% - 2px),
+      calc(100% - 6px) 100%,
+      6px 100%,
+      6px calc(100% - 2px),
+      4px calc(100% - 2px),
+      4px calc(100% - 4px),
+      2px calc(100% - 4px),
+      2px calc(100% - 6px),
+      0 calc(100% - 6px),
+      0 6px,
+      2px 6px,
+      2px 4px,
+      4px 4px,
+      4px 2px,
+      6px 2px
+    );
+  }
+  /* A cut-corner element shows keyboard focus inside its clip. */
+  .pxl-corner-sm:focus-visible,
+  .pxl-corner-md:focus-visible,
+  .pxl-corner-lg:focus-visible {
+    @apply pxl-focus-inset;
+  }
+
+  /*
+   * Pixel-art offset shadows: a drop shadow of everything the element
+   * paints, its text and border included, which doubles them wherever its
+   * background lets them through. It cannot show on a .pxl-corner-*
+   * element, whose clip removes it past the cut corners: put it on an
+   * unclipped element, or on a wrapper around the cut-corner one, whose
+   * staircase it then follows.
+   * .pxl-nudge-hover and .pxl-nudge-active are the hover and press moves
+   * without the shadow; the kit's cut-corner controls move with them.
+   */
+  .pxl-shadow {
+    filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.25));
+  }
+  .pxl-shadow-hover:hover {
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.25));
+    transform: translate(1px, 1px);
+  }
+  .pxl-shadow-active:active {
+    filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.25));
+    transform: translate(2px, 2px);
+  }
+  .pxl-nudge-hover:hover {
+    transform: translate(1px, 1px);
+  }
+  .pxl-nudge-active:active {
+    transform: translate(2px, 2px);
+  }
+
+  /* Legacy compat (kept for any old consumers) */
+  .pixel-corners {
+    clip-path: polygon(
+      4px 0, calc(100% - 4px) 0,
+      100% 4px, 100% calc(100% - 4px),
+      calc(100% - 4px) 100%, 4px 100%,
+      0 calc(100% - 4px), 0 4px
+    );
+  }
+
+  .btn-retro {
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-pixel);
+    letter-spacing: 0.05em;
+    border-width: 2px;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+    box-shadow: 4px 4px 0px 0px currentColor;
+  }
+  .btn-retro:hover {
+    box-shadow: 2px 2px 0px 0px currentColor;
+    transform: translate(2px, 2px);
+  }
+  .btn-retro:active {
+    box-shadow: 0px 0px 0px 0px currentColor;
+    transform: translate(4px, 4px);
+  }
+
+  .pixel-border {
+    box-shadow:
+      inset -4px -4px 0px 0px rgba(0, 0, 0, 0.3),
+      inset 4px 4px 0px 0px rgba(255, 255, 255, 0.1),
+      0 0 0 2px var(--color-retro-border);
+  }
+}
+
+/* ─── Scroll Areas ────────────────────────────────────────────
+ * PixelScrollArea's scrollbar, in every kit. The variant class picks
+ * when it shows, the surface class the shape of its thumb, and
+ * --pxl-scrollbar-size its thickness (8px by default).
+ *
+ * WebKit and Blink draw the ::-webkit-scrollbar parts, but Blink ignores
+ * them on an element that sets scrollbar-width or scrollbar-color — so
+ * those standard properties only apply where the parts do not exist
+ * (Firefox), which has no custom thickness: `thin` stands in for it.
+ * ──────────────────────────────────────────────────────────── */
+@layer components {
+  :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover)::-webkit-scrollbar {
+    width: var(--pxl-scrollbar-size, 8px);
+    height: var(--pxl-scrollbar-size, 8px);
+  }
+  :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover)::-webkit-scrollbar-track,
+  :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover)::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+  :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover)::-webkit-scrollbar-thumb {
+    background-color: var(--color-retro-border);
+  }
+  :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover)::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-retro-muted);
+  }
+  /* Square thumb on the pixel surface, rounded on the linear one. */
+  .pxl-scroll-pixel::-webkit-scrollbar-thumb {
+    border-radius: 0;
+  }
+  .pxl-scroll-linear::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+  }
+  /* `hover`: the thumb shows while the region is hovered or focused. */
+  .pxl-scroll-hover:not(:hover, :focus-visible)::-webkit-scrollbar-thumb {
+    background-color: transparent;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover) {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-retro-border) transparent;
+    }
+    .pxl-scroll-hover:not(:hover, :focus-visible) {
+      scrollbar-color: transparent transparent;
+    }
+  }
+}

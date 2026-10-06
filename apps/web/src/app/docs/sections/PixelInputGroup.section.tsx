@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelInputGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelInputGroupDocsMeta = {
@@ -17,35 +23,109 @@ export const PixelInputGroupDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSectionProps): React.ReactElement {
+/** PixelInputGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelInputGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelInputGroup',
+        props: [
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Height of the shell.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name for the group. Strongly recommended since this primitive visually joins multiple form controls (e.g. country code + phone) — without an accessible name a screen reader user has no idea what the group represents. In development, a group of more than one child without a name logs a warning.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group, in place of `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The controls to join; each element is joined, text is dropped.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelInputGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelInputGroup',
+        props: [
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Height of the shell.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'role', type: 'string', description: 'Role of the shell; `group` when named and left out.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name of the group — strongly recommended.' },
+          { name: 'ariaLabelledby', type: 'string', description: 'Id of the element that names the group.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The controls to join; each element is joined, text is dropped.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelInputGroup',
+        selector: 'pxl-input-group',
+        props: [
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Height of the shell.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'role', type: 'string', description: 'Role of the shell; `group` when named and left out.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the group — strongly recommended.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelInputGroupItem',
+        selector: '[pxlInputGroupItem]',
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelInputGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelInputGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-input-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-input-group-heading'>PixelInputGroup</h2>
+      <Title id='pixel-input-group-heading'>PixelInputGroup</Title>
       <p className="docs-lead">Visually joins multiple form controls into a single shell — strips inner borders/radii from children and adds segment dividers, so combos like country-code + phone read as one field.</p>
       <ul className="docs-highlights">
         <li>Composes any form children (input, button, select) into a single joined shell.</li>
-        <li>`size` and `surface` props inherit the kit-wide design tokens.</li>
-        <li>Accessible: applies `role=&quot;group&quot;` only when an `aria-label`/`aria-labelledby` is provided.</li>
+        <li><code>size</code> and <code>surface</code> props inherit the kit-wide design tokens.</li>
+        <li>Accessible: applies <code>role=&quot;group&quot;</code> only when an <code>aria-label</code>/<code>aria-labelledby</code> is provided.</li>
         <li>Dev-mode warning when a multi-child group is missing an accessible name.</li>
-        <li>Preserves child `className` (consumer styles win over the join overrides).</li>
+        <li>Keeps the classes of each control alongside the join classes.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-input-group-api">
+      <Heading id="pixel-input-group-api">API</Heading>
+      <FrameworkApi label={'PixelInputGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-input-group-a11y">
-      <h3 id="pixel-input-group-a11y">Accessibility</h3>
+      <Heading id="pixel-input-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
       </ul>
-      <p className="docs-aria-notes">Sets `role=&quot;group&quot;` only when given an accessible name (`aria-label` / `aria-labelledby`). Decorative addons inside should use `aria-hidden`; child controls keep their own labels.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Sets <code>role=&quot;group&quot;</code> only when given an accessible name (<code>aria-label</code> / <code>aria-labelledby</code>). Decorative addons inside should use <code>aria-hidden</code>; child controls keep their own labels. The shell clips its controls, so each shows keyboard focus inside its own edge.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -64,8 +144,11 @@ export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-input-group-usage">
-      <h3 id="pixel-input-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelInputGroup } from '@pxlkit/ui-kit';
+      <Heading id="pixel-input-group-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelInputGroup usage'}
+        react={`import { PixelInputGroup } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -75,14 +158,44 @@ export function Default() {
       <input aria-label="Top-level domain" defaultValue=".xyz" className="bg-transparent px-2 outline-none" />
     </PixelInputGroup>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelInputGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInputGroup aria-label="Website URL">
+    <input aria-label="Protocol" value="https://" class="bg-transparent px-2 outline-none" />
+    <input aria-label="Domain name" value="pxlkit" class="bg-transparent px-2 outline-none" />
+    <input aria-label="Top-level domain" value=".xyz" class="bg-transparent px-2 outline-none" />
+  </PixelInputGroup>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInputGroup, PixelInputGroupItem],
+  template: \`
+    <pxl-input-group aria-label="Website URL">
+      <input pxlInputGroupItem aria-label="Protocol" value="https://" class="bg-transparent px-2 outline-none" />
+      <input pxlInputGroupItem aria-label="Domain name" value="pxlkit" class="bg-transparent px-2 outline-none" />
+      <input pxlInputGroupItem aria-label="Top-level domain" value=".xyz" class="bg-transparent px-2 outline-none" />
+    </pxl-input-group>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelInputGroup } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelInputGroup aria-label="Website URL">
       <input aria-label="Protocol" defaultValue="https://" className="bg-transparent px-2 outline-none" />
@@ -90,11 +203,42 @@ export function Default() {
       <input aria-label="Top-level domain" defaultValue=".xyz" className="bg-transparent px-2 outline-none" />
     </PixelInputGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInputGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInputGroup aria-label="Website URL">
+    <input aria-label="Protocol" value="https://" class="bg-transparent px-2 outline-none" />
+    <input aria-label="Domain name" value="pxlkit" class="bg-transparent px-2 outline-none" />
+    <input aria-label="Top-level domain" value=".xyz" class="bg-transparent px-2 outline-none" />
+  </PixelInputGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInputGroup, PixelInputGroupItem],
+  template: \`
+    <pxl-input-group aria-label="Website URL">
+      <input pxlInputGroupItem aria-label="Protocol" value="https://" class="bg-transparent px-2 outline-none" />
+      <input pxlInputGroupItem aria-label="Domain name" value="pxlkit" class="bg-transparent px-2 outline-none" />
+      <input pxlInputGroupItem aria-label="Top-level domain" value=".xyz" class="bg-transparent px-2 outline-none" />
+    </pxl-input-group>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelInputGroup } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex flex-col gap-3">
       <PixelInputGroup size="sm" aria-label="Small group">
@@ -111,11 +255,60 @@ export function Default() {
       </PixelInputGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInputGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelInputGroup size="sm" aria-label="Small group">
+      <input aria-label="First segment" value="small" class="bg-transparent px-2 outline-none" />
+      <input aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+    </PixelInputGroup>
+    <PixelInputGroup size="md" aria-label="Medium group">
+      <input aria-label="First segment" value="medium" class="bg-transparent px-2 outline-none" />
+      <input aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+    </PixelInputGroup>
+    <PixelInputGroup size="lg" aria-label="Large group">
+      <input aria-label="First segment" value="large" class="bg-transparent px-2 outline-none" />
+      <input aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+    </PixelInputGroup>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInputGroup, PixelInputGroupItem],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-input-group size="sm" aria-label="Small group">
+        <input pxlInputGroupItem aria-label="First segment" value="small" class="bg-transparent px-2 outline-none" />
+        <input pxlInputGroupItem aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+      </pxl-input-group>
+      <pxl-input-group size="md" aria-label="Medium group">
+        <input pxlInputGroupItem aria-label="First segment" value="medium" class="bg-transparent px-2 outline-none" />
+        <input pxlInputGroupItem aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+      </pxl-input-group>
+      <pxl-input-group size="lg" aria-label="Large group">
+        <input pxlInputGroupItem aria-label="First segment" value="large" class="bg-transparent px-2 outline-none" />
+        <input pxlInputGroupItem aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+      </pxl-input-group>
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelInputGroup } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelInputGroup surface="pixel" aria-label="Pixel surface group">
@@ -128,11 +321,52 @@ export function Default() {
       </PixelInputGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInputGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelInputGroup surface="pixel" aria-label="Pixel surface group">
+      <input aria-label="First segment" value="pixel" class="bg-transparent px-2 outline-none" />
+      <input aria-label="Second segment" value="surface" class="bg-transparent px-2 outline-none" />
+    </PixelInputGroup>
+    <PixelInputGroup surface="linear" aria-label="Linear surface group">
+      <input aria-label="First segment" value="linear" class="bg-transparent px-2 outline-none" />
+      <input aria-label="Second segment" value="surface" class="bg-transparent px-2 outline-none" />
+    </PixelInputGroup>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInputGroup, PixelInputGroupItem],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-input-group surface="pixel" aria-label="Pixel surface group">
+        <input pxlInputGroupItem aria-label="First segment" value="pixel" class="bg-transparent px-2 outline-none" />
+        <input pxlInputGroupItem aria-label="Second segment" value="surface" class="bg-transparent px-2 outline-none" />
+      </pxl-input-group>
+      <pxl-input-group surface="linear" aria-label="Linear surface group">
+        <input pxlInputGroupItem aria-label="First segment" value="linear" class="bg-transparent px-2 outline-none" />
+        <input pxlInputGroupItem aria-label="Second segment" value="surface" class="bg-transparent px-2 outline-none" />
+      </pxl-input-group>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-phone-with-country-code">
-        <h4>Phone with Country Code</h4>
-        <pre className="docs-code"><code>{`export function PhoneWithCountryCode() {
+        <Subheading>Phone with Country Code</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Phone with Country Code code'}
+          react={`import { PixelInputGroup } from '@pxlkit/ui-kit';
+
+export function PhoneWithCountryCode() {
   return (
     <PixelInputGroup aria-label="Phone number with country code">
       <input
@@ -148,16 +382,46 @@ export function Default() {
       />
     </PixelInputGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInputGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInputGroup aria-label="Phone number with country code">
+    <input aria-label="Country code" value="+58" class="bg-transparent px-2 outline-none" style="max-width: 5rem" />
+    <input aria-label="Phone number" placeholder="412 555 0123" class="bg-transparent px-2 outline-none" />
+  </PixelInputGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInputGroup, PixelInputGroupItem],
+  template: \`
+    <pxl-input-group aria-label="Phone number with country code">
+      <input
+        pxlInputGroupItem
+        aria-label="Country code"
+        value="+58"
+        class="bg-transparent px-2 outline-none"
+        style="max-width: 5rem"
+      />
+      <input pxlInputGroupItem aria-label="Phone number" placeholder="412 555 0123" class="bg-transparent px-2 outline-none" />
+    </pxl-input-group>
+  \`,
+})
+export class PhoneWithCountryCode {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-bare-input">PixelBareInput</a></li>
-        <li><a href="#pixel-select">PixelSelect</a></li>
-        <li><a href="#pixel-button">PixelButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-input' : '#pixel-bare-input'}>PixelBareInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-select' : '#pixel-select'}>PixelSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-button' : '#pixel-button'}>PixelButton</a></li>
       </ul>
     </section>
     </section>

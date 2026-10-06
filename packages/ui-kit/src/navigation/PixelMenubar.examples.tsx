@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelMenubar, type PixelMenubarMenu } from './PixelMenubar';
 
 const menus: PixelMenubarMenu[] = [

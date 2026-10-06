@@ -71,11 +71,11 @@ describe('PixelShake', () => {
     }
   });
 
-  it('merges className with inline-block and injects keyframes once', () => {
+  it('merges className with inline-block and injects no stylesheet: the keyframes are in the theme', () => {
     const { container } = render(<PixelShake className="custom">x</PixelShake>);
     const el = container.firstElementChild as HTMLElement;
     expect(el.className).toContain('inline-block');
     expect(el.className).toContain('custom');
-    expect(document.querySelectorAll('#pxl-anims')).toHaveLength(1);
+    expect(document.head.querySelectorAll('style')).toHaveLength(0);
   });
 });

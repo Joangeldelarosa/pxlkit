@@ -17,7 +17,7 @@ export default defineManifest({
   since: '1.9.0',
   status: 'stable',
   description:
-    'Pure-SVG bar chart that renders one rect per data point, in vertical (default) or horizontal orientation, with crisp pixel edges or smoothed linear corners.',
+    'Pure-SVG bar chart that renders one rect per data point (none for a value that is not finite), in vertical (default) or horizontal orientation, with crisp pixel edges or smoothed linear corners.',
   highlights: [
     'Tone-aware fills via retro-* token classes — matches the rest of the kit.',
     'Three sizes (sm/md/lg) with sensible inner padding and gap math.',
@@ -39,7 +39,7 @@ export default defineManifest({
     patterns: ['img'],
     keyboard: [],
     notes:
-      'The SVG renders as role="img" with an auto-derived aria-label summarizing the series (kind, count, min..max range). Pass a custom aria-label for richer context. For full data accessibility, render a visually-hidden <table> sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.',
+      'The SVG renders as role="img" with an auto-derived aria-label summarizing the series (kind, point count and min..max range of its finite values — a point whose y is NaN or ±Infinity is left out of the chart and of the summary, which reads "bar chart, no data" when no value is finite). Pass a custom aria-label for richer context. For full data accessibility, render a visually-hidden <table> sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.',
   },
   related: ['PixelSparkline', 'PixelAreaChart', 'PixelStatGroup', 'PixelDataTable'],
   apiStability: 'stable',

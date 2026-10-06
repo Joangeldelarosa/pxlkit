@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelRibbonDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelRibbonDocsMeta = {
@@ -17,10 +23,78 @@ export const PixelRibbonDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelRibbonDocsSection({ className }: PixelRibbonDocsSectionProps): React.ReactElement {
+/** PixelRibbon's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelRibbon } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelRibbon',
+        props: [
+          { name: 'position', type: "'top-center' | 'top-left' | 'top-right' | 'corner-tl' | 'corner-tr'", default: "'top-center'", description: 'Where the ribbon sits on its container.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'gold'", description: 'Tone of the opaque fill.' },
+          { name: 'offset', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "How far a top ribbon rises above the container's edge." },
+          { name: 'tilt', type: 'number', description: 'Tilt in degrees; the corners lean outwards by 12° when unset.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: "The ribbon's text." },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelRibbon } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelRibbon',
+        props: [
+          { name: 'position', type: "'top-center' | 'top-left' | 'top-right' | 'corner-tl' | 'corner-tr'", default: "'top-center'", description: 'Where the ribbon sits on its container.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'gold'", description: 'Tone of the opaque fill.' },
+          { name: 'offset', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "How far a top ribbon rises above the container's edge." },
+          { name: 'tilt', type: 'number', description: 'Tilt in degrees; the corners lean outwards by 12° when unset.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: "The ribbon's text." },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelRibbon } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelRibbon',
+        selector: 'pxl-ribbon',
+        props: [
+          { name: 'position', type: "'top-center' | 'top-left' | 'top-right' | 'corner-tl' | 'corner-tr'", default: "'top-center'", description: 'Where the ribbon sits on its container.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'gold'", description: 'Tone of the opaque fill.' },
+          { name: 'offset', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "How far a top ribbon rises above the container's edge." },
+          { name: 'tilt', type: 'number', accepts: 'unknown', description: 'Tilt in degrees; the corners lean outwards by 12° when unset.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelRibbonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelRibbonDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-ribbon-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-ribbon-heading'>PixelRibbon</h2>
+      <Title id='pixel-ribbon-heading'>PixelRibbon</Title>
       <p className="docs-lead">Absolutely-positioned decorative ribbon for cards — surface-aware, tone-driven, with corner-tilt presets.</p>
       <ul className="docs-highlights">
         <li>Five position presets (top-center/left/right, corner-tl/tr)</li>
@@ -33,12 +107,12 @@ export function PixelRibbonDocsSection({ className }: PixelRibbonDocsSectionProp
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-ribbon-api">
+      <Heading id="pixel-ribbon-api">API</Heading>
+      <FrameworkApi label={'PixelRibbon API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-ribbon-a11y">
-      <h3 id="pixel-ribbon-a11y">Accessibility</h3>
+      <Heading id="pixel-ribbon-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>Decorative text node — wrap in role=img with aria-label when content is purely visual</code></li>
@@ -47,8 +121,11 @@ export function PixelRibbonDocsSection({ className }: PixelRibbonDocsSectionProp
       <p className="docs-aria-notes">Ribbon is non-interactive; pair its message with the card heading so screen readers still convey the badge meaning.</p>
     </section>
     <section aria-labelledby="pixel-ribbon-usage">
-      <h3 id="pixel-ribbon-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react';
+      <Heading id="pixel-ribbon-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelRibbon usage'}
+        react={`import React from 'react';
 import { PixelRibbon } from '@pxlkit/ui-kit';
 
 function Container({ children }: { children: React.ReactNode }) {
@@ -66,24 +143,101 @@ export function Default() {
       <PixelRibbon>New</PixelRibbon>
     </Container>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelRibbon } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+    <div>Card content</div>
+    <PixelRibbon>New</PixelRibbon>
+  </div>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelRibbon } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRibbon],
+  template: \`
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <pxl-ribbon>New</pxl-ribbon>
+    </div>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import React from 'react';
+import { PixelRibbon } from '@pxlkit/ui-kit';
+
+function Container({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      {children}
+    </div>
+  );
+}
+
+export function Default() {
   return (
     <Container>
       <PixelRibbon>New</PixelRibbon>
     </Container>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelRibbon } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+    <div>Card content</div>
+    <PixelRibbon>New</PixelRibbon>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRibbon } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRibbon],
+  template: \`
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <pxl-ribbon>New</pxl-ribbon>
+    </div>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-corner-tilted">
-        <h4>Corner tilted</h4>
-        <pre className="docs-code"><code>{`export function CornerTilted() {
+        <Subheading>Corner tilted</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Corner tilted code'}
+          react={`import React from 'react';
+import { PixelRibbon } from '@pxlkit/ui-kit';
+
+function Container({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      {children}
+    </div>
+  );
+}
+
+export function CornerTilted() {
   return (
     <Container>
       <PixelRibbon position="corner-tr" tone="red">
@@ -91,11 +245,50 @@ export function Default() {
       </PixelRibbon>
     </Container>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelRibbon } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+    <div>Card content</div>
+    <PixelRibbon position="corner-tr" tone="red">Hot</PixelRibbon>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRibbon } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRibbon],
+  template: \`
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <pxl-ribbon position="corner-tr" tone="red">Hot</pxl-ribbon>
+    </div>
+  \`,
+})
+export class CornerTilted {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import React from 'react';
+import { PixelRibbon } from '@pxlkit/ui-kit';
+
+function Container({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      {children}
+    </div>
+  );
+}
+
+export function Tones() {
   return (
     <div className="flex flex-wrap gap-6">
       <Container>
@@ -109,11 +302,70 @@ export function Default() {
       </Container>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelRibbon } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-6">
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <PixelRibbon tone="green">Free</PixelRibbon>
+    </div>
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <PixelRibbon tone="cyan">Beta</PixelRibbon>
+    </div>
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <PixelRibbon tone="purple">Pro</PixelRibbon>
+    </div>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRibbon } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRibbon],
+  template: \`
+    <div class="flex flex-wrap gap-6">
+      <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+        <div>Card content</div>
+        <pxl-ribbon tone="green">Free</pxl-ribbon>
+      </div>
+      <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+        <div>Card content</div>
+        <pxl-ribbon tone="cyan">Beta</pxl-ribbon>
+      </div>
+      <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+        <div>Card content</div>
+        <pxl-ribbon tone="purple">Pro</pxl-ribbon>
+      </div>
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-position-left">
-        <h4>Position left</h4>
-        <pre className="docs-code"><code>{`export function PositionLeft() {
+        <Subheading>Position left</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Position left code'}
+          react={`import React from 'react';
+import { PixelRibbon } from '@pxlkit/ui-kit';
+
+function Container({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      {children}
+    </div>
+  );
+}
+
+export function PositionLeft() {
   return (
     <Container>
       <PixelRibbon position="top-left" offset="lg" tone="gold">
@@ -121,14 +373,38 @@ export function Default() {
       </PixelRibbon>
     </Container>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelRibbon } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+    <div>Card content</div>
+    <PixelRibbon position="top-left" offset="lg" tone="gold">Sale</PixelRibbon>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRibbon } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRibbon],
+  template: \`
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <pxl-ribbon position="top-left" offset="lg" tone="gold">Sale</pxl-ribbon>
+    </div>
+  \`,
+})
+export class PositionLeft {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-badge">PixelBadge</a></li>
-        <li><a href="#pixel-card">PixelCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge' : '#pixel-badge'}>PixelBadge</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-card' : '#pixel-card'}>PixelCard</a></li>
       </ul>
     </section>
     </section>

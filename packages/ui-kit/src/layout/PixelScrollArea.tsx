@@ -1,20 +1,28 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
-
-type ScrollType = 'auto' | 'always' | 'scroll' | 'hover';
+import {
+  scrollAreaClasses,
+  scrollAreaNameWarning,
+  scrollAreaStyle,
+  type ScrollAreaVariant,
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
 
 export interface PixelScrollAreaProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'type'> {
+  /** Height cap before the content scrolls: pixels, or any CSS length. */
   maxHeight?: string | number;
   /** Canonical structural variant (scrollbar visibility mode). */
-  variant?: ScrollType;
+  variant?: ScrollAreaVariant;
   /**
    * @deprecated Use `variant` instead. Retained as alias for one minor.
    */
-  type?: ScrollType;
+  type?: ScrollAreaVariant;
+  /** Keep the scrollbar's room reserved, so content never shifts. */
   offsetScrollbars?: boolean;
+  /** Scrollbar thickness in pixels. */
   scrollbarSize?: number;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
   bordered?: boolean;
@@ -24,16 +32,11 @@ export interface PixelScrollAreaProps extends Omit<React.HTMLAttributes<HTMLDivE
    * `aria-labelledby`. In dev, a missing label logs a warning.
    */
   'aria-label'?: string;
+  /** Id of the element that names the region, in place of `aria-label`. */
   'aria-labelledby'?: string;
+  /** The content that scrolls. */
   children: React.ReactNode;
 }
-
-const typeClass: Record<ScrollType, string> = {
-  auto: 'pxl-scroll-auto overflow-auto',
-  always: 'pxl-scroll-always overflow-scroll',
-  scroll: 'pxl-scroll-scroll overflow-scroll',
-  hover: 'pxl-scroll-hover overflow-auto',
-};
 
 /**
  * Surface-aware scroll container with styled scrollbar (CSS `scrollbar-width`
@@ -60,20 +63,11 @@ export const PixelScrollArea = forwardRef<HTMLDivElement, PixelScrollAreaProps>(
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const resolvedVariant: ScrollType = variant ?? type ?? 'auto';
+  const resolvedVariant: ScrollAreaVariant = variant ?? type ?? 'auto';
 
   const inlineStyle: React.CSSProperties = {
     ...style,
-    ...(maxHeight !== undefined
-      ? { maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight }
-      : null),
-    ...(scrollbarSize !== undefined
-      ? ({ ['--pxl-scrollbar-size' as string]: `${scrollbarSize}px` } as React.CSSProperties)
-      : null),
-    ...(offsetScrollbars
-      ? { scrollbarGutter: 'stable' as React.CSSProperties['scrollbarGutter'] }
-      : null),
+    ...scrollAreaStyle({ maxHeight, scrollbarSize, offsetScrollbars }),
   };
 
   const ariaLabel = (rest as { 'aria-label'?: string })['aria-label'];
@@ -81,17 +75,10 @@ export const PixelScrollArea = forwardRef<HTMLDivElement, PixelScrollAreaProps>(
   const explicitTabIndex = (rest as { tabIndex?: number }).tabIndex;
   const explicitRole = (rest as { role?: string }).role;
 
-  if (
-    process.env.NODE_ENV !== 'production' &&
-    !ariaLabel &&
-    !ariaLabelledBy &&
-    explicitTabIndex === undefined
-  ) {
+  if (process.env.NODE_ENV !== 'production') {
+    const warning = scrollAreaNameWarning({ label: ariaLabel, labelledBy: ariaLabelledBy, tabIndex: explicitTabIndex });
     // eslint-disable-next-line no-console
-    console.warn(
-      '[PixelScrollArea] missing aria-label / aria-labelledby on a focusable scroll region. ' +
-        'Provide one so keyboard + screen-reader users know what they\'re scrolling.',
-    );
+    if (warning) console.warn(warning);
   }
 
   return (
@@ -101,16 +88,7 @@ export const PixelScrollArea = forwardRef<HTMLDivElement, PixelScrollAreaProps>(
       data-surface={surface}
       role={explicitRole ?? 'region'}
       tabIndex={explicitTabIndex ?? 0}
-      className={cn(
-        'relative outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40',
-        typeClass[resolvedVariant],
-        bordered && s.border,
-        bordered && s.radius,
-        bordered && 'border-retro-border',
-        s.font,
-        surface === 'pixel' ? 'pxl-scroll-pixel' : 'pxl-scroll-linear',
-        className,
-      )}
+      className={cn(scrollAreaClasses(surface, { variant: resolvedVariant, bordered }), className)}
       style={inlineStyle}
       {...rest}
     >

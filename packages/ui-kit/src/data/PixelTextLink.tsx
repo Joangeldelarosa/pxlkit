@@ -1,8 +1,6 @@
 import React from 'react';
-import {
-  Tone, Surface, cn,
-  toneMap, surfaceClasses, useEffectiveSurface,
-} from '../common';
+import { textLinkClasses } from '@pxlkit/ui-kit-core';
+import { Tone, Surface, cn, useEffectiveSurface } from '../common';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelTextLink — anchor or button styled as a tone-coloured underline.
@@ -20,11 +18,17 @@ type PixelTextLinkCommon = {
 };
 
 type PixelTextLinkAnchorProps = PixelTextLinkCommon
-  & { href: string }
+  & {
+    /** Link target; without one the link is a button. */
+    href: string;
+  }
   & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'className' | 'children'>;
 
 type PixelTextLinkButtonProps = PixelTextLinkCommon
-  & { href?: undefined }
+  & {
+    /** Link target; without one the link is a button. */
+    href?: undefined;
+  }
   & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'children'>;
 
 export type PixelTextLinkProps = PixelTextLinkAnchorProps | PixelTextLinkButtonProps;
@@ -38,17 +42,7 @@ export function PixelTextLink({
   ...props
 }: PixelTextLinkProps) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const cls = cn(
-    'underline underline-offset-2 decoration-current/40 transition-colors cursor-pointer',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
-    toneMap[tone].ring,
-    s.font,
-    toneMap[tone].text,
-    tone === 'cyan' && 'hover:text-retro-green',
-    tone !== 'cyan' && 'hover:opacity-80',
-    className,
-  );
+  const cls = cn(textLinkClasses(surface, tone), className);
 
   if (href) {
     const anchorProps = props as PixelTextLinkAnchorProps;

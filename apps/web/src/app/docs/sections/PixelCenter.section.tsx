@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCenterDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCenterDocsMeta = {
@@ -17,38 +23,113 @@ export const PixelCenterDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProps): React.ReactElement {
+/** PixelCenter's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCenter } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCenter',
+        props: [
+          { name: 'maxWidth', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full'", default: "'5xl'", description: 'Width cap (`containerWidth`).' },
+          { name: 'gutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal padding (`pageGutter`).' },
+          { name: 'align', type: "'left' | 'center' | 'right'", description: 'Text alignment of the centered content (canonical).' },
+          { name: 'text', type: "'left' | 'center' | 'right'", deprecated: 'Use `align` instead. Retained as alias for one minor.' },
+          { name: 'inline', type: 'boolean', default: 'false', description: '`inline-block` instead of `block`.' },
+          { name: 'as', type: 'keyof React.JSX.IntrinsicElements', description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCenter } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCenter',
+        props: [
+          { name: 'maxWidth', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full'", default: "'5xl'", description: 'Width cap (`containerWidth`).' },
+          { name: 'gutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal padding (`pageGutter`).' },
+          { name: 'align', type: "'left' | 'center' | 'right'", description: 'Text alignment of the centred content.' },
+          { name: 'text', type: "'left' | 'center' | 'right'", deprecated: 'Use `align`.' },
+          { name: 'inline', type: 'boolean', default: 'false', description: '`inline-block` instead of `block`.' },
+          { name: 'as', type: 'string', default: "'div'", description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The centred content.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCenter } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCenter',
+        selector: '[pxlCenter]',
+        props: [
+          { name: 'maxWidth', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full'", default: "'5xl'", description: 'Width cap (`containerWidth`).' },
+          { name: 'gutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal padding (`pageGutter`).' },
+          { name: 'align', type: "'left' | 'center' | 'right'", description: 'Text alignment of the centred content.' },
+          { name: 'text', type: "'left' | 'center' | 'right'", deprecated: 'Use `align`.' },
+          { name: 'inline', type: 'boolean', default: 'false', accepts: 'unknown', description: '`inline-block` instead of `block`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border and radius.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelCenterDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCenterDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-center-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-center-heading'>PixelCenter</h2>
+      <Title id='pixel-center-heading'>PixelCenter</Title>
       <p className="docs-lead">Polymorphic max-width wrapper that centers content horizontally with token-driven page gutters.</p>
       <ul className="docs-highlights">
         <li>Token-driven max-width via the containerWidth scale</li>
         <li>Token-driven horizontal padding via the pageGutter scale</li>
-        <li>Polymorphic via the `as` prop — inherits semantics from the chosen element</li>
+        <li>Polymorphic via the <code>as</code> prop (in Angular, the element you put <code>pxlCenter</code> on) — inherits semantics from the chosen element</li>
         <li>Optional text alignment helper (left / center / right)</li>
-        <li>Surface-aware transition tokens through useEffectiveSurface</li>
+        <li>Surface-aware transition tokens</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-center-api">
+      <Heading id="pixel-center-api">API</Heading>
+      <FrameworkApi label={'PixelCenter API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-center-a11y">
-      <h3 id="pixel-center-a11y">Accessibility</h3>
+      <Heading id="pixel-center-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>polymorphic-wrapper</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; consumers pass `as` to inherit appropriate semantics (e.g. section, main, article). No additional ARIA is required.</p>
+      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; consumers pass <code>as</code> to inherit appropriate semantics (e.g. section, main, article). No additional ARIA is required.</p>
     </section>
     <section aria-labelledby="pixel-center-usage">
-      <h3 id="pixel-center-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelCenter } from '@pxlkit/ui-kit';
+      <Heading id="pixel-center-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCenter usage'}
+        react={`import { PixelCenter } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,14 +139,44 @@ export function Default() {
       </p>
     </PixelCenter>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelCenter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCenter>
+    <p class="text-sm text-retro-muted">
+      Centered content with the default max-width and page gutter.
+    </p>
+  </PixelCenter>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelCenter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCenter],
+  template: \`
+    <div pxlCenter>
+      <p class="text-sm text-retro-muted">
+        Centered content with the default max-width and page gutter.
+      </p>
+    </div>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelCenter } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelCenter>
       <p className="text-sm text-retro-muted">
@@ -73,11 +184,42 @@ export function Default() {
       </p>
     </PixelCenter>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCenter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCenter>
+    <p class="text-sm text-retro-muted">
+      Centered content with the default max-width and page gutter.
+    </p>
+  </PixelCenter>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCenter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCenter],
+  template: \`
+    <div pxlCenter>
+      <p class="text-sm text-retro-muted">
+        Centered content with the default max-width and page gutter.
+      </p>
+    </div>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-narrow-prose">
-        <h4>Narrow Prose</h4>
-        <pre className="docs-code"><code>{`export function NarrowProse() {
+        <Subheading>Narrow Prose</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Narrow Prose code'}
+          react={`import { PixelCenter } from '@pxlkit/ui-kit';
+
+export function NarrowProse() {
   return (
     <PixelCenter maxWidth="2xl" text="left">
       <p className="text-sm text-retro-muted">
@@ -85,11 +227,42 @@ export function Default() {
       </p>
     </PixelCenter>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCenter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCenter max-width="2xl" text="left">
+    <p class="text-sm text-retro-muted">
+      A narrower max-width is useful for long-form reading flows where measure matters.
+    </p>
+  </PixelCenter>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCenter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCenter],
+  template: \`
+    <div pxlCenter maxWidth="2xl" text="left">
+      <p class="text-sm text-retro-muted">
+        A narrower max-width is useful for long-form reading flows where measure matters.
+      </p>
+    </div>
+  \`,
+})
+export class NarrowProse {}`}
+        />
       </article>
       <article className="docs-example" id="example-text-centered">
-        <h4>Text Centered</h4>
-        <pre className="docs-code"><code>{`export function TextCentered() {
+        <Subheading>Text Centered</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Text Centered code'}
+          react={`import { PixelCenter } from '@pxlkit/ui-kit';
+
+export function TextCentered() {
   return (
     <PixelCenter maxWidth="3xl" text="center" gutter="md">
       <p className="text-sm text-retro-muted">
@@ -97,11 +270,42 @@ export function Default() {
       </p>
     </PixelCenter>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCenter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCenter max-width="3xl" text="center" gutter="md">
+    <p class="text-sm text-retro-muted">
+      Both the wrapper and the inner text are centered.
+    </p>
+  </PixelCenter>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCenter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCenter],
+  template: \`
+    <div pxlCenter maxWidth="3xl" text="center" gutter="md">
+      <p class="text-sm text-retro-muted">
+        Both the wrapper and the inner text are centered.
+      </p>
+    </div>
+  \`,
+})
+export class TextCentered {}`}
+        />
       </article>
       <article className="docs-example" id="example-as-section">
-        <h4>As Section</h4>
-        <pre className="docs-code"><code>{`export function AsSection() {
+        <Subheading>As Section</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'As Section code'}
+          react={`import { PixelCenter } from '@pxlkit/ui-kit';
+
+export function AsSection() {
   return (
     <PixelCenter as="section" maxWidth="4xl" gutter="lg" surface="pixel">
       <p className="text-sm text-retro-muted">
@@ -109,14 +313,40 @@ export function Default() {
       </p>
     </PixelCenter>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCenter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCenter as="section" max-width="4xl" gutter="lg" surface="pixel">
+    <p class="text-sm text-retro-muted">
+      Polymorphic: renders as a semantic &lt;section&gt; on the pixel surface.
+    </p>
+  </PixelCenter>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCenter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCenter],
+  template: \`
+    <section pxlCenter maxWidth="4xl" gutter="lg" surface="pixel">
+      <p class="text-sm text-retro-muted">
+        Polymorphic: renders as a semantic &lt;section&gt; on the pixel surface.
+      </p>
+    </section>
+  \`,
+})
+export class AsSection {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-section">PixelSection</a></li>
-        <li><a href="#pixel-container">PixelContainer</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-section' : '#pixel-section'}>PixelSection</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-container' : '#pixel-container'}>PixelContainer</a></li>
       </ul>
     </section>
     </section>

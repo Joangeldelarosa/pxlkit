@@ -3,9 +3,10 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React, { forwardRef } from 'react';
+import { radioGroupClasses, radioIndicatorClasses } from '@pxlkit/ui-kit-core';
 import {
-  Tone, Surface, Option, cn,
-  toneMap, surfaceClasses, useEffectiveSurface,
+  Tone, Surface, Option,
+  useEffectiveSurface,
 } from '../common';
 
 /** Public prop bag for {@link PixelRadioGroup}. */
@@ -41,13 +42,14 @@ export const PixelRadioGroup = forwardRef<HTMLFieldSetElement, PixelRadioGroupPr
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
+  const c = radioGroupClasses(surface, disabled);
   return (
-    <fieldset ref={ref} className="space-y-2" role="radiogroup" aria-disabled={disabled} aria-required={required || undefined}>
+    <fieldset ref={ref} className={c.group} role="radiogroup" aria-disabled={disabled} aria-required={required || undefined}>
       {name && <input type="hidden" name={name} value={value} required={required} />}
-      <legend className={cn('mb-1.5 text-xs text-retro-muted', s.font)}>{label}</legend>
+      <legend className={c.legend}>{label}</legend>
       {options.map((opt) => {
         const isActive = value === opt.value;
+        const radio = radioIndicatorClasses(surface, { tone, checked: isActive, disabled });
         return (
           <button
             key={opt.value}
@@ -60,32 +62,12 @@ export const PixelRadioGroup = forwardRef<HTMLFieldSetElement, PixelRadioGroupPr
             // unavailable (not just visually dim).
             disabled={disabled}
             onClick={() => !disabled && onChange(opt.value)}
-            className={cn(
-              'group flex items-center gap-2.5 text-sm outline-none',
-              s.font,
-              disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
-            )}
+            className={c.radio}
           >
-            <span
-              className={cn(
-                'flex h-[18px] w-[18px] shrink-0 items-center justify-center transition-all',
-                s.border,
-                surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full',
-                isActive ? cn(toneMap[tone].border, toneMap[tone].bg) : 'border-retro-border-strong bg-retro-bg',
-                !disabled && 'group-hover:border-retro-muted',
-              )}
-            >
-              {isActive && (
-                <span
-                  className={cn(
-                    'block h-2 w-2',
-                    surface === 'pixel' ? 'rounded-[1px]' : 'rounded-full',
-                    toneMap[tone].fill,
-                  )}
-                />
-              )}
+            <span className={radio.indicator}>
+              {isActive && <span className={radio.dot} />}
             </span>
-            <span className="text-retro-text select-none">{opt.label}</span>
+            <span className={c.label}>{opt.label}</span>
           </button>
         );
       })}

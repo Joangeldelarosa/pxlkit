@@ -10,6 +10,7 @@ import {
   parseStripItems,
   whatsnewVsVersionGate,
 } from '../../gates/34-whatsnew-vs-version';
+import { findRootReleaseSection, resolveAdvertisedRelease } from '../../_lib/release-policy';
 
 interface Fixture {
   root: string;
@@ -21,6 +22,8 @@ interface FixtureOpts {
   uiKitVersion: string | null;
   /** Extra web-app files (relative to apps/web/src) for consumer-item scans. */
   webFiles?: Record<string, string>;
+  /** The root CHANGELOG.md, where releases that span packages are written up. */
+  rootChangelogContent?: string;
 }
 
 async function createFixture(opts: FixtureOpts): Promise<Fixture> {
@@ -41,6 +44,10 @@ async function createFixture(opts: FixtureOpts): Promise<Fixture> {
       join(root, 'packages/ui-kit/CHANGELOG.md'),
       opts.changelogContent,
     );
+  }
+
+  if (opts.rootChangelogContent !== undefined) {
+    await writeFile(join(root, 'CHANGELOG.md'), opts.rootChangelogContent);
   }
 
   for (const [rel, content] of Object.entries(opts.webFiles ?? {})) {
@@ -372,6 +379,169 @@ describe('gate 34: whatsnew-vs-version', () => {
       const d = result.drift.find((x) => x.actual.includes('no wired items found'));
       expect(d).toBeDefined();
       expect(d?.severity).toBe('major');
+    });
+  });
+
+  describe('release written up in the root CHANGELOG', () => {
+    /** The kit's 2.2.0 section lists changes and fixes only; 2.1.0 added components. */
+    const KIT_CHANGELOG = `# @pxlkit/ui-kit — Changelog
+
+## 2.2.0 — 2026-10-03
+
+### Changed
+- The kit runs on \`@pxlkit/ui-kit-core\`.
+
+### Fixed
+- Pages hydrate.
+
+## 2.1.0 — 2026-07-06
+
+### Added
+- \`PixelCard\`: \`title\` is optional.
+- \`PixelChip\`: \`value\` prop.
+`;
+
+    /** The release across packages, with what it added. */
+    const ROOT_CHANGELOG = `# Changelog
+
+## [ui-kit 2.2.0 / core 1.4.0 / vue 0.1.0] - 2026-10-03 — The UI kit in Vue and Angular
+
+### Added
+
+- **Vue support.** A new package renders the icons:
+  - \`@pxlkit/vue\` (0.1.0) — Vue 3 components.
+- **\`@pxlkit/ui-kit-core\`.** The framework-neutral core.
+- **The UI kit for Vue.** \`@pxlkit/ui-kit-vue\` renders the React kit's markup.
+
+## [ui-kit 2.1.0] - 2026-07-06 — Cards
+
+### Added
+
+- **\`PixelCard\`** — headerless cards.
+`;
+
+    const PROP_DRIVEN_STRIP = `
+      'use client';
+      export interface WhatsNewItem { name: string; category: string; }
+      export function WhatsNewStrip({ version, items }: { version: string; items: WhatsNewItem[] }) {
+        return <ul>{items.map((i) => <li key={i.name}>{i.name}</li>)}</ul>;
+      }
+    `;
+
+    const wired = (names: string[]) => ({
+      'lib/whats-new.ts': `
+        import type { WhatsNewItem } from '@/components/whats-new-strip';
+        export const WHATS_NEW_ITEMS: WhatsNewItem[] = [
+          ${names.map((n) => `{ name: '${n}', category: 'x' },`).join('\n          ')}
+        ];
+      `,
+    });
+
+    it("advertises the current version with the root section's Added entries when the kit's own has none", async () => {
+      const f = await createFixture({
+        stripContent: PROP_DRIVEN_STRIP,
+        changelogContent: KIT_CHANGELOG,
+        rootChangelogContent: ROOT_CHANGELOG,
+        uiKitVersion: '2.2.0',
+        webFiles: wired(['@pxlkit/ui-kit-vue', '@pxlkit/vue', '@pxlkit/ui-kit-core']),
+      });
+      fixtures.push(f);
+
+      const result = await whatsnewVsVersionGate({ repoRoot: f.root });
+      expect(result.drift).toEqual([]);
+    });
+
+    it('flags the previous release\'s highlights once the root CHANGELOG writes up the current one', async () => {
+      const f = await createFixture({
+        stripContent: PROP_DRIVEN_STRIP,
+        changelogContent: KIT_CHANGELOG,
+        rootChangelogContent: ROOT_CHANGELOG,
+        uiKitVersion: '2.2.0',
+        webFiles: wired(['PixelCard', 'PixelChip']),
+      });
+      fixtures.push(f);
+
+      const result = await whatsnewVsVersionGate({ repoRoot: f.root });
+      const stale = result.drift.find((d) => d.actual.includes('stale highlights'));
+      expect(stale).toBeDefined();
+      expect(stale?.severity).toBe('major');
+      expect(stale?.expected).toContain('v2.2.0');
+    });
+
+    it("falls back to the kit's last release with Added entries when the root CHANGELOG has no section for the version", async () => {
+      const f = await createFixture({
+        stripContent: PROP_DRIVEN_STRIP,
+        changelogContent: KIT_CHANGELOG,
+        rootChangelogContent: ROOT_CHANGELOG.replace('ui-kit 2.2.0 / ', ''),
+        uiKitVersion: '2.2.0',
+        webFiles: wired(['PixelCard', 'PixelChip']),
+      });
+      fixtures.push(f);
+
+      const result = await whatsnewVsVersionGate({ repoRoot: f.root });
+      expect(result.drift).toEqual([]);
+    });
+
+    // The kit's own section adds props to existing components; the root
+    // section holds the release's headline additions.
+    const KIT_CHANGELOG_WITH_ADDED = KIT_CHANGELOG.replace(
+      '## 2.2.0 — 2026-10-03\n\n### Changed',
+      '## 2.2.0 — 2026-10-03\n\n### Added\n- `PixelHeroSection` `as`: the heading level.\n\n### Changed',
+    );
+
+    it("advertises the release with the kit section's and the root section's Added entries together", async () => {
+      for (const strip of [['@pxlkit/ui-kit-vue', '@pxlkit/vue'], ['PixelHeroSection']]) {
+        const f = await createFixture({
+          stripContent: PROP_DRIVEN_STRIP,
+          changelogContent: KIT_CHANGELOG_WITH_ADDED,
+          rootChangelogContent: ROOT_CHANGELOG,
+          uiKitVersion: '2.2.0',
+          webFiles: wired(strip),
+        });
+        fixtures.push(f);
+
+        const result = await whatsnewVsVersionGate({ repoRoot: f.root });
+        expect(result.drift).toEqual([]);
+      }
+    });
+
+    it('still flags a strip that advertises neither section of the release', async () => {
+      const f = await createFixture({
+        stripContent: PROP_DRIVEN_STRIP,
+        changelogContent: KIT_CHANGELOG_WITH_ADDED,
+        rootChangelogContent: ROOT_CHANGELOG,
+        uiKitVersion: '2.2.0',
+        webFiles: wired(['PixelCard', 'PixelChip']),
+      });
+      fixtures.push(f);
+
+      const result = await whatsnewVsVersionGate({ repoRoot: f.root });
+      expect(result.drift.some((d) => d.severity === 'major')).toBe(true);
+    });
+
+    it('findRootReleaseSection matches the package by name and version, not a package whose name extends it', () => {
+      expect(findRootReleaseSection(ROOT_CHANGELOG, 'ui-kit', '2.2.0')?.date).toBe('2026-10-03');
+      expect(findRootReleaseSection(ROOT_CHANGELOG, 'ui-kit', '2.1.0')?.heading).toContain('Cards');
+      expect(findRootReleaseSection(ROOT_CHANGELOG, 'core', '1.4.0')).not.toBeNull();
+      expect(findRootReleaseSection(ROOT_CHANGELOG, 'ui-kit', '2.2')).toBeNull();
+      expect(findRootReleaseSection('## [ui-kit-core 2.2.0] - 2026-10-03\n\n### Added\n- `X`\n', 'ui-kit', '2.2.0')).toBeNull();
+    });
+
+    it('resolveAdvertisedRelease reports where the Added entries come from', () => {
+      const fromRoot = resolveAdvertisedRelease(KIT_CHANGELOG, '2.2.0', { rootChangelog: ROOT_CHANGELOG });
+      expect(fromRoot).toMatchObject({ version: '2.2.0', isFallback: false, source: 'root' });
+      expect(fromRoot?.added).toEqual(expect.arrayContaining(['@pxlkit/vue', '@pxlkit/ui-kit-core', '@pxlkit/ui-kit-vue']));
+
+      const withoutRoot = resolveAdvertisedRelease(KIT_CHANGELOG, '2.2.0');
+      expect(withoutRoot).toMatchObject({ version: '2.1.0', isFallback: true, source: 'package' });
+
+      const both = resolveAdvertisedRelease(KIT_CHANGELOG_WITH_ADDED, '2.2.0', { rootChangelog: ROOT_CHANGELOG });
+      expect(both).toMatchObject({ version: '2.2.0', isFallback: false, source: 'both' });
+      expect(both?.added[0]).toBe('PixelHeroSection');
+      expect(both?.added).toEqual(expect.arrayContaining(['@pxlkit/ui-kit-vue']));
+
+      const packageOnly = resolveAdvertisedRelease(KIT_CHANGELOG_WITH_ADDED, '2.2.0');
+      expect(packageOnly).toMatchObject({ version: '2.2.0', source: 'package', added: ['PixelHeroSection'] });
     });
   });
 

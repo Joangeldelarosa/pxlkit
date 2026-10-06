@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFileUploadDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelFileUploadDocsMeta = {
@@ -17,16 +23,126 @@ export const PixelFileUploadDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSectionProps): React.ReactElement {
+/** PixelFileUpload's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelFileUpload } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelFileUpload',
+        props: [
+          { name: 'value', type: 'File[]', description: 'Files; leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'File[]', description: 'Initial files while uncontrolled.' },
+          { name: 'onChange', type: '(files: File[]) => void', description: 'Called with the new files, after each choice, drop or removal.' },
+          { name: 'accept', type: 'string', description: 'Types the field takes: MIME types, `type/*` wildcards and `.ext` extensions, comma-separated.' },
+          { name: 'multiple', type: 'boolean', default: 'false', description: 'Files add up; without it each choice replaces the last.' },
+          { name: 'maxSize', type: 'number', description: 'Bytes per file.' },
+          { name: 'maxFiles', type: 'number', description: 'Most files the field holds.' },
+          { name: 'dropzone', type: 'boolean', default: 'true', description: 'Shows the dropzone; `false` shows a browse button instead.' },
+          { name: 'renderItem', type: '(file: File, remove: () => void) => React.ReactNode', description: "Draws a file's row in place of the default one: gets the file, and a function that removes it." },
+          { name: 'onReject', type: '(rejections: PixelFileRejection[]) => void', description: 'Called with the files turned down by a choice or a drop, with their reasons.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and type size of the dropzone.' },
+          { name: 'label', type: 'string', description: 'Label above the field, pointing at the file input.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; turns the dropzone red.' },
+          { name: 'disabled', type: 'boolean', description: 'Disables choosing, dropping and removing files.' },
+          { name: 'name', type: 'string', description: "Deprecated form-serialization hint. Files are not serializable through a hidden mirror once `e.target.value` is reset, so this prop no longer wires to a native input. Read selected files from `onChange` and POST them manually (e.g. `FormData.append(name, file)` per file). Kept in the prop bag so consumers using it don't break — the `id` of the file input still uses it via the `id` prop fallback path." },
+          { name: 'id', type: 'string', description: '`id` of the file input; generated when left out.' },
+          { name: 'className', type: 'string', description: 'Extra classes on the root element.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelFileUpload } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelFileUpload',
+        props: [
+          { name: 'modelValue', type: 'File[]', binding: 'v-model', description: 'Files (`v-model`); leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'File[]', description: 'Initial files while uncontrolled.' },
+          { name: 'accept', type: 'string', description: 'Types the field takes: MIME types, `type/*` wildcards and `.ext` extensions, comma-separated.' },
+          { name: 'multiple', type: 'boolean', default: 'false', description: 'Files add up; without it each choice replaces the last.' },
+          { name: 'maxSize', type: 'number', description: 'Largest size of a file, in bytes.' },
+          { name: 'maxFiles', type: 'number', description: 'Most files the field holds.' },
+          { name: 'dropzone', type: 'boolean', default: 'true', description: 'Shows the dropzone; `false` shows a browse button instead.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and type size of the dropzone.' },
+          { name: 'label', type: 'string', description: 'Label above the field, pointing at the file input.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; turns the dropzone red.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables choosing, dropping and removing files.' },
+          { name: 'name', type: 'string', description: 'Exposed as `data-pxl-name`; the file input submits nothing (see above).' },
+          { name: 'id', type: 'string', description: '`id` of the file input; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'files: File[]', description: 'The new files, after each choice, drop or removal.' },
+          { name: 'reject', payload: 'rejections: FileUploadRejection[]', description: 'The files turned down by a choice or a drop, with their reasons.' },
+        ],
+        slots: [
+          { name: 'item', props: '{ file: File; remove: () => void }', description: 'Renders a chosen file in place of the default row; `remove` takes it out of the field.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<div>`.',
+          'Its template ref exposes `element`: the element around the dropzone and the list.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelFileUpload } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelFileUpload',
+        selector: 'pxl-file-upload',
+        props: [
+          { name: 'value', type: 'File[]', binding: '[(value)]', description: 'Files (`[(value)]`); leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'File[]', description: 'Initial files while uncontrolled.' },
+          { name: 'accept', type: 'string', description: 'Types the field takes: MIME types, `type/*` wildcards and `.ext` extensions, comma-separated.' },
+          { name: 'multiple', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Files add up; without it each choice replaces the last.' },
+          { name: 'maxSize', type: 'number', accepts: 'unknown', description: 'Largest size of a file, in bytes.' },
+          { name: 'maxFiles', type: 'number', accepts: 'unknown', description: 'Most files the field holds.' },
+          { name: 'dropzone', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Shows the dropzone; `false` shows a browse button instead.' },
+          { name: 'item', type: 'TemplateRef<PixelFileUploadItemContext>', description: 'Renders a chosen file in place of the default row (`let-file let-remove="remove"`).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and type size of the dropzone.' },
+          { name: 'label', type: 'string', description: 'Label above the field, pointing at the file input.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; turns the dropzone red.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables choosing, dropping and removing files.' },
+          { name: 'name', type: 'string', description: 'Exposed as `data-pxl-name`; the file input submits nothing (see above).' },
+          { name: 'id', type: 'string', description: '`id` of the file input; generated when left out.' },
+        ],
+        events: [
+          { name: 'reject', payload: 'FileUploadRejection[]', description: 'The files turned down by a choice or a drop, with their reasons.' },
+          { name: 'valueChange', payload: 'File[]', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`File[]`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelFileUploadDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelFileUploadDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-file-upload-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-file-upload-heading'>PixelFileUpload</h2>
+      <Title id='pixel-file-upload-heading'>PixelFileUpload</Title>
       <p className="docs-lead">Dropzone + click-to-browse file uploader with accept/size/count validation, image thumbnails, and per-item removal.</p>
       <ul className="docs-highlights">
         <li>Drag-and-drop or click/keyboard to open the native file picker</li>
-        <li>Validates against accept, maxSize, and maxFiles with onReject callback</li>
+        <li>Validates against accept, maxSize, and maxFiles and reports the rejected files (<code>onReject</code>, <code>@reject</code> in Vue, <code>(reject)</code> in Angular)</li>
         <li>Image previews via object URLs with automatic revoke on unmount</li>
-        <li>Controlled or uncontrolled file list via useControllableState</li>
+        <li>Controlled file list — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code></li>
         <li>Surface-aware styling with size, label, hint, and error props</li>
       </ul>
     <dl className="docs-meta">
@@ -34,19 +150,19 @@ export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSec
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-file-upload-api">
+      <Heading id="pixel-file-upload-api">API</Heading>
+      <FrameworkApi label={'PixelFileUpload API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-file-upload-a11y">
-      <h3 id="pixel-file-upload-a11y">Accessibility</h3>
+      <Heading id="pixel-file-upload-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button-like dropzone</code></li>
         <li><code>aria-describedby for accepted formats</code></li>
       </ul>
-      <p className="docs-aria-notes">Dropzone exposes role=&quot;button&quot; with tabIndex 0 (or -1 when disabled) and aria-describedby pointing at the hint/error message. The hidden &lt;input type=&quot;file&quot;&gt; is aria-hidden while the dropzone is active.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Dropzone exposes role=&quot;button&quot; with tabIndex 0 (or -1 when disabled) and, while a hint or error shows, aria-describedby pointing at it. The hidden &lt;input type=&quot;file&quot;&gt; is aria-hidden while the dropzone is active. Without the dropzone the input is the one control and tab stop: the browse button is a second &lt;label&gt; of it, so the input is named by both labels, carries the aria-describedby, and the button shows its keyboard focus.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -66,12 +182,20 @@ export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSec
             <td>Opens the native file picker</td>
             <td>dropzone has focus</td>
           </tr>
+          <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Opens the native file picker</td>
+            <td>file input has focus (no dropzone)</td>
+          </tr>
         </tbody>
       </table>
     </section>
     <section aria-labelledby="pixel-file-upload-usage">
-      <h3 id="pixel-file-upload-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-file-upload-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelFileUpload usage'}
+        react={`import { useState } from 'react';
 import { PixelFileUpload } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -88,14 +212,58 @@ export function Default() {
       maxFiles={5}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelFileUpload } from '@pxlkit/ui-kit-vue';
+
+const files = ref<File[]>([]);
+</script>
+
+<template>
+  <PixelFileUpload
+    v-model="files"
+    label="Upload files"
+    hint="PNG or JPG, up to 5 MB each"
+    accept="image/*"
+    multiple
+    :max-size="5 * 1024 * 1024"
+    :max-files="5"
+  />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelFileUpload } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFileUpload],
+  template: \`
+    <pxl-file-upload
+      label="Upload files"
+      hint="PNG or JPG, up to 5 MB each"
+      [(value)]="files"
+      accept="image/*"
+      multiple
+      [maxSize]="5 * 1024 * 1024"
+      [maxFiles]="5"
+    />
+  \`,
+})
+export class Default {
+  readonly files = signal<File[]>([]);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelFileUpload } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [files, setFiles] = useState<File[]>([]);
   return (
     <PixelFileUpload
@@ -109,11 +277,56 @@ export function Default() {
       maxFiles={5}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelFileUpload } from '@pxlkit/ui-kit-vue';
+
+const files = ref<File[]>([]);
+</script>
+
+<template>
+  <PixelFileUpload
+    v-model="files"
+    label="Upload files"
+    hint="PNG or JPG, up to 5 MB each"
+    accept="image/*"
+    multiple
+    :max-size="5 * 1024 * 1024"
+    :max-files="5"
+  />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelFileUpload } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFileUpload],
+  template: \`
+    <pxl-file-upload
+      label="Upload files"
+      hint="PNG or JPG, up to 5 MB each"
+      [(value)]="files"
+      accept="image/*"
+      multiple
+      [maxSize]="5 * 1024 * 1024"
+      [maxFiles]="5"
+    />
+  \`,
+})
+export class Default {
+  readonly files = signal<File[]>([]);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-button-mode">
-        <h4>Button mode</h4>
-        <pre className="docs-code"><code>{`export function ButtonMode() {
+        <Subheading>Button mode</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Button mode code'}
+          react={`import { useState } from 'react';
+import { PixelFileUpload } from '@pxlkit/ui-kit';
+
+export function ButtonMode() {
   const [files, setFiles] = useState<File[]>([]);
   return (
     <PixelFileUpload
@@ -123,11 +336,37 @@ export function Default() {
       dropzone={false}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelFileUpload } from '@pxlkit/ui-kit-vue';
+
+const files = ref<File[]>([]);
+</script>
+
+<template>
+  <PixelFileUpload v-model="files" label="Choose a file" :dropzone="false" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelFileUpload } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFileUpload],
+  template: \`<pxl-file-upload label="Choose a file" [(value)]="files" [dropzone]="false" />\`,
+})
+export class ButtonMode {
+  readonly files = signal<File[]>([]);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-error">
-        <h4>With error</h4>
-        <pre className="docs-code"><code>{`export function WithError() {
+        <Subheading>With error</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With error code'}
+          react={`import { PixelFileUpload } from '@pxlkit/ui-kit';
+
+export function WithError() {
   return (
     <PixelFileUpload
       label="Attachments"
@@ -135,15 +374,31 @@ export function Default() {
       accept=".pdf,.doc,.docx"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFileUpload } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFileUpload label="Attachments" error="At least one file is required" accept=".pdf,.doc,.docx" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFileUpload } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFileUpload],
+  template: \`<pxl-file-upload label="Attachments" error="At least one file is required" accept=".pdf,.doc,.docx" />\`,
+})
+export class WithError {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-textarea">PixelTextarea</a></li>
-        <li><a href="#pixel-form">PixelForm</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-textarea' : '#pixel-textarea'}>PixelTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-form' : '#pixel-form'}>PixelForm</a></li>
       </ul>
     </section>
     </section>

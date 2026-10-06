@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { PixelParallaxGroup, PixelParallaxLayer, PixelMouseParallax } from './parallax';
 import { ParallaxPxlKitIcon, PxlKitIcon } from '@pxlkit/core';
 import { CoolEmoji, PixelHeart, RetroTV } from '@pxlkit/parallax';

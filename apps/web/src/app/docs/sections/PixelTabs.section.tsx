@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTabsDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTabsDocsMeta = {
@@ -17,10 +23,202 @@ export const PixelTabsDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): React.ReactElement {
+/** PixelTabs's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTabs } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTabs',
+        props: [
+          { name: 'items', type: 'TabItem[]', description: 'The tabs as data. Without them, compose `PixelTabs.List`, `PixelTabs.Trigger` and `PixelTabs.Panel`.' },
+          { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial active tab id. Canonical name; aliases `defaultTab`.' },
+          { name: 'defaultTab', type: 'string', deprecated: 'Use `defaultValue` instead. Retained as alias for one minor.' },
+          { name: 'value', type: 'string', description: 'Controlled active tab id. When set, `defaultValue` is ignored.' },
+          { name: 'onChange', type: '(id: string) => void', description: 'Fires whenever the active tab changes (controlled or uncontrolled).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface treatment override.' },
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label for the tablist.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction for the tab list + keyboard nav.' },
+          { name: 'keepMounted', type: 'boolean', default: 'false', description: 'When true, all panels render in the DOM (hidden via CSS).' },
+          { name: 'scrollable', type: 'boolean', default: 'false', description: 'When true, the tablist scrolls horizontally with a fade-mask. Ignored for vertical orientation.' },
+          { name: 'activationMode', type: "'automatic' | 'manual'", default: "'automatic'", description: "'automatic' (default) selects on focus. 'manual' requires Enter/Space." },
+          { name: 'children', type: 'React.ReactNode', description: 'Compositional children. Ignored when `items` is provided.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelTabs.List',
+        props: [
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label announced for the tablist.' },
+          { name: 'scrollable', type: 'boolean', default: 'false', description: 'When true, the tablist scrolls horizontally with a fade-mask. Ignored for vertical orientation.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `role`.',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelTabs.Trigger',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Tab id this trigger controls — must match a PixelTabsPanel value.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Optional leading icon node.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`), except `role`.',
+          '`ref` points to `<button>`.',
+        ],
+      },
+      {
+        name: 'PixelTabs.Panel',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Tab id this panel belongs to — must match a PixelTabsTrigger value.' },
+          { name: 'keepMounted', type: 'boolean', description: "Override the root's keepMounted setting for this panel." },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `role`.',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTabs, PixelTabsList, PixelTabsPanel, PixelTabsTrigger } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTabs',
+        props: [
+          { name: 'items', type: 'TabItem[]', description: 'Shorthand; leave out to compose List / Trigger / Panel yourself.' },
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Active tab id (`v-model`); leave unset for uncontrolled tabs.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial active tab while uncontrolled.' },
+          { name: 'defaultTab', type: 'string', deprecated: 'Use `defaultValue`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label of the tablist.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction of the tab list and of arrow-key navigation.' },
+          { name: 'keepMounted', type: 'boolean', default: 'false', description: 'Keep every panel in the DOM (hidden) instead of only the active one.' },
+          { name: 'scrollable', type: 'boolean', default: 'false', description: 'Horizontal tab list scrolls with a fade mask (ignored when vertical).' },
+          { name: 'activationMode', type: "'automatic' | 'manual'", default: "'automatic'", description: '`automatic` selects on focus; `manual` waits for Enter / Space.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'id: string', description: 'The newly active tab id.' },
+        ],
+        slots: [
+          { name: 'default', description: '`PixelTabsList` and the `PixelTabsPanel`s, in place of `items`.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelTabsList',
+        props: [
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label of the tablist.' },
+          { name: 'scrollable', type: 'boolean', default: 'false', description: 'Scroll horizontally with a fade mask (ignored when vertical).' },
+        ],
+        slots: [
+          { name: 'default', description: 'The triggers (`PixelTabsTrigger`).' },
+        ],
+      },
+      {
+        name: 'PixelTabsPanel',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Id of the tab — matches a `PixelTabsTrigger` value.' },
+          { name: 'keepMounted', type: 'boolean', description: "Override the root's `keep-mounted` for this panel." },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface-aware border and radius chrome.' },
+        ],
+        slots: [
+          { name: 'default', description: "The panel's content." },
+        ],
+      },
+      {
+        name: 'PixelTabsTrigger',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Id of the tab — matches a `PixelTabsPanel` value.' },
+        ],
+        slots: [
+          { name: 'default', description: "The tab's label." },
+          { name: 'icon', description: 'Leading icon.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<button>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTabs, PixelTabsList, PixelTabsPanel, PixelTabsTrigger } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTabs',
+        selector: 'pxl-tabs',
+        props: [
+          { name: 'items', type: 'TabItem[]', description: 'Shorthand; leave out to compose list, triggers and panels yourself.' },
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Active tab id (`[(value)]`); leave unset for uncontrolled tabs.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial active tab while uncontrolled.' },
+          { name: 'defaultTab', type: 'string', deprecated: 'Use `defaultValue`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label of the tablist.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction of the tab list and of arrow-key navigation.' },
+          { name: 'keepMounted', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Keep every panel in the DOM (hidden) instead of only the active one.' },
+          { name: 'scrollable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Horizontal tab list scrolls with a fade mask (ignored when vertical).' },
+          { name: 'activationMode', type: "'automatic' | 'manual'", default: "'automatic'", description: '`automatic` selects on focus; `manual` waits for Enter / Space.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelTabsList',
+        selector: 'pxl-tabs-list',
+        props: [
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label of the tablist.' },
+          { name: 'scrollable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Scroll horizontally with a fade mask (ignored when vertical).' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelTabsPanel',
+        selector: 'pxl-tabs-panel',
+        props: [
+          { name: 'value', type: 'string', required: true, description: "Id of the tab — matches a trigger's value." },
+          { name: 'keepMounted', type: 'boolean', accepts: 'unknown', description: "Override the root's `keepMounted` for this panel." },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface-aware border and radius chrome.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelTabsTrigger',
+        selector: 'button[pxlTabsTrigger]',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Id of the tab — matches a `<pxl-tabs-panel>` value.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Leading icon.' },
+        ],
+        notes: [
+          'Goes on a native `<button>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelTabsDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelTabsDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-tabs-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-tabs-heading'>PixelTabs</h2>
+      <Title id='pixel-tabs-heading'>PixelTabs</Title>
       <p className="docs-lead">Tabbed panel with roving tabindex and WAI-ARIA keyboard navigation, available as a sugar items[] API or a compositional List/Trigger/Panel API.</p>
       <ul className="docs-highlights">
         <li>Sugar API (items[]) for quick setup or compositional API (List/Trigger/Panel) for full control over rendering.</li>
@@ -34,18 +232,18 @@ export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): 
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-tabs-api">
+      <Heading id="pixel-tabs-api">API</Heading>
+      <FrameworkApi label={'PixelTabs API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-tabs-a11y">
-      <h3 id="pixel-tabs-a11y">Accessibility</h3>
+      <Heading id="pixel-tabs-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>tablist</code></li>
       </ul>
       <p className="docs-aria-notes">Renders role=&quot;tablist&quot; on the list container with aria-orientation reflecting the orientation prop, role=&quot;tab&quot; on each trigger with aria-selected and aria-controls wiring, and role=&quot;tabpanel&quot; on the panel with aria-labelledby pointing back at its trigger. Panels are tabIndex=0 so keyboard users can reach panel content after activating a tab. The active panel is the only one rendered by default; keepMounted preserves all panels in the DOM and uses the hidden attribute to mask inactive ones.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -104,9 +302,11 @@ export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): 
       </table>
     </section>
     <section aria-labelledby="pixel-tabs-usage">
-      <h3 id="pixel-tabs-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelTabs } from '@pxlkit/ui-kit';
+      <Heading id="pixel-tabs-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelTabs usage'}
+        react={`import { PixelTabs } from '@pxlkit/ui-kit';
 import type { TabItem } from '@pxlkit/ui-kit';
 
 const ITEMS: TabItem[] = [
@@ -116,21 +316,119 @@ const ITEMS: TabItem[] = [
 ];
 
 export function Default() {
-  return <PixelTabs items={ITEMS} defaultTab="overview" />;
-}
-`}</code></pre>
+  return <PixelTabs items={ITEMS} defaultValue="overview" />;
+}`}
+        vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-vue';
+
+const items: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: () => h('p', 'High-level summary of the project.') },
+  { id: 'activity', label: 'Activity', content: () => h('p', 'Recent events and commits.') },
+  { id: 'settings', label: 'Settings', content: () => h('p', 'Configuration for this workspace.') },
+];
+</script>
+
+<template>
+  <PixelTabs :items="items" default-value="overview" />
+</template>`}
+        angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTabs],
+  template: \`
+    <pxl-tabs [items]="items()" defaultValue="overview" />
+    <ng-template #overview><p>High-level summary of the project.</p></ng-template>
+    <ng-template #activity><p>Recent events and commits.</p></ng-template>
+    <ng-template #settings><p>Configuration for this workspace.</p></ng-template>
+  \`,
+})
+export class Default {
+  private readonly overview = viewChild.required<TemplateRef<unknown>>('overview');
+  private readonly activity = viewChild.required<TemplateRef<unknown>>('activity');
+  private readonly settings = viewChild.required<TemplateRef<unknown>>('settings');
+  readonly items = computed<TabItem[]>(() => [
+    { id: 'overview', label: 'Overview', content: this.overview() },
+    { id: 'activity', label: 'Activity', content: this.activity() },
+    { id: 'settings', label: 'Settings', content: this.settings() },
+  ]);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
-  return <PixelTabs items={ITEMS} defaultTab="overview" />;
-}`}</code></pre>
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelTabs } from '@pxlkit/ui-kit';
+import type { TabItem } from '@pxlkit/ui-kit';
+
+const ITEMS: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: <p>High-level summary of the project.</p> },
+  { id: 'activity', label: 'Activity', content: <p>Recent events and commits.</p> },
+  { id: 'settings', label: 'Settings', content: <p>Configuration for this workspace.</p> },
+];
+
+export function Default() {
+  return <PixelTabs items={ITEMS} defaultValue="overview" />;
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-vue';
+
+const items: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: () => h('p', 'High-level summary of the project.') },
+  { id: 'activity', label: 'Activity', content: () => h('p', 'Recent events and commits.') },
+  { id: 'settings', label: 'Settings', content: () => h('p', 'Configuration for this workspace.') },
+];
+</script>
+
+<template>
+  <PixelTabs :items="items" default-value="overview" />
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTabs],
+  template: \`
+    <pxl-tabs [items]="items()" defaultValue="overview" />
+    <ng-template #overview><p>High-level summary of the project.</p></ng-template>
+    <ng-template #activity><p>Recent events and commits.</p></ng-template>
+    <ng-template #settings><p>Configuration for this workspace.</p></ng-template>
+  \`,
+})
+export class Default {
+  private readonly overview = viewChild.required<TemplateRef<unknown>>('overview');
+  private readonly activity = viewChild.required<TemplateRef<unknown>>('activity');
+  private readonly settings = viewChild.required<TemplateRef<unknown>>('settings');
+  readonly items = computed<TabItem[]>(() => [
+    { id: 'overview', label: 'Overview', content: this.overview() },
+    { id: 'activity', label: 'Activity', content: this.activity() },
+    { id: 'settings', label: 'Settings', content: this.settings() },
+  ]);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
+        <Subheading>Controlled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import { useState } from 'react';
+import { PixelTabs } from '@pxlkit/ui-kit';
+import type { TabItem } from '@pxlkit/ui-kit';
+
+const ITEMS: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: <p>High-level summary of the project.</p> },
+  { id: 'activity', label: 'Activity', content: <p>Recent events and commits.</p> },
+  { id: 'settings', label: 'Settings', content: <p>Configuration for this workspace.</p> },
+];
+
+export function Controlled() {
   const [active, setActive] = useState('activity');
   return (
     <div className="space-y-2">
@@ -138,66 +436,366 @@ export function Default() {
       <p className="text-xs text-retro-muted">Active tab: {active}</p>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h, ref } from 'vue';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-vue';
+
+const items: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: () => h('p', 'High-level summary of the project.') },
+  { id: 'activity', label: 'Activity', content: () => h('p', 'Recent events and commits.') },
+  { id: 'settings', label: 'Settings', content: () => h('p', 'Configuration for this workspace.') },
+];
+
+const active = ref('activity');
+</script>
+
+<template>
+  <div class="space-y-2">
+    <PixelTabs v-model="active" :items="items" />
+    <p class="text-xs text-retro-muted">Active tab: {{ active }}</p>
+  </div>
+</template>`}
+          angular={`import { Component, TemplateRef, computed, signal, viewChild } from '@angular/core';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTabs],
+  template: \`
+    <div class="space-y-2">
+      <pxl-tabs [items]="items()" [(value)]="active" />
+      <p class="text-xs text-retro-muted">Active tab: {{ active() }}</p>
+    </div>
+    <ng-template #overview><p>High-level summary of the project.</p></ng-template>
+    <ng-template #activity><p>Recent events and commits.</p></ng-template>
+    <ng-template #settings><p>Configuration for this workspace.</p></ng-template>
+  \`,
+})
+export class Controlled {
+  private readonly overview = viewChild.required<TemplateRef<unknown>>('overview');
+  private readonly activity = viewChild.required<TemplateRef<unknown>>('activity');
+  private readonly settings = viewChild.required<TemplateRef<unknown>>('settings');
+  readonly items = computed<TabItem[]>(() => [
+    { id: 'overview', label: 'Overview', content: this.overview() },
+    { id: 'activity', label: 'Activity', content: this.activity() },
+    { id: 'settings', label: 'Settings', content: this.settings() },
+  ]);
+  readonly active = signal('activity');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-vertical">
-        <h4>Vertical</h4>
-        <pre className="docs-code"><code>{`export function Vertical() {
-  return <PixelTabs items={ITEMS} defaultTab="overview" orientation="vertical" />;
-}`}</code></pre>
+        <Subheading>Vertical</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Vertical code'}
+          react={`import { PixelTabs } from '@pxlkit/ui-kit';
+import type { TabItem } from '@pxlkit/ui-kit';
+
+const ITEMS: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: <p>High-level summary of the project.</p> },
+  { id: 'activity', label: 'Activity', content: <p>Recent events and commits.</p> },
+  { id: 'settings', label: 'Settings', content: <p>Configuration for this workspace.</p> },
+];
+
+export function Vertical() {
+  return <PixelTabs items={ITEMS} defaultValue="overview" orientation="vertical" />;
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-vue';
+
+const items: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: () => h('p', 'High-level summary of the project.') },
+  { id: 'activity', label: 'Activity', content: () => h('p', 'Recent events and commits.') },
+  { id: 'settings', label: 'Settings', content: () => h('p', 'Configuration for this workspace.') },
+];
+</script>
+
+<template>
+  <PixelTabs :items="items" default-value="overview" orientation="vertical" />
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTabs],
+  template: \`
+    <pxl-tabs [items]="items()" defaultValue="overview" orientation="vertical" />
+    <ng-template #overview><p>High-level summary of the project.</p></ng-template>
+    <ng-template #activity><p>Recent events and commits.</p></ng-template>
+    <ng-template #settings><p>Configuration for this workspace.</p></ng-template>
+  \`,
+})
+export class Vertical {
+  private readonly overview = viewChild.required<TemplateRef<unknown>>('overview');
+  private readonly activity = viewChild.required<TemplateRef<unknown>>('activity');
+  private readonly settings = viewChild.required<TemplateRef<unknown>>('settings');
+  readonly items = computed<TabItem[]>(() => [
+    { id: 'overview', label: 'Overview', content: this.overview() },
+    { id: 'activity', label: 'Activity', content: this.activity() },
+    { id: 'settings', label: 'Settings', content: this.settings() },
+  ]);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-manual-activation">
-        <h4>Manual activation</h4>
-        <pre className="docs-code"><code>{`export function ManualActivation() {
+        <Subheading>Manual activation</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Manual activation code'}
+          react={`import { PixelTabs } from '@pxlkit/ui-kit';
+import type { TabItem } from '@pxlkit/ui-kit';
+
+const ITEMS: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: <p>High-level summary of the project.</p> },
+  { id: 'activity', label: 'Activity', content: <p>Recent events and commits.</p> },
+  { id: 'settings', label: 'Settings', content: <p>Configuration for this workspace.</p> },
+];
+
+export function ManualActivation() {
   return (
     <PixelTabs
       items={ITEMS}
-      defaultTab="overview"
+      defaultValue="overview"
       activationMode="manual"
       ariaLabel="Manual activation tabs"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-vue';
+
+const items: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: () => h('p', 'High-level summary of the project.') },
+  { id: 'activity', label: 'Activity', content: () => h('p', 'Recent events and commits.') },
+  { id: 'settings', label: 'Settings', content: () => h('p', 'Configuration for this workspace.') },
+];
+</script>
+
+<template>
+  <PixelTabs :items="items" default-value="overview" activation-mode="manual" aria-label="Manual activation tabs" />
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTabs],
+  template: \`
+    <pxl-tabs [items]="items()" defaultValue="overview" activationMode="manual" ariaLabel="Manual activation tabs" />
+    <ng-template #overview><p>High-level summary of the project.</p></ng-template>
+    <ng-template #activity><p>Recent events and commits.</p></ng-template>
+    <ng-template #settings><p>Configuration for this workspace.</p></ng-template>
+  \`,
+})
+export class ManualActivation {
+  private readonly overview = viewChild.required<TemplateRef<unknown>>('overview');
+  private readonly activity = viewChild.required<TemplateRef<unknown>>('activity');
+  private readonly settings = viewChild.required<TemplateRef<unknown>>('settings');
+  readonly items = computed<TabItem[]>(() => [
+    { id: 'overview', label: 'Overview', content: this.overview() },
+    { id: 'activity', label: 'Activity', content: this.activity() },
+    { id: 'settings', label: 'Settings', content: this.settings() },
+  ]);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelTabs } from '@pxlkit/ui-kit';
+import type { TabItem } from '@pxlkit/ui-kit';
+
+const ITEMS: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: <p>High-level summary of the project.</p> },
+  { id: 'activity', label: 'Activity', content: <p>Recent events and commits.</p> },
+  { id: 'settings', label: 'Settings', content: <p>Configuration for this workspace.</p> },
+];
+
+export function Surfaces() {
   return (
     <div className="grid grid-cols-1 gap-6">
-      <PixelTabs items={ITEMS} defaultTab="overview" surface="pixel" ariaLabel="Pixel tabs" />
-      <PixelTabs items={ITEMS} defaultTab="overview" surface="linear" ariaLabel="Linear tabs" />
+      <PixelTabs items={ITEMS} defaultValue="overview" surface="pixel" ariaLabel="Pixel tabs" />
+      <PixelTabs items={ITEMS} defaultValue="overview" surface="linear" ariaLabel="Linear tabs" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-vue';
+
+const items: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: () => h('p', 'High-level summary of the project.') },
+  { id: 'activity', label: 'Activity', content: () => h('p', 'Recent events and commits.') },
+  { id: 'settings', label: 'Settings', content: () => h('p', 'Configuration for this workspace.') },
+];
+</script>
+
+<template>
+  <div class="grid grid-cols-1 gap-6">
+    <PixelTabs :items="items" default-value="overview" surface="pixel" aria-label="Pixel tabs" />
+    <PixelTabs :items="items" default-value="overview" surface="linear" aria-label="Linear tabs" />
+  </div>
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTabs],
+  template: \`
+    <div class="grid grid-cols-1 gap-6">
+      <pxl-tabs [items]="items()" defaultValue="overview" surface="pixel" ariaLabel="Pixel tabs" />
+      <pxl-tabs [items]="items()" defaultValue="overview" surface="linear" ariaLabel="Linear tabs" />
+    </div>
+    <ng-template #overview><p>High-level summary of the project.</p></ng-template>
+    <ng-template #activity><p>Recent events and commits.</p></ng-template>
+    <ng-template #settings><p>Configuration for this workspace.</p></ng-template>
+  \`,
+})
+export class Surfaces {
+  private readonly overview = viewChild.required<TemplateRef<unknown>>('overview');
+  private readonly activity = viewChild.required<TemplateRef<unknown>>('activity');
+  private readonly settings = viewChild.required<TemplateRef<unknown>>('settings');
+  readonly items = computed<TabItem[]>(() => [
+    { id: 'overview', label: 'Overview', content: this.overview() },
+    { id: 'activity', label: 'Activity', content: this.activity() },
+    { id: 'settings', label: 'Settings', content: this.settings() },
+  ]);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-scrollable">
-        <h4>Scrollable</h4>
-        <pre className="docs-code"><code>{`export function Scrollable() {
+        <Subheading>Scrollable</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Scrollable code'}
+          react={`import { PixelTabs } from '@pxlkit/ui-kit';
+import type { TabItem } from '@pxlkit/ui-kit';
+
+const MANY: TabItem[] = Array.from({ length: 9 }, (_, i) => ({
+  id: \`tab-\${i + 1}\`,
+  label: \`Section \${i + 1}\`,
+  content: <p>Contents of section {i + 1}.</p>,
+}));
+
+export function Scrollable() {
   return (
     <div className="max-w-sm">
-      <PixelTabs items={MANY} defaultTab="tab-1" scrollable ariaLabel="Scrollable tabs" />
+      <PixelTabs items={MANY} defaultValue="tab-1" scrollable ariaLabel="Scrollable tabs" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-vue';
+
+const many: TabItem[] = Array.from({ length: 9 }, (_, i) => ({
+  id: \`tab-\${i + 1}\`,
+  label: \`Section \${i + 1}\`,
+  content: () => h('p', \`Contents of section \${i + 1}.\`),
+}));
+</script>
+
+<template>
+  <div class="max-w-sm">
+    <PixelTabs :items="many" default-value="tab-1" scrollable aria-label="Scrollable tabs" />
+  </div>
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTabs],
+  template: \`
+    <div class="max-w-sm">
+      <pxl-tabs [items]="many()" defaultValue="tab-1" scrollable ariaLabel="Scrollable tabs" />
+    </div>
+    <ng-template #section let-item><p>Contents of section {{ item.id.slice(4) }}.</p></ng-template>
+  \`,
+})
+export class Scrollable {
+  private readonly section = viewChild.required<TemplateRef<{ $implicit: TabItem }>>('section');
+  readonly many = computed<TabItem[]>(() =>
+    Array.from({ length: 9 }, (_, i) => ({ id: \`tab-\${i + 1}\`, label: \`Section \${i + 1}\`, content: this.section() })),
+  );
+}`}
+        />
       </article>
       <article className="docs-example" id="example-keep-mounted">
-        <h4>Keep mounted</h4>
-        <pre className="docs-code"><code>{`export function KeepMounted() {
+        <Subheading>Keep mounted</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Keep mounted code'}
+          react={`import { PixelTabs } from '@pxlkit/ui-kit';
+import type { TabItem } from '@pxlkit/ui-kit';
+
+const ITEMS: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: <p>High-level summary of the project.</p> },
+  { id: 'activity', label: 'Activity', content: <p>Recent events and commits.</p> },
+  { id: 'settings', label: 'Settings', content: <p>Configuration for this workspace.</p> },
+];
+
+export function KeepMounted() {
   return (
     <PixelTabs
       items={ITEMS}
-      defaultTab="overview"
+      defaultValue="overview"
       keepMounted
       ariaLabel="Persistent panels"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-vue';
+
+const items: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: () => h('p', 'High-level summary of the project.') },
+  { id: 'activity', label: 'Activity', content: () => h('p', 'Recent events and commits.') },
+  { id: 'settings', label: 'Settings', content: () => h('p', 'Configuration for this workspace.') },
+];
+</script>
+
+<template>
+  <PixelTabs :items="items" default-value="overview" keep-mounted aria-label="Persistent panels" />
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTabs],
+  template: \`
+    <pxl-tabs [items]="items()" defaultValue="overview" keepMounted ariaLabel="Persistent panels" />
+    <ng-template #overview><p>High-level summary of the project.</p></ng-template>
+    <ng-template #activity><p>Recent events and commits.</p></ng-template>
+    <ng-template #settings><p>Configuration for this workspace.</p></ng-template>
+  \`,
+})
+export class KeepMounted {
+  private readonly overview = viewChild.required<TemplateRef<unknown>>('overview');
+  private readonly activity = viewChild.required<TemplateRef<unknown>>('activity');
+  private readonly settings = viewChild.required<TemplateRef<unknown>>('settings');
+  readonly items = computed<TabItem[]>(() => [
+    { id: 'overview', label: 'Overview', content: this.overview() },
+    { id: 'activity', label: 'Activity', content: this.activity() },
+    { id: 'settings', label: 'Settings', content: this.settings() },
+  ]);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-compositional">
-        <h4>Compositional</h4>
-        <pre className="docs-code"><code>{`export function Compositional() {
+        <Subheading>Compositional</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Compositional code'}
+          react={`import { PixelTabs } from '@pxlkit/ui-kit';
+
+export function Compositional() {
   return (
-    <PixelTabs defaultTab="one">
+    <PixelTabs defaultValue="one">
       <PixelTabs.List ariaLabel="Compositional tabs">
         <PixelTabs.Trigger value="one">One</PixelTabs.Trigger>
         <PixelTabs.Trigger value="two">Two</PixelTabs.Trigger>
@@ -208,15 +806,51 @@ export function Default() {
       <PixelTabs.Panel value="three">Third panel.</PixelTabs.Panel>
     </PixelTabs>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTabs, PixelTabsList, PixelTabsPanel, PixelTabsTrigger } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTabs default-value="one">
+    <PixelTabsList aria-label="Compositional tabs">
+      <PixelTabsTrigger value="one">One</PixelTabsTrigger>
+      <PixelTabsTrigger value="two">Two</PixelTabsTrigger>
+      <PixelTabsTrigger value="three">Three</PixelTabsTrigger>
+    </PixelTabsList>
+    <PixelTabsPanel value="one">First panel.</PixelTabsPanel>
+    <PixelTabsPanel value="two">Second panel.</PixelTabsPanel>
+    <PixelTabsPanel value="three">Third panel.</PixelTabsPanel>
+  </PixelTabs>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTabs, PixelTabsList, PixelTabsPanel, PixelTabsTrigger } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTabs, PixelTabsList, PixelTabsTrigger, PixelTabsPanel],
+  template: \`
+    <pxl-tabs defaultValue="one">
+      <pxl-tabs-list ariaLabel="Compositional tabs">
+        <button pxlTabsTrigger value="one">One</button>
+        <button pxlTabsTrigger value="two">Two</button>
+        <button pxlTabsTrigger value="three">Three</button>
+      </pxl-tabs-list>
+      <pxl-tabs-panel value="one">First panel.</pxl-tabs-panel>
+      <pxl-tabs-panel value="two">Second panel.</pxl-tabs-panel>
+      <pxl-tabs-panel value="three">Third panel.</pxl-tabs-panel>
+    </pxl-tabs>
+  \`,
+})
+export class Compositional {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-accordion">PixelAccordion</a></li>
-        <li><a href="#pixel-segmented">PixelSegmented</a></li>
-        <li><a href="#pixel-stepper">PixelStepper</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-accordion' : '#pixel-accordion'}>PixelAccordion</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-segmented' : '#pixel-segmented'}>PixelSegmented</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stepper' : '#pixel-stepper'}>PixelStepper</a></li>
       </ul>
     </section>
     </section>

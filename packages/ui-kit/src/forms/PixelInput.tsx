@@ -2,10 +2,19 @@
    PixelInput — single-line text input with label/hint/error, icon slot.
    ───────────────────────────────────────────────────────────────────────── */
 
-import React, { forwardRef, useId, useState } from 'react';
+import React, { forwardRef, useCallback, useId, useRef, useState } from 'react';
+import {
+  characterCountClasses,
+  characterCountText,
+  fieldDescribedBy,
+  fieldMessageId,
+  inputClasses,
+  inputControlClasses,
+  showCountMax,
+} from '@pxlkit/ui-kit-core';
 import {
   Tone, Size, Surface, cn,
-  toneMap, focusRing, inputBase, sizeHeight, surfaceClasses, useEffectiveSurface,
+  useEffectiveSurface,
   CloseIcon, FieldShell,
 } from '../common';
 import { getStringLength } from './_internal/getStringLength';
@@ -44,18 +53,6 @@ export interface PixelInputProps extends Omit<React.InputHTMLAttributes<HTMLInpu
   loading?: boolean;
 }
 
-function InputSpinner({ className }: { className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={cn(
-        'inline-block h-3 w-3 animate-spin border-2 border-retro-muted border-t-transparent rounded-full',
-        className,
-      )}
-    />
-  );
-}
-
 export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function PixelInput(
   {
     label, hint, error,
@@ -75,12 +72,12 @@ export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function
     defaultValue,
     onChange,
     disabled,
+    'aria-describedby': ariaDescribedBy,
     ...rest
   },
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
 
   const reactId = useId();
   const inputId = rest.id ?? `pxl-input-${reactId}`;
@@ -92,9 +89,29 @@ export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function
   const currentValue = isControlled ? (value as string | number) : internalValue;
   const valueLen = getStringLength(currentValue);
 
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const setRefs = useCallback(
+    (node: HTMLInputElement | null) => {
+      inputRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = node;
+    },
+    [ref],
+  );
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isControlled) setInternalValue(e.target.value);
     onChange?.(e);
+  };
+
+  const handleClear = () => {
+    if (!isControlled) {
+      // The native input owns an uncontrolled value: empty it too, not only
+      // the length that drives the counter and this button.
+      if (inputRef.current) inputRef.current.value = '';
+      setInternalValue('');
+    }
+    onClear?.();
   };
 
   // Resolve the effective left/right *inside-shell* slots.
@@ -102,119 +119,72 @@ export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function
   const leftInside = prefix ?? icon ?? null;
   const isLoading = !!loading;
   const showClear = !!clearable && valueLen > 0 && !disabled && !isLoading;
-  const rightInside = isLoading ? <InputSpinner /> : suffix ?? null;
+  const c = inputClasses(surface, size);
+  const rightInside = isLoading ? <span aria-hidden className={c.spinner} /> : suffix ?? null;
 
-  // Padding decisions based on which slots are filled.
-  // Reserve ~2.5rem (pl-10/pr-10) per occupied side; both clear+suffix share the right side.
-  const hasLeft = !!leftInside;
-  const padLeft = hasLeft ? 'pl-10' : 'pl-3';
-  // If both clear and (suffix OR loading) live on the right we widen padding further.
-  const rightSlots = (rightInside ? 1 : 0) + (showClear ? 1 : 0);
-  const padRight = rightSlots === 0 ? 'pr-3' : rightSlots === 1 ? 'pr-10' : 'pr-16';
-
-  const max =
-    typeof showCount === 'object' && showCount !== null && typeof showCount.max === 'number'
-      ? showCount.max
-      : undefined;
-  const countText = max !== undefined ? `${valueLen}/${max}` : `${valueLen}`;
+  const max = showCountMax(showCount);
 
   const inputEl = (
-    <span className="relative block w-full min-w-0">
-      {leftInside && (
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-retro-muted shrink-0">
-          {leftInside}
-        </span>
-      )}
+    <span className={c.shell}>
+      {leftInside && <span className={c.leading}>{leftInside}</span>}
       <input
         id={inputId}
-        ref={ref}
+        ref={setRefs}
         aria-invalid={error ? true : undefined}
-        aria-describedby={error || hint ? `${inputId}-msg` : undefined}
+        aria-describedby={fieldDescribedBy(inputId, { hint, error }, ariaDescribedBy)}
         value={isControlled ? (value as string | number) : undefined}
         defaultValue={!isControlled ? defaultValue : undefined}
         onChange={handleChange}
         disabled={disabled || isLoading}
         maxLength={max ?? (rest as { maxLength?: number }).maxLength}
         className={cn(
-          inputBase, s.font, s.border, s.radius, s.transition,
-          sizeHeight[size], focusRing, toneMap[tone].ring,
-          error ? 'border-retro-red/60' : 'border-retro-border-strong',
-          padLeft, padRight,
-          // When wrapped by addons, kill the rounded corners on the joined edges
-          // so the group reads as a single control.
-          addonLeft ? 'rounded-l-none' : undefined,
-          addonRight ? 'rounded-r-none' : undefined,
+          inputControlClasses(surface, {
+            tone,
+            size,
+            invalid: !!error,
+            leading: !!leftInside,
+            trailing: isLoading || !!suffix,
+            clearButton: showClear,
+            addonLeft: !!addonLeft,
+            addonRight: !!addonRight,
+          }),
           className,
         )}
         {...rest}
       />
       {(showClear || rightInside) && (
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 text-retro-muted">
+        <span className={c.trailing}>
           {showClear && (
             <button
               type="button"
               tabIndex={-1}
               aria-label="Clear input"
-              onClick={() => {
-                if (!isControlled) setInternalValue('');
-                onClear?.();
-              }}
-              className="inline-flex items-center justify-center text-retro-muted hover:text-retro-text"
+              onClick={handleClear}
+              className={c.clearButton}
             >
-              <CloseIcon className="h-3 w-3" />
+              <CloseIcon className={c.clearIcon} />
             </button>
           )}
-          {rightInside && (
-            <span className={cn('pointer-events-none inline-flex items-center justify-center shrink-0', s.font)}>
-              {rightInside}
-            </span>
-          )}
+          {rightInside && <span className={c.suffix}>{rightInside}</span>}
         </span>
       )}
     </span>
   );
 
   const shellBody = (addonLeft || addonRight) ? (
-    <span className="flex w-full items-stretch">
-      {addonLeft && (
-        <span
-          className={cn(
-            'inline-flex items-center bg-retro-surface/60 px-3 text-retro-muted shrink-0',
-            s.font, s.border, s.radius, sizeHeight[size],
-            'border-retro-border-strong rounded-r-none border-r-0',
-          )}
-        >
-          {addonLeft}
-        </span>
-      )}
+    <span className={c.addons}>
+      {addonLeft && <span className={c.addonLeft}>{addonLeft}</span>}
       {inputEl}
-      {addonRight && (
-        <span
-          className={cn(
-            'inline-flex items-center bg-retro-surface/60 px-3 text-retro-muted shrink-0',
-            s.font, s.border, s.radius, sizeHeight[size],
-            'border-retro-border-strong rounded-l-none border-l-0',
-          )}
-        >
-          {addonRight}
-        </span>
-      )}
+      {addonRight && <span className={c.addonRight}>{addonRight}</span>}
     </span>
   ) : inputEl;
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId} messageId={fieldMessageId(inputId)}>
       {shellBody}
       {showCount && (
-        <span
-          aria-live="polite"
-          className={cn(
-            'block text-right text-[10px] text-retro-muted',
-            s.font,
-            max !== undefined && valueLen > max && 'text-retro-red',
-          )}
-        >
-          {countText}
+        <span aria-live="polite" className={characterCountClasses(surface, valueLen, max)}>
+          {characterCountText(valueLen, max)}
         </span>
       )}
     </FieldShell>

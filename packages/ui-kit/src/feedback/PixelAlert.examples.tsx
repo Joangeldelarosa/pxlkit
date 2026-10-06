@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelAlert } from '../feedback';
 import { PixelButton } from '../actions';
 

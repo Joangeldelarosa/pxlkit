@@ -123,4 +123,57 @@ describe('PixelAlertDialog', () => {
       expect(onOpenChange).toHaveBeenCalledWith(false);
     });
   });
+
+  // Regression: the linear surface's spinner kept spinning under
+  // prefers-reduced-motion while the pixel one stopped.
+  it('stops the pending spinner when the user prefers reduced motion, on every surface', async () => {
+    const original = window.matchMedia;
+    const list = { matches: true, media: '', addEventListener: vi.fn(), removeEventListener: vi.fn() };
+    window.matchMedia = vi.fn().mockReturnValue(list) as unknown as typeof window.matchMedia;
+    try {
+      for (const surface of ['pixel', 'linear'] as const) {
+        const { getByText, unmount } = render(
+          <PixelAlertDialog
+            open
+            onOpenChange={() => {}}
+            title="Submit?"
+            actionLabel="Submit"
+            surface={surface}
+            onAction={() => new Promise<void>(() => {})}
+          />,
+        );
+        fireEvent.click(getByText('Submit'));
+        const spinner = await waitFor(() => {
+          const node = getByText('Submit').closest('button')!.querySelector('span[aria-hidden]');
+          expect(node).not.toBeNull();
+          return node!;
+        });
+        expect(spinner.className).not.toMatch(/animate-spin/);
+        unmount();
+      }
+    } finally {
+      window.matchMedia = original;
+    }
+  });
+
+  it('shows what its parent passes: a refused cancel or confirmation keeps it open, until the parent closes it', () => {
+    const onOpenChange = vi.fn();
+    const onAction = vi.fn();
+    const dialog = (open: boolean) => (
+      <PixelAlertDialog open={open} onOpenChange={onOpenChange} title="Delete file?" onAction={onAction} />
+    );
+    const { rerender, getByRole, queryByRole } = render(dialog(true));
+    fireEvent.click(getByRole('button', { name: 'Cancel' }));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.click(document.querySelector('[data-pxl-overlay-backdrop]')!);
+    fireEvent.click(getByRole('button', { name: 'Confirm' }));
+    expect(onOpenChange.mock.calls).toEqual([[false], [false], [false], [false]]);
+    expect(onAction).toHaveBeenCalledTimes(1);
+    expect(queryByRole('alertdialog')).toBeTruthy();
+    expect(document.body.style.overflow).toBe('hidden');
+    rerender(dialog(false));
+    expect(queryByRole('alertdialog')).toBeNull();
+    rerender(dialog(true));
+    expect(queryByRole('alertdialog')).toBeTruthy();
+  });
 });

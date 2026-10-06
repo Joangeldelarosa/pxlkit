@@ -13,7 +13,7 @@ export default defineManifest({
     'Mount, hover, click, or in-view triggers',
     'Configurable duration, delay, distance, easing, and fill-mode',
     'Iteration count supports finite or infinite repeats',
-    'Respects prefers-reduced-motion via useReducedMotion',
+    'Respects prefers-reduced-motion automatically',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

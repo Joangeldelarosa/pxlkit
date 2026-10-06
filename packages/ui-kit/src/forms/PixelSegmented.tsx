@@ -3,9 +3,10 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React, { forwardRef } from 'react';
+import { segmentClasses, segmentedClasses, segmentedGroupName } from '@pxlkit/ui-kit-core';
 import {
-  Tone, Surface, Option, cn,
-  toneMap, focusRing, surfaceClasses, useEffectiveSurface,
+  Tone, Surface, Option,
+  useEffectiveSurface,
 } from '../common';
 
 /** Public prop bag for {@link PixelSegmented}. */
@@ -44,16 +45,16 @@ export const PixelSegmented = forwardRef<HTMLDivElement, PixelSegmentedProps>(fu
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const groupName = ariaLabel || label || undefined;
+  const c = segmentedClasses(surface, disabled);
+  const groupName = segmentedGroupName(ariaLabel, label);
   return (
-    <div ref={ref} className={cn('space-y-1.5', disabled && 'opacity-50 cursor-not-allowed')}>
+    <div ref={ref} className={c.root}>
       {name && <input type="hidden" name={name} value={value} required={required} />}
-      {label && <p className={cn('text-xs text-retro-muted', s.font)}>{label}</p>}
+      {label && <p className={c.label}>{label}</p>}
       <div
         role={groupName ? 'group' : undefined}
         aria-label={groupName}
-        className={cn('inline-flex max-w-full overflow-x-auto bg-retro-surface/50 p-0.5', s.border, s.radius, 'border-retro-border-strong/60')}
+        className={c.track}
       >
         {options.map((opt) => {
           const isActive = value === opt.value;
@@ -64,15 +65,7 @@ export const PixelSegmented = forwardRef<HTMLDivElement, PixelSegmentedProps>(fu
               aria-pressed={isActive}
               aria-disabled={disabled}
               disabled={disabled}
-              className={cn(
-                'px-3 py-1.5 text-xs outline-none whitespace-nowrap',
-                s.font, s.radius, s.transition,
-                focusRing, toneMap[tone].ring,
-                isActive
-                  ? cn(toneMap[tone].bg, toneMap[tone].text, 'border border-transparent shadow-sm')
-                  : 'border border-transparent text-retro-muted hover:text-retro-text',
-                disabled && 'cursor-not-allowed',
-              )}
+              className={segmentClasses(surface, { tone, active: isActive, disabled })}
               onClick={() => !disabled && onChange(opt.value)}
             >
               {opt.label}

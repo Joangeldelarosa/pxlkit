@@ -170,3 +170,116 @@ describe('PixelMenubar', () => {
     expect(onQuit).not.toHaveBeenCalled();
   });
 });
+
+describe('PixelMenubar — focus and keyboard (WAI-ARIA menubar)', () => {
+  const key = (name: string) => fireEvent.keyDown(document.activeElement!, { key: name });
+  const highlighted = () => document.getElementById(document.activeElement!.getAttribute('aria-activedescendant')!);
+
+  it('moves focus into the open menu, which points aria-activedescendant at the highlighted item', () => {
+    const { getByText, getByRole } = render(<PixelMenubar menus={makeMenus()} />);
+    fireEvent.click(getByText('File'));
+    expect(document.activeElement).toBe(getByRole('menu'));
+    expect(highlighted()?.textContent).toContain('New File');
+    key('ArrowDown');
+    expect(highlighted()?.textContent).toContain('Open…');
+    // Separators and disabled items are skipped, and the highlight wraps round.
+    key('ArrowDown');
+    expect(highlighted()?.textContent).toContain('New File');
+  });
+
+  it('enters a submenu from the keyboard and activates its items', () => {
+    const onPasteImage = vi.fn();
+    const { getByText, queryByText } = render(
+      <PixelMenubar menus={makeMenus(vi.fn(), vi.fn(), vi.fn(), vi.fn(), onPasteImage)} />,
+    );
+    fireEvent.click(getByText('Edit'));
+    key('ArrowDown');
+    key('ArrowRight');
+    expect(highlighted()?.textContent).toBe('Paste as Text');
+    key('ArrowDown');
+    expect(highlighted()?.textContent).toBe('Paste as Image');
+    key('Enter');
+    expect(onPasteImage).toHaveBeenCalledTimes(1);
+    expect(queryByText('Copy')).toBeNull();
+    expect(document.activeElement).toBe(getByText('Edit'));
+  });
+
+  it('closes an open submenu with Escape, then the menu, with focus back on its button', () => {
+    const { getByText, queryByText, getByRole } = render(<PixelMenubar menus={makeMenus()} />);
+    fireEvent.click(getByText('Edit'));
+    key('ArrowDown');
+    key('Enter');
+    expect(getByText('Paste as Text')).toBeTruthy();
+    key('Escape');
+    expect(queryByText('Paste as Text')).toBeNull();
+    expect(document.activeElement).toBe(getByRole('menu'));
+    expect(highlighted()?.textContent).toContain('Paste');
+    key('Escape');
+    expect(queryByText('Copy')).toBeNull();
+    expect(document.activeElement).toBe(getByText('Edit'));
+  });
+
+  it('opens a closed menu on its first item with ArrowDown and on its last with ArrowUp', () => {
+    const { getByText } = render(<PixelMenubar menus={makeMenus()} />);
+    getByText('File').focus();
+    key('ArrowDown');
+    expect(highlighted()?.textContent).toContain('New File');
+    key('Escape');
+    expect(document.activeElement).toBe(getByText('File'));
+    key('ArrowUp');
+    // Quit, the last item, is disabled.
+    expect(highlighted()?.textContent).toContain('Open…');
+  });
+
+  it('switches from the focused button while every menu is closed', () => {
+    const { getByText } = render(<PixelMenubar menus={makeMenus()} />);
+    getByText('View').focus();
+    key('ArrowRight');
+    expect(getByText('File').getAttribute('aria-expanded')).toBe('true');
+    expect(getByText('New File')).toBeTruthy();
+  });
+
+  it('closes the open menu on Tab with focus back on its button, for the browser to move on from', () => {
+    const { getByText, queryByText } = render(<PixelMenubar menus={makeMenus()} />);
+    fireEvent.click(getByText('File'));
+    const tab = fireEvent.keyDown(document.activeElement!, { key: 'Tab' });
+    expect(tab).toBe(true);
+    expect(queryByText('New File')).toBeNull();
+    expect(document.activeElement).toBe(getByText('File'));
+  });
+
+  it('keeps its one tab stop on the button last used, so Shift+Tab out of a menu leaves the menubar', () => {
+    const { getByText } = render(<PixelMenubar menus={makeMenus()} />);
+    const tabStops = () =>
+      ['File', 'Edit', 'View'].filter((label) => getByText(label).getAttribute('tabindex') === '0');
+    expect(tabStops()).toEqual(['File']);
+    fireEvent.click(getByText('View'));
+    fireEvent.keyDown(document.activeElement!, { key: 'Tab', shiftKey: true });
+    // Back on its button, the only tab stop: the browser moves on out of the menubar.
+    expect(document.activeElement).toBe(getByText('View'));
+    expect(tabStops()).toEqual(['View']);
+    act(() => getByText('Edit').focus());
+    expect(tabStops()).toEqual(['Edit']);
+  });
+
+  it('returns focus to the button when an item is chosen with the pointer', () => {
+    const onNew = vi.fn();
+    const { getByText } = render(<PixelMenubar menus={makeMenus(onNew)} />);
+    fireEvent.click(getByText('File'));
+    const item = getByText('New File').closest<HTMLElement>('[role="menuitem"]')!;
+    item.focus();
+    fireEvent.click(item);
+    expect(onNew).toHaveBeenCalledTimes(1);
+    expect(document.activeElement).toBe(getByText('File'));
+  });
+
+  it('highlights submenu items under the pointer', () => {
+    const { getByText, getByRole } = render(<PixelMenubar menus={makeMenus()} />);
+    fireEvent.click(getByText('Edit'));
+    fireEvent.mouseEnter(getByText('Paste'));
+    fireEvent.mouseEnter(getByText('Paste as Image'));
+    expect(getByRole('menu', { name: 'Edit' }).getAttribute('aria-activedescendant')).toBe(
+      getByText('Paste as Image').closest('[role="menuitem"]')!.id,
+    );
+  });
+});

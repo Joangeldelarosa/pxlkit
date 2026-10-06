@@ -1,16 +1,16 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit" width="480" />
+  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit voxel toolkit — early preview" width="480" />
 </p>
 
 <h1 align="center">@pxlkit/voxel</h1>
 
 <p align="center">
-  <strong>Voxel engine for Pxlkit.</strong><br/>
+  <strong>Voxel toolkit for Pxlkit — early preview, not yet on npm.</strong><br/>
   Convert 2D pixel art icons into 3D voxel data — designed for use with React Three Fiber and other 3D rendering engines.
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@pxlkit/voxel"><img src="https://img.shields.io/npm/v/@pxlkit/voxel?color=blue" alt="npm version" /></a>
+  <img src="https://img.shields.io/badge/npm-not%20yet%20published-lightgrey" alt="Not yet published to npm" />
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE-CODE"><img src="https://img.shields.io/badge/license-MIT-22c55e.svg" alt="MIT License" /></a>
   <img src="https://img.shields.io/badge/status-early%20preview-orange" alt="Early preview" />
 </p>
@@ -26,19 +26,24 @@
 - **Types** — `Voxel`, `VoxelData`, `VoxelConvertOptions` for typed voxel workflows
 - **`VoxelBomb`** — A sample voxel icon
 
-> ⚠️ **Early preview** — This package is in active development (v0.x). The API may change in future releases.
+> ⚠️ **Early preview, not yet published to npm.** This package is in active development (version 0.1.5, in this repository). The API may change before its first release.
 
 ## Live procedural-world engine
 
-The chunk-streaming city engine you can fly through at **[pxlkit.xyz/explore](https://pxlkit.xyz/explore)** is *not* part of the published v0.1.x package — it lives in [`apps/web/src/components/procedural-terrain/`](https://github.com/joangeldelarosa/pxlkit/tree/main/apps/web/src/components/procedural-terrain) and ships with biomes, continents, day/night cycles, highways, tunnels and a Game HUD built on `@pxlkit/ui-kit`. The plan for v1 is to promote those modules into this package so consumers can `npm install @pxlkit/voxel` and get the full engine.
+The chunk-streaming city engine you can fly through at **[pxlkit.xyz/explore](https://pxlkit.xyz/explore)** is *not* part of this package yet — it lives in [`apps/web/src/components/procedural-terrain/`](https://github.com/joangeldelarosa/pxlkit/tree/main/apps/web/src/components/procedural-terrain) and ships with biomes, continents, day/night cycles, highways, tunnels and a Game HUD built on `@pxlkit/ui-kit`. The plan for v1 is to promote those modules into this package and publish it, so consumers can `npm install @pxlkit/voxel` and get the full engine.
 
 ## Installation
 
+`@pxlkit/voxel` is not on npm yet. In this repository it is a workspace package — the showcase app imports it as `@pxlkit/voxel`:
+
 ```bash
-npm install @pxlkit/core @pxlkit/voxel
+git clone https://github.com/Joangeldelarosa/pxlkit.git
+cd pxlkit
+npm install
+npm run build --workspace=@pxlkit/voxel
 ```
 
-> `@pxlkit/core` is required as a dependency.
+> It depends on `@pxlkit/core` for the icon types.
 
 ## Quick Start
 
@@ -96,7 +101,7 @@ import { VoxelBomb } from '@pxlkit/voxel';
 
 ## Documentation
 
-Learn more about the Pxlkit ecosystem at **[pxlkit.xyz](https://pxlkit.xyz)**.
+Fly through the procedural-world demo at **[pxlkit.xyz/explore](https://pxlkit.xyz/explore)**; the rest of the Pxlkit ecosystem is at [pxlkit.xyz](https://pxlkit.xyz).
 
 ## License
 

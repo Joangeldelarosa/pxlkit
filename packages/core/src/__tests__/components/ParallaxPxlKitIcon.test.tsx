@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import { render, fireEvent, act } from '@testing-library/react';
 import { ParallaxPxlKitIcon } from '../../components/ParallaxPxlKitIcon';
 import { testParallaxIcon } from '../fixtures';
 import type { ParallaxPxlKitData } from '../../types';
@@ -61,6 +61,23 @@ describe('ParallaxPxlKitIcon', () => {
     );
     const wrapper = container.firstChild as HTMLElement;
     expect(wrapper.getAttribute('aria-label')).toBe('My 3D Icon');
+    expect(wrapper.hasAttribute('aria-hidden')).toBe(false);
+  });
+
+  it('decorative hides the container and empties the alt of every layer', () => {
+    const icon: ParallaxPxlKitData = {
+      ...testParallaxIcon,
+      layers: [...testParallaxIcon.layers, { icon: testAnimatedIcon, depth: 1 }],
+    };
+    const { container } = render(
+      <ParallaxPxlKitIcon icon={icon} decorative aria-label="My 3D Icon" />
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper.getAttribute('aria-hidden')).toBe('true');
+    expect(wrapper.hasAttribute('role')).toBe(false);
+    expect(wrapper.hasAttribute('aria-label')).toBe(false);
+    const alts = Array.from(container.querySelectorAll('img'), (img) => img.getAttribute('alt'));
+    expect(alts).toEqual(['', '', '', '']);
   });
 
   it('applies size prop to container dimensions', () => {
@@ -199,5 +216,100 @@ describe('ParallaxPxlKitIcon', () => {
       fireEvent.mouseMove(wrapper, { clientX: 50, clientY: 50 });
       fireEvent.mouseLeave(wrapper);
     }).not.toThrow();
+  });
+});
+
+describe('ParallaxPxlKitIcon — click burst and motion (shared parallax controller)', () => {
+  let now = 0;
+  let frames: FrameRequestCallback[] = [];
+
+  beforeEach(() => {
+    // jsdom has no canvas: hand the particle renderer a context that draws nothing.
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(
+      (() => ({ clearRect() {}, fillRect() {}, globalAlpha: 1, fillStyle: '' })) as unknown as HTMLCanvasElement['getContext'],
+    );
+    now = 0;
+    frames = [];
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+      frames.push(cb);
+      return frames.length;
+    });
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  function step(count: number) {
+    for (let i = 0; i < count; i++) {
+      now += 16;
+      const due = frames.splice(0);
+      act(() => due.forEach((cb) => cb(now)));
+    }
+  }
+
+  function layerTransforms(container: HTMLElement): string[] {
+    const scene = (container.firstChild as HTMLElement).children[0] as HTMLElement;
+    return Array.from(scene.children).map((layer) => (layer as HTMLElement).style.transform);
+  }
+
+  it('peels the layers apart, explodes on click and springs back', () => {
+    const { container } = render(<ParallaxPxlKitIcon icon={testParallaxIcon} layerGap={20} />);
+    expect(layerTransforms(container)).toEqual(['translateZ(0px)', 'translateZ(0px)', 'translateZ(0px)']);
+
+    step(60);
+    const resting = ['translateZ(-20px)', 'translateZ(0px)', 'translateZ(20px)'];
+    expect(layerTransforms(container)).toEqual(resting);
+
+    fireEvent.click(container.firstChild as HTMLElement);
+    step(1);
+    expect(Number(/-?[\d.]+/.exec(layerTransforms(container)[0])![0])).toBeLessThan(-40);
+
+    // Before the shared controller the stack stayed exploded until the next re-render.
+    step(200);
+    expect(layerTransforms(container)).toEqual(resting);
+  });
+
+  it('toggles the active hue-shift and reports it through onActivate', () => {
+    const onActivate = vi.fn();
+    const { container } = render(<ParallaxPxlKitIcon icon={testParallaxIcon} onActivate={onActivate} />);
+    const root = container.firstChild as HTMLElement;
+    const scene = root.children[0] as HTMLElement;
+
+    fireEvent.click(root);
+    expect(onActivate).toHaveBeenLastCalledWith(true);
+    expect(scene.style.filter).toBe('hue-rotate(30deg) saturate(1.3)');
+
+    fireEvent.click(root);
+    expect(onActivate).toHaveBeenLastCalledWith(false);
+    expect(scene.style.filter).toBe('');
+  });
+
+  it('is inert when interactive is false: no canvas, no pointer, no activation', () => {
+    const onActivate = vi.fn();
+    const { container } = render(
+      <ParallaxPxlKitIcon icon={testParallaxIcon} interactive={false} onActivate={onActivate} />,
+    );
+    const root = container.firstChild as HTMLElement;
+    expect(container.querySelector('canvas')).toBeNull();
+    expect(root.style.cursor).toBe('');
+    fireEvent.click(root);
+    expect(onActivate).not.toHaveBeenCalled();
+  });
+
+  it('renders a size×size particle canvas when interactive', () => {
+    const { container } = render(<ParallaxPxlKitIcon icon={testParallaxIcon} size={96} />);
+    const canvas = container.querySelector('canvas')!;
+    expect(canvas.getAttribute('width')).toBe('96');
+    expect(canvas.getAttribute('height')).toBe('96');
+    expect(canvas.style.pointerEvents).toBe('none');
+  });
+
+  it('stops animating once unmounted', () => {
+    const { unmount } = render(<ParallaxPxlKitIcon icon={testParallaxIcon} />);
+    unmount();
+    expect(window.cancelAnimationFrame).toHaveBeenCalled();
   });
 });

@@ -17,6 +17,17 @@ describe('PixelEqualHeightGrid', () => {
     expect(el.className).toContain('items-stretch');
   });
 
+  it('keeps items at their own height when aligned to the top, with no stretch class left', () => {
+    const { getByTestId } = render(
+      <PixelEqualHeightGrid data-testid="grid" cols={3} rowAlign="top">
+        <div>a</div>
+      </PixelEqualHeightGrid>,
+    );
+    const classes = getByTestId('grid').className.split(' ');
+    expect(classes).toContain('items-start');
+    expect(classes).not.toContain('items-stretch');
+  });
+
   it('each direct child has grid-rows-[auto_1fr_auto] class', () => {
     const { getByTestId } = render(
       <PixelEqualHeightGrid data-testid="grid" cols={3}>

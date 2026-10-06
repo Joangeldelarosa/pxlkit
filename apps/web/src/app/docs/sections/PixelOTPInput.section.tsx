@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelOTPInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelOTPInputDocsMeta = {
@@ -17,10 +23,107 @@ export const PixelOTPInputDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSectionProps): React.ReactElement {
+/** PixelOTPInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelOTPInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelOTPInput',
+        props: [
+          { name: 'length', type: 'number', default: '6', description: 'Number of cells.' },
+          { name: 'value', type: 'string', description: 'Code; leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial code while uncontrolled.' },
+          { name: 'onChange', type: '(next: string) => void', description: 'Called with the new code, after every edit.' },
+          { name: 'onComplete', type: '(full: string) => void', description: 'Called with the code each time it comes to fill every cell.' },
+          { name: 'mask', type: 'boolean', default: 'false', description: 'Hides the characters, as a password field does.' },
+          { name: 'variant', type: "'numeric' | 'alphanumeric'", description: 'Canonical structural variant.' },
+          { name: 'type', type: "'numeric' | 'alphanumeric'", deprecated: 'Use `variant` instead. Retained as alias for one minor.' },
+          { name: 'autoFocus', type: 'boolean', default: 'false', description: 'Focuses the first cell once mounted.' },
+          { name: 'separator', type: 'React.ReactNode', description: 'Shown between two cells, hidden from assistive technology.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Cell size.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the code.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every cell.' },
+        ],
+        notes: [
+          '`ref` points to `<input>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelOTPInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelOTPInput',
+        props: [
+          { name: 'length', type: 'number', default: '6', description: 'Number of cells.' },
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Code (`v-model`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial code while uncontrolled.' },
+          { name: 'mask', type: 'boolean', default: 'false', description: 'Hides the characters, as a password field does.' },
+          { name: 'variant', type: "'numeric' | 'alphanumeric'", description: 'Characters the cells accept: digits (`numeric`), or digits and letters (`alphanumeric`).' },
+          { name: 'type', type: "'numeric' | 'alphanumeric'", deprecated: 'Use `variant`.' },
+          { name: 'autoFocus', type: 'boolean', default: 'false', description: 'Focuses the first cell once mounted.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Cell size.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the code.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every cell.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The new code, after every edit.' },
+          { name: 'complete', payload: 'value: string', description: 'The code, each time it comes to fill every cell.' },
+        ],
+        slots: [
+          { name: 'separator', description: 'Shown between two cells, hidden from assistive technology.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+          'Its template ref exposes `element`: the first cell.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelOTPInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelOTPInput',
+        selector: 'pxl-otp-input',
+        props: [
+          { name: 'length', type: 'number', default: '6', accepts: 'unknown', description: 'Number of cells.' },
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Code (`[(value)]`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial code while uncontrolled.' },
+          { name: 'mask', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Hides the characters, as a password field does.' },
+          { name: 'variant', type: "'numeric' | 'alphanumeric'", description: 'Characters the cells accept: digits (`numeric`), or digits and letters (`alphanumeric`).' },
+          { name: 'type', type: "'numeric' | 'alphanumeric'", deprecated: 'Use `variant`.' },
+          { name: 'autoFocus', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Focuses the first cell once rendered.' },
+          { name: 'separator', type: 'string | TemplateRef<any>', description: 'Shown between two cells, hidden from assistive technology: text or an `<ng-template>`.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Cell size.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the code.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables every cell.' },
+        ],
+        events: [
+          { name: 'complete', payload: 'string', description: 'The code, each time it comes to fill every cell.' },
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelOTPInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelOTPInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-otp-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-otp-input-heading'>PixelOTPInput</h2>
+      <Title id='pixel-otp-input-heading'>PixelOTPInput</Title>
       <p className="docs-lead">One-time passcode input with auto-advance, paste-fill, and per-cell keyboard navigation.</p>
       <ul className="docs-highlights">
         <li>Configurable length and numeric or alphanumeric input mode</li>
@@ -34,12 +137,12 @@ export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSection
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-otp-input-api">
+      <Heading id="pixel-otp-input-api">API</Heading>
+      <FrameworkApi label={'PixelOTPInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-otp-input-a11y">
-      <h3 id="pixel-otp-input-a11y">Accessibility</h3>
+      <Heading id="pixel-otp-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>role=&quot;group&quot; with aria-label for the cell collection</code></li>
@@ -47,8 +150,8 @@ export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSection
         <li><code>inputmode=numeric|text matches the accepted character set</code></li>
         <li><code>autocomplete=&quot;one-time-code&quot; on the first cell for SMS autofill</code></li>
       </ul>
-      <p className="docs-aria-notes">Invalid characters are silently rejected based on the type prop. onComplete fires once when all cells are filled.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Invalid characters are silently rejected based on the type prop. The completion event (<code>onComplete</code>, <code>@complete</code> in Vue, <code>(complete)</code> in Angular) fires once when all cells are filled.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -92,28 +195,84 @@ export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSection
       </table>
     </section>
     <section aria-labelledby="pixel-otp-input-usage">
-      <h3 id="pixel-otp-input-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react'
-import { PixelOTPInput } from '@pxlkit/ui-kit'
+      <Heading id="pixel-otp-input-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelOTPInput usage'}
+        react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [value, setValue] = React.useState('')
   return <PixelOTPInput length={6} value={value} onChange={setValue} />
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="6" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`<pxl-otp-input [length]="6" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal('');
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [value, setValue] = React.useState('')
   return <PixelOTPInput length={6} value={value} onChange={setValue} />
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="6" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`<pxl-otp-input [length]="6" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal('');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-numeric-4">
-        <h4>4-digit Numeric</h4>
-        <pre className="docs-code"><code>{`export function Numeric4() {
+        <Subheading>4-digit Numeric</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'4-digit Numeric code'}
+          react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
+
+export function Numeric4() {
   const [value, setValue] = React.useState('')
   return (
     <PixelOTPInput
@@ -123,11 +282,38 @@ export function Default() {
       onChange={setValue}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="4" type="numeric" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`<pxl-otp-input [length]="4" type="numeric" [(value)]="value" />\`,
+})
+export class Numeric4 {
+  readonly value = signal('');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-alphanumeric">
-        <h4>Alphanumeric</h4>
-        <pre className="docs-code"><code>{`export function Alphanumeric() {
+        <Subheading>Alphanumeric</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Alphanumeric code'}
+          react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
+
+export function Alphanumeric() {
   const [value, setValue] = React.useState('')
   return (
     <PixelOTPInput
@@ -137,11 +323,38 @@ export function Default() {
       onChange={setValue}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="6" type="alphanumeric" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`<pxl-otp-input [length]="6" type="alphanumeric" [(value)]="value" />\`,
+})
+export class Alphanumeric {
+  readonly value = signal('');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-masked">
-        <h4>Masked</h4>
-        <pre className="docs-code"><code>{`export function Masked() {
+        <Subheading>Masked</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Masked code'}
+          react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
+
+export function Masked() {
   const [value, setValue] = React.useState('')
   return (
     <PixelOTPInput
@@ -151,11 +364,38 @@ export function Default() {
       onChange={setValue}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="6" mask />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`<pxl-otp-input [length]="6" mask [(value)]="value" />\`,
+})
+export class Masked {
+  readonly value = signal('');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-separator">
-        <h4>With Separator</h4>
-        <pre className="docs-code"><code>{`export function WithSeparator() {
+        <Subheading>With Separator</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Separator code'}
+          react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
+
+export function WithSeparator() {
   const [value, setValue] = React.useState('')
   return (
     <PixelOTPInput
@@ -165,14 +405,40 @@ export function Default() {
       onChange={setValue}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="6">
+    <template #separator><span>-</span></template>
+  </PixelOTPInput>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`
+    <pxl-otp-input [length]="6" [separator]="dash" [(value)]="value" />
+    <ng-template #dash><span>-</span></ng-template>
+  \`,
+})
+export class WithSeparator {
+  readonly value = signal('');
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-password-input">PixelPasswordInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-password-input' : '#pixel-password-input'}>PixelPasswordInput</a></li>
       </ul>
     </section>
     </section>

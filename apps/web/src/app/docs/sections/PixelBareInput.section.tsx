@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBareInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBareInputDocsMeta = {
@@ -17,14 +23,72 @@ export const PixelBareInputDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSectionProps): React.ReactElement {
+/** PixelBareInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBareInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBareInput',
+        notes: [
+          'Also takes the native attributes and event handlers of `<input>` (`InputHTMLAttributes<HTMLInputElement>`).',
+          '`ref` points to `<input>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBareInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBareInput',
+        props: [
+          { name: 'modelValue', type: 'string | number', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string | number', description: 'Initial value while uncontrolled.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The new value, on every edit.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<input>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBareInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBareInput',
+        selector: 'input[pxlBareInput]',
+        props: [
+          { name: 'value', type: 'string | number', binding: '[(value)]', description: 'Value (`[(value)]`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string | number', description: 'Initial value while uncontrolled.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string | number', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'Goes on a native `<input>`, which keeps its own attributes and events.',
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelBareInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBareInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-bare-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-bare-input-heading'>PixelBareInput</h2>
-      <p className="docs-lead">Unstyled, forwardRef-enabled `&lt;input&gt;` primitive used as an escape hatch for fully custom field compositions.</p>
+      <Title id='pixel-bare-input-heading'>PixelBareInput</Title>
+      <p className="docs-lead">Unstyled <code>&lt;input&gt;</code> primitive, the native input itself, used as an escape hatch for fully custom field compositions.</p>
       <ul className="docs-highlights">
-        <li>Native `&lt;input&gt;` semantics — accepts every `InputHTMLAttributes` prop verbatim.</li>
-        <li>forwardRef passthrough exposes the underlying `HTMLInputElement` for measurement, focus, or imperative APIs.</li>
+        <li>Native <code>&lt;input&gt;</code> semantics — takes every native input attribute verbatim.</li>
+        <li>Its element is the native <code>&lt;input&gt;</code>, for measurement, focus, or imperative APIs: a ref in React, <code>$el</code> in Vue, the <code>input[pxlBareInput]</code> element in Angular.</li>
         <li>Zero styling — pair with parent surfaces (PixelInputGroup, PixelFieldset) when building bespoke field widgets.</li>
         <li>SSR-safe and tree-shakable — no client effects or runtime dependencies.</li>
       </ul>
@@ -33,18 +97,18 @@ export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSecti
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-bare-input-api">
+      <Heading id="pixel-bare-input-api">API</Heading>
+      <FrameworkApi label={'PixelBareInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bare-input-a11y">
-      <h3 id="pixel-bare-input-a11y">Accessibility</h3>
+      <Heading id="pixel-bare-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Because this primitive is unstyled, callers MUST supply an accessible name via `aria-label`, `aria-labelledby`, or an associated `&lt;label&gt;` element. Visual focus styling is the consumer&#39;s responsibility.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Because this primitive is unstyled, callers MUST supply an accessible name via <code>aria-label</code>, <code>aria-labelledby</code>, or an associated <code>&lt;label&gt;</code> element. Visual focus styling is the consumer&#39;s responsibility.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -68,32 +132,97 @@ export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSecti
       </table>
     </section>
     <section aria-labelledby="pixel-bare-input-usage">
-      <h3 id="pixel-bare-input-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import * as React from 'react';
-import { PixelBareInput } from '@pxlkit/ui-kit';
+      <Heading id="pixel-bare-input-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBareInput usage'}
+        react={`import { PixelBareInput } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelBareInput placeholder="Type something" />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelBareInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareInput placeholder="Type something" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareInput],
+  template: \`<input pxlBareInput placeholder="Type something" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBareInput } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelBareInput placeholder="Type something" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareInput placeholder="Type something" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareInput],
+  template: \`<input pxlBareInput placeholder="Type something" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
-        <pre className="docs-code"><code>{`export function Uncontrolled() {
+        <Subheading>Uncontrolled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Uncontrolled code'}
+          react={`import { PixelBareInput } from '@pxlkit/ui-kit';
+
+export function Uncontrolled() {
   return <PixelBareInput defaultValue="hello world" aria-label="uncontrolled-input" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareInput default-value="hello world" aria-label="uncontrolled-input" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareInput],
+  template: \`<input pxlBareInput defaultValue="hello world" aria-label="uncontrolled-input" />\`,
+})
+export class Uncontrolled {}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
+        <Subheading>Controlled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import * as React from 'react';
+import { PixelBareInput } from '@pxlkit/ui-kit';
+
+export function Controlled() {
   const [value, setValue] = React.useState('');
   return (
     <PixelBareInput
@@ -103,68 +232,250 @@ export function Default() {
       aria-label="controlled-input"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelBareInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelBareInput v-model="value" placeholder="Controlled" aria-label="controlled-input" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareInput],
+  template: \`<input pxlBareInput [(value)]="value" placeholder="Controlled" aria-label="controlled-input" />\`,
+})
+export class Controlled {
+  readonly value = signal('');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-email">
-        <h4>Email</h4>
-        <pre className="docs-code"><code>{`export function Email() {
+        <Subheading>Email</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Email code'}
+          react={`import { PixelBareInput } from '@pxlkit/ui-kit';
+
+export function Email() {
   return <PixelBareInput type="email" placeholder="you@example.com" autoComplete="email" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareInput type="email" placeholder="you@example.com" autocomplete="email" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareInput],
+  template: \`<input pxlBareInput type="email" placeholder="you@example.com" autocomplete="email" />\`,
+})
+export class Email {}`}
+        />
       </article>
       <article className="docs-example" id="example-password">
-        <h4>Password</h4>
-        <pre className="docs-code"><code>{`export function Password() {
+        <Subheading>Password</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Password code'}
+          react={`import { PixelBareInput } from '@pxlkit/ui-kit';
+
+export function Password() {
   return <PixelBareInput type="password" placeholder="••••••••" autoComplete="current-password" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareInput type="password" placeholder="••••••••" autocomplete="current-password" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareInput],
+  template: \`<input pxlBareInput type="password" placeholder="••••••••" autocomplete="current-password" />\`,
+})
+export class Password {}`}
+        />
       </article>
       <article className="docs-example" id="example-number">
-        <h4>Number</h4>
-        <pre className="docs-code"><code>{`export function Number() {
+        <Subheading>Number</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Number code'}
+          react={`import { PixelBareInput } from '@pxlkit/ui-kit';
+
+export function Number() {
   return (
     <PixelBareInput type="number" min={0} max={100} step={1} defaultValue={42} aria-label="number-input" />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareInput type="number" :min="0" :max="100" :step="1" :default-value="42" aria-label="number-input" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareInput],
+  template: \`
+    <input pxlBareInput type="number" min="0" max="100" step="1" [defaultValue]="42" aria-label="number-input" />
+  \`,
+})
+export class Number {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelBareInput } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return <PixelBareInput defaultValue="not editable" disabled aria-label="disabled-input" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareInput default-value="not editable" disabled aria-label="disabled-input" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareInput],
+  template: \`<input pxlBareInput defaultValue="not editable" disabled aria-label="disabled-input" />\`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-read-only">
-        <h4>Read-only</h4>
-        <pre className="docs-code"><code>{`export function ReadOnly() {
+        <Subheading>Read-only</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Read-only code'}
+          react={`import { PixelBareInput } from '@pxlkit/ui-kit';
+
+export function ReadOnly() {
   return <PixelBareInput defaultValue="read only" readOnly aria-label="readonly-input" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareInput default-value="read only" readonly aria-label="readonly-input" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareInput],
+  template: \`<input pxlBareInput defaultValue="read only" readonly aria-label="readonly-input" />\`,
+})
+export class ReadOnly {}`}
+        />
       </article>
       <article className="docs-example" id="example-required">
-        <h4>Required</h4>
-        <pre className="docs-code"><code>{`export function Required() {
+        <Subheading>Required</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Required code'}
+          react={`import { PixelBareInput } from '@pxlkit/ui-kit';
+
+export function Required() {
   return <PixelBareInput required placeholder="required field" aria-label="required-input" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareInput required placeholder="required field" aria-label="required-input" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareInput],
+  template: \`<input pxlBareInput required placeholder="required field" aria-label="required-input" />\`,
+})
+export class Required {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-ref">
-        <h4>With ref</h4>
-        <pre className="docs-code"><code>{`export function WithRef() {
+        <Subheading>With ref</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With ref code'}
+          react={`import * as React from 'react';
+import { PixelButton, PixelBareInput } from '@pxlkit/ui-kit';
+
+export function WithRef() {
   const ref = React.useRef<HTMLInputElement>(null);
   return (
-    <PixelBareInput
-      ref={ref}
-      placeholder="Focus me via ref"
-      onFocus={() => {
-        /* ref attached */
-      }}
-    />
+    <div className="flex items-center gap-2">
+      <PixelBareInput ref={ref} placeholder="Focus me via ref" />
+      <PixelButton size="sm" onClick={() => ref.current?.focus()}>
+        Focus
+      </PixelButton>
+    </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { useTemplateRef } from 'vue';
+import { PixelBareInput, PixelButton } from '@pxlkit/ui-kit-vue';
+
+// The component's root element (\`$el\`) is the native input.
+const field = useTemplateRef<InstanceType<typeof PixelBareInput>>('field');
+</script>
+
+<template>
+  <div class="flex items-center gap-2">
+    <PixelBareInput ref="field" placeholder="Focus me via ref" />
+    <PixelButton size="sm" @click="field?.$el.focus()">Focus</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareInput, PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareInput, PixelButton],
+  template: \`
+    <div class="flex items-center gap-2">
+      <input pxlBareInput #field placeholder="Focus me via ref" />
+      <button pxlButton size="sm" (click)="field.focus()">Focus</button>
+    </div>
+  \`,
+})
+export class WithRef {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-bare-textarea">PixelBareTextarea</a></li>
-        <li><a href="#pixel-bare-button">PixelBareButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-textarea' : '#pixel-bare-textarea'}>PixelBareTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-button' : '#pixel-bare-button'}>PixelBareButton</a></li>
       </ul>
     </section>
     </section>

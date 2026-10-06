@@ -21,5 +21,5 @@ export const ICON_PACK_COUNT = 7;
 /** Number of complete page templates. */
 export const PAGE_TEMPLATE_COUNT = 6;
 
-/** Accessibility baseline claimed across the site. */
+/** The accessibility standard the kit is built for ("built for WCAG 2.1 AA" — a target, not an audited conformance claim). */
 export const A11Y_BASELINE = 'WCAG 2.1 AA';

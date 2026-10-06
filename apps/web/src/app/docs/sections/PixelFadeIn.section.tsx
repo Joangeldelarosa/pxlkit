@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFadeInDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelFadeInDocsMeta = {
@@ -17,29 +23,107 @@ export const PixelFadeInDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelFadeInDocsSection({ className }: PixelFadeInDocsSectionProps): React.ReactElement {
+/** PixelFadeIn's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelFadeIn } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelFadeIn',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to fade in.' },
+          { name: 'duration', type: 'number', default: '400', description: 'Animation duration in milliseconds. Default `400`.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Animation delay in milliseconds. Default `0`.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`. Default `1`." },
+          { name: 'easing', type: 'string', default: "'ease'", description: "CSS `animation-timing-function`. Default `'ease'`." },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: "CSS `animation-fill-mode`. Default `'both'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelFadeIn } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelFadeIn',
+        props: [
+          { name: 'duration', type: 'number', default: '400', description: 'Animation duration in milliseconds.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Animation delay in milliseconds.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease'", description: 'CSS `animation-timing-function`.' },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: 'CSS `animation-fill-mode`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to fade in.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelFadeIn } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelFadeIn',
+        selector: 'pxl-fade-in',
+        props: [
+          { name: 'duration', type: 'number', default: '400', accepts: 'unknown', description: 'Animation duration in milliseconds.' },
+          { name: 'delay', type: 'number', default: '0', accepts: 'unknown', description: 'Animation delay in milliseconds.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', accepts: "number | 'infinite' | `${number}`", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease'", description: 'CSS `animation-timing-function`.' },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: 'CSS `animation-fill-mode`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelFadeInDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelFadeInDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-fade-in-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-fade-in-heading'>PixelFadeIn</h2>
+      <Title id='pixel-fade-in-heading'>PixelFadeIn</Title>
       <p className="docs-lead">Fades children from opacity 0 to 1 with configurable duration, delay, easing, and trigger.</p>
       <ul className="docs-highlights">
         <li>Mount, hover, click, or in-view triggers</li>
         <li>Configurable duration, delay, easing, and fill-mode</li>
         <li>Iteration count supports finite or infinite repeats</li>
-        <li>onComplete callback fires after the final iteration</li>
-        <li>Respects prefers-reduced-motion via useReducedMotion</li>
+        <li>Signals the end of its last iteration: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
+        <li>Respects prefers-reduced-motion automatically</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-fade-in-api">
+      <Heading id="pixel-fade-in-api">API</Heading>
+      <FrameworkApi label={'PixelFadeIn API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-fade-in-a11y">
-      <h3 id="pixel-fade-in-a11y">Accessibility</h3>
+      <Heading id="pixel-fade-in-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>prefers-reduced-motion</code></li>
@@ -47,8 +131,11 @@ export function PixelFadeInDocsSection({ className }: PixelFadeInDocsSectionProp
       <p className="docs-aria-notes">Animation is suppressed when the user prefers reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-fade-in-usage">
-      <h3 id="pixel-fade-in-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelFadeIn } from '@pxlkit/ui-kit';
+      <Heading id="pixel-fade-in-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelFadeIn usage'}
+        react={`import { PixelFadeIn } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,14 +145,40 @@ export function Default() {
       </div>
     </PixelFadeIn>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelFadeIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFadeIn>
+    <div style="padding: 16px; background: #111; color: #fff">Fades in on mount</div>
+  </PixelFadeIn>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelFadeIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFadeIn],
+  template: \`
+    <pxl-fade-in>
+      <div style="padding: 16px; background: #111; color: #fff">Fades in on mount</div>
+    </pxl-fade-in>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelFadeIn } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelFadeIn>
       <div style={{ padding: 16, background: '#111', color: '#fff' }}>
@@ -73,11 +186,38 @@ export function Default() {
       </div>
     </PixelFadeIn>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFadeIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFadeIn>
+    <div style="padding: 16px; background: #111; color: #fff">Fades in on mount</div>
+  </PixelFadeIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFadeIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFadeIn],
+  template: \`
+    <pxl-fade-in>
+      <div style="padding: 16px; background: #111; color: #fff">Fades in on mount</div>
+    </pxl-fade-in>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-delayed">
-        <h4>Delayed</h4>
-        <pre className="docs-code"><code>{`export function Delayed() {
+        <Subheading>Delayed</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Delayed code'}
+          react={`import { PixelFadeIn } from '@pxlkit/ui-kit';
+
+export function Delayed() {
   return (
     <PixelFadeIn duration={600} delay={200} easing="ease-out">
       <div style={{ padding: 16, background: '#0EA5E9', color: '#000' }}>
@@ -85,11 +225,38 @@ export function Default() {
       </div>
     </PixelFadeIn>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFadeIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFadeIn :duration="600" :delay="200" easing="ease-out">
+    <div style="padding: 16px; background: #0EA5E9; color: #000">Delayed fade-in</div>
+  </PixelFadeIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFadeIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFadeIn],
+  template: \`
+    <pxl-fade-in [duration]="600" [delay]="200" easing="ease-out">
+      <div style="padding: 16px; background: #0EA5E9; color: #000">Delayed fade-in</div>
+    </pxl-fade-in>
+  \`,
+})
+export class Delayed {}`}
+        />
       </article>
       <article className="docs-example" id="example-on-hover">
-        <h4>On Hover</h4>
-        <pre className="docs-code"><code>{`export function OnHover() {
+        <Subheading>On Hover</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'On Hover code'}
+          react={`import { PixelFadeIn } from '@pxlkit/ui-kit';
+
+export function OnHover() {
   return (
     <PixelFadeIn trigger="hover" duration={300}>
       <div style={{ padding: 16, background: '#222', color: '#0EA5E9' }}>
@@ -97,15 +264,37 @@ export function Default() {
       </div>
     </PixelFadeIn>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFadeIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFadeIn trigger="hover" :duration="300">
+    <div style="padding: 16px; background: #222; color: #0EA5E9">Hover to fade in</div>
+  </PixelFadeIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFadeIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFadeIn],
+  template: \`
+    <pxl-fade-in trigger="hover" [duration]="300">
+      <div style="padding: 16px; background: #222; color: #0EA5E9">Hover to fade in</div>
+    </pxl-fade-in>
+  \`,
+})
+export class OnHover {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-slide-in">PixelSlideIn</a></li>
-        <li><a href="#pixel-scale-in">PixelScaleIn</a></li>
-        <li><a href="#pixel-blur-in">PixelBlurIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-slide-in' : '#pixel-slide-in'}>PixelSlideIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-scale-in' : '#pixel-scale-in'}>PixelScaleIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-blur-in' : '#pixel-blur-in'}>PixelBlurIn</a></li>
       </ul>
     </section>
     </section>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { readStorage, removeStorage, writeStorage } from '@pxlkit/ui-kit-core';
 import { useEventListener } from './useEventListener';
 
 export interface UseLocalStorageOptions<T> {
@@ -43,16 +44,10 @@ export function useLocalStorage<T>(
   const initialRef = useRef(initialValue);
   initialRef.current = initialValue;
 
-  const readFromStorage = useCallback((): T => {
-    if (typeof window === 'undefined') return initialRef.current;
-    try {
-      const raw = window.localStorage.getItem(key);
-      if (raw === null) return initialRef.current;
-      return deserializeRef.current(raw);
-    } catch {
-      return initialRef.current;
-    }
-  }, [key]);
+  const readFromStorage = useCallback(
+    (): T => readStorage(key, initialRef.current, (raw) => deserializeRef.current(raw)),
+    [key],
+  );
 
   const [value, setValueState] = useState<T>(initialValue);
 
@@ -66,13 +61,7 @@ export function useLocalStorage<T>(
       setValueState((prev) => {
         const resolved =
           typeof next === 'function' ? (next as (p: T) => T)(prev) : next;
-        if (typeof window !== 'undefined') {
-          try {
-            window.localStorage.setItem(key, serializeRef.current(resolved));
-          } catch {
-            // Quota / privacy mode — ignore, keep in-memory state.
-          }
-        }
+        writeStorage(key, resolved, (value) => serializeRef.current(value));
         return resolved;
       });
     },
@@ -80,13 +69,7 @@ export function useLocalStorage<T>(
   );
 
   const remove = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        window.localStorage.removeItem(key);
-      } catch {
-        // ignore
-      }
-    }
+    removeStorage(key);
     setValueState(initialRef.current);
   }, [key]);
 

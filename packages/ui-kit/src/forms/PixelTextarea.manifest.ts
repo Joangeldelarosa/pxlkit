@@ -27,7 +27,7 @@ export default defineManifest({
     'Optional autosize between minRows and maxRows, scrolling beyond the cap',
     'Character counter (showCount) — total or N/max with overflow styling',
     'Full tone + surface (pixel/linear) theming aligned with the rest of forms',
-    'Controlled and uncontrolled value patterns, ref forwards to <textarea>',
+    'Controlled — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or uncontrolled with `defaultValue`',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
@@ -51,7 +51,7 @@ export default defineManifest({
       { key: 'Shift+Tab', does: 'Moves focus to the previous focusable element' },
     ],
     notes:
-      'Wraps a native <textarea> so multiline textbox semantics are announced by assistive tech automatically. The label prop is wired through FieldShell, error toggles aria-invalid, and hint/error are exposed via aria-describedby. The counter uses aria-live="polite" so screen readers announce updates without stealing focus.',
+      'Wraps a native <textarea> so multiline textbox semantics are announced by assistive tech automatically. The label prop is wired through FieldShell, error toggles aria-invalid, and the hint/error it shows is exposed via aria-describedby, after any ids you pass. The counter uses aria-live="polite" so screen readers announce updates without stealing focus.',
   },
   related: ['PixelInput', 'PixelBareTextarea'],
   apiStability: 'stable',

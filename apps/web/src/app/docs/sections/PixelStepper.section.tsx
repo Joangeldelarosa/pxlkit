@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStepperDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelStepperDocsMeta = {
@@ -17,16 +23,133 @@ export const PixelStepperDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionProps): React.ReactElement {
+/** PixelStepper's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelStepper } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelStepper',
+        props: [
+          { name: 'active', type: 'number', required: true, description: 'Index of the current step, from 0.' },
+          { name: 'onStepClick', type: '(idx: number) => void', description: 'Called with the index of a step that is clicked, or activated with Enter or Space. With it, the steps up to the active one — every step with `allowNextStepsSelect` — are clickable and in the tab order.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Steps in a row or a column; also the arrow keys that move between them.' },
+          { name: 'allowNextStepsSelect', type: 'boolean', default: 'false', description: 'With `onStepClick`, makes the steps after the active one clickable too.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the indicators and labels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Progress steps'", description: 'Accessible name for the steps landmark. Defaults to "Progress steps".' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The steps (`PixelStepper.Step`).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelStepper.Step',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label under (or beside) the indicator.' },
+          { name: 'description', type: 'string', description: 'Smaller text below the label.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Custom icon in the indicator, shown while the step is neither completed nor in error.' },
+          { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner in the indicator.' },
+          { name: 'completed', type: 'boolean', default: 'false', description: 'Marks the step done, with a check mark.' },
+          { name: 'error', type: 'boolean', default: 'false', description: 'Marks the step failed, with a cross; wins over `completed`.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `children`.',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelStepper',
+        props: [
+          { name: 'active', type: 'number', required: true, description: 'Index of the current step, from 0.' },
+          { name: 'onStepClick', type: '(index: number) => void', binding: '@step-click', description: 'Called with the index of a step that is clicked, or activated with Enter or Space (bind it as `@step-click`). With it, the steps up to the active one — every step with `allowNextStepsSelect` — are clickable and in the tab order.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Steps in a row or a column; also the arrow keys that move between them.' },
+          { name: 'allowNextStepsSelect', type: 'boolean', default: 'false', description: 'Makes the steps after the active one clickable too.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the indicators and labels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Progress steps'", description: 'Accessible name of the group.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The steps.' },
+        ],
+      },
+      {
+        name: 'PixelStepperStep',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label under (or beside) the indicator.' },
+          { name: 'description', type: 'string', description: 'Smaller text below the label.' },
+          { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner in the indicator.' },
+          { name: 'completed', type: 'boolean', default: 'false', description: 'Marks the step done, with a check mark.' },
+          { name: 'error', type: 'boolean', default: 'false', description: 'Marks the step failed, with a cross; wins over `completed`.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'Custom icon in the indicator, shown while the step is neither completed nor in error.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelStepper',
+        selector: 'pxl-stepper',
+        props: [
+          { name: 'active', type: 'number', required: true, accepts: 'unknown', description: 'Index of the current step, from 0.' },
+          { name: 'clickable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the steps up to the active one clickable: they emit `(stepClick)`.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Steps in a row or a column; also the arrow keys that move between them.' },
+          { name: 'allowNextStepsSelect', type: 'boolean', default: 'false', accepts: 'unknown', description: 'With `clickable`, makes the steps after the active one clickable too.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the indicators and labels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Progress steps'", description: 'Accessible name of the group.' },
+        ],
+        events: [
+          { name: 'stepClick', payload: 'number', description: 'A clickable step was clicked, or activated with Enter or Space: its index.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelStepperStep',
+        selector: 'pxl-stepper-step',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label under (or beside) the indicator.' },
+          { name: 'description', type: 'string', description: 'Smaller text below the label.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Custom icon in the indicator, shown while the step is neither completed nor in error.' },
+          { name: 'loading', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows a spinner in the indicator.' },
+          { name: 'completed', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the step done, with a check mark.' },
+          { name: 'error', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the step failed, with a cross; wins over `completed`.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelStepperDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelStepperDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-stepper-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-stepper-heading'>PixelStepper</h2>
+      <Title id='pixel-stepper-heading'>PixelStepper</Title>
       <p className="docs-lead">Multi-step progress indicator with completed/active/pending/error/loading states, horizontal or vertical orientation, and full keyboard navigation.</p>
       <ul className="docs-highlights">
-        <li>Compound API (PixelStepper + PixelStepper.Step) keeps step content declarative and easy to reorder.</li>
+        <li>Compound API (a stepper and its steps: <code>PixelStepper.Step</code>, <code>PixelStepperStep</code> in Vue, <code>pxl-stepper-step</code> in Angular) keeps step content declarative and easy to reorder.</li>
         <li>Per-step states (completed, active, pending, error, loading) with tone-mapped indicators and connectors.</li>
         <li>Horizontal or vertical orientation with roving focus, Arrow/Home/End keys, and Enter/Space activation.</li>
-        <li>Optional onStepClick handler with allowNextStepsSelect gate so future steps stay locked until allowed.</li>
+        <li>Optional step clicks (<code>onStepClick</code>, <code>@step-click</code> in Vue, <code>clickable</code> + <code>(stepClick)</code> in Angular) with allowNextStepsSelect gate so future steps stay locked until allowed.</li>
         <li>Surface-aware (pixel/linear) and size-aware (sm/md/lg), inheriting kit-wide tokens and focus rings.</li>
       </ul>
     <dl className="docs-meta">
@@ -34,18 +157,18 @@ export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionPr
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-stepper-api">
+      <Heading id="pixel-stepper-api">API</Heading>
+      <FrameworkApi label={'PixelStepper API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stepper-a11y">
-      <h3 id="pixel-stepper-a11y">Accessibility</h3>
+      <Heading id="pixel-stepper-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>progress-steps</code></li>
       </ul>
-      <p className="docs-aria-notes">The root renders role=&quot;group&quot; with a configurable ariaLabel (defaults to &quot;Progress steps&quot;). Each step carries an aria-label combining its position (&quot;Step N of M&quot;), its label, and its state (current/completed/error). The active step is marked with aria-current=&quot;step&quot;. Steps that are not clickable (no onStepClick, or future steps when allowNextStepsSelect is false) are removed from the tab sequence via tabIndex=-1. Indicators and connectors are aria-hidden so screen readers announce only the step label and state.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">The root renders role=&quot;group&quot; with a configurable ariaLabel (defaults to &quot;Progress steps&quot;). A clickable step is role=&quot;button&quot;, named by its position (&quot;Step N of M&quot;), its label and its state (current/completed/error) and described by its description. A step that is not clickable (no step click handling, or a future step when allowNextStepsSelect is false) has no role and stays out of the tab sequence; since ARIA does not let an element without a role take a name, it reads its position and state as visually hidden text around its label. The active step is marked with aria-current=&quot;step&quot;. Indicators and connectors are aria-hidden so screen readers announce only the step label and state.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -104,9 +227,11 @@ export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionPr
       </table>
     </section>
     <section aria-labelledby="pixel-stepper-usage">
-      <h3 id="pixel-stepper-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelStepper } from '@pxlkit/ui-kit';
+      <Heading id="pixel-stepper-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelStepper usage'}
+        react={`import { PixelStepper } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -116,14 +241,44 @@ export function Default() {
       <PixelStepper.Step label="Confirm" description="Review and submit" />
     </PixelStepper>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStepper :active="1">
+    <PixelStepperStep label="Account" description="Create your account" />
+    <PixelStepperStep label="Profile" description="Add some details" />
+    <PixelStepperStep label="Confirm" description="Review and submit" />
+  </PixelStepper>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <pxl-stepper [active]="1">
+      <pxl-stepper-step label="Account" description="Create your account" />
+      <pxl-stepper-step label="Profile" description="Add some details" />
+      <pxl-stepper-step label="Confirm" description="Review and submit" />
+    </pxl-stepper>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelStepper active={1}>
       <PixelStepper.Step label="Account" description="Create your account" />
@@ -131,11 +286,43 @@ export function Default() {
       <PixelStepper.Step label="Confirm" description="Review and submit" />
     </PixelStepper>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStepper :active="1">
+    <PixelStepperStep label="Account" description="Create your account" />
+    <PixelStepperStep label="Profile" description="Add some details" />
+    <PixelStepperStep label="Confirm" description="Review and submit" />
+  </PixelStepper>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <pxl-stepper [active]="1">
+      <pxl-stepper-step label="Account" description="Create your account" />
+      <pxl-stepper-step label="Profile" description="Add some details" />
+      <pxl-stepper-step label="Confirm" description="Review and submit" />
+    </pxl-stepper>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-interactive">
-        <h4>Interactive</h4>
-        <pre className="docs-code"><code>{`export function Interactive() {
+        <Subheading>Interactive</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Interactive code'}
+          react={`import { useState } from 'react';
+import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function Interactive() {
   const [active, setActive] = useState(0);
   const total = 4;
   return (
@@ -164,11 +351,79 @@ export function Default() {
       </div>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+
+const active = ref(0);
+const total = 4;
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelStepper :active="active" @step-click="active = $event">
+      <PixelStepperStep label="Plan" description="Pick a tier" />
+      <PixelStepperStep label="Billing" description="Payment method" />
+      <PixelStepperStep label="Confirm" description="Review charges" />
+      <PixelStepperStep label="Done" description="All set" />
+    </PixelStepper>
+    <div class="flex gap-2">
+      <button type="button" class="text-xs px-2 py-1 border border-retro-border" @click="active = Math.max(0, active - 1)">
+        Back
+      </button>
+      <button
+        type="button"
+        class="text-xs px-2 py-1 border border-retro-border"
+        @click="active = Math.min(total - 1, active + 1)"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <div class="space-y-3">
+      <pxl-stepper [active]="active()" clickable (stepClick)="active.set($event)">
+        <pxl-stepper-step label="Plan" description="Pick a tier" />
+        <pxl-stepper-step label="Billing" description="Payment method" />
+        <pxl-stepper-step label="Confirm" description="Review charges" />
+        <pxl-stepper-step label="Done" description="All set" />
+      </pxl-stepper>
+      <div class="flex gap-2">
+        <button type="button" class="text-xs px-2 py-1 border border-retro-border" (click)="back()">Back</button>
+        <button type="button" class="text-xs px-2 py-1 border border-retro-border" (click)="next()">Next</button>
+      </div>
+    </div>
+  \`,
+})
+export class Interactive {
+  readonly active = signal(0);
+  private readonly total = 4;
+
+  back(): void {
+    this.active.update((i) => Math.max(0, i - 1));
+  }
+
+  next(): void {
+    this.active.update((i) => Math.min(this.total - 1, i + 1));
+  }
+}`}
+        />
       </article>
       <article className="docs-example" id="example-vertical">
-        <h4>Vertical</h4>
-        <pre className="docs-code"><code>{`export function Vertical() {
+        <Subheading>Vertical</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Vertical code'}
+          react={`import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function Vertical() {
   return (
     <PixelStepper active={1} orientation="vertical">
       <PixelStepper.Step label="Upload" description="Pick a file" />
@@ -176,11 +431,42 @@ export function Default() {
       <PixelStepper.Step label="Publish" description="Make it live" />
     </PixelStepper>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStepper :active="1" orientation="vertical">
+    <PixelStepperStep label="Upload" description="Pick a file" />
+    <PixelStepperStep label="Process" description="Running checks" loading />
+    <PixelStepperStep label="Publish" description="Make it live" />
+  </PixelStepper>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <pxl-stepper [active]="1" orientation="vertical">
+      <pxl-stepper-step label="Upload" description="Pick a file" />
+      <pxl-stepper-step label="Process" description="Running checks" loading />
+      <pxl-stepper-step label="Publish" description="Make it live" />
+    </pxl-stepper>
+  \`,
+})
+export class Vertical {}`}
+        />
       </article>
       <article className="docs-example" id="example-states">
-        <h4>States</h4>
-        <pre className="docs-code"><code>{`export function States() {
+        <Subheading>States</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'States code'}
+          react={`import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function States() {
   return (
     <PixelStepper active={2}>
       <PixelStepper.Step label="Created" completed />
@@ -190,11 +476,46 @@ export function Default() {
       <PixelStepper.Step label="Done" />
     </PixelStepper>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStepper :active="2">
+    <PixelStepperStep label="Created" completed />
+    <PixelStepperStep label="Validated" completed />
+    <PixelStepperStep label="Signing" loading />
+    <PixelStepperStep label="Failed" error />
+    <PixelStepperStep label="Done" />
+  </PixelStepper>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <pxl-stepper [active]="2">
+      <pxl-stepper-step label="Created" completed />
+      <pxl-stepper-step label="Validated" completed />
+      <pxl-stepper-step label="Signing" loading />
+      <pxl-stepper-step label="Failed" error />
+      <pxl-stepper-step label="Done" />
+    </pxl-stepper>
+  \`,
+})
+export class States {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="space-y-6">
       <PixelStepper active={1} size="sm">
@@ -214,11 +535,66 @@ export function Default() {
       </PixelStepper>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-6">
+    <PixelStepper :active="1" size="sm">
+      <PixelStepperStep label="One" />
+      <PixelStepperStep label="Two" />
+      <PixelStepperStep label="Three" />
+    </PixelStepper>
+    <PixelStepper :active="1" size="md">
+      <PixelStepperStep label="One" />
+      <PixelStepperStep label="Two" />
+      <PixelStepperStep label="Three" />
+    </PixelStepper>
+    <PixelStepper :active="1" size="lg">
+      <PixelStepperStep label="One" />
+      <PixelStepperStep label="Two" />
+      <PixelStepperStep label="Three" />
+    </PixelStepper>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <div class="space-y-6">
+      <pxl-stepper [active]="1" size="sm">
+        <pxl-stepper-step label="One" />
+        <pxl-stepper-step label="Two" />
+        <pxl-stepper-step label="Three" />
+      </pxl-stepper>
+      <pxl-stepper [active]="1" size="md">
+        <pxl-stepper-step label="One" />
+        <pxl-stepper-step label="Two" />
+        <pxl-stepper-step label="Three" />
+      </pxl-stepper>
+      <pxl-stepper [active]="1" size="lg">
+        <pxl-stepper-step label="One" />
+        <pxl-stepper-step label="Two" />
+        <pxl-stepper-step label="Three" />
+      </pxl-stepper>
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="grid grid-cols-1 gap-6">
       <PixelStepper active={1} surface="pixel" ariaLabel="Pixel stepper">
@@ -233,11 +609,57 @@ export function Default() {
       </PixelStepper>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-1 gap-6">
+    <PixelStepper :active="1" surface="pixel" aria-label="Pixel stepper">
+      <PixelStepperStep label="Start" />
+      <PixelStepperStep label="Build" />
+      <PixelStepperStep label="Ship" />
+    </PixelStepper>
+    <PixelStepper :active="1" surface="linear" aria-label="Linear stepper">
+      <PixelStepperStep label="Start" />
+      <PixelStepperStep label="Build" />
+      <PixelStepperStep label="Ship" />
+    </PixelStepper>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <div class="grid grid-cols-1 gap-6">
+      <pxl-stepper [active]="1" surface="pixel" ariaLabel="Pixel stepper">
+        <pxl-stepper-step label="Start" />
+        <pxl-stepper-step label="Build" />
+        <pxl-stepper-step label="Ship" />
+      </pxl-stepper>
+      <pxl-stepper [active]="1" surface="linear" ariaLabel="Linear stepper">
+        <pxl-stepper-step label="Start" />
+        <pxl-stepper-step label="Build" />
+        <pxl-stepper-step label="Ship" />
+      </pxl-stepper>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-allow-next-steps-select">
-        <h4>Allow next steps</h4>
-        <pre className="docs-code"><code>{`export function AllowNextStepsSelect() {
+        <Subheading>Allow next steps</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Allow next steps code'}
+          react={`import { useState } from 'react';
+import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function AllowNextStepsSelect() {
   const [active, setActive] = useState(1);
   return (
     <PixelStepper active={active} onStepClick={setActive} allowNextStepsSelect>
@@ -247,15 +669,48 @@ export function Default() {
       <PixelStepper.Step label="Finish" description="Complete" />
     </PixelStepper>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+
+const active = ref(1);
+</script>
+
+<template>
+  <PixelStepper :active="active" allow-next-steps-select @step-click="active = $event">
+    <PixelStepperStep label="Intro" description="Welcome" />
+    <PixelStepperStep label="Details" description="Tell us more" />
+    <PixelStepperStep label="Review" description="Almost there" />
+    <PixelStepperStep label="Finish" description="Complete" />
+  </PixelStepper>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <pxl-stepper [active]="active()" clickable allowNextStepsSelect (stepClick)="active.set($event)">
+      <pxl-stepper-step label="Intro" description="Welcome" />
+      <pxl-stepper-step label="Details" description="Tell us more" />
+      <pxl-stepper-step label="Review" description="Almost there" />
+      <pxl-stepper-step label="Finish" description="Complete" />
+    </pxl-stepper>
+  \`,
+})
+export class AllowNextStepsSelect {
+  readonly active = signal(1);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-tabs">PixelTabs</a></li>
-        <li><a href="#pixel-progress">PixelProgress</a></li>
-        <li><a href="#pixel-breadcrumb">PixelBreadcrumb</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tabs' : '#pixel-tabs'}>PixelTabs</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-progress' : '#pixel-progress'}>PixelProgress</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-breadcrumb' : '#pixel-breadcrumb'}>PixelBreadcrumb</a></li>
       </ul>
     </section>
     </section>

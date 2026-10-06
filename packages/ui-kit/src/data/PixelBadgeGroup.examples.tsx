@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelBadgeGroup } from './PixelBadgeGroup';
 import { PixelBadge } from './PixelBadge';
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
 import { PixelInput } from '../../forms/PixelInput';
 
@@ -61,6 +61,20 @@ describe('PixelInput — upgrades', () => {
     expect(queryByLabelText(/clear input/i)).toBeTruthy();
   });
 
+  it('clearing an uncontrolled input empties the field itself (regression)', () => {
+    const onClear = vi.fn();
+    const { container, getByLabelText, queryByLabelText } = render(
+      <PixelInput clearable showCount defaultValue="abc" onClear={onClear} />,
+    );
+    const input = container.querySelector('input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'abcd' } });
+    fireEvent.click(getByLabelText(/clear input/i));
+    expect(input.value).toBe('');
+    expect(container.textContent).toContain('0');
+    expect(queryByLabelText(/clear input/i)).toBeNull();
+    expect(onClear).toHaveBeenCalledOnce();
+  });
+
   it('addonLeft / addonRight render outside the shell joined to input', () => {
     const { getByText, container } = render(
       <PixelInput
@@ -101,8 +115,9 @@ describe('PixelInput — upgrades', () => {
     const { container } = render(<PixelInput loading defaultValue="" />);
     const input = container.querySelector('input') as HTMLInputElement;
     expect(input.disabled).toBe(true);
-    // Spinner is the animate-spin element
-    expect(container.querySelector('.animate-spin')).toBeTruthy();
+    // The spinner turns only for a reader who allows motion.
+    expect(container.querySelector('[class~="motion-safe:animate-spin"]')).toBeTruthy();
+    expect(container.querySelector('.animate-spin')).toBeNull();
   });
 
   it('loading hides the clear button even when value is set', () => {
@@ -118,5 +133,45 @@ describe('PixelInput — upgrades', () => {
     );
     expect(getByText('Email')).toBeTruthy();
     expect(getByText('Use a real one')).toBeTruthy();
+  });
+});
+
+describe('PixelInput — hint / error description (regression)', () => {
+  // The input pointed aria-describedby at `<id>-msg`, an id no element had.
+  it('describes the input with the hint, then with the error that replaces it', () => {
+    const { getByRole, rerender } = render(<PixelInput label="Email" hint="We never share it" />);
+    const input = getByRole('textbox', { name: 'Email' });
+    expect(input).toHaveAccessibleDescription('We never share it');
+    rerender(<PixelInput label="Email" hint="We never share it" error="Enter a valid email" />);
+    expect(input).toHaveAccessibleDescription('Enter a valid email');
+    rerender(<PixelInput label="Email" />);
+    expect(input).not.toHaveAttribute('aria-describedby');
+  });
+
+  it("adds the message after the consumer's aria-describedby instead of replacing it", () => {
+    const field = (hint?: string) => (
+      <>
+        <p id="email-rules">Work addresses only</p>
+        <PixelInput id="email" label="Email" aria-describedby="email-rules" hint={hint} />
+      </>
+    );
+    const { getByRole, rerender } = render(field());
+    const input = getByRole('textbox', { name: 'Email' });
+    expect(input).toHaveAttribute('aria-describedby', 'email-rules');
+    rerender(field('We never share it'));
+    expect(input).toHaveAttribute('aria-describedby', 'email-rules email-msg');
+    expect(input).toHaveAccessibleDescription('Work addresses only We never share it');
+  });
+});
+
+describe('PixelInput — one class per property', () => {
+  it("takes its surface's font family and border width, once each", () => {
+    for (const [surface, family, border] of [['pixel', 'font-mono', 'border-2'], ['linear', 'font-sans', 'border']] as const) {
+      const { container, unmount } = render(<PixelInput surface={surface} defaultValue="" />);
+      const classes = container.querySelector('input')!.className.split(' ');
+      expect(classes.filter((name) => /^font-(sans|serif|mono|pixel)$/.test(name))).toEqual([family]);
+      expect(classes.filter((name) => /^border(-[0248])?$/.test(name))).toEqual([border]);
+      unmount();
+    }
   });
 });

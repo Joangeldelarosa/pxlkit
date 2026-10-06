@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, type ReactNode } from 'react';
+import { useReducedMotion } from '@pxlkit/ui-kit';
 import { useMouse } from './mouseContext';
-import { useReducedMotion } from './useReducedMotion';
 
 export const MAX_TILT = 6;
 
@@ -22,7 +22,7 @@ export function computeTilt(mx: number, my: number): { tiltX: number; tiltY: num
  * 3D voxel-style headline. Uses stacked text-shadows for fake-depth + a
  * subtle rotateX/Y tilt driven by mouse position. Respects prefers-reduced-motion.
  */
-export function VoxelText({ children }: { children: ReactNode }) {
+export function VoxelText({ children, subtitle }: { children: ReactNode; subtitle?: string }) {
   const { mouseRef, active } = useMouse();
   const reduced = useReducedMotion();
   const innerRef = useRef<HTMLSpanElement>(null);
@@ -78,6 +78,8 @@ export function VoxelText({ children }: { children: ReactNode }) {
       >
         {children}
       </span>
+      {/* What the brand is, for the heading's text: the voxel letters show only the name. */}
+      {subtitle && <span className="sr-only"> — {subtitle}</span>}
     </h1>
   );
 }

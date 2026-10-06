@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PixelModal } from './PixelModal';
 import { PixelButton } from '../actions';
 

@@ -1,4 +1,4 @@
-import type { AnimatedPxlKitData } from '@pxlkit/core';
+import type { AnimatedPxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * 💬… TypingDots — a filled chat bubble with a tail and three animated dots.

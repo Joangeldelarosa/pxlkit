@@ -25,20 +25,37 @@ const SAMPLE_ITEMS = [
 
 export function Default() {
   return <PixelAccordion items={SAMPLE_ITEMS} />;
-}
-`,
-  'pixel-alert': `import { PixelAlert } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+}`,
+  'pixel-alert': `import { PixelAlert, PixelButton } from '@pxlkit/ui-kit';
 
-export function Default() {
+const InfoIcon = () => (
+  <span
+    aria-hidden
+    style={{
+      width: 14,
+      height: 14,
+      borderRadius: 9999,
+      background: 'currentColor',
+      display: 'inline-block',
+    }}
+  />
+);
+
+export function WithAction() {
   return (
     <PixelAlert
-      title="Something went wrong"
-      message="Your session expired. Please sign in again to continue."
+      tone="red"
+      title="Connection lost"
+      message="We couldn't reach the server. Check your network and retry."
+      icon={<InfoIcon />}
+      action={
+        <PixelButton size="sm" tone="red" variant="outline">
+          Retry
+        </PixelButton>
+      }
     />
   );
-}
-`,
+}`,
   'pixel-alert-dialog': `import { useState } from 'react';
 import { PixelAlertDialog } from '@pxlkit/ui-kit';
 
@@ -59,8 +76,7 @@ export function Default() {
       />
     </div>
   );
-}
-`,
+}`,
   'pixel-area-chart': `import { PixelAreaChart } from '@pxlkit/ui-kit';
 
 const sample = [
@@ -75,16 +91,13 @@ const sample = [
 
 export function Default() {
   return <PixelAreaChart data={sample} />;
-}
-`,
+}`,
   'pixel-avatar': `import { PixelAvatar } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelAvatar name="Joangel De La Rosa" />;
-}
-`,
-  'pixel-avatar-group': `import { PixelAvatarGroup } from '@pxlkit/ui-kit';
-import { PixelAvatar } from '@pxlkit/ui-kit';
+}`,
+  'pixel-avatar-group': `import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -94,16 +107,13 @@ export function Default() {
       <PixelAvatar name="Carlos Diaz" />
     </PixelAvatarGroup>
   );
-}
-`,
+}`,
   'pixel-badge': `import { PixelBadge } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelBadge>NEW</PixelBadge>;
-}
-`,
-  'pixel-badge-group': `import { PixelBadgeGroup } from '@pxlkit/ui-kit';
-import { PixelBadge } from '@pxlkit/ui-kit';
+}`,
+  'pixel-badge-group': `import { PixelBadgeGroup, PixelBadge } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -113,8 +123,7 @@ export function Default() {
       <PixelBadge tone="gold">design</PixelBadge>
     </PixelBadgeGroup>
   );
-}
-`,
+}`,
   'pixel-bar-chart': `import { PixelBarChart } from '@pxlkit/ui-kit';
 
 const sample = [
@@ -129,28 +138,22 @@ const sample = [
 
 export function Default() {
   return <PixelBarChart data={sample} />;
-}
-`,
+}`,
   'pixel-bare-button': `import { PixelBareButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelBareButton>Bare button</PixelBareButton>;
-}
-`,
-  'pixel-bare-input': `import * as React from 'react';
-import { PixelBareInput } from '@pxlkit/ui-kit';
+}`,
+  'pixel-bare-input': `import { PixelBareInput } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelBareInput placeholder="Type something" />;
-}
-`,
-  'pixel-bare-textarea': `import { useState } from 'react';
-import { PixelBareTextarea } from '@pxlkit/ui-kit';
+}`,
+  'pixel-bare-textarea': `import { PixelBareTextarea } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelBareTextarea placeholder="Write something..." rows={4} />;
-}
-`,
+}`,
   'pixel-bento': `import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -176,10 +179,8 @@ export function Default() {
       </PixelBentoCell>
     </PixelBento>
   );
-}
-`,
-  'pixel-bento-cell': `import { PixelBento } from '@pxlkit/ui-kit';
-import { PixelBentoCell } from '@pxlkit/ui-kit';
+}`,
+  'pixel-bento-cell': `import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -197,8 +198,7 @@ export function Default() {
       </PixelBentoCell>
     </PixelBento>
   );
-}
-`,
+}`,
   'pixel-bounce': `import { PixelBounce } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -207,8 +207,7 @@ export function Default() {
       <span>Bounce</span>
     </PixelBounce>
   );
-}
-`,
+}`,
   'pixel-box': `import { PixelBox } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -217,8 +216,7 @@ export function Default() {
       <p className="text-sm text-retro-muted">Surface-aware container box.</p>
     </PixelBox>
   );
-}
-`,
+}`,
   'pixel-breadcrumb': `import { PixelBreadcrumb } from '@pxlkit/ui-kit';
 
 const TRAIL = [
@@ -230,32 +228,41 @@ const TRAIL = [
 
 export function Default() {
   return <PixelBreadcrumb items={TRAIL} />;
-}
-`,
+}`,
   'pixel-button': `import { PixelButton } from '@pxlkit/ui-kit';
 
-export function Default() {
-  return <PixelButton>Click me</PixelButton>;
-}
-`,
-  'pixel-calendar-grid': `import React, { useState } from 'react'
-import { PixelCalendarGrid } from '@pxlkit/ui-kit'
+const Arrow = () => (
+  <span aria-hidden className="inline-block h-3.5 w-3.5">→</span>
+);
+
+export function WithIcons() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <PixelButton iconLeft={<Arrow />}>Leading</PixelButton>
+      <PixelButton iconRight={<Arrow />}>Trailing</PixelButton>
+      <PixelButton iconLeft={<Arrow />} iconRight={<Arrow />}>Both</PixelButton>
+    </div>
+  );
+}`,
+  'pixel-calendar-grid': `import { useState } from 'react';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [value, setValue] = useState<Date | null>(null)
   return <PixelCalendarGrid value={value} onChange={setValue} />
-}
-`,
+}`,
   'pixel-card': `import { PixelCard } from '@pxlkit/ui-kit';
 
-export function Default() {
+export function WithFooter() {
   return (
-    <PixelCard title="Project Atlas">
-      <p>Compact dossier on the Atlas migration. Status nominal.</p>
+    <PixelCard
+      title="Invoice #1042"
+      footer={<span className="text-xs text-retro-muted">Due in 7 days</span>}
+    >
+      <p>Total: $1,250.00</p>
     </PixelCard>
   );
-}
-`,
+}`,
   'pixel-carousel': `import { PixelCarousel } from '@pxlkit/ui-kit';
 
 function Slide({ label, tone }: { label: string; tone: string }) {
@@ -283,8 +290,7 @@ export function Default() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
-}
-`,
+}`,
   'pixel-center': `import { PixelCenter } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -295,8 +301,7 @@ export function Default() {
       </p>
     </PixelCenter>
   );
-}
-`,
+}`,
   'pixel-checkbox': `import { useState } from 'react';
 import { PixelCheckbox } from '@pxlkit/ui-kit';
 
@@ -309,22 +314,24 @@ export function Default() {
       onChange={setChecked}
     />
   );
-}
-`,
+}`,
   'pixel-chip': `import { useState } from 'react';
 import { PixelChip } from '@pxlkit/ui-kit';
 
-export function Default() {
-  return <PixelChip label="React" />;
-}
-`,
+export function Deletable() {
+  const [visible, setVisible] = useState(true);
+  if (!visible) return null;
+  return (
+    <PixelChip
+      label="Remove me"
+      tone="red"
+      onDelete={() => setVisible(false)}
+    />
+  );
+}`,
   'pixel-chip-group': `import React, { useState } from 'react';
-import { PixelChipGroup } from '@pxlkit/ui-kit';
-import { PixelChip } from '@pxlkit/ui-kit';
+import { PixelChipGroup, PixelChip } from '@pxlkit/ui-kit';
 
-// PixelChipGroup reads \`value\` off each child via children inspection; the chip
-// component itself forwards unknown attrs, so we use a tiny shim here so the
-// example reads naturally without leaking a \`value\` prop into PixelChipProps.
 const Chip = PixelChip as unknown as React.ComponentType<
   React.ComponentProps<typeof PixelChip> & { value: string }
 >;
@@ -338,8 +345,7 @@ export function Default() {
       <Chip value="svelte" label="Svelte" tone="gold" />
     </PixelChipGroup>
   );
-}
-`,
+}`,
   'pixel-cluster': `import React from 'react';
 import { PixelCluster } from '@pxlkit/ui-kit';
 
@@ -361,14 +367,12 @@ export function Default() {
       <Chip>vite</Chip>
     </PixelCluster>
   );
-}
-`,
+}`,
   'pixel-code-inline': `import { PixelCodeInline } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelCodeInline>npm install</PixelCodeInline>;
-}
-`,
+}`,
   'pixel-collapsible': `import { PixelCollapsible } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -379,8 +383,7 @@ export function Default() {
       </p>
     </PixelCollapsible>
   );
-}
-`,
+}`,
   'pixel-color-input': `import { useState } from 'react';
 import { PixelColorInput } from '@pxlkit/ui-kit';
 
@@ -393,16 +396,13 @@ export function Default() {
       onChange={setValue}
     />
   );
-}
-`,
+}`,
   'pixel-color-swatch': `import { PixelColorSwatch } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" />;
-}
-`,
-  'pixel-combobox': `import { useState } from 'react';
-import { PixelCombobox } from '@pxlkit/ui-kit';
+}`,
+  'pixel-combobox': `import { PixelCombobox } from '@pxlkit/ui-kit';
 
 const FRUITS = [
   { value: 'apple', label: 'Apple' },
@@ -414,17 +414,6 @@ const FRUITS = [
   { value: 'grape', label: 'Grape' },
 ];
 
-const GROUPED = [
-  { value: 'us', label: 'United States', group: 'Americas' },
-  { value: 've', label: 'Venezuela', group: 'Americas' },
-  { value: 'mx', label: 'Mexico', group: 'Americas' },
-  { value: 'es', label: 'Spain', group: 'Europe' },
-  { value: 'fr', label: 'France', group: 'Europe' },
-  { value: 'de', label: 'Germany', group: 'Europe' },
-  { value: 'jp', label: 'Japan', group: 'Asia' },
-  { value: 'kr', label: 'South Korea', group: 'Asia' },
-];
-
 export function Default() {
   return (
     <PixelCombobox
@@ -434,8 +423,7 @@ export function Default() {
       hint="Type to filter"
     />
   );
-}
-`,
+}`,
   'pixel-command': `import { useState } from 'react';
 import { PixelCommand } from '@pxlkit/ui-kit';
 
@@ -494,8 +482,7 @@ export function Default() {
       />
     </>
   );
-}
-`,
+}`,
   'pixel-container': `import { PixelContainer } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -504,14 +491,8 @@ export function Default() {
       <p className="text-sm text-retro-muted">Default container — section landmark, xl max-width, lg rhythm.</p>
     </PixelContainer>
   );
-}
-`,
-  'pixel-data-table': `import * as React from 'react';
-import {
-  PixelDataTable,
-  createColumnHelper,
-  type ColumnDef,
-} from '@pxlkit/ui-kit';
+}`,
+  'pixel-data-table': `import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit';
 
 type Row = {
   id: string;
@@ -538,8 +519,7 @@ const columns: ColumnDef<Row, unknown>[] = [
 
 export function Default() {
   return <PixelDataTable<Row> data={rows} columns={columns} />;
-}
-`,
+}`,
   'pixel-date-picker': `import { useState } from 'react';
 import { PixelDatePicker } from '@pxlkit/ui-kit';
 
@@ -553,10 +533,9 @@ export function Default() {
       placeholder="Select date"
     />
   );
-}
-`,
+}`,
   'pixel-date-range-picker': `import { useState } from 'react';
-import { PixelDateRangePicker, DateRangeValue } from '@pxlkit/ui-kit';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [range, setRange] = useState<DateRangeValue>({});
@@ -568,14 +547,12 @@ export function Default() {
       placeholder="Select date range"
     />
   );
-}
-`,
+}`,
   'pixel-divider': `import { PixelDivider } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelDivider />;
-}
-`,
+}`,
   'pixel-drawer': `import { useState } from 'react';
 import { PixelDrawer } from '@pxlkit/ui-kit';
 
@@ -604,10 +581,8 @@ export function Default() {
       </PixelDrawer>
     </>
   );
-}
-`,
-  'pixel-dropdown': `import { useState } from 'react';
-import { PixelDropdown } from '@pxlkit/ui-kit';
+}`,
+  'pixel-dropdown': `import { PixelDropdown } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -621,25 +596,41 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}
-`,
-  'pixel-empty-state': `import { PixelEmptyState } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+}`,
+  'pixel-empty-state': `import { PixelEmptyState, PixelButton } from '@pxlkit/ui-kit';
 
-export function Default() {
+const FolderIcon = () => (
+  <span
+    aria-hidden
+    style={{
+      width: 32,
+      height: 32,
+      borderRadius: 4,
+      border: '2px solid currentColor',
+      display: 'inline-block',
+    }}
+  />
+);
+
+export function WithIconAndAction() {
   return (
     <PixelEmptyState
-      title="No results found"
-      description="Try adjusting your filters or search terms to find what you are looking for."
+      icon={<FolderIcon />}
+      title="No documents"
+      description="Upload a file or create a new document to begin."
+      action={
+        <PixelButton size="sm" tone="green" variant="solid">
+          Create document
+        </PixelButton>
+      }
     />
   );
-}
-`,
-  'pixel-equal-height-grid': `import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+}`,
+  'pixel-equal-height-grid': `import { cn, PixelEqualHeightGrid } from '@pxlkit/ui-kit';
 
-function Card({ title, body }: { title: string; body: string }) {
+function Card({ title, body, className }: { title: string; body: string; className?: string }) {
   return (
-    <div className="border border-retro-border p-4">
+    <div className={cn('border border-retro-border p-4', className)}>
       <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
       <p className="text-sm text-retro-muted">{body}</p>
       <div className="mt-2 text-xs text-retro-muted">Footer</div>
@@ -655,8 +646,7 @@ export function Default() {
       <Card title="Three" body="Medium length copy here." />
     </PixelEqualHeightGrid>
   );
-}
-`,
+}`,
   'pixel-fade-in': `import { PixelFadeIn } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -667,16 +657,8 @@ export function Default() {
       </div>
     </PixelFadeIn>
   );
-}
-`,
+}`,
   'pixel-feature-card': `import { PixelFeatureCard } from '@pxlkit/ui-kit';
-
-const PixelIcon = (
-  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
-    <rect x="3" y="0" width="2" height="8" />
-    <rect x="0" y="3" width="8" height="2" />
-  </svg>
-);
 
 export function Default() {
   return (
@@ -685,8 +667,7 @@ export function Default() {
       description="Push every keystroke to peers via WebSockets — under 50ms p95."
     />
   );
-}
-`,
+}`,
   'pixel-file-upload': `import { useState } from 'react';
 import { PixelFileUpload } from '@pxlkit/ui-kit';
 
@@ -704,8 +685,7 @@ export function Default() {
       maxFiles={5}
     />
   );
-}
-`,
+}`,
   'pixel-flicker': `import { PixelFlicker } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -714,8 +694,7 @@ export function Default() {
       <span>OPEN 24/7</span>
     </PixelFlicker>
   );
-}
-`,
+}`,
   'pixel-float': `import { PixelFloat } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -724,13 +703,9 @@ export function Default() {
       <span>Float</span>
     </PixelFloat>
   );
-}
-`,
-  'pixel-form': `'use client';
-
-import { useForm } from 'react-hook-form';
-import { PixelForm } from '@pxlkit/ui-kit';
-import { PixelInput } from '@pxlkit/ui-kit';
+}`,
+  'pixel-form': `import { useForm } from 'react-hook-form';
+import { PixelForm, PixelInput } from '@pxlkit/ui-kit';
 
 type DefaultValues = {
   username: string;
@@ -783,8 +758,7 @@ export function Default() {
       />
     </PixelForm>
   );
-}
-`,
+}`,
   'pixel-glitch': `import { PixelGlitch } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -793,8 +767,7 @@ export function Default() {
       <span className="text-2xl font-bold">SYSTEM ONLINE</span>
     </PixelGlitch>
   );
-}
-`,
+}`,
   'pixel-grid': `import React from 'react';
 import { PixelGrid } from '@pxlkit/ui-kit';
 
@@ -817,8 +790,7 @@ export function Default() {
       <Cell>Six</Cell>
     </PixelGrid>
   );
-}
-`,
+}`,
   'pixel-hero-media': `import { PixelHeroMedia } from '@pxlkit/ui-kit';
 
 const Placeholder = ({ label }: { label: string }) => (
@@ -833,10 +805,8 @@ export function Default() {
       <Placeholder label="16:10 media" />
     </PixelHeroMedia>
   );
-}
-`,
-  'pixel-hero-section': `import React from 'react'
-import { PixelHeroSection } from '@pxlkit/ui-kit'
+}`,
+  'pixel-hero-section': `import { PixelHeroSection } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -848,24 +818,17 @@ export function Default() {
       secondaryCta={<button type="button">View docs</button>}
     />
   )
-}
-`,
+}`,
   'pixel-icon-frame': `import { PixelIconFrame } from '@pxlkit/ui-kit';
 
 const Glyph = () => (
   <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{'>_'}</span>
 );
 
-const Dot = () => (
-  <span style={{ width: 6, height: 6, borderRadius: 9999, background: 'currentColor', display: 'inline-block' }} />
-);
-
 export function Default() {
   return <PixelIconFrame icon={<Glyph />} />;
-}
-`,
-  'pixel-input': `import { useState } from 'react';
-import { PixelInput } from '@pxlkit/ui-kit';
+}`,
+  'pixel-input': `import { PixelInput } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -875,8 +838,7 @@ export function Default() {
       hint="Your retro alias"
     />
   );
-}
-`,
+}`,
   'pixel-input-group': `import { PixelInputGroup } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -887,14 +849,12 @@ export function Default() {
       <input aria-label="Top-level domain" defaultValue=".xyz" className="bg-transparent px-2 outline-none" />
     </PixelInputGroup>
   );
-}
-`,
+}`,
   'pixel-kbd': `import { PixelKbd } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelKbd>Enter</PixelKbd>;
-}
-`,
+}`,
   'pixel-menubar': `import { PixelMenubar, type PixelMenubarMenu } from '@pxlkit/ui-kit';
 
 const menus: PixelMenubarMenu[] = [
@@ -939,11 +899,9 @@ const menus: PixelMenubarMenu[] = [
 
 export function Default() {
   return <PixelMenubar menus={menus} />;
-}
-`,
+}`,
   'pixel-modal': `import { useState } from 'react';
-import { PixelModal } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [open, setOpen] = useState(false);
@@ -955,8 +913,7 @@ export function Default() {
       </PixelModal>
     </>
   );
-}
-`,
+}`,
   'pixel-mouse-parallax': `import { PixelMouseParallax } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -969,8 +926,7 @@ export function Default() {
       </PixelMouseParallax>
     </div>
   );
-}
-`,
+}`,
   'pixel-multi-select': `import React from 'react';
 import { PixelMultiSelect } from '@pxlkit/ui-kit';
 
@@ -993,10 +949,8 @@ export function Default() {
       placeholder="Pick frameworks…"
     />
   );
-}
-`,
-  'pixel-navigation-menu': `import React from 'react'
-import { PixelNavigationMenu } from '@pxlkit/ui-kit'
+}`,
+  'pixel-navigation-menu': `import { PixelNavigationMenu } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -1018,8 +972,7 @@ export function Default() {
       ]}
     />
   )
-}
-`,
+}`,
   'pixel-number-input': `import { useState } from 'react';
 import { PixelNumberInput } from '@pxlkit/ui-kit';
 
@@ -1034,24 +987,21 @@ export function Default() {
       max={100}
     />
   );
-}
-`,
-  'pixel-otp-input': `import React from 'react'
-import { PixelOTPInput } from '@pxlkit/ui-kit'
+}`,
+  'pixel-otp-input': `import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [value, setValue] = React.useState('')
   return <PixelOTPInput length={6} value={value} onChange={setValue} />
-}
-`,
+}`,
   'pixel-pagination': `import { useState } from 'react';
 import { PixelPagination } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [page, setPage] = useState(1);
   return <PixelPagination page={page} total={10} onChange={setPage} />;
-}
-`,
+}`,
   'pixel-parallax-group': `import { PixelParallaxGroup } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1064,8 +1014,7 @@ export function Default() {
       </div>
     </PixelParallaxGroup>
   );
-}
-`,
+}`,
   'pixel-parallax-layer': `import { PixelParallaxLayer } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1076,15 +1025,12 @@ export function Default() {
       </div>
     </PixelParallaxLayer>
   );
-}
-`,
-  'pixel-password-input': `import { useState } from 'react';
-import { PixelPasswordInput } from '@pxlkit/ui-kit';
+}`,
+  'pixel-password-input': `import { PixelPasswordInput } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelPasswordInput label="Password" placeholder="Enter password" />;
-}
-`,
+}`,
   'pixel-popover': `import { useState } from 'react';
 import { PixelPopover } from '@pxlkit/ui-kit';
 
@@ -1103,10 +1049,8 @@ export function Default() {
       </PixelPopover.Content>
     </PixelPopover>
   );
-}
-`,
-  'pixel-portal': `import React from 'react'
-import { PixelPortal } from '@pxlkit/ui-kit'
+}`,
+  'pixel-portal': `import { PixelPortal } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -1114,10 +1058,8 @@ export function Default() {
       <div>Portaled content (renders into document.body after mount)</div>
     </PixelPortal>
   )
-}
-`,
+}`,
   'pixel-pricing-card': `import { PixelPricingCard } from '@pxlkit/ui-kit';
-import { PixelBadge } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -1134,14 +1076,12 @@ export function Default() {
       ]}
     />
   );
-}
-`,
+}`,
   'pixel-progress': `import { PixelProgress } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelProgress value={60} label="HP" />;
-}
-`,
+}`,
   'pixel-pulse': `import { PixelPulse } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1150,8 +1090,7 @@ export function Default() {
       <span>Pulse</span>
     </PixelPulse>
   );
-}
-`,
+}`,
   'pixel-radio-group': `import { useState } from 'react';
 import { PixelRadioGroup } from '@pxlkit/ui-kit';
 
@@ -1171,8 +1110,7 @@ export function Default() {
       onChange={setValue}
     />
   );
-}
-`,
+}`,
   'pixel-ribbon': `import React from 'react';
 import { PixelRibbon } from '@pxlkit/ui-kit';
 
@@ -1191,8 +1129,7 @@ export function Default() {
       <PixelRibbon>New</PixelRibbon>
     </Container>
   );
-}
-`,
+}`,
   'pixel-rotate': `import { PixelRotate } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1201,8 +1138,7 @@ export function Default() {
       <span>Rotate</span>
     </PixelRotate>
   );
-}
-`,
+}`,
   'pixel-scroll-area': `import { PixelScrollArea } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1217,8 +1153,7 @@ export function Default() {
       </div>
     </PixelScrollArea>
   );
-}
-`,
+}`,
   'pixel-section': `import { PixelSection } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1229,8 +1164,7 @@ export function Default() {
       </p>
     </PixelSection>
   );
-}
-`,
+}`,
   'pixel-section-header': `import { PixelSectionHeader } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1241,8 +1175,7 @@ export function Default() {
       description="A retro-cinematic component kit with surface awareness and rhythm tokens."
     />
   );
-}
-`,
+}`,
   'pixel-segmented': `import { useState } from 'react';
 import { PixelSegmented } from '@pxlkit/ui-kit';
 
@@ -1262,23 +1195,14 @@ export function Default() {
       onChange={setValue}
     />
   );
-}
-`,
-  'pixel-select': `import { useState } from 'react';
-import { PixelSelect } from '@pxlkit/ui-kit';
+}`,
+  'pixel-select': `import { PixelSelect } from '@pxlkit/ui-kit';
 
 const FRUITS = [
   { value: 'apple', label: 'Apple' },
   { value: 'banana', label: 'Banana' },
   { value: 'cherry', label: 'Cherry' },
   { value: 'date', label: 'Date' },
-];
-
-const REGIONS = [
-  { value: 'us', label: 'United States' },
-  { value: 've', label: 'Venezuela' },
-  { value: 'es', label: 'Spain' },
-  { value: 'mx', label: 'Mexico' },
 ];
 
 export function Default() {
@@ -1290,8 +1214,7 @@ export function Default() {
       hint="Choose your favorite"
     />
   );
-}
-`,
+}`,
   'pixel-shake': `import { PixelShake } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1300,8 +1223,7 @@ export function Default() {
       <span>Shake on mount</span>
     </PixelShake>
   );
-}
-`,
+}`,
   'pixel-sheet': `import { useState } from 'react';
 import { PixelSheet } from '@pxlkit/ui-kit';
 
@@ -1325,8 +1247,7 @@ export function Default() {
       </PixelSheet>
     </>
   );
-}
-`,
+}`,
   'pixel-sidebar': `import { PixelSidebar } from '@pxlkit/ui-kit';
 
 const sections = [
@@ -1353,14 +1274,12 @@ export function Default() {
       <PixelSidebar sections={sections} header={<span className="text-xs text-retro-text">pxlkit</span>} />
     </div>
   );
-}
-`,
+}`,
   'pixel-skeleton': `import { PixelSkeleton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelSkeleton width="12rem" height="1rem" />;
-}
-`,
+}`,
   'pixel-slide-in': `import { PixelSlideIn } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1371,8 +1290,7 @@ export function Default() {
       </div>
     </PixelSlideIn>
   );
-}
-`,
+}`,
   'pixel-slider': `import { useState } from 'react';
 import { PixelSlider } from '@pxlkit/ui-kit';
 
@@ -1385,8 +1303,7 @@ export function Default() {
       onChange={setValue}
     />
   );
-}
-`,
+}`,
   'pixel-sparkline': `import { PixelSparkline } from '@pxlkit/ui-kit';
 
 const sample = [
@@ -1401,34 +1318,34 @@ const sample = [
 
 export function Default() {
   return <PixelSparkline data={sample} />;
-}
-`,
-  'pixel-spinner': `import React from 'react'
-import { PixelSpinner } from '@pxlkit/ui-kit'
+}`,
+  'pixel-spinner': `import { PixelSpinner } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelSpinner />
-}
-`,
-  'pixel-split-button': `import { PixelSplitButton } from '@pxlkit/ui-kit';
+}`,
+  'pixel-split-button': `import React from 'react';
+import { PixelSplitButton } from '@pxlkit/ui-kit';
 
-const exportOptions = [
-  { value: 'png', label: 'Export as PNG' },
-  { value: 'svg', label: 'Export as SVG' },
-  { value: 'json', label: 'Export icon code' },
-];
-
-export function Default() {
+export function WithCallbacks() {
+  const [last, setLast] = React.useState<string>('—');
   return (
-    <PixelSplitButton
-      label="Export"
-      options={exportOptions}
-      onPrimary={() => {}}
-      onSelect={() => {}}
-    />
+    <div className="flex flex-col items-start gap-2">
+      <PixelSplitButton
+        label="Save"
+        tone="cyan"
+        options={[
+          { value: 'draft', label: 'Save as draft' },
+          { value: 'template', label: 'Save as template' },
+          { value: 'copy', label: 'Save a copy' },
+        ]}
+        onPrimary={() => setLast('primary')}
+        onSelect={(v) => setLast(v)}
+      />
+      <span className="text-xs text-retro-muted">last action: {last}</span>
+    </div>
   );
-}
-`,
+}`,
   'pixel-stack': `import { PixelStack } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1439,24 +1356,18 @@ export function Default() {
       <div className="text-sm text-retro-muted">Third item</div>
     </PixelStack>
   );
-}
-`,
-  'pixel-star-rating': `import { PxlKitIcon } from '@pxlkit/core';
-import { Heart } from '@pxlkit/gamification';
-import { PixelStarRating } from '@pxlkit/ui-kit';
+}`,
+  'pixel-star-rating': `import { PixelStarRating } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelStarRating value={4} />;
-}
-`,
-  'pixel-stat-card': `import { PixelStatCard } from '@pxlkit/ui-kit'
+}`,
+  'pixel-stat-card': `import { PixelStatCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
-}
-`,
-  'pixel-stat-group': `import { PixelStatGroup } from '@pxlkit/ui-kit';
-import { PixelStatCard } from '@pxlkit/ui-kit';
+}`,
+  'pixel-stat-group': `import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -1466,10 +1377,8 @@ export function Default() {
       <PixelStatCard label="Active" value="312" />
     </PixelStatGroup>
   );
-}
-`,
-  'pixel-stepper': `import { useState } from 'react';
-import { PixelStepper } from '@pxlkit/ui-kit';
+}`,
+  'pixel-stepper': `import { PixelStepper } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -1479,18 +1388,15 @@ export function Default() {
       <PixelStepper.Step label="Confirm" description="Review and submit" />
     </PixelStepper>
   );
-}
-`,
+}`,
   'pixel-switch': `import { useState } from 'react';
 import { PixelSwitch } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [on, setOn] = useState(false);
   return <PixelSwitch label="Enable notifications" checked={on} onChange={setOn} />;
-}
-`,
-  'pixel-table': `import * as React from 'react';
-import { PixelTable, type PixelTableSortState } from '@pxlkit/ui-kit';
+}`,
+  'pixel-table': `import { PixelTable } from '@pxlkit/ui-kit';
 
 type Row = {
   id: string;
@@ -1513,10 +1419,8 @@ const baseColumns = [
 
 export function Default() {
   return <PixelTable<Row> columns={baseColumns} data={rows} />;
-}
-`,
-  'pixel-tabs': `import { useState } from 'react';
-import { PixelTabs } from '@pxlkit/ui-kit';
+}`,
+  'pixel-tabs': `import { PixelTabs } from '@pxlkit/ui-kit';
 import type { TabItem } from '@pxlkit/ui-kit';
 
 const ITEMS: TabItem[] = [
@@ -1526,9 +1430,8 @@ const ITEMS: TabItem[] = [
 ];
 
 export function Default() {
-  return <PixelTabs items={ITEMS} defaultTab="overview" />;
-}
-`,
+  return <PixelTabs items={ITEMS} defaultValue="overview" />;
+}`,
   'pixel-testimonial-card': `import { PixelTestimonialCard } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1542,16 +1445,13 @@ export function Default() {
       verified
     />
   );
-}
-`,
+}`,
   'pixel-text-link': `import { PixelTextLink } from '@pxlkit/ui-kit';
 
 export function Default() {
-  return <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>;
-}
-`,
-  'pixel-textarea': `import { useState } from 'react';
-import { PixelTextarea } from '@pxlkit/ui-kit';
+  return <PixelTextLink href="https://pxlkit.xyz">Read the docs</PixelTextLink>;
+}`,
+  'pixel-textarea': `import { PixelTextarea } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -1561,8 +1461,7 @@ export function Default() {
       hint="Up to 280 characters."
     />
   );
-}
-`,
+}`,
   'pixel-timeline': `import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1579,11 +1478,9 @@ export function Default() {
       </PixelTimelineItem>
     </PixelTimeline>
   );
-}
-`,
+}`,
   'pixel-toast': `import { PixelToast } from '@pxlkit/ui-kit';
 import type { ToastItem } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
 
 const noop = () => {};
 
@@ -1598,8 +1495,7 @@ const baseToast = (overrides: Partial<ToastItem> = {}): ToastItem => ({
 
 export function Default() {
   return <PixelToast toast={baseToast()} onDismiss={noop} />;
-}
-`,
+}`,
   'pixel-toggle': `import { useState } from 'react';
 import { PixelToggle } from '@pxlkit/ui-kit';
 
@@ -1610,8 +1506,7 @@ export function Default() {
       Bold
     </PixelToggle>
   );
-}
-`,
+}`,
   'pixel-toggle-group': `import { useState } from 'react';
 import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
 
@@ -1629,11 +1524,8 @@ export function Default() {
       <PixelToggle value="right">Right</PixelToggle>
     </PixelToggleGroup>
   );
-}
-`,
-  'pixel-tooltip': `import { useState } from 'react';
-import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+}`,
+  'pixel-tooltip': `import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -1641,8 +1533,7 @@ export function Default() {
       <PixelButton>Save</PixelButton>
     </PixelTooltip>
   );
-}
-`,
+}`,
   'pixel-two-column': `import { PixelTwoColumn } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1652,14 +1543,12 @@ export function Default() {
       right={<div className="text-sm text-retro-muted">Right column</div>}
     />
   );
-}
-`,
+}`,
   'pixel-typewriter': `import { PixelTypewriter } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelTypewriter text="Hello, pxlkit." />;
-}
-`,
+}`,
   'pixel-zoom-in': `import { PixelZoomIn } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1670,8 +1559,7 @@ export function Default() {
       </div>
     </PixelZoomIn>
   );
-}
-`,
+}`,
   'pxl-kit-button': `import { PxlKitButton } from '@pxlkit/ui-kit';
 
 const StarIcon = () => (
@@ -1680,16 +1568,9 @@ const StarIcon = () => (
   </svg>
 );
 
-const PlusIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-    <path d="M12 5v14M5 12h14" />
-  </svg>
-);
-
 export function Default() {
   return <PxlKitButton label="Favorite" icon={<StarIcon />} />;
-}
-`,
+}`,
   'pxl-kit-locale-provider': `import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -1698,21 +1579,21 @@ export function Default() {
       <p>Hello, world!</p>
     </PxlKitLocaleProvider>
   );
-}
-`,
-  'pxl-kit-surface-provider': `import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+}`,
+  'pxl-kit-surface-provider': `import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
     <PxlKitSurfaceProvider surface="pixel">
-      <p>Nested PxlKit components default to the pixel surface.</p>
+      <div className="flex flex-wrap gap-2">
+        <PixelButton>Pixel</PixelButton>
+        <PixelButton variant="outline" tone="cyan">Pixel outline</PixelButton>
+      </div>
     </PxlKitSurfaceProvider>
   );
-}
-`,
+}`,
   'pxl-kit-toast-provider': `import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -1735,6 +1616,5 @@ export function Default() {
       <DefaultTriggers />
     </PxlKitToastProvider>
   );
-}
-`,
+}`,
 };

@@ -8,7 +8,7 @@
  * to overwrite it (a hand-authored *.stories.tsx is detected).
  */
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Component from './PixelMultiSelect';
 import manifest from './PixelMultiSelect.manifest';
 import * as examples from './PixelMultiSelect.examples';

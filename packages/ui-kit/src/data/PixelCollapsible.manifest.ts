@@ -20,9 +20,9 @@ export default defineManifest({
   highlights: [
     'Single-section disclosure pattern with animated chevron rotation',
     'Seven brand tones applied to the header button (neutral default)',
-    'Surface-aware typography (pixel vs linear) via shared surface context',
+    'Surface-aware typography (pixel vs linear)',
     'Uncontrolled state with `defaultOpen` for SSR-friendly initial render',
-    'SSR-safe and tree-shakable; renders children only when expanded',
+    'SSR-safe and tree-shakable; renders its content only when expanded',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
@@ -41,7 +41,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus to the disclosure trigger' },
     ],
     notes:
-      'Header is a native <button> so assistive tech announces it as a button trigger. The trigger exposes aria-expanded reflecting the open state and aria-controls pointing at the content region (a stable generated id); the content region is labelled by the trigger via aria-labelledby — the same wiring PixelAccordion uses.',
+      'Header is a native <button> so assistive tech announces it as a button trigger. The trigger exposes aria-expanded reflecting the open state and aria-controls pointing at the content region (a stable generated id); the content container follows the trigger in reading order and takes no name, which ARIA does not allow on an element without a role — the same wiring PixelAccordion uses.',
   },
   related: ['PixelAccordion', 'PixelTabs'],
   apiStability: 'stable',

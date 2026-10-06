@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelParallaxLayerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelParallaxLayerDocsMeta = {
@@ -17,10 +23,70 @@ export const PixelParallaxLayerDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelParallaxLayerDocsSection({ className }: PixelParallaxLayerDocsSectionProps): React.ReactElement {
+/** PixelParallaxLayer's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelParallaxLayer } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelParallaxLayer',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content of the layer.' },
+          { name: 'speed', type: 'number', default: '0.5', description: 'Parallax multiplier. 0 = no movement, 1 = full scroll speed, negative = reverse.' },
+          { name: 'axis', type: "'x' | 'y' | 'both'", default: "'y'", description: 'Axis to translate on. Default `"y"`.' },
+          { name: 'className', type: 'string', description: 'Extra classes on the wrapper.' },
+          { name: 'style', type: 'React.CSSProperties', description: 'Inline styles of the wrapper.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelParallaxLayer } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelParallaxLayer',
+        props: [
+          { name: 'speed', type: 'number', default: '0.5', description: 'Multiplier of the scroll: 0 holds the layer in place, 1 moves it at scroll speed, a negative one reverses it.' },
+          { name: 'axis', type: "'x' | 'y' | 'both'", default: "'y'", description: 'Axis the layer moves along.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content of the layer.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelParallaxLayer } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelParallaxLayer',
+        selector: 'pxl-parallax-layer',
+        props: [
+          { name: 'speed', type: 'number', default: '0.5', accepts: 'unknown', description: 'Multiplier of the scroll: 0 holds the layer in place, 1 moves it at scroll speed, a negative one reverses it.' },
+          { name: 'axis', type: "'x' | 'y' | 'both'", default: "'y'", description: 'Axis the layer moves along.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelParallaxLayerDocsSection({ className, headingLevel = 2 }: PixelParallaxLayerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-parallax-layer-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-parallax-layer-heading'>PixelParallaxLayer</h2>
+      <Title id='pixel-parallax-layer-heading'>PixelParallaxLayer</Title>
       <p className="docs-lead">Scroll-driven parallax wrapper that GPU-translates its children proportionally to scroll position.</p>
       <ul className="docs-highlights">
         <li>GPU-composited via translate3d for smooth 60fps motion</li>
@@ -33,12 +99,12 @@ export function PixelParallaxLayerDocsSection({ className }: PixelParallaxLayerD
       <dt>Category</dt><dd>parallax</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-parallax-layer-api">
+      <Heading id="pixel-parallax-layer-api">API</Heading>
+      <FrameworkApi label={'PixelParallaxLayer API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-parallax-layer-a11y">
-      <h3 id="pixel-parallax-layer-a11y">Accessibility</h3>
+      <Heading id="pixel-parallax-layer-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -47,8 +113,11 @@ export function PixelParallaxLayerDocsSection({ className }: PixelParallaxLayerD
       <p className="docs-aria-notes">Parallax is decorative; consumers should gate motion or apply aria-hidden on purely decorative layers.</p>
     </section>
     <section aria-labelledby="pixel-parallax-layer-usage">
-      <h3 id="pixel-parallax-layer-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelParallaxLayer } from '@pxlkit/ui-kit';
+      <Heading id="pixel-parallax-layer-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelParallaxLayer usage'}
+        react={`import { PixelParallaxLayer } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,14 +127,40 @@ export function Default() {
       </div>
     </PixelParallaxLayer>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelParallaxLayer } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelParallaxLayer :speed="0.5" axis="y">
+    <div style="padding: 24px; background: #111; color: #fff">Scroll to see this layer move at half speed.</div>
+  </PixelParallaxLayer>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelParallaxLayer } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelParallaxLayer],
+  template: \`
+    <pxl-parallax-layer [speed]="0.5" axis="y">
+      <div style="padding: 24px; background: #111; color: #fff">Scroll to see this layer move at half speed.</div>
+    </pxl-parallax-layer>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default (background)</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default (background)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default (background) code'}
+          react={`import { PixelParallaxLayer } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelParallaxLayer speed={0.5} axis="y">
       <div style={{ padding: 24, background: '#111', color: '#fff' }}>
@@ -73,11 +168,38 @@ export function Default() {
       </div>
     </PixelParallaxLayer>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelParallaxLayer } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelParallaxLayer :speed="0.5" axis="y">
+    <div style="padding: 24px; background: #111; color: #fff">Scroll to see this layer move at half speed.</div>
+  </PixelParallaxLayer>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelParallaxLayer } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelParallaxLayer],
+  template: \`
+    <pxl-parallax-layer [speed]="0.5" axis="y">
+      <div style="padding: 24px; background: #111; color: #fff">Scroll to see this layer move at half speed.</div>
+    </pxl-parallax-layer>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-foreground">
-        <h4>Foreground (reverse)</h4>
-        <pre className="docs-code"><code>{`export function Foreground() {
+        <Subheading>Foreground (reverse)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Foreground (reverse) code'}
+          react={`import { PixelParallaxLayer } from '@pxlkit/ui-kit';
+
+export function Foreground() {
   return (
     <PixelParallaxLayer speed={-0.3} axis="y">
       <div style={{ padding: 24, background: '#222', color: '#fff' }}>
@@ -85,11 +207,38 @@ export function Default() {
       </div>
     </PixelParallaxLayer>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelParallaxLayer } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelParallaxLayer :speed="-0.3" axis="y">
+    <div style="padding: 24px; background: #222; color: #fff">Foreground float-up (negative speed).</div>
+  </PixelParallaxLayer>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelParallaxLayer } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelParallaxLayer],
+  template: \`
+    <pxl-parallax-layer [speed]="-0.3" axis="y">
+      <div style="padding: 24px; background: #222; color: #fff">Foreground float-up (negative speed).</div>
+    </pxl-parallax-layer>
+  \`,
+})
+export class Foreground {}`}
+        />
       </article>
       <article className="docs-example" id="example-horizontal">
-        <h4>Horizontal axis</h4>
-        <pre className="docs-code"><code>{`export function Horizontal() {
+        <Subheading>Horizontal axis</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Horizontal axis code'}
+          react={`import { PixelParallaxLayer } from '@pxlkit/ui-kit';
+
+export function Horizontal() {
   return (
     <div className="relative w-full overflow-hidden">
       <PixelParallaxLayer speed={0.4} axis="x">
@@ -99,7 +248,33 @@ export function Default() {
       </PixelParallaxLayer>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelParallaxLayer } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative w-full overflow-hidden">
+    <PixelParallaxLayer :speed="0.4" axis="x">
+      <div style="padding: 24px; background: #0EA5E9; color: #fff">Horizontal parallax drift.</div>
+    </PixelParallaxLayer>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelParallaxLayer } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelParallaxLayer],
+  template: \`
+    <div class="relative w-full overflow-hidden">
+      <pxl-parallax-layer [speed]="0.4" axis="x">
+        <div style="padding: 24px; background: #0EA5E9; color: #fff">Horizontal parallax drift.</div>
+      </pxl-parallax-layer>
+    </div>
+  \`,
+})
+export class Horizontal {}`}
+        />
       </article>
     </section>
     </section>

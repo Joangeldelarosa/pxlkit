@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelHeroMediaDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelHeroMediaDocsMeta = {
@@ -17,28 +23,103 @@ export const PixelHeroMediaDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelHeroMediaDocsSection({ className }: PixelHeroMediaDocsSectionProps): React.ReactElement {
+/** PixelHeroMedia's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelHeroMedia } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelHeroMedia',
+        props: [
+          { name: 'ratio', type: "'1/1' | '4/5' | '16/10' | '16/9'", default: "'16/10'", description: 'Aspect ratio of the figure.' },
+          { name: 'anchor', type: "'center' | 'baseline-headline'", default: "'center'", description: "Centred across its row, or on the row's end beside a headline." },
+          { name: 'framed', type: 'boolean', default: 'false', description: "Draw the surface border and radius in the tone's border colour." },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the frame.' },
+          { name: 'caption', type: 'string', description: 'Caption under the media, in a `<figcaption>`.' },
+          { name: 'captionClassName', type: 'string', description: 'Optional className applied to the inner caption (figcaption).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The media.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelHeroMedia } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelHeroMedia',
+        props: [
+          { name: 'ratio', type: "'1/1' | '4/5' | '16/10' | '16/9'", default: "'16/10'", description: 'Aspect ratio of the figure.' },
+          { name: 'anchor', type: "'center' | 'baseline-headline'", default: "'center'", description: "Centred across its row, or on the row's end beside a headline." },
+          { name: 'framed', type: 'boolean', default: 'false', description: "Draw the surface border and radius in the tone's border colour." },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the frame.' },
+          { name: 'caption', type: 'string', description: 'Caption under the media, in a `<figcaption>`.' },
+          { name: 'captionClass', type: 'string', description: "Extra classes for the caption (the React kit's `captionClassName`)." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The media.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<figure>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelHeroMedia } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelHeroMedia',
+        selector: 'figure[pxlHeroMedia]',
+        props: [
+          { name: 'ratio', type: "'1/1' | '4/5' | '16/10' | '16/9'", default: "'16/10'", description: 'Aspect ratio of the figure.' },
+          { name: 'anchor', type: "'center' | 'baseline-headline'", default: "'center'", description: "Centred across its row, or on the row's end beside a headline." },
+          { name: 'framed', type: 'boolean', default: 'false', accepts: 'unknown', description: "Draw the surface border and radius in the tone's border colour." },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the frame.' },
+          { name: 'caption', type: 'string', description: 'Caption under the media, in a `<figcaption>`.' },
+          { name: 'captionClass', type: 'string', description: "Extra classes for the caption (the React kit's `captionClassName`)." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on a native `<figure>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelHeroMediaDocsSection({ className, headingLevel = 2 }: PixelHeroMediaDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-hero-media-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-hero-media-heading'>PixelHeroMedia</h2>
+      <Title id='pixel-hero-media-heading'>PixelHeroMedia</Title>
       <p className="docs-lead">Aspect-ratio-preserving figure slot for hero media with optional frame, tone border, and caption.</p>
       <ul className="docs-highlights">
         <li>Four ratio presets (1/1, 4/5, 16/10, 16/9) reserve layout to prevent CLS</li>
         <li>Optional framed border driven by surface + tone tokens</li>
         <li>Renders as semantic figure/figcaption when caption is provided</li>
-        <li>Surface-aware via useEffectiveSurface for light/dark contexts</li>
+        <li>Surface-aware (pixel / linear) frame and corners</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>hero</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-hero-media-api">
+      <Heading id="pixel-hero-media-api">API</Heading>
+      <FrameworkApi label={'PixelHeroMedia API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-hero-media-a11y">
-      <h3 id="pixel-hero-media-a11y">Accessibility</h3>
+      <Heading id="pixel-hero-media-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>figure/figcaption when caption present</code></li>
@@ -47,8 +128,11 @@ export function PixelHeroMediaDocsSection({ className }: PixelHeroMediaDocsSecti
       <p className="docs-aria-notes">Caption is rendered inside a &lt;figcaption&gt; when provided; otherwise the media stands alone inside &lt;figure&gt;.</p>
     </section>
     <section aria-labelledby="pixel-hero-media-usage">
-      <h3 id="pixel-hero-media-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelHeroMedia } from '@pxlkit/ui-kit';
+      <Heading id="pixel-hero-media-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelHeroMedia usage'}
+        react={`import { PixelHeroMedia } from '@pxlkit/ui-kit';
 
 const Placeholder = ({ label }: { label: string }) => (
   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted">
@@ -62,40 +146,192 @@ export function Default() {
       <Placeholder label="16:10 media" />
     </PixelHeroMedia>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelHeroMedia } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroMedia ratio="16/10">
+    <div
+      class="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted"
+    >
+      16:10 media
+    </div>
+  </PixelHeroMedia>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelHeroMedia } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroMedia],
+  template: \`
+    <figure pxlHeroMedia ratio="16/10">
+      <div
+        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted"
+      >
+        16:10 media
+      </div>
+    </figure>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelHeroMedia } from '@pxlkit/ui-kit';
+
+const Placeholder = ({ label }: { label: string }) => (
+  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted">
+    {label}
+  </div>
+);
+
+export function Default() {
   return (
     <PixelHeroMedia ratio="16/10">
       <Placeholder label="16:10 media" />
     </PixelHeroMedia>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroMedia } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroMedia ratio="16/10">
+    <div
+      class="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted"
+    >
+      16:10 media
+    </div>
+  </PixelHeroMedia>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroMedia } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroMedia],
+  template: \`
+    <figure pxlHeroMedia ratio="16/10">
+      <div
+        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted"
+      >
+        16:10 media
+      </div>
+    </figure>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-framed">
-        <h4>Framed with caption</h4>
-        <pre className="docs-code"><code>{`export function Framed() {
+        <Subheading>Framed with caption</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Framed with caption code'}
+          react={`import { PixelHeroMedia } from '@pxlkit/ui-kit';
+
+const Placeholder = ({ label }: { label: string }) => (
+  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted">
+    {label}
+  </div>
+);
+
+export function Framed() {
   return (
     <PixelHeroMedia ratio="16/9" framed tone="cyan" caption="Framed hero with caption">
       <Placeholder label="16:9 framed" />
     </PixelHeroMedia>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroMedia } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroMedia ratio="16/9" framed tone="cyan" caption="Framed hero with caption">
+    <div
+      class="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted"
+    >
+      16:9 framed
+    </div>
+  </PixelHeroMedia>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroMedia } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroMedia],
+  template: \`
+    <figure pxlHeroMedia ratio="16/9" framed tone="cyan" caption="Framed hero with caption">
+      <div
+        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted"
+      >
+        16:9 framed
+      </div>
+    </figure>
+  \`,
+})
+export class Framed {}`}
+        />
       </article>
       <article className="docs-example" id="example-square">
-        <h4>Square (1:1)</h4>
-        <pre className="docs-code"><code>{`export function Square() {
+        <Subheading>Square (1:1)</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Square (1:1) code'}
+          react={`import { PixelHeroMedia } from '@pxlkit/ui-kit';
+
+const Placeholder = ({ label }: { label: string }) => (
+  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted">
+    {label}
+  </div>
+);
+
+export function Square() {
   return (
     <PixelHeroMedia ratio="1/1" framed tone="purple">
       <Placeholder label="1:1 square" />
     </PixelHeroMedia>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroMedia } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroMedia ratio="1/1" framed tone="purple">
+    <div
+      class="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted"
+    >
+      1:1 square
+    </div>
+  </PixelHeroMedia>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroMedia } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroMedia],
+  template: \`
+    <figure pxlHeroMedia ratio="1/1" framed tone="purple">
+      <div
+        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted"
+      >
+        1:1 square
+      </div>
+    </figure>
+  \`,
+})
+export class Square {}`}
+        />
       </article>
     </section>
     </section>

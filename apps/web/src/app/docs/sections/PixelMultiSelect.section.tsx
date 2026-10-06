@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelMultiSelectDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelMultiSelectDocsMeta = {
@@ -17,10 +23,109 @@ export const PixelMultiSelectDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsSectionProps): React.ReactElement {
+/** PixelMultiSelect's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelMultiSelect } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelMultiSelect',
+        props: [
+          { name: 'value', type: 'string[]', description: 'The selected values, in the order picked; leave unset for an uncontrolled multi-select.' },
+          { name: 'defaultValue', type: 'string[]', description: 'Initial values while uncontrolled.' },
+          { name: 'onChange', type: '(next: string[]) => void', description: 'Called with the selected values after every toggle, removal or clear.' },
+          { name: 'options', type: 'PixelMultiSelectOption[]', required: true, description: 'The options of the listbox.' },
+          { name: 'searchable', type: 'boolean', default: 'false', description: 'Shows a search field that filters the options.' },
+          { name: 'max', type: 'number', description: 'Most values that can be selected.' },
+          { name: 'placeholder', type: 'string', default: "'Select…'", description: 'Text shown while nothing is selected.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows a button that clears the selection while there is one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Hidden-input `name`. Multiple values are serialized as repeated `<input type="hidden" name={name}>` entries; read with `FormData.getAll(name)`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelMultiSelect } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelMultiSelect',
+        props: [
+          { name: 'modelValue', type: 'string[]', binding: 'v-model', description: 'The selected values, in the order picked (`v-model`); leave unset for an uncontrolled multi-select.' },
+          { name: 'defaultValue', type: 'string[]', description: 'Initial values while uncontrolled.' },
+          { name: 'options', type: 'PixelMultiSelectOption[]', required: true, description: 'The options of the listbox.' },
+          { name: 'searchable', type: 'boolean', default: 'false', description: 'Shows a search field that filters the options.' },
+          { name: 'max', type: 'number', description: 'Most values that can be selected.' },
+          { name: 'placeholder', type: 'string', default: "'Select…'", description: 'Text shown while nothing is selected.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows a button that clears the selection while there is one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — one hidden input per value submits the selection.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'values: string[]', description: 'The selected values after every toggle, removal or clear.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+          'Its template ref exposes `element`: the combobox trigger.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelMultiSelect } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelMultiSelect',
+        selector: 'pxl-multi-select',
+        props: [
+          { name: 'value', type: 'string[]', binding: '[(value)]', description: 'The selected values, in the order picked (`[(value)]`); leave unset for an uncontrolled multi-select.' },
+          { name: 'defaultValue', type: 'string[]', description: 'Initial values while uncontrolled.' },
+          { name: 'options', type: 'PixelMultiSelectOption[]', required: true, description: 'The options of the listbox.' },
+          { name: 'searchable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows a search field that filters the options.' },
+          { name: 'max', type: 'number', accepts: 'unknown', description: 'Most values that can be selected.' },
+          { name: 'placeholder', type: 'string', default: "'Select…'", description: 'Text shown while nothing is selected.' },
+          { name: 'clearable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows a button that clears the selection while there is one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — one hidden input per value submits the selection.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the trigger; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string[]', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string[]`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelMultiSelectDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelMultiSelectDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-multi-select-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-multi-select-heading'>PixelMultiSelect</h2>
+      <Title id='pixel-multi-select-heading'>PixelMultiSelect</Title>
       <p className="docs-lead">Multi-select combobox with chip-based selected values, optional search, and max-selection cap.</p>
       <ul className="docs-highlights">
         <li>Combobox + listbox with aria-multiselectable</li>
@@ -34,19 +139,19 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-multi-select-api">
+      <Heading id="pixel-multi-select-api">API</Heading>
+      <FrameworkApi label={'PixelMultiSelect API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-multi-select-a11y">
-      <h3 id="pixel-multi-select-a11y">Accessibility</h3>
+      <Heading id="pixel-multi-select-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>combobox</code></li>
         <li><code>listbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Trigger uses role=combobox with aria-controls/expanded/activedescendant. Listbox advertises aria-multiselectable. Chip remove targets carry aria-label for the screen reader.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">The field holds, side by side, the chips — each a label and a native button named after it (&quot;Remove Apple&quot;) — the combobox and, when clearable, a native &quot;Clear selection&quot; button: a button cannot contain a button, so none sits inside another, and each is a tab stop in reading order. The combobox (role=combobox, named by the label) has aria-controls/expanded/activedescendant, and so does the search field while focus is in it; it reads the selected labels as its value. A remove or clear button that holds focus hands it on as it goes; under the pointer they leave focus where it is. A press elsewhere on the field opens or closes the listbox and focuses the combobox; the popover anchors to the field. The field shows the combobox&#39;s keyboard focus. Listbox advertises aria-multiselectable and marks the chosen options aria-selected.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -56,6 +161,11 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
           </tr>
         </thead>
         <tbody>
+          <tr>
+            <td><kbd>Tab</kbd></td>
+            <td>Move through the field: each chip&#39;s remove button, the combobox, then the clear button</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
           <tr>
             <td><kbd>ArrowDown</kbd></td>
             <td>Open popover or move highlight down</td>
@@ -77,8 +187,13 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
-            <td><kbd>Enter / Space</kbd></td>
+            <td><kbd>Enter</kbd></td>
             <td>Toggle highlighted option</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Space</kbd></td>
+            <td>Toggle highlighted option from the combobox; types a space in the search field</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
@@ -86,12 +201,30 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
             <td>Remove last selected chip when query is empty</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
+          <tr>
+            <td><kbd>Escape</kbd></td>
+            <td>Close the popover; from the search field, focus returns to the combobox</td>
+            <td>popover open</td>
+          </tr>
+          <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Remove the chip and focus the next chip&#39;s remove button, else the combobox</td>
+            <td>remove button focused</td>
+          </tr>
+          <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Clear the selection and focus the combobox</td>
+            <td>clear button focused</td>
+          </tr>
         </tbody>
       </table>
     </section>
     <section aria-labelledby="pixel-multi-select-usage">
-      <h3 id="pixel-multi-select-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react';
+      <Heading id="pixel-multi-select-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelMultiSelect usage'}
+        react={`import React from 'react';
 import { PixelMultiSelect } from '@pxlkit/ui-kit';
 
 const OPTIONS = [
@@ -113,14 +246,64 @@ export function Default() {
       placeholder="Pick frameworks…"
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-vue';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+const value = ref(['react']);
+</script>
+
+<template>
+  <PixelMultiSelect v-model="value" label="Frameworks" :options="OPTIONS" placeholder="Pick frameworks…" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-angular';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+@Component({
+  imports: [PixelMultiSelect],
+  template: \`<pxl-multi-select label="Frameworks" [options]="options" placeholder="Pick frameworks…" [(value)]="value" />\`,
+})
+export class Default {
+  readonly options = OPTIONS;
+  readonly value = signal(['react']);
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import React from 'react';
+import { PixelMultiSelect } from '@pxlkit/ui-kit';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+export function Default() {
   const [value, setValue] = React.useState<string[]>(['react']);
   return (
     <PixelMultiSelect
@@ -131,11 +314,62 @@ export function Default() {
       placeholder="Pick frameworks…"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-vue';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+const value = ref(['react']);
+</script>
+
+<template>
+  <PixelMultiSelect v-model="value" label="Frameworks" :options="OPTIONS" placeholder="Pick frameworks…" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-angular';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+@Component({
+  imports: [PixelMultiSelect],
+  template: \`<pxl-multi-select label="Frameworks" [options]="options" placeholder="Pick frameworks…" [(value)]="value" />\`,
+})
+export class Default {
+  readonly options = OPTIONS;
+  readonly value = signal(['react']);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-searchable">
-        <h4>Searchable + Clearable</h4>
-        <pre className="docs-code"><code>{`export function Searchable() {
+        <Subheading>Searchable + Clearable</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Searchable + Clearable code'}
+          react={`import React from 'react';
+import { PixelMultiSelect } from '@pxlkit/ui-kit';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+export function Searchable() {
   const [value, setValue] = React.useState<string[]>([]);
   return (
     <PixelMultiSelect
@@ -148,11 +382,64 @@ export function Default() {
       clearable
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-vue';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+const value = ref<string[]>([]);
+</script>
+
+<template>
+  <PixelMultiSelect v-model="value" label="Frameworks" hint="Type to filter" :options="OPTIONS" searchable clearable />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-angular';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+@Component({
+  imports: [PixelMultiSelect],
+  template: \`
+    <pxl-multi-select label="Frameworks" hint="Type to filter" [options]="options" searchable clearable [(value)]="value" />
+  \`,
+})
+export class Searchable {
+  readonly options = OPTIONS;
+  readonly value = signal<string[]>([]);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-max">
-        <h4>With Max</h4>
-        <pre className="docs-code"><code>{`export function WithMax() {
+        <Subheading>With Max</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Max code'}
+          react={`import React from 'react';
+import { PixelMultiSelect } from '@pxlkit/ui-kit';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+export function WithMax() {
   const [value, setValue] = React.useState<string[]>(['react', 'vue']);
   return (
     <PixelMultiSelect
@@ -164,15 +451,52 @@ export function Default() {
       clearable
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-vue';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+const value = ref(['react', 'vue']);
+</script>
+
+<template>
+  <PixelMultiSelect v-model="value" label="Pick up to 2" :options="OPTIONS" :max="2" clearable />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-angular';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+@Component({
+  imports: [PixelMultiSelect],
+  template: \`<pxl-multi-select label="Pick up to 2" [options]="options" [max]="2" clearable [(value)]="value" />\`,
+})
+export class WithMax {
+  readonly options = OPTIONS;
+  readonly value = signal(['react', 'vue']);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-select">PixelSelect</a></li>
-        <li><a href="#pixel-combobox">PixelCombobox</a></li>
-        <li><a href="#pixel-tag-input">PixelTagInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-select' : '#pixel-select'}>PixelSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-combobox' : '#pixel-combobox'}>PixelCombobox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tag-input' : '#pixel-tag-input'}>PixelTagInput</a></li>
       </ul>
     </section>
     </section>

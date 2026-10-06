@@ -1,11 +1,23 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
+import { act, render, fireEvent, screen } from '@testing-library/react';
 import { PixelSplitButton } from '../../actions/PixelSplitButton';
 
 const OPTIONS = [
   { value: 'csv', label: 'Export CSV' },
   { value: 'json', label: 'Export JSON' },
+];
+/** The border, corners, shadow, press offset and ring of a framed button. */
+const FRAME = [
+  'border',
+  'border-2',
+  'pxl-corner-sm',
+  'rounded-md',
+  'pxl-shadow',
+  'pxl-shadow-hover',
+  'pxl-shadow-active',
+  'shadow-sm',
+  'focus-visible:ring-2',
 ];
 
 describe('PixelSplitButton — primary half', () => {
@@ -89,5 +101,185 @@ describe('PixelSplitButton — disabled & ref', () => {
     const ref = React.createRef<HTMLDivElement>();
     render(<PixelSplitButton ref={ref} label="Export" options={OPTIONS} />);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
+  });
+});
+
+// Regression: the frame clips both halves (`overflow-hidden`), so the focus
+// ring around either was cut off, and the chevron had none.
+describe('PixelSplitButton — keyboard focus', () => {
+  it('shows keyboard focus inside each half, on both surfaces', () => {
+    const { getAllByRole } = render(
+      <>
+        <PixelSplitButton label="Pixel" options={OPTIONS} surface="pixel" />
+        <PixelSplitButton label="Linear" options={OPTIONS} surface="linear" />
+      </>,
+    );
+    const halves = getAllByRole('button');
+    expect(halves).toHaveLength(4);
+    for (const half of halves) expect(half.className.split(' ')).toContain('focus-visible:pxl-focus-inset');
+  });
+});
+
+// Regression: the primary half was a PixelButton with overrides merged in,
+// and Tailwind emits the button's own `border-2` (pixel) and `shadow-sm`
+// (linear) after them, so it kept a border and a shadow inside the frame.
+describe('PixelSplitButton — frame', () => {
+  it('leaves the border, corners and shadow to the frame, on both surfaces', () => {
+    const { getByRole } = render(
+      <>
+        <PixelSplitButton label="Pixel" options={OPTIONS} surface="pixel" />
+        <PixelSplitButton label="Linear" options={OPTIONS} surface="linear" />
+      </>,
+    );
+    for (const name of ['Pixel', 'Linear']) {
+      const classes = getByRole('button', { name }).className.split(' ');
+      for (const frame of FRAME) expect(classes).not.toContain(frame);
+    }
+  });
+});
+
+/* ─── Regressions: the WAI-ARIA menu button pattern, as in PixelDropdown ── */
+
+describe('PixelSplitButton — menu keyboard and focus', () => {
+  const THREE = [
+    { value: 'png', label: 'Export as PNG' },
+    { value: 'svg', label: 'Export as SVG' },
+    { value: 'json', label: 'Export icon code' },
+  ];
+  const chevron = () => screen.getByRole('button', { name: 'More options' });
+
+  // The open menu never took focus, so neither the arrows nor a screen
+  // reader could reach its options.
+  it('moves focus into the open menu, whose aria-activedescendant follows the arrows, Home and End', () => {
+    render(<PixelSplitButton label="Export" options={THREE} />);
+    fireEvent.click(chevron());
+    const menu = screen.getByRole('menu');
+    expect(document.activeElement).toBe(menu);
+    expect(menu.getAttribute('tabindex')).toBe('-1');
+    expect(menu.hasAttribute('aria-activedescendant')).toBe(false);
+    const [png, svg, json] = screen.getAllByRole('menuitem');
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    expect(menu.getAttribute('aria-activedescendant')).toBe(png!.id);
+    expect(png!.getAttribute('data-highlighted')).toBe('true');
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    expect(menu.getAttribute('aria-activedescendant')).toBe(json!.id);
+    fireEvent.keyDown(menu, { key: 'Home' });
+    expect(menu.getAttribute('aria-activedescendant')).toBe(png!.id);
+    fireEvent.keyDown(menu, { key: 'End' });
+    expect(menu.getAttribute('aria-activedescendant')).toBe(json!.id);
+    fireEvent.keyDown(menu, { key: 'ArrowUp' });
+    expect(menu.getAttribute('aria-activedescendant')).toBe(svg!.id);
+    fireEvent.mouseEnter(png!);
+    expect(menu.getAttribute('aria-activedescendant')).toBe(png!.id);
+    for (const item of [png, svg, json]) expect(item!.getAttribute('tabindex')).toBe('-1');
+    expect(new Set([png!.id, svg!.id, json!.id, menu.id]).size).toBe(4);
+  });
+
+  // The menu had no name, and the chevron did not point at it.
+  it('is named by the chevron, which controls it while open', () => {
+    render(<PixelSplitButton label="Export" options={THREE} />);
+    expect(chevron().id).not.toBe('');
+    expect(chevron().hasAttribute('aria-controls')).toBe(false);
+    fireEvent.click(chevron());
+    const menu = screen.getByRole('menu', { name: 'More options' });
+    expect(menu.getAttribute('aria-labelledby')).toBe(chevron().id);
+    expect(menu.getAttribute('aria-orientation')).toBe('vertical');
+    expect(chevron().getAttribute('aria-controls')).toBe(menu.id);
+  });
+
+  it('opens from the chevron on its first option with ArrowDown and on its last with ArrowUp', () => {
+    render(<PixelSplitButton label="Export" options={THREE} />);
+    fireEvent.keyDown(chevron(), { key: 'ArrowDown' });
+    let menu = screen.getByRole('menu');
+    expect(document.activeElement).toBe(menu);
+    expect(menu.getAttribute('aria-activedescendant')).toBe(screen.getAllByRole('menuitem')[0]!.id);
+    fireEvent.keyDown(menu, { key: 'Escape' });
+    fireEvent.keyDown(chevron(), { key: 'ArrowUp' });
+    menu = screen.getByRole('menu');
+    expect(menu.getAttribute('aria-activedescendant')).toBe(screen.getAllByRole('menuitem')[2]!.id);
+  });
+
+  it('moves into the open menu from the chevron with an arrow key', () => {
+    render(<PixelSplitButton label="Export" options={THREE} />);
+    fireEvent.click(chevron());
+    act(() => chevron().focus());
+    fireEvent.keyDown(chevron(), { key: 'ArrowDown' });
+    const menu = screen.getByRole('menu');
+    expect(document.activeElement).toBe(menu);
+    expect(menu.getAttribute('aria-activedescendant')).toBe(screen.getAllByRole('menuitem')[0]!.id);
+  });
+
+  it('chooses the highlighted option with Enter or Space, returning focus to the chevron', () => {
+    const onSelect = vi.fn();
+    render(<PixelSplitButton label="Export" options={THREE} onSelect={onSelect} />);
+    fireEvent.keyDown(chevron(), { key: 'ArrowDown' });
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'ArrowDown' });
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Enter' });
+    expect(onSelect).toHaveBeenLastCalledWith('svg');
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(document.activeElement).toBe(chevron());
+
+    fireEvent.keyDown(chevron(), { key: 'ArrowUp' });
+    fireEvent.keyDown(screen.getByRole('menu'), { key: ' ' });
+    expect(onSelect).toHaveBeenLastCalledWith('json');
+    expect(document.activeElement).toBe(chevron());
+
+    // Nothing is chosen while nothing is highlighted.
+    fireEvent.click(chevron());
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Enter' });
+    expect(onSelect).toHaveBeenCalledTimes(2);
+    expect(screen.getByRole('menu')).toBeTruthy();
+  });
+
+  it('returns focus to the chevron on Escape, on Tab and when an option is clicked', () => {
+    const onSelect = vi.fn();
+    render(<PixelSplitButton label="Export" options={THREE} onSelect={onSelect} />);
+    fireEvent.click(chevron());
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' });
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(document.activeElement).toBe(chevron());
+
+    fireEvent.click(chevron());
+    // Tab leaves the default to the browser, which moves on from the chevron.
+    expect(fireEvent.keyDown(screen.getByRole('menu'), { key: 'Tab' })).toBe(true);
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(document.activeElement).toBe(chevron());
+
+    fireEvent.click(chevron());
+    const svg = screen.getByRole('menuitem', { name: 'Export as SVG' });
+    act(() => svg.focus());
+    fireEvent.click(svg);
+    expect(onSelect).toHaveBeenLastCalledWith('svg');
+    expect(document.activeElement).toBe(chevron());
+  });
+
+  it('lets focus follow the pointer when a press outside closes the menu', () => {
+    render(<PixelSplitButton label="Export" options={THREE} />);
+    fireEvent.click(chevron());
+    expect(document.activeElement).toBe(screen.getByRole('menu'));
+    fireEvent.pointerDown(document.body);
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(document.activeElement).not.toBe(chevron());
+  });
+
+  it('jumps to an option by typing its label, starting over after a pause', () => {
+    vi.useFakeTimers();
+    try {
+      render(<PixelSplitButton label="Export" options={THREE} />);
+      fireEvent.click(chevron());
+      const menu = screen.getByRole('menu');
+      const [png, svg, json] = screen.getAllByRole('menuitem');
+      fireEvent.keyDown(menu, { key: 'i' });
+      expect(menu.getAttribute('aria-activedescendant')).toBe(json!.id);
+      act(() => { vi.advanceTimersByTime(600); });
+      fireEvent.keyDown(menu, { key: 'S' });
+      expect(menu.getAttribute('aria-activedescendant')).toBe(png!.id);
+      fireEvent.keyDown(menu, { key: 'v' });
+      expect(menu.getAttribute('aria-activedescendant')).toBe(svg!.id);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

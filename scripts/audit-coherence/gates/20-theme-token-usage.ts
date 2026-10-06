@@ -1,10 +1,13 @@
 /**
  * Gate 20 — theme-token-usage.
  *
- * Mission: every visual class in `packages/ui-kit/src/**\/*.tsx` must come
- * from the design-system tokens defined in `packages/ui-kit/src/tokens.ts`
- * (the `tone` map: `bg-retro-*`, `border-retro-*`, `text-retro-*`,
- * `fill-retro-*`, plus the alpha-modulated `bg-retro-*\/NN` variants).
+ * Mission: every visual class of the UI kits must come from the design-system
+ * tokens defined in `packages/ui-kit-core/src/tokens.ts` (the `tone` map:
+ * `bg-retro-*`, `border-retro-*`, `text-retro-*`, `fill-retro-*`, plus the
+ * alpha-modulated `bg-retro-*\/NN` variants) and name a color the theme
+ * defines (`--color-retro-*` in `packages/ui-kit-core/styles.css`). The class
+ * recipes live in the core and the Vue and Angular kits render them too, so
+ * the gate reads the React components, the core and both ports.
  *
  * Why a separate gate?
  *   Core gates check coverage / examples / typings — they don't open files
@@ -20,9 +23,14 @@
  *   - MAJOR  : standard Tailwind color palette — `bg-gray-500`,
  *              `text-blue-400`, `border-zinc-700`. Should be replaced by a
  *              `retro-*` token (we suggest the closest tone in `tokens.ts`).
+ *   - MAJOR  : a `retro-*` class whose color the theme does not define —
+ *              `bg-retro-line` — for which Tailwind generates nothing; and a
+ *              theme variable a stylesheet reads but nothing defines
+ *              (`var(--color-retro-border-base)`), which voids the whole
+ *              declaration.
  *   - OK     : `bg-retro-*`, `border-retro-*`, `text-retro-*`, `fill-retro-*`
- *              (with optional `/NN` alpha) — counted for the frequency
- *              table the dashboard reads later.
+ *              (with optional `/NN` alpha) naming a theme color — counted for
+ *              the frequency table the dashboard reads later.
  *   - SKIPPED: structural color-adjacent utilities that aren't actually
  *              setting a brand color — `bg-transparent`, `bg-current`,
  *              `bg-clip-text`, `bg-gradient-to-r`, `border-0`,
@@ -60,11 +68,8 @@ import {
 } from '../_lib/gate-base.js';
 
 // ---------------------------------------------------------------------------
-// Token catalog — kept in sync with packages/ui-kit/src/tokens.ts.
-// We list the retro color slugs the design system exposes. Anything outside
-// this set that matches `(bg|text|border|fill)-retro-*` is still treated as
-// OK (it's a retro token by namespace), but the SUGGESTION engine uses this
-// list to recommend the closest match for a violating class.
+// Token catalog — kept in sync with packages/ui-kit-core/src/tokens.ts.
+// The tone names the suggestion engine recommends a replacement from.
 // ---------------------------------------------------------------------------
 
 export const RETRO_TONES = [
@@ -79,20 +84,70 @@ export const RETRO_TONES = [
 export type RetroTone = (typeof RETRO_TONES)[number];
 
 /**
- * Retro token slugs that are valid in `bg|text|border|fill-retro-<slug>`.
- * Includes both the tone color names and the structural-surface names that
- * appear in tokens.ts (`border`, `surface`, `text`, `muted`, `bg`).
+ * The colors the theme defines (`--color-retro-<slug>` in
+ * packages/ui-kit-core/styles.css) — the only `retro-*` colors Tailwind turns
+ * into classes. The gate reads them from the stylesheet; this copy, which a
+ * test keeps equal to it, serves repositories without one (the unit tests'
+ * fixtures).
  */
-const RETRO_VALID_SLUGS = new Set<string>([
-  ...RETRO_TONES,
+export const THEME_COLOR_SLUGS: readonly string[] = [
+  'accent',
+  'bg',
   'border',
   'border-strong',
-  'surface',
-  'surface-strong',
-  'text',
+  'card',
+  'cyan',
+  'gold',
+  'green',
+  'green-hover',
   'muted',
-  'bg',
-]);
+  'pink',
+  'primary',
+  'purple',
+  'red',
+  'secondary',
+  'surface',
+  'text',
+];
+
+const DEFAULT_THEME_COLORS: ReadonlySet<string> = new Set(THEME_COLOR_SLUGS);
+
+const THEME_STYLESHEET = 'packages/ui-kit-core/styles.css';
+
+/** The theme variables a stylesheet defines: `--retro-<slug>` and `--color-retro-<slug>`, by full name. */
+export function definedThemeVars(css: string): Set<string> {
+  return new Set(Array.from(css.matchAll(/(--(?:color-)?retro-[a-z0-9-]+)\s*:/g), (match) => match[1]!));
+}
+
+/** The color slugs the theme turns into classes, from its `--color-retro-<slug>` definitions. */
+export function themeColorSlugs(css: string): Set<string> {
+  const slugs = new Set<string>();
+  for (const name of definedThemeVars(css)) {
+    if (name.startsWith('--color-retro-')) slugs.add(name.slice('--color-retro-'.length));
+  }
+  return slugs;
+}
+
+/**
+ * Findings for every theme variable `css` reads (`var(--retro-*)`,
+ * `var(--color-retro-*)`) that `defined` lacks: the browser drops the whole
+ * declaration, so the border, shadow or color it sets silently disappears.
+ */
+export function undefinedThemeVarFindings(relFile: string, css: string, defined: ReadonlySet<string>): GateFinding[] {
+  const findings: GateFinding[] = [];
+  for (const match of css.matchAll(/var\(\s*(--(?:color-)?retro-[a-z0-9-]+)/g)) {
+    const name = match[1]!;
+    if (defined.has(name)) continue;
+    const { line, column } = lineColOfIndex(css, match.index! + 'var('.length);
+    findings.push({
+      severity: 'major',
+      file: relFile,
+      message: `\`var(${name})\` at ${relFile}:${line}:${column} reads a theme variable nothing defines — the declaration is dropped`,
+      suggestion: `Read a variable the theme defines (${THEME_STYLESHEET}), e.g. ${name.replace(/-(?:base|dark|light)$/, '')} if it exists, or define ${name}.`,
+    });
+  }
+  return findings;
+}
 
 /**
  * Standard Tailwind color palette names. If a class matches
@@ -243,6 +298,22 @@ const PALETTE_TO_RETRO_TONE: Readonly<Record<string, RetroTone>> = {
 };
 
 /**
+ * The neutral tone is no color of its own: grays map onto the theme's
+ * structural colors — the surface behind, the border around, muted ink.
+ */
+const NEUTRAL_SLUG_BY_PREFIX: Readonly<Record<ColorPrefix, string>> = {
+  bg: 'surface',
+  border: 'border',
+  text: 'muted',
+  fill: 'muted',
+};
+
+/** The theme color a tone stands for after `prefix`. */
+function retroSlugFor(tone: RetroTone, prefix: ColorPrefix): string {
+  return tone === 'neutral' ? NEUTRAL_SLUG_BY_PREFIX[prefix] : tone;
+}
+
+/**
  * Maps a class-prefix (`bg` | `text` | `border` | `fill`) onto the tone-map
  * subkey it should resolve to (see tokens.ts `tone[<tone>]`).
  */
@@ -367,6 +438,7 @@ export function extractColorClasses(source: string): ExtractedClass[] {
 
 export type ClassVerdict =
   | { kind: 'ok-retro'; toneSlug: string; alpha: string | null }
+  | { kind: 'unknown-retro'; slug: string }
   | { kind: 'hardcoded'; reason: string }
   | { kind: 'palette'; palette: string; shade: string | null; alpha: string | null }
   | { kind: 'keyword-color'; keyword: string }
@@ -389,7 +461,11 @@ function splitAlpha(body: string): { core: string; alpha: string | null } {
 /**
  * Decides what a class' body means. Pure — no IO.
  */
-export function classifyClassBody(prefix: ColorPrefix, body: string): ClassVerdict {
+export function classifyClassBody(
+  prefix: ColorPrefix,
+  body: string,
+  themeColors: ReadonlySet<string> = DEFAULT_THEME_COLORS,
+): ClassVerdict {
   const { core, alpha } = splitAlpha(body);
 
   // Arbitrary value: `bg-[#fff]` / `text-[rgb(0,0,0)]` / `border-[hsl(...)]`
@@ -419,9 +495,11 @@ export function classifyClassBody(prefix: ColorPrefix, body: string): ClassVerdi
     return { kind: 'hardcoded', reason: `bare hex literal ${core}` };
   }
 
-  // Retro token: `bg-retro-green`, `text-retro-text`, `border-retro-border-strong`.
+  // Retro token: `bg-retro-green`, `text-retro-text`, `border-retro-border-strong`
+  // — as long as the theme defines that color.
   if (core.startsWith('retro-')) {
     const slug = core.slice('retro-'.length);
+    if (!themeColors.has(slug)) return { kind: 'unknown-retro', slug };
     return { kind: 'ok-retro', toneSlug: slug, alpha };
   }
 
@@ -481,6 +559,7 @@ export function suggestionFor(input: SuggestionInput): string {
   const { variant, prefix, verdict } = input;
   if (verdict.kind === 'palette') {
     const tone = PALETTE_TO_RETRO_TONE[verdict.palette] ?? 'neutral';
+    const slug = retroSlugFor(tone, prefix);
     const tokenKey = PREFIX_TO_TOKEN_KEY[prefix];
     // For dark shades (>= 500) and bg/border prefixes the tokens.ts default
     // uses a /18 alpha bg + /30 border; for shades < 500 we suggest /soft (/8).
@@ -488,11 +567,11 @@ export function suggestionFor(input: SuggestionInput): string {
     const shadeNum = verdict.shade ? Number(verdict.shade) : 500;
     let suggestedClass: string;
     if (prefix === 'bg') {
-      suggestedClass = shadeNum >= 600 ? `bg-retro-${tone}` : `bg-retro-${tone}/${shadeNum < 400 ? 8 : 18}`;
+      suggestedClass = shadeNum >= 600 ? `bg-retro-${slug}` : `bg-retro-${slug}/${shadeNum < 400 ? 8 : 18}`;
     } else if (prefix === 'border') {
-      suggestedClass = `border-retro-${tone}/30`;
+      suggestedClass = `border-retro-${slug}/30`;
     } else {
-      suggestedClass = `${prefix}-retro-${tone}`;
+      suggestedClass = `${prefix}-retro-${slug}`;
     }
     if (verdict.alpha) {
       // Preserve explicit alpha if the original had one.
@@ -506,7 +585,10 @@ export function suggestionFor(input: SuggestionInput): string {
     return `Hardcoded color (${verdict.reason}) bypasses the token system. Pick a tone from tokens.ts and use \`${variant}${prefix}-retro-<tone>\` (or \`tone.<tone>.${tokenKey}\`). If you need this exact shade, ADD a token to tokens.ts first.`;
   }
   if (verdict.kind === 'keyword-color') {
-    return `Standalone \`${prefix}-${verdict.keyword}\` ignores the theme. Use \`${variant}${prefix}-retro-${verdict.keyword === 'black' ? 'text' : 'bg'}\` or \`${variant}${prefix}-retro-neutral\`, whichever matches the surface vs ink intent.`;
+    return `Standalone \`${prefix}-${verdict.keyword}\` ignores the theme. Use \`${variant}${prefix}-retro-text\` (ink) or \`${variant}${prefix}-retro-bg\` (surface), whichever matches the intent.`;
+  }
+  if (verdict.kind === 'unknown-retro') {
+    return `The theme defines no \`retro-${verdict.slug}\` color, so Tailwind generates no class for it. Use one it defines: ${THEME_COLOR_SLUGS.map((slug) => `retro-${slug}`).join(', ')}.`;
   }
   return 'No suggestion — this class did not match a known violation pattern.';
 }
@@ -531,6 +613,7 @@ export interface FileScanResult {
 export function scanFileSource(
   relFile: string,
   source: string,
+  themeColors: ReadonlySet<string> = DEFAULT_THEME_COLORS,
 ): FileScanResult {
   const findings: GateFinding[] = [];
   const retroUsage: Record<string, number> = {};
@@ -539,7 +622,7 @@ export function scanFileSource(
 
   const classes = extractColorClasses(source);
   for (const c of classes) {
-    const verdict = classifyClassBody(c.prefix, c.body);
+    const verdict = classifyClassBody(c.prefix, c.body, themeColors);
     if (verdict.kind === 'skip') continue;
     if (verdict.kind === 'ok-retro') {
       const key = `retro-${verdict.toneSlug}`;
@@ -567,6 +650,16 @@ export function scanFileSource(
       });
       continue;
     }
+    if (verdict.kind === 'unknown-retro') {
+      majorCount += 1;
+      findings.push({
+        severity: 'major',
+        file: relFile,
+        message: `\`${c.variant}${c.prefix}-${c.body}\` at ${where} names no theme color — Tailwind generates nothing for it`,
+        suggestion: suggestionFor({ variant: c.variant, prefix: c.prefix, verdict }),
+      });
+      continue;
+    }
     if (verdict.kind === 'palette') {
       majorCount += 1;
       findings.push({
@@ -589,18 +682,28 @@ export function scanFileSource(
 
 export interface ThemeTokenUsageOptions {
   /**
-   * Override the glob used to find component files. Defaults to
-   * `packages/ui-kit/src/**\/*.tsx` minus tests/stories.
+   * Override the globs used to find component files. Defaults to the React
+   * components, the core's recipes and both ports' sources, minus
+   * tests/stories/examples.
    */
   includeGlobs?: string[];
   /** Globs to ignore. */
   ignoreGlobs?: string[];
 }
 
-const DEFAULT_INCLUDE = ['packages/ui-kit/src/**/*.tsx'];
+const DEFAULT_INCLUDE = [
+  'packages/ui-kit/src/**/*.tsx',
+  'packages/ui-kit-core/src/**/*.ts',
+  'packages/ui-kit-vue/src/**/*.{vue,ts}',
+  'packages/ui-kit-angular/src/lib/**/*.ts',
+];
+/** Stylesheets whose theme variable reads must resolve: the theme itself and the site's. */
+const CSS_INCLUDE = [THEME_STYLESHEET, 'apps/web/src/**/*.css'];
 const DEFAULT_IGNORE = [
   '**/__tests__/**',
   '**/*.test.tsx',
+  '**/*.test.ts',
+  '**/*.spec.ts',
   '**/*.stories.tsx',
   // Colocated `<Component>.examples.tsx` demo snippets are documentation
   // collateral (often staging the component on top of arbitrary "user
@@ -615,7 +718,7 @@ export class ThemeTokenUsageGate extends Gate {
   readonly id = 20;
   readonly name = 'theme-token-usage';
   readonly description =
-    'Every color class in packages/ui-kit/src must come from tokens.ts (`bg|text|border|fill-retro-*`). Hardcoded colors are blockers; standard Tailwind palette colors are majors. Also emits a per-file frequency table of retro-token usage for the docs dashboard.';
+    'Every color class of the UI kits (React, the core recipes, Vue, Angular) must come from tokens.ts (`bg|text|border|fill-retro-*`) and name a color the theme defines, and every theme variable a stylesheet reads must be defined. Hardcoded colors are blockers; standard Tailwind palette colors, undefined retro colors and undefined theme variables are majors. Also emits a per-file frequency table of retro-token usage for the docs dashboard.';
 
   private readonly options: ThemeTokenUsageOptions;
 
@@ -639,7 +742,31 @@ export class ThemeTokenUsageGate extends Gate {
       ignore,
     });
 
-    if (files.length === 0) {
+    // The theme's colors, read from its stylesheet when the repository has one.
+    const themePath = path.join(ctx.repoRoot, THEME_STYLESHEET);
+    const themeCss = (await fs.pathExists(themePath)) ? await fs.readFile(themePath, 'utf8') : null;
+    const parsedColors = themeCss === null ? null : themeColorSlugs(themeCss);
+    const themeColors = parsedColors && parsedColors.size > 0 ? parsedColors : DEFAULT_THEME_COLORS;
+
+    // Theme variables the stylesheets read must be defined in one of them.
+    if (themeCss !== null) {
+      const cssFiles = await fgGlob(CSS_INCLUDE, {
+        cwd: ctx.repoRoot,
+        absolute: true,
+        onlyFiles: true,
+        ignore: ['**/node_modules/**', '**/.next/**', '**/dist/**'],
+      });
+      const sheets = await Promise.all(
+        cssFiles.map(async (abs) => ({
+          relFile: path.relative(ctx.repoRoot, abs).replace(/\\/g, '/'),
+          css: await fs.readFile(abs, 'utf8'),
+        })),
+      );
+      const defined = new Set(sheets.flatMap((sheet) => [...definedThemeVars(sheet.css)]));
+      for (const sheet of sheets) findings.push(...undefinedThemeVarFindings(sheet.relFile, sheet.css, defined));
+    }
+
+    if (files.length === 0 && findings.length === 0) {
       return {
         name: this.name,
         passed: true,
@@ -681,7 +808,7 @@ export class ThemeTokenUsageGate extends Gate {
         });
         continue;
       }
-      const result = scanFileSource(relFile, source);
+      const result = scanFileSource(relFile, source, themeColors);
       findings.push(...result.findings);
       perFileSummary.push({
         file: relFile,

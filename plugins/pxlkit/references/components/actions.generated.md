@@ -1,4 +1,4 @@
-<!-- GENERATED from @pxlkit/ui-kit v2.1.1 — do not edit; run npm run docs:build -->
+<!-- GENERATED from @pxlkit/ui-kit v2.2.0 — do not edit; run npm run docs:build -->
 
 # actions
 
@@ -6,20 +6,20 @@
 
 ### PixelBareButton
 - stable · since 1.0.0
-- Unstyled passthrough <button> primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.
-- Zero styling — renders a raw <button> with all native attributes forwarded · Defaults type="button" to prevent accidental form submissions · Forwards refs to the underlying HTMLButtonElement · Ideal for icon triggers, custom-styled CTAs, or wrapping inside compound components · Tree-shakable and SSR-safe
+- Unstyled passthrough `<button>` primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.
+- Zero styling — renders a raw <button> with all native attributes forwarded · Defaults type="button" to prevent accidental form submissions · Its element is the native <button> itself, for focus and measurement: a ref in React, `$el` in Vue, the `button[pxlBareButton]` element in Angular · Ideal for icon triggers, custom-styled CTAs, or wrapping inside compound components · Tree-shakable and SSR-safe
 - related: PixelButton, PixelBareInput, PixelBareTextarea
 
 ### PixelButton
 - stable · since 1.0.0
-- Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and an asChild slot pattern for wrapping links or routers.
-- Four variants — solid, soft, outline, ghost — across seven tones · Loading state pins the rendered width to prevent collapse when text swaps to spinner · asChild slot pattern lets you wrap <a>/<Link> while keeping all styling · Pixel and linear surfaces inherit from PxlKitSurfaceProvider · Forwards refs and accepts every native <button> attribute
+- Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and a link form for anchors and router links (`asChild` in React and Vue, `a[pxlButton]` in Angular).
+- Four variants — solid, soft, outline, ghost — across seven tones · Loading state pins the rendered width to prevent collapse when text swaps to spinner · Styles a link or router link as the button: `asChild` in React and Vue, `<a pxlButton>` in Angular · Pixel and linear surfaces inherit from PxlKitSurfaceProvider · Accepts every native <button> attribute
 - related: PixelIconButton, PxlKitButton, PixelSplitButton, PixelBareButton
 
 ### PixelSplitButton
 - stable · since 1.0.0
 - Composite button pairing a primary action with a chevron-triggered dropdown menu for related secondary actions.
-- Primary click handler plus a menu of alternate actions in a single control · Inherits tone + surface theming from the design system · Closes on outside click via useClickOutside · aria-haspopup="menu" + aria-expanded on the chevron trigger
+- Primary click handler plus a menu of alternate actions in a single control · Inherits tone + surface theming from the design system · Its menu closes on an outside press, Escape or Tab · aria-haspopup="menu" + aria-expanded on the chevron trigger
 - related: PixelButton, PixelDropdown, PixelIconButton
 
 ### PxlKitButton

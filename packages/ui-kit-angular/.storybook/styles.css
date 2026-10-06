@@ -1,0 +1,10 @@
+/*
+ * The Storybook's global styles: its fonts and base, then the Angular kit's
+ * stylesheet, with Tailwind also reading the kit's sources, which the
+ * stories render from, and its core's.
+ */
+@import "../../../.storybook/preview.css";
+@import "../styles.css";
+@source "../src";
+@source "../examples";
+@source "../../ui-kit-core/src";

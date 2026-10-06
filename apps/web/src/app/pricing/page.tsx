@@ -262,8 +262,11 @@ function HeroSection() {
 /* ──────────────── PLANS CARDS ──────────────── */
 function PlansSection() {
   return (
-    <section className="relative px-4 pb-20 sm:pb-28">
+    <section aria-labelledby="plans-heading" className="relative px-4 pb-20 sm:pb-28">
       <div className="max-w-6xl mx-auto">
+        <h2 id="plans-heading" className="sr-only">
+          Plans
+        </h2>
         <motion.div
           className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8"
           variants={staggerContainer}
@@ -511,7 +514,7 @@ interface ComparisonRow {
 function ComparisonTable() {
   const rows: ComparisonRow[] = [
     { feature: `${ICON_COUNT_LABEL} pixel art icons`, community: true, indie: true, team: true },
-    { feature: `${UI_COMPONENTS_COUNT} React components & SVG export`, community: true, indie: true, team: true },
+    { feature: `${UI_COMPONENTS_COUNT} UI components (React; Vue & Angular too) & SVG export`, community: true, indie: true, team: true },
     { feature: 'Visual Icon Builder', community: true, indie: true, team: true },
     { feature: 'Toast notification system', community: true, indie: true, team: true },
     { feature: 'Static & animated icons', community: true, indie: true, team: true },
@@ -659,7 +662,7 @@ function CTASection() {
         {/* Install command */}
         <div className="mb-8">
           <PixelCodeInline tone="green">
-            <span className="text-xs sm:text-sm">$ npm install @pxlkit/core @pxlkit/ui-kit</span>
+            <span className="text-xs sm:text-sm">$ npm install @pxlkit/ui-kit</span>
           </PixelCodeInline>
         </div>
 

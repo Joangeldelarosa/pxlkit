@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBareButtonDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBareButtonDocsMeta = {
@@ -17,15 +23,67 @@ export const PixelBareButtonDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSectionProps): React.ReactElement {
+/** PixelBareButton's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBareButton } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBareButton',
+        notes: [
+          "Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`); `type` defaults to `'button'`.",
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBareButton } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBareButton',
+        props: [
+          { name: 'type', type: "'button' | 'submit' | 'reset'", default: "'button'", description: 'Native `type`; `button` unless set.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Button content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<button>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBareButton } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBareButton',
+        selector: 'button[pxlBareButton]',
+        props: [
+          { name: 'type', type: "'button' | 'submit' | 'reset'", default: "'button'", description: 'Native `type`; `button` unless set.' },
+        ],
+        notes: [
+          'Goes on a native `<button>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelBareButtonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBareButtonDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-bare-button-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-bare-button-heading'>PixelBareButton</h2>
-      <p className="docs-lead">Unstyled passthrough &lt;button&gt; primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.</p>
+      <Title id='pixel-bare-button-heading'>PixelBareButton</Title>
+      <p className="docs-lead">Unstyled passthrough <code>&lt;button&gt;</code> primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.</p>
       <ul className="docs-highlights">
         <li>Zero styling — renders a raw &lt;button&gt; with all native attributes forwarded</li>
         <li>Defaults type=&quot;button&quot; to prevent accidental form submissions</li>
-        <li>Forwards refs to the underlying HTMLButtonElement</li>
+        <li>Its element is the native &lt;button&gt; itself, for focus and measurement: a ref in React, <code>$el</code> in Vue, the <code>button[pxlBareButton]</code> element in Angular</li>
         <li>Ideal for icon triggers, custom-styled CTAs, or wrapping inside compound components</li>
         <li>Tree-shakable and SSR-safe</li>
       </ul>
@@ -34,18 +92,18 @@ export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSec
       <dt>Category</dt><dd>actions</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-bare-button-api">
+      <Heading id="pixel-bare-button-api">API</Heading>
+      <FrameworkApi label={'PixelBareButton API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bare-button-a11y">
-      <h3 id="pixel-bare-button-a11y">Accessibility</h3>
+      <Heading id="pixel-bare-button-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">Renders a native &lt;button&gt;, so keyboard activation and focus semantics come for free. Consumer is responsible for visible focus styles, contrast, and providing aria-label when the button has no text content (e.g. icon-only triggers).</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -69,56 +127,178 @@ export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-bare-button-usage">
-      <h3 id="pixel-bare-button-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelBareButton } from '@pxlkit/ui-kit';
+      <Heading id="pixel-bare-button-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBareButton usage'}
+        react={`import { PixelBareButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelBareButton>Bare button</PixelBareButton>;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareButton>Bare button</PixelBareButton>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`<button pxlBareButton>Bare button</button>\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelBareButton>Bare button</PixelBareButton>;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareButton>Bare button</PixelBareButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`<button pxlBareButton>Bare button</button>\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-custom-class">
-        <h4>With custom class</h4>
-        <pre className="docs-code"><code>{`export function WithCustomClass() {
+        <Subheading>With custom class</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With custom class code'}
+          react={`import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function WithCustomClass() {
   return (
     <PixelBareButton className="rounded-md border border-retro-border bg-retro-surface px-3 py-1 text-sm text-retro-text">
       Styled by consumer
     </PixelBareButton>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareButton class="rounded-md border border-retro-border bg-retro-surface px-3 py-1 text-sm text-retro-text">
+    Styled by consumer
+  </PixelBareButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`
+    <button
+      pxlBareButton
+      class="rounded-md border border-retro-border bg-retro-surface px-3 py-1 text-sm text-retro-text"
+    >
+      Styled by consumer
+    </button>
+  \`,
+})
+export class WithCustomClass {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-on-click">
-        <h4>With onClick</h4>
-        <pre className="docs-code"><code>{`export function WithOnClick() {
+        <Subheading>With onClick</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With onClick code'}
+          react={`import React from 'react';
+import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function WithOnClick() {
   const [count, setCount] = React.useState(0);
   return (
     <PixelBareButton onClick={() => setCount((c) => c + 1)}>
       Clicked {count} times
     </PixelBareButton>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+
+const count = ref(0);
+</script>
+
+<template>
+  <PixelBareButton @click="count++">Clicked {{ count }} times</PixelBareButton>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`<button pxlBareButton (click)="count.set(count() + 1)">Clicked {{ count() }} times</button>\`,
+})
+export class WithOnClick {
+  readonly count = signal(0);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelBareButton disabled className="cursor-not-allowed opacity-50">
       Disabled
     </PixelBareButton>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareButton disabled class="cursor-not-allowed opacity-50">Disabled</PixelBareButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`<button pxlBareButton disabled class="cursor-not-allowed opacity-50">Disabled</button>\`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-submit-type">
-        <h4>Submit / reset type</h4>
-        <pre className="docs-code"><code>{`export function SubmitType() {
+        <Subheading>Submit / reset type</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Submit / reset type code'}
+          react={`import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function SubmitType() {
   return (
     <form
       onSubmit={(e) => {
@@ -130,11 +310,40 @@ export function Default() {
       <PixelBareButton type="reset">Reset</PixelBareButton>
     </form>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <form class="flex gap-2" @submit.prevent>
+    <PixelBareButton type="submit">Submit</PixelBareButton>
+    <PixelBareButton type="reset">Reset</PixelBareButton>
+  </form>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`
+    <form class="flex gap-2" (submit)="$event.preventDefault()">
+      <button pxlBareButton type="submit">Submit</button>
+      <button pxlBareButton type="reset">Reset</button>
+    </form>
+  \`,
+})
+export class SubmitType {}`}
+        />
       </article>
       <article className="docs-example" id="example-as-icon-trigger">
-        <h4>As icon trigger</h4>
-        <pre className="docs-code"><code>{`export function AsIconTrigger() {
+        <Subheading>As icon trigger</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'As icon trigger code'}
+          react={`import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function AsIconTrigger() {
   return (
     <PixelBareButton
       aria-label="Close"
@@ -145,15 +354,48 @@ export function Default() {
       </svg>
     </PixelBareButton>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareButton
+    aria-label="Close"
+    class="inline-flex h-6 w-6 items-center justify-center text-retro-muted hover:text-retro-text"
+  >
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  </PixelBareButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`
+    <button
+      pxlBareButton
+      aria-label="Close"
+      class="inline-flex h-6 w-6 items-center justify-center text-retro-muted hover:text-retro-text"
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
+    </button>
+  \`,
+})
+export class AsIconTrigger {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-button">PixelButton</a></li>
-        <li><a href="#pixel-bare-input">PixelBareInput</a></li>
-        <li><a href="#pixel-bare-textarea">PixelBareTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-button' : '#pixel-button'}>PixelButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-input' : '#pixel-bare-input'}>PixelBareInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-textarea' : '#pixel-bare-textarea'}>PixelBareTextarea</a></li>
       </ul>
     </section>
     </section>

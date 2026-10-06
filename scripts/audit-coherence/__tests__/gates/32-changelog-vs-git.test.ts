@@ -140,6 +140,11 @@ describe('gate 32: changelog vs git (release-policy aware)', () => {
       expect(refs.shas).toContain('abc1234ef');
     });
 
+    it('does not take the digits of a decimal number for a sha', () => {
+      const refs = extractRefs('- exact values (`0.3`, not `0.30000000000000004`), as 1234567.5 or abc1234ef');
+      expect(refs.shas).toEqual(['abc1234ef']);
+    });
+
     it('returns empty arrays when nothing is referenced', () => {
       const refs = extractRefs('- plain bullet with no refs');
       expect(refs.prs).toEqual([]);

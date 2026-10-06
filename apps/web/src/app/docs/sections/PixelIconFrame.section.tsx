@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelIconFrameDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelIconFrameDocsMeta = {
@@ -17,10 +23,79 @@ export const PixelIconFrameDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelIconFrameDocsSection({ className }: PixelIconFrameDocsSectionProps): React.ReactElement {
+/** PixelIconFrame's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelIconFrame } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelIconFrame',
+        props: [
+          { name: 'icon', type: 'React.ReactNode', required: true, description: 'The icon.' },
+          { name: 'size', type: '48 | 56 | 64 | 80 | 112', default: '56', description: 'Width and height, in px.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the border, fill and icon.' },
+          { name: 'shape', type: "'square' | 'rounded' | 'circle'", default: "'square'", description: "`square` keeps the surface's corners." },
+          { name: 'accent', type: '{ icon: React.ReactNode; position?: AccentPosition }', description: 'Badge in a corner: its content and corner (top right by default).' },
+          { name: 'animated', type: 'boolean', default: 'false', description: 'Pulses, unless the user prefers reduced motion.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelIconFrame } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelIconFrame',
+        props: [
+          { name: 'size', type: '48 | 56 | 64 | 80 | 112', default: '56', description: 'Width and height, in px.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the border, fill and icon.' },
+          { name: 'shape', type: "'square' | 'rounded' | 'circle'", default: "'square'", description: "`square` keeps the surface's corners." },
+          { name: 'accent', type: '{ icon: PxlNode; position?: IconFrameAccentPosition }', description: 'Badge in a corner: its content (text, a VNode or a render function) and corner (top right by default).' },
+          { name: 'animated', type: 'boolean', default: 'false', description: 'Pulses, unless the user prefers reduced motion.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'The icon.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelIconFrame } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelIconFrame',
+        selector: 'pxl-icon-frame',
+        props: [
+          { name: 'icon', type: 'string | TemplateRef<any>', required: true, description: 'The icon.' },
+          { name: 'size', type: '48 | 56 | 64 | 80 | 112', default: '56', accepts: "48 | 56 | 64 | 80 | 112 | '48' | '56' | '64' | '80' | '112'", description: 'Width and height, in px.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the border, fill and icon.' },
+          { name: 'shape', type: "'square' | 'rounded' | 'circle'", default: "'square'", description: "`square` keeps the surface's corners." },
+          { name: 'accent', type: '{ icon: PxlContent; position?: IconFrameAccentPosition }', description: 'Badge in a corner: its content (text or an `<ng-template>`) and corner (top right by default).' },
+          { name: 'animated', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Pulses, unless the user prefers reduced motion.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelIconFrameDocsSection({ className, headingLevel = 2 }: PixelIconFrameDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-icon-frame-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-icon-frame-heading'>PixelIconFrame</h2>
+      <Title id='pixel-icon-frame-heading'>PixelIconFrame</Title>
       <p className="docs-lead">Decorative icon container with surface-aware borders, tone tinting, sizes, shapes, and an optional accent badge.</p>
       <ul className="docs-highlights">
         <li>Five fixed sizes (48 / 56 / 64 / 80 / 112) for consistent layout rhythm</li>
@@ -34,12 +109,12 @@ export function PixelIconFrameDocsSection({ className }: PixelIconFrameDocsSecti
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-icon-frame-api">
+      <Heading id="pixel-icon-frame-api">API</Heading>
+      <FrameworkApi label={'PixelIconFrame API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-icon-frame-a11y">
-      <h3 id="pixel-icon-frame-a11y">Accessibility</h3>
+      <Heading id="pixel-icon-frame-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>decorative wrapper</code></li>
@@ -47,33 +122,91 @@ export function PixelIconFrameDocsSection({ className }: PixelIconFrameDocsSecti
       <p className="docs-aria-notes">Inner icon and accent are aria-hidden. Provide an accessible label on a parent element when the frame conveys meaning.</p>
     </section>
     <section aria-labelledby="pixel-icon-frame-usage">
-      <h3 id="pixel-icon-frame-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelIconFrame } from '@pxlkit/ui-kit';
+      <Heading id="pixel-icon-frame-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelIconFrame usage'}
+        react={`import { PixelIconFrame } from '@pxlkit/ui-kit';
 
 const Glyph = () => (
   <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{'>_'}</span>
 );
 
-const Dot = () => (
-  <span style={{ width: 6, height: 6, borderRadius: 9999, background: 'currentColor', display: 'inline-block' }} />
+export function Default() {
+  return <PixelIconFrame icon={<Glyph />} />;
+}`}
+        vue={`<script setup lang="ts">
+import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelIconFrame>
+    <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+  </PixelIconFrame>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <pxl-icon-frame [icon]="glyph" />
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+  \`,
+})
+export class Default {}`}
+      />
+    </section>
+    <section aria-label="Examples">
+      <Heading>Examples</Heading>
+      <article className="docs-example" id="example-default">
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelIconFrame } from '@pxlkit/ui-kit';
+
+const Glyph = () => (
+  <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{'>_'}</span>
 );
 
 export function Default() {
   return <PixelIconFrame icon={<Glyph />} />;
-}
-`}</code></pre>
-    </section>
-    <section aria-label="Examples">
-      <h3>Examples</h3>
-      <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
-  return <PixelIconFrame icon={<Glyph />} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelIconFrame>
+    <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+  </PixelIconFrame>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <pxl-icon-frame [icon]="glyph" />
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelIconFrame } from '@pxlkit/ui-kit';
+
+const Glyph = () => (
+  <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{'>_'}</span>
+);
+
+export function Tones() {
   return (
     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
       <PixelIconFrame icon={<Glyph />} tone="neutral" />
@@ -85,11 +218,53 @@ export function Default() {
       <PixelIconFrame icon={<Glyph />} tone="pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelIconFrame, type ToneKey } from '@pxlkit/ui-kit-vue';
+
+const tones: ToneKey[] = ['neutral', 'cyan', 'green', 'gold', 'red', 'purple', 'pink'];
+</script>
+
+<template>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap">
+    <PixelIconFrame v-for="tone in tones" :key="tone" :tone="tone">
+      <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+    </PixelIconFrame>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <div style="display: flex; gap: 12px; flex-wrap: wrap">
+      <pxl-icon-frame [icon]="glyph" tone="neutral" />
+      <pxl-icon-frame [icon]="glyph" tone="cyan" />
+      <pxl-icon-frame [icon]="glyph" tone="green" />
+      <pxl-icon-frame [icon]="glyph" tone="gold" />
+      <pxl-icon-frame [icon]="glyph" tone="red" />
+      <pxl-icon-frame [icon]="glyph" tone="purple" />
+      <pxl-icon-frame [icon]="glyph" tone="pink" />
+    </div>
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelIconFrame } from '@pxlkit/ui-kit';
+
+const Glyph = () => (
+  <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{'>_'}</span>
+);
+
+export function Sizes() {
   return (
     <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
       <PixelIconFrame icon={<Glyph />} size={48} />
@@ -99,11 +274,51 @@ export function Default() {
       <PixelIconFrame icon={<Glyph />} size={112} />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
+
+const sizes = [48, 56, 64, 80, 112] as const;
+</script>
+
+<template>
+  <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+    <PixelIconFrame v-for="size in sizes" :key="size" :size="size">
+      <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+    </PixelIconFrame>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+      <pxl-icon-frame [icon]="glyph" [size]="48" />
+      <pxl-icon-frame [icon]="glyph" [size]="56" />
+      <pxl-icon-frame [icon]="glyph" [size]="64" />
+      <pxl-icon-frame [icon]="glyph" [size]="80" />
+      <pxl-icon-frame [icon]="glyph" [size]="112" />
+    </div>
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-shapes">
-        <h4>Shapes</h4>
-        <pre className="docs-code"><code>{`export function Shapes() {
+        <Subheading>Shapes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Shapes code'}
+          react={`import { PixelIconFrame } from '@pxlkit/ui-kit';
+
+const Glyph = () => (
+  <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{'>_'}</span>
+);
+
+export function Shapes() {
   return (
     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
       <PixelIconFrame icon={<Glyph />} shape="square" />
@@ -111,11 +326,53 @@ export function Default() {
       <PixelIconFrame icon={<Glyph />} shape="circle" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
+
+const shapes = ['square', 'rounded', 'circle'] as const;
+</script>
+
+<template>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap">
+    <PixelIconFrame v-for="shape in shapes" :key="shape" :shape="shape">
+      <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+    </PixelIconFrame>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <div style="display: flex; gap: 12px; flex-wrap: wrap">
+      <pxl-icon-frame [icon]="glyph" shape="square" />
+      <pxl-icon-frame [icon]="glyph" shape="rounded" />
+      <pxl-icon-frame [icon]="glyph" shape="circle" />
+    </div>
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+  \`,
+})
+export class Shapes {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-accent">
-        <h4>With Accent</h4>
-        <pre className="docs-code"><code>{`export function WithAccent() {
+        <Subheading>With Accent</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'With Accent code'}
+          react={`import { PixelIconFrame } from '@pxlkit/ui-kit';
+
+const Glyph = () => (
+  <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{'>_'}</span>
+);
+
+const Dot = () => (
+  <span style={{ width: 6, height: 6, borderRadius: 9999, background: 'currentColor', display: 'inline-block' }} />
+);
+
+export function WithAccent() {
   return (
     <PixelIconFrame
       icon={<Glyph />}
@@ -123,7 +380,37 @@ export function Default() {
       accent={{ icon: <Dot />, position: 'top-right' }}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
+
+const dot = () =>
+  h('span', {
+    style: { width: '6px', height: '6px', borderRadius: '9999px', background: 'currentColor', display: 'inline-block' },
+  });
+</script>
+
+<template>
+  <PixelIconFrame tone="cyan" :accent="{ icon: dot, position: 'top-right' }">
+    <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+  </PixelIconFrame>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <pxl-icon-frame [icon]="glyph" tone="cyan" [accent]="{ icon: dot, position: 'top-right' }" />
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+    <ng-template #dot>
+      <span style="width: 6px; height: 6px; border-radius: 9999px; background: currentColor; display: inline-block"></span>
+    </ng-template>
+  \`,
+})
+export class WithAccent {}`}
+        />
       </article>
     </section>
     </section>

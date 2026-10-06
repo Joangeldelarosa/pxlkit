@@ -1,4 +1,4 @@
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * 🛡️✕ ShieldCross — filled red shield with a white ✕ (access denied / blocked /

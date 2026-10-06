@@ -2,119 +2,53 @@
 
 import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
+  DEFAULT_COLOR_PRESETS,
+  colorInputClasses,
+  colorInputValue,
+  colorPresetClasses,
+  colorPresetKeydown,
+  colorSwatchHex,
+  fieldDescribedBy,
+  fieldMessageId,
+  isColorPresetSelected,
+  normalizeHex,
+  type ColorFormat,
+} from '@pxlkit/ui-kit-core';
+import {
   Surface,
-  cn,
   FieldShell,
-  focusRing,
-  inputBase,
-  sizeHeight,
-  surfaceClasses,
   useEffectiveSurface,
 } from '../common';
 import { PixelPopover } from '../overlay-foundation/PixelPopover';
 import { useControllableState } from '../hooks/useControllableState';
 
-type ColorFormat = 'hex' | 'rgb' | 'hsl';
 type ColorSize = 'sm' | 'md' | 'lg';
 
 export interface PixelColorInputProps {
+  /** The colour; leave unset for an uncontrolled input. */
   value?: string;
+  /** Initial colour while uncontrolled. */
   defaultValue?: string;
+  /** Called with the colour picked or typed, in `format`. */
   onChange?: (next: string) => void;
+  /** How a picked colour is written: `#rrggbb`, `rgb(r, g, b)` or `hsl(h, s%, l%)`. */
   format?: ColorFormat;
+  /** The preset colours; sixteen greys and hues by default. */
   presets?: string[];
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Trigger height. */
   size?: ColorSize;
+  /** Label rendered above the trigger, which it also names. */
   label?: string;
+  /** Helper text below the field; hidden while `error` is set. */
   hint?: string;
+  /** Error message below the field; marks the trigger invalid. */
   error?: string;
+  /** Form field name — a hidden input submits the colour. */
   name?: string;
+  /** `id` of the trigger; generated when left out. */
   id?: string;
-}
-
-const DEFAULT_PRESETS = [
-  '#000000', '#1a1a1a', '#404040', '#737373',
-  '#a3a3a3', '#d4d4d4', '#f5f5f5', '#ffffff',
-  '#ef4444', '#f97316', '#eab308', '#22c55e',
-  '#06b6d4', '#3b82f6', '#a855f7', '#ec4899',
-];
-
-function clampByte(n: number): number {
-  if (!Number.isFinite(n)) return 0;
-  return Math.max(0, Math.min(255, Math.round(n)));
-}
-
-function normalizeHex(input: string): string | null {
-  if (!input) return null;
-  let v = input.trim().toLowerCase();
-  if (!v.startsWith('#')) v = `#${v}`;
-  // Expand 3-char shorthand
-  if (/^#[0-9a-f]{3}$/.test(v)) {
-    v = '#' + v.slice(1).split('').map((c) => c + c).join('');
-  }
-  if (!/^#[0-9a-f]{6}$/.test(v)) return null;
-  return v;
-}
-
-function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const norm = normalizeHex(hex);
-  if (!norm) return null;
-  return {
-    r: parseInt(norm.slice(1, 3), 16),
-    g: parseInt(norm.slice(3, 5), 16),
-    b: parseInt(norm.slice(5, 7), 16),
-  };
-}
-
-function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
-  const rn = r / 255;
-  const gn = g / 255;
-  const bn = b / 255;
-  const max = Math.max(rn, gn, bn);
-  const min = Math.min(rn, gn, bn);
-  const l = (max + min) / 2;
-  let h = 0;
-  let s = 0;
-  if (max !== min) {
-    const d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case rn: h = (gn - bn) / d + (gn < bn ? 6 : 0); break;
-      case gn: h = (bn - rn) / d + 2; break;
-      case bn: h = (rn - gn) / d + 4; break;
-    }
-    h /= 6;
-  }
-  return {
-    h: Math.round(h * 360),
-    s: Math.round(s * 100),
-    l: Math.round(l * 100),
-  };
-}
-
-function formatValue(hex: string, format: ColorFormat): string {
-  const norm = normalizeHex(hex);
-  if (!norm) return hex;
-  if (format === 'hex') return norm;
-  const rgb = hexToRgb(norm)!;
-  if (format === 'rgb') return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
-  return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
-}
-
-function toHexForSwatch(value: string): string {
-  // Try parse hex straight up
-  const direct = normalizeHex(value);
-  if (direct) return direct;
-  // Try rgb(r, g, b)
-  const rgbMatch = value.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
-  if (rgbMatch) {
-    const r = clampByte(Number(rgbMatch[1]));
-    const g = clampByte(Number(rgbMatch[2]));
-    const b = clampByte(Number(rgbMatch[3]));
-    return '#' + [r, g, b].map((n) => n.toString(16).padStart(2, '0')).join('');
-  }
-  return '#000000';
 }
 
 export const PixelColorInput = forwardRef<HTMLButtonElement, PixelColorInputProps>(
@@ -136,7 +70,6 @@ export const PixelColorInput = forwardRef<HTMLButtonElement, PixelColorInputProp
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
     const reactId = useId();
     const inputId = id ?? `pxl-color-${reactId}`;
     const hexInputId = `${reactId}-hex`;
@@ -148,8 +81,8 @@ export const PixelColorInput = forwardRef<HTMLButtonElement, PixelColorInputProp
     });
 
     const [open, setOpen] = useState(false);
-    const palette = useMemo(() => presets ?? DEFAULT_PRESETS, [presets]);
-    const swatchHex = useMemo(() => (value ? toHexForSwatch(value) : '#ffffff'), [value]);
+    const palette = useMemo(() => presets ?? DEFAULT_COLOR_PRESETS, [presets]);
+    const swatchHex = useMemo(() => colorSwatchHex(value), [value]);
 
     // Local draft for the hex text input so partial keystrokes don't leak
     // through onChange as garbage values.
@@ -159,13 +92,14 @@ export const PixelColorInput = forwardRef<HTMLButtonElement, PixelColorInputProp
       setDraftHex(value ?? '');
     }, [value]);
 
+    // Focus moves into the dialog as it opens, to its first field.
+    const nativeRef = useRef<HTMLInputElement | null>(null);
+    useEffect(() => {
+      if (open) nativeRef.current?.focus();
+    }, [open]);
+
     const commit = (hex: string) => {
-      const norm = normalizeHex(hex);
-      if (!norm) {
-        setValue(hex);
-        return;
-      }
-      setValue(formatValue(norm, format));
+      setValue(colorInputValue(hex, format));
     };
 
     const handleHexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -190,31 +124,23 @@ export const PixelColorInput = forwardRef<HTMLButtonElement, PixelColorInputProp
       if (el) swatchRefs.current.set(idx, el);
       else swatchRefs.current.delete(idx);
     }, []);
-    const moveSwatchFocus = useCallback((nextIdx: number) => {
-      const clamped = Math.max(0, Math.min(palette.length - 1, nextIdx));
-      setFocusedSwatchIdx(clamped);
-      swatchRefs.current.get(clamped)?.focus();
-    }, [palette.length]);
-    const handleSwatchKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, currentIdx: number) => {
-      switch (e.key) {
-        case 'ArrowRight': e.preventDefault(); moveSwatchFocus(currentIdx + 1); return;
-        case 'ArrowLeft': e.preventDefault(); moveSwatchFocus(currentIdx - 1); return;
-        case 'ArrowDown': e.preventDefault(); moveSwatchFocus(currentIdx + 8); return;
-        case 'ArrowUp': e.preventDefault(); moveSwatchFocus(currentIdx - 8); return;
-        case 'Home': e.preventDefault(); moveSwatchFocus(0); return;
-        case 'End': e.preventDefault(); moveSwatchFocus(palette.length - 1); return;
-        case 'Enter':
-        case ' ':
-          e.preventDefault();
-          commit(palette[currentIdx]);
-          return;
-        default: return;
+    const handleSwatchKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, currentIdx: number) => {
+      const action = colorPresetKeydown(e.key, currentIdx, palette.length);
+      if (!action) return;
+      e.preventDefault();
+      if ('select' in action) {
+        commit(palette[currentIdx]!);
+        return;
       }
+      setFocusedSwatchIdx(action.focus);
+      swatchRefs.current.get(action.focus)?.focus();
     };
 
+    const classes = colorInputClasses(surface, { size, invalid: !!error, hasValue: !!value });
+
     return (
-      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
-        <span className="relative block">
+      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId} messageId={fieldMessageId(inputId)}>
+        <span className={classes.anchor}>
           <PixelPopover
             open={open}
             onOpenChange={setOpen}
@@ -232,51 +158,35 @@ export const PixelColorInput = forwardRef<HTMLButtonElement, PixelColorInputProp
                 type="button"
                 aria-label={label ?? 'Color'}
                 aria-invalid={error ? true : undefined}
-                className={cn(
-                  inputBase,
-                  s.font,
-                  s.border,
-                  s.radius,
-                  s.transition,
-                  sizeHeight[size],
-                  focusRing,
-                  'flex items-center gap-2 px-2 text-left',
-                  error ? 'border-retro-red/60' : 'border-retro-border-strong',
-                )}
+                aria-describedby={fieldDescribedBy(inputId, { hint, error })}
+                className={classes.trigger}
               >
                 <span
                   aria-hidden
-                  className={cn(
-                    'inline-block h-5 w-5 shrink-0 border border-retro-border-strong',
-                    surface === 'pixel' ? 'rounded-[2px]' : 'rounded',
-                  )}
+                  className={classes.sample}
                   style={{ backgroundColor: swatchHex }}
                 />
-                <span className={cn('min-w-0 flex-1 truncate', value ? 'text-retro-text' : 'text-retro-muted')}>
+                <span className={classes.value}>
                   {value || 'Pick a color'}
                 </span>
               </button>
             </PixelPopover.Trigger>
             <PixelPopover.Content
               aria-label="Color picker"
-              className="w-64 p-2"
+              className={classes.content}
             >
-              <div className="mb-2 flex items-center gap-2">
+              <div className={classes.pickers}>
                 <input
+                  ref={nativeRef}
                   type="color"
                   aria-label="Native color picker"
                   value={swatchHex}
                   onChange={(e) => commit(e.target.value)}
-                  className={cn(
-                    'h-8 w-10 cursor-pointer bg-transparent p-0',
-                    s.border,
-                    s.radius,
-                    'border-retro-border-strong',
-                  )}
+                  className={classes.native}
                 />
                 <label
                   htmlFor={hexInputId}
-                  className={cn('sr-only', s.font)}
+                  className={classes.hexLabel}
                 >
                   Hex
                 </label>
@@ -288,47 +198,29 @@ export const PixelColorInput = forwardRef<HTMLButtonElement, PixelColorInputProp
                   value={draftHex}
                   onChange={handleHexChange}
                   onBlur={handleHexBlur}
-                  className={cn(
-                    inputBase,
-                    s.font,
-                    s.border,
-                    s.radius,
-                    'h-8 flex-1 px-2 text-xs',
-                    focusRing,
-                    error ? 'border-retro-red/60' : 'border-retro-border-strong',
-                  )}
+                  className={classes.hex}
                 />
               </div>
               <div
                 role="group"
                 aria-label="Color presets"
-                className="grid grid-cols-8 gap-1"
+                className={classes.presets}
               >
-                {palette.map((hex, idx) => {
-                  const norm = normalizeHex(hex) ?? hex;
-                  const isSelected = swatchHex.toLowerCase() === norm.toLowerCase();
-                  const isFocused = focusedSwatchIdx === idx;
-                  return (
-                    <button
-                      key={hex}
-                      ref={(el) => setSwatchRef(idx, el)}
-                      type="button"
-                      aria-pressed={isSelected}
-                      aria-label={hex}
-                      tabIndex={isFocused ? 0 : -1}
-                      onClick={() => { setFocusedSwatchIdx(idx); commit(hex); }}
-                      onFocus={() => setFocusedSwatchIdx(idx)}
-                      onKeyDown={(e) => handleSwatchKeyDown(e as unknown as React.KeyboardEvent<HTMLDivElement>, idx)}
-                      className={cn(
-                        'h-6 w-6 border border-retro-border-strong',
-                        surface === 'pixel' ? 'rounded-[2px]' : 'rounded',
-                        focusRing,
-                        isSelected && 'ring-2 ring-retro-cyan ring-offset-1 ring-offset-retro-bg',
-                      )}
-                      style={{ backgroundColor: hex }}
-                    />
-                  );
-                })}
+                {palette.map((hex, idx) => (
+                  <button
+                    key={hex}
+                    ref={(el) => setSwatchRef(idx, el)}
+                    type="button"
+                    aria-pressed={isColorPresetSelected(hex, swatchHex)}
+                    aria-label={hex}
+                    tabIndex={focusedSwatchIdx === idx ? 0 : -1}
+                    onClick={() => { setFocusedSwatchIdx(idx); commit(hex); }}
+                    onFocus={() => setFocusedSwatchIdx(idx)}
+                    onKeyDown={(e) => handleSwatchKeyDown(e, idx)}
+                    className={colorPresetClasses(surface, isColorPresetSelected(hex, swatchHex))}
+                    style={{ backgroundColor: hex }}
+                  />
+                ))}
               </div>
             </PixelPopover.Content>
           </PixelPopover>

@@ -54,4 +54,33 @@ describe('PixelBarChart', () => {
     const svg = container.querySelector('svg');
     expect(svg?.getAttribute('shape-rendering')).toBe('crispEdges');
   });
+
+  it('leaves the slot of a value that is not finite empty, without a bar or a label', () => {
+    const { container } = render(
+      <PixelBarChart
+        data={[
+          { x: 'a', y: 4 },
+          { x: 'b', y: Number.NaN },
+          { x: 'c', y: 2 },
+          { x: 'd', y: Infinity },
+        ]}
+        size="sm"
+        showValues
+      />,
+    );
+    const bars = Array.from(container.querySelectorAll('rect'), (rect) =>
+      ['x', 'y', 'width', 'height'].map((name) => rect.getAttribute(name)),
+    );
+    expect(bars).toEqual([
+      ['4', '14', '36.5', '36'],
+      ['81', '32', '36.5', '18'],
+    ]);
+    expect(Array.from(container.querySelectorAll('text'), (text) => text.textContent)).toEqual(['4', '2']);
+    expect(container.querySelector('svg')!.getAttribute('aria-label')).toBe('bar chart with 2 points, range 2 to 4');
+  });
+
+  it('names a chart of one value in the singular', () => {
+    const { container } = render(<PixelBarChart data={[{ x: 'a', y: 3 }]} />);
+    expect(container.querySelector('svg')!.getAttribute('aria-label')).toBe('bar chart with 1 point, range 3 to 3');
+  });
 });

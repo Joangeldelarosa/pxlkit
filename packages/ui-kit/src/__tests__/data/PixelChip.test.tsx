@@ -1,6 +1,8 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { act, render, fireEvent, screen } from '@testing-library/react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { PixelChip } from '../../data/PixelChip';
 
 /* Extracted from __tests__/data/PixelBadgeChipUpgrade.test.tsx (additive
@@ -173,6 +175,17 @@ describe('PixelChip — deletable + onDelete', () => {
     expect(screen.queryByRole('button', { name: 'Remove React' })).toBeNull();
   });
 
+  // Regression: the X took the chip's `h-2 w-2` after the glyph's own
+  // `h-3 w-3`, which Tailwind emits later, so it kept the larger size.
+  it('draws the X at the chip size, without the glyph default', () => {
+    render(<PixelChip label="React" onDelete={() => {}} />);
+    const glyph = screen.getByRole('button', { name: 'Remove React' }).querySelector('svg')!;
+    const classes = glyph.getAttribute('class')!.split(' ');
+    expect(classes).toEqual(expect.arrayContaining(['h-2', 'w-2']));
+    expect(classes).not.toContain('h-3');
+    expect(classes).not.toContain('w-3');
+  });
+
   it('the X button has accessible aria-label "Remove <label>"', () => {
     render(<PixelChip label="TypeScript" onDelete={() => {}} />);
     expect(
@@ -193,5 +206,71 @@ describe('PixelChip — deletable + onDelete', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Remove x' }));
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onRemove).not.toHaveBeenCalled();
+  });
+});
+
+// Regression: a chip that was both clickable and deletable nested the delete
+// <button> inside its own <button> — invalid HTML, which the parser splits, so
+// its server markup could not hydrate. The label and the X are now sibling
+// buttons in a <span> frame.
+describe('PixelChip — clickable and deletable', () => {
+  it('renders the label and the X as sibling buttons in a frame', () => {
+    const { container } = render(
+      <PixelChip label="Tag" className="extra" data-testid="action" onClick={() => {}} onDelete={() => {}} />,
+    );
+    const frame = container.firstElementChild as HTMLElement;
+    expect(frame.tagName).toBe('SPAN');
+    expect(frame.className).toContain('extra');
+    expect(container.querySelector('button button')).toBeNull();
+    const [action, remove] = Array.from(frame.children) as HTMLElement[];
+    expect(action!.tagName).toBe('BUTTON');
+    expect(action!.hasAttribute('data-chip-action')).toBe(true);
+    expect(action!.getAttribute('data-testid')).toBe('action');
+    expect(action!.textContent).toBe('Tag');
+    expect(remove!.getAttribute('aria-label')).toBe('Remove Tag');
+  });
+
+  it('activates the label button and the X separately, with the ref on the label button', () => {
+    const onClick = vi.fn();
+    const onDelete = vi.fn();
+    const ref = React.createRef<HTMLElement>();
+    render(<PixelChip ref={ref} label="Tag" onClick={onClick} onDelete={onDelete} />);
+    const action = screen.getByRole('button', { name: 'Tag' });
+    fireEvent.click(action);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Remove Tag' }));
+    expect(onDelete).toHaveBeenCalledTimes(1);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(ref.current).toBe(action);
+  });
+
+  it("shows the label button's keyboard focus on the frame: inside its cut corners on the pixel surface, a ring in the tone on the linear one", () => {
+    const { container } = render(
+      <>
+        <PixelChip label="Pixel" tone="pink" surface="pixel" onClick={() => {}} onDelete={() => {}} />
+        <PixelChip label="Linear" tone="pink" surface="linear" onClick={() => {}} onDelete={() => {}} />
+      </>,
+    );
+    const [pixel, linear] = Array.from(container.children).map((frame) => frame.className.split(' '));
+    expect(pixel).toEqual(expect.arrayContaining(['pxl-corner-sm', 'has-[[data-chip-action]:focus-visible]:pxl-focus-inset']));
+    expect(pixel!.filter((c) => c.includes('ring'))).toEqual([]);
+    expect(linear).toEqual(
+      expect.arrayContaining(['has-[[data-chip-action]:focus-visible]:ring-2', 'has-[[data-chip-action]:focus-visible]:ring-retro-pink/40']),
+    );
+  });
+
+  it('hydrates its own server markup without an error', async () => {
+    const chip = <PixelChip label="Tag" onClick={() => {}} onDelete={() => {}} />;
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(chip);
+    document.body.appendChild(container);
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const onRecoverableError = vi.fn();
+    const root = await act(async () => hydrateRoot(container, chip, { onRecoverableError }));
+    expect(error).not.toHaveBeenCalled();
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    error.mockRestore();
+    act(() => root.unmount());
+    container.remove();
   });
 });

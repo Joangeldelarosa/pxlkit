@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelProgressDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelProgressDocsMeta = {
@@ -17,10 +23,73 @@ export const PixelProgressDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelProgressDocsSection({ className }: PixelProgressDocsSectionProps): React.ReactElement {
+/** PixelProgress's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelProgress } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelProgress',
+        props: [
+          { name: 'value', type: 'number', required: true, description: 'Current value 0-100 (clamped).' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: "Tone determines fill color. Defaults to `'green'`." },
+          { name: 'label', type: 'string', description: 'Optional label rendered above the bar. Also used as the progressbar\'s accessible name; falls back to "Progress" when omitted.' },
+          { name: 'showValue', type: 'boolean', default: 'true', description: 'Whether to show the numeric percentage on the right. Defaults to `true`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; falls back to nearest provider.' },
+          { name: 'indeterminate', type: 'boolean', default: 'false', description: 'Unknown-duration work: the bar pulses (it holds still, at 70 %, for a reader who prefers reduced motion), `aria-valuenow` is dropped and `aria-busy` set.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelProgress } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelProgress',
+        props: [
+          { name: 'value', type: 'number', required: true, description: 'Current value 0–100 (clamped).' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the fill.' },
+          { name: 'label', type: 'string', description: 'Label above the bar, also its accessible name; the name falls back to "Progress" without one.' },
+          { name: 'showValue', type: 'boolean', default: 'true', description: 'Show the percentage on the right.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'indeterminate', type: 'boolean', default: 'false', description: 'Unknown-duration work: the bar pulses and reports no value.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelProgress } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelProgress',
+        selector: 'pxl-progress',
+        props: [
+          { name: 'value', type: 'number', required: true, description: 'Current value 0–100 (clamped).' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the fill.' },
+          { name: 'label', type: 'string', description: 'Label above the bar, also its accessible name; the name falls back to "Progress" without one.' },
+          { name: 'showValue', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Show the percentage on the right.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'indeterminate', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Unknown-duration work: the bar pulses and reports no value.' },
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelProgressDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelProgressDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-progress-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-progress-heading'>PixelProgress</h2>
+      <Title id='pixel-progress-heading'>PixelProgress</Title>
       <p className="docs-lead">Determinate or indeterminate progress bar that renders as 10 segmented HP-bar blocks on the pixel surface and a smooth filled track on the linear surface.</p>
       <ul className="docs-highlights">
         <li>Pixel surface renders an RPG-style 10-segment HP bar; linear surface renders a smooth filled track</li>
@@ -34,38 +103,82 @@ export function PixelProgressDocsSection({ className }: PixelProgressDocsSection
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-progress-api">
+      <Heading id="pixel-progress-api">API</Heading>
+      <FrameworkApi label={'PixelProgress API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-progress-a11y">
-      <h3 id="pixel-progress-a11y">Accessibility</h3>
+      <Heading id="pixel-progress-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>progressbar</code></li>
       </ul>
-      <p className="docs-aria-notes">Exposes role=&quot;progressbar&quot; with aria-valuemin=0 and aria-valuemax=100; aria-valuenow is set from the clamped value. The label prop is forwarded to aria-label, falling back to &quot;Progress&quot; when omitted so the progressbar always has an accessible name. In indeterminate mode aria-valuenow is omitted and aria-busy is set to true so assistive tech announces unknown-duration work. The 10-segment pixel surface is purely visual — assistive tech reads the same progressbar attributes as the linear surface.</p>
+      <p className="docs-aria-notes">Exposes role=&quot;progressbar&quot; with aria-valuemin=0 and aria-valuemax=100; aria-valuenow is set from the clamped value. The label prop is forwarded to aria-label, falling back to &quot;Progress&quot; when omitted so the progressbar always has an accessible name. In indeterminate mode aria-valuenow is omitted and aria-busy is set to true so assistive tech announces unknown-duration work; the bar pulses only for a reader who allows motion, and under <code>prefers-reduced-motion: reduce</code> holds still at 70 % opacity. The 10-segment pixel surface is purely visual — assistive tech reads the same progressbar attributes as the linear surface.</p>
     </section>
     <section aria-labelledby="pixel-progress-usage">
-      <h3 id="pixel-progress-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelProgress } from '@pxlkit/ui-kit';
+      <Heading id="pixel-progress-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelProgress usage'}
+        react={`import { PixelProgress } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelProgress value={60} label="HP" />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelProgress } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelProgress :value="60" label="HP" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelProgress } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelProgress],
+  template: \`<pxl-progress [value]="60" label="HP" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelProgress } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelProgress value={60} label="HP" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelProgress } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelProgress :value="60" label="HP" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelProgress } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelProgress],
+  template: \`<pxl-progress [value]="60" label="HP" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelProgress } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="space-y-3">
       <PixelProgress value={70} tone="neutral" label="Neutral" />
@@ -77,51 +190,211 @@ export function Default() {
       <PixelProgress value={70} tone="pink" label="Pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelProgress } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelProgress :value="70" tone="neutral" label="Neutral" />
+    <PixelProgress :value="70" tone="green" label="Green" />
+    <PixelProgress :value="70" tone="cyan" label="Cyan" />
+    <PixelProgress :value="70" tone="gold" label="Gold" />
+    <PixelProgress :value="70" tone="red" label="Red" />
+    <PixelProgress :value="70" tone="purple" label="Purple" />
+    <PixelProgress :value="70" tone="pink" label="Pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelProgress } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelProgress],
+  template: \`
+    <div class="space-y-3">
+      <pxl-progress [value]="70" tone="neutral" label="Neutral" />
+      <pxl-progress [value]="70" tone="green" label="Green" />
+      <pxl-progress [value]="70" tone="cyan" label="Cyan" />
+      <pxl-progress [value]="70" tone="gold" label="Gold" />
+      <pxl-progress [value]="70" tone="red" label="Red" />
+      <pxl-progress [value]="70" tone="purple" label="Purple" />
+      <pxl-progress [value]="70" tone="pink" label="Pink" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelProgress } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="space-y-4">
       <PixelProgress value={55} label="Pixel (segmented)" surface="pixel" />
       <PixelProgress value={55} label="Linear (smooth)" surface="linear" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelProgress } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-4">
+    <PixelProgress :value="55" label="Pixel (segmented)" surface="pixel" />
+    <PixelProgress :value="55" label="Linear (smooth)" surface="linear" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelProgress } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelProgress],
+  template: \`
+    <div class="space-y-4">
+      <pxl-progress [value]="55" label="Pixel (segmented)" surface="pixel" />
+      <pxl-progress [value]="55" label="Linear (smooth)" surface="linear" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-without-value">
-        <h4>Without value</h4>
-        <pre className="docs-code"><code>{`export function WithoutValue() {
+        <Subheading>Without value</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Without value code'}
+          react={`import { PixelProgress } from '@pxlkit/ui-kit';
+
+export function WithoutValue() {
   return <PixelProgress value={45} label="Loading assets" showValue={false} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelProgress } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelProgress :value="45" label="Loading assets" :show-value="false" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelProgress } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelProgress],
+  template: \`<pxl-progress [value]="45" label="Loading assets" [showValue]="false" />\`,
+})
+export class WithoutValue {}`}
+        />
       </article>
       <article className="docs-example" id="example-without-label">
-        <h4>Without label</h4>
-        <pre className="docs-code"><code>{`export function WithoutLabel() {
+        <Subheading>Without label</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Without label code'}
+          react={`import { PixelProgress } from '@pxlkit/ui-kit';
+
+export function WithoutLabel() {
   return <PixelProgress value={80} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelProgress } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelProgress :value="80" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelProgress } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelProgress],
+  template: \`<pxl-progress [value]="80" />\`,
+})
+export class WithoutLabel {}`}
+        />
       </article>
       <article className="docs-example" id="example-indeterminate">
-        <h4>Indeterminate</h4>
-        <pre className="docs-code"><code>{`export function Indeterminate() {
+        <Subheading>Indeterminate</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Indeterminate code'}
+          react={`import { PixelProgress } from '@pxlkit/ui-kit';
+
+export function Indeterminate() {
   return <PixelProgress value={0} label="Working…" indeterminate />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelProgress } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelProgress :value="0" label="Working…" indeterminate />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelProgress } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelProgress],
+  template: \`<pxl-progress [value]="0" label="Working…" indeterminate />\`,
+})
+export class Indeterminate {}`}
+        />
       </article>
       <article className="docs-example" id="example-clamped">
-        <h4>Clamped</h4>
-        <pre className="docs-code"><code>{`export function Clamped() {
+        <Subheading>Clamped</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Clamped code'}
+          react={`import { PixelProgress } from '@pxlkit/ui-kit';
+
+export function Clamped() {
   return (
     <div className="space-y-3">
       <PixelProgress value={-25} label="Below 0 (clamped to 0)" />
       <PixelProgress value={150} label="Above 100 (clamped to 100)" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelProgress } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelProgress :value="-25" label="Below 0 (clamped to 0)" />
+    <PixelProgress :value="150" label="Above 100 (clamped to 100)" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelProgress } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelProgress],
+  template: \`
+    <div class="space-y-3">
+      <pxl-progress [value]="-25" label="Below 0 (clamped to 0)" />
+      <pxl-progress [value]="150" label="Above 100 (clamped to 100)" />
+    </div>
+  \`,
+})
+export class Clamped {}`}
+        />
       </article>
       <article className="docs-example" id="example-steps">
-        <h4>Steps</h4>
-        <pre className="docs-code"><code>{`export function Steps() {
+        <Subheading>Steps</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Steps code'}
+          react={`import { PixelProgress } from '@pxlkit/ui-kit';
+
+export function Steps() {
   return (
     <div className="space-y-3">
       <PixelProgress value={0} label="0%" />
@@ -131,15 +404,45 @@ export function Default() {
       <PixelProgress value={100} label="100%" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelProgress } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelProgress :value="0" label="0%" />
+    <PixelProgress :value="25" label="25%" />
+    <PixelProgress :value="50" label="50%" />
+    <PixelProgress :value="75" label="75%" />
+    <PixelProgress :value="100" label="100%" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelProgress } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelProgress],
+  template: \`
+    <div class="space-y-3">
+      <pxl-progress [value]="0" label="0%" />
+      <pxl-progress [value]="25" label="25%" />
+      <pxl-progress [value]="50" label="50%" />
+      <pxl-progress [value]="75" label="75%" />
+      <pxl-progress [value]="100" label="100%" />
+    </div>
+  \`,
+})
+export class Steps {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-spinner">PixelSpinner</a></li>
-        <li><a href="#pixel-skeleton">PixelSkeleton</a></li>
-        <li><a href="#pixel-slider">PixelSlider</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-spinner' : '#pixel-spinner'}>PixelSpinner</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-skeleton' : '#pixel-skeleton'}>PixelSkeleton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-slider' : '#pixel-slider'}>PixelSlider</a></li>
       </ul>
     </section>
     </section>

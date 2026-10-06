@@ -162,7 +162,7 @@ function LoadingTriggers() {
               loading: false,
               duration: 4500,
             });
-          }, 1500);
+          }, 1000);
         }}
       >
         Run loading → success
@@ -187,7 +187,7 @@ function PromiseTriggers() {
         size="sm"
         onClick={() =>
           toast.promise(
-            () => new Promise<string>((resolve) => setTimeout(() => resolve('ok'), 1500)),
+            () => new Promise<string>((resolve) => setTimeout(() => resolve('ok'), 1000)),
             {
               loading: { title: 'Saving…' },
               success: { title: 'Saved', message: 'All set.' },
@@ -206,6 +206,41 @@ export function PromiseFlow() {
   return (
     <PxlKitToastProvider>
       <PromiseTriggers />
+    </PxlKitToastProvider>
+  );
+}
+
+function RejectedPromiseTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton
+        size="sm"
+        tone="red"
+        onClick={() =>
+          toast
+            .promise(
+              () => new Promise<string>((_resolve, reject) => setTimeout(() => reject(new Error('Network down')), 1000)),
+              {
+                loading: { title: 'Saving…' },
+                success: { title: 'Saved', message: 'All set.' },
+                error: { title: 'Failed', message: 'Try again.' },
+              },
+            )
+            // The error toast tells the user; the rejection needs no other handling.
+            .catch(() => {})
+        }
+      >
+        Run failing promise
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function PromiseRejected() {
+  return (
+    <PxlKitToastProvider>
+      <RejectedPromiseTriggers />
     </PxlKitToastProvider>
   );
 }

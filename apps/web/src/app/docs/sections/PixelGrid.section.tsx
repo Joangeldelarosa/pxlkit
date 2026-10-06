@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelGridDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelGridDocsMeta = {
@@ -17,35 +23,122 @@ export const PixelGridDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): React.ReactElement {
+/** PixelGrid's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelGrid } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelGrid',
+        props: [
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', default: "'16rem'", description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the items.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'as', type: 'keyof React.JSX.IntrinsicElements', description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelGrid } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelGrid',
+        props: [
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', default: "'16rem'", description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the items.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'as', type: 'string', default: "'div'", description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The items.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelGrid } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelGrid',
+        selector: '[pxlGrid]',
+        props: [
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', accepts: "1 | 2 | 3 | 4 | 5 | 6 | 12 | '1' | '2' | '3' | '4' | '5' | '6' | '12' | GridResponsiveColumns", description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', accepts: "1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'", description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', default: 'false', accepts: 'unknown', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', default: 'false', accepts: 'unknown', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', default: "'16rem'", description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the items.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelGridDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelGridDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-grid-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-grid-heading'>PixelGrid</h2>
+      <Title id='pixel-grid-heading'>PixelGrid</Title>
       <p className="docs-lead">Surface-aware CSS grid container with responsive column maps, asymmetric gaps, and auto-fit/auto-fill modes.</p>
       <ul className="docs-highlights">
         <li>Numeric or responsive column spec (base/sm/md/lg/xl)</li>
         <li>Asymmetric colGap/rowGap via stack-gap tokens</li>
         <li>autoFit / autoFill with configurable minColWidth</li>
-        <li>Polymorphic via `as`; inherits semantics from rendered element</li>
-        <li>Surface-aware transition classes via useEffectiveSurface</li>
+        <li>Polymorphic via <code>as</code> (in Angular, the element you put <code>pxlGrid</code> on); inherits semantics from rendered element</li>
+        <li>Surface-aware transition classes</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-grid-api">
+      <Heading id="pixel-grid-api">API</Heading>
+      <FrameworkApi label={'PixelGrid API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-grid-a11y">
-      <h3 id="pixel-grid-a11y">Accessibility</h3>
+      <Heading id="pixel-grid-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
-      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the element provided via `as` (e.g. ul, section). Authors are responsible for the semantic role of grid children.</p>
+      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the element provided via <code>as</code> (e.g. ul, section). Authors are responsible for the semantic role of grid children.</p>
     </section>
     <section aria-labelledby="pixel-grid-usage">
-      <h3 id="pixel-grid-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react';
+      <Heading id="pixel-grid-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelGrid usage'}
+        react={`import React from 'react';
 import { PixelGrid } from '@pxlkit/ui-kit';
 
 function Cell({ children }: { children: React.ReactNode }) {
@@ -67,14 +160,57 @@ export function Default() {
       <Cell>Six</Cell>
     </PixelGrid>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelGrid } from '@pxlkit/ui-kit-vue';
+
+const cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
+</script>
+
+<template>
+  <PixelGrid :cols="3" :gap="4">
+    <div v-for="cell in cells" :key="cell" class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {{ cell }}
+    </div>
+  </PixelGrid>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGrid],
+  template: \`
+    <div pxlGrid [cols]="3" [gap]="4">
+      @for (cell of cells; track cell) {
+        <div class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">{{ cell }}</div>
+      }
+    </div>
+  \`,
+})
+export class Default {
+  readonly cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import React from 'react';
+import { PixelGrid } from '@pxlkit/ui-kit';
+
+function Cell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {children}
+    </div>
+  );
+}
+
+export function Default() {
   return (
     <PixelGrid cols={3} gap={4}>
       <Cell>One</Cell>
@@ -85,11 +221,55 @@ export function Default() {
       <Cell>Six</Cell>
     </PixelGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGrid } from '@pxlkit/ui-kit-vue';
+
+const cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
+</script>
+
+<template>
+  <PixelGrid :cols="3" :gap="4">
+    <div v-for="cell in cells" :key="cell" class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {{ cell }}
+    </div>
+  </PixelGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGrid],
+  template: \`
+    <div pxlGrid [cols]="3" [gap]="4">
+      @for (cell of cells; track cell) {
+        <div class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">{{ cell }}</div>
+      }
+    </div>
+  \`,
+})
+export class Default {
+  readonly cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-responsive">
-        <h4>Responsive Columns</h4>
-        <pre className="docs-code"><code>{`export function Responsive() {
+        <Subheading>Responsive Columns</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Responsive Columns code'}
+          react={`import React from 'react';
+import { PixelGrid } from '@pxlkit/ui-kit';
+
+function Cell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {children}
+    </div>
+  );
+}
+
+export function Responsive() {
   return (
     <PixelGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={4}>
       <Cell>1</Cell>
@@ -98,11 +278,55 @@ export function Default() {
       <Cell>4</Cell>
     </PixelGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGrid } from '@pxlkit/ui-kit-vue';
+
+const cells = ['1', '2', '3', '4'];
+</script>
+
+<template>
+  <PixelGrid :cols="{ base: 1, sm: 2, md: 3, lg: 4 }" :gap="4">
+    <div v-for="cell in cells" :key="cell" class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {{ cell }}
+    </div>
+  </PixelGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGrid],
+  template: \`
+    <div pxlGrid [cols]="{ base: 1, sm: 2, md: 3, lg: 4 }" [gap]="4">
+      @for (cell of cells; track cell) {
+        <div class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">{{ cell }}</div>
+      }
+    </div>
+  \`,
+})
+export class Responsive {
+  readonly cells = ['1', '2', '3', '4'];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-auto-fit">
-        <h4>Auto Fit</h4>
-        <pre className="docs-code"><code>{`export function AutoFit() {
+        <Subheading>Auto Fit</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Auto Fit code'}
+          react={`import React from 'react';
+import { PixelGrid } from '@pxlkit/ui-kit';
+
+function Cell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {children}
+    </div>
+  );
+}
+
+export function AutoFit() {
   return (
     <PixelGrid autoFit minColWidth="12rem" gap={4}>
       <Cell>Auto A</Cell>
@@ -111,11 +335,55 @@ export function Default() {
       <Cell>Auto D</Cell>
     </PixelGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGrid } from '@pxlkit/ui-kit-vue';
+
+const cells = ['Auto A', 'Auto B', 'Auto C', 'Auto D'];
+</script>
+
+<template>
+  <PixelGrid auto-fit min-col-width="12rem" :gap="4">
+    <div v-for="cell in cells" :key="cell" class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {{ cell }}
+    </div>
+  </PixelGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGrid],
+  template: \`
+    <div pxlGrid autoFit minColWidth="12rem" [gap]="4">
+      @for (cell of cells; track cell) {
+        <div class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">{{ cell }}</div>
+      }
+    </div>
+  \`,
+})
+export class AutoFit {
+  readonly cells = ['Auto A', 'Auto B', 'Auto C', 'Auto D'];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-asymmetric-gaps">
-        <h4>Asymmetric Gaps</h4>
-        <pre className="docs-code"><code>{`export function AsymmetricGaps() {
+        <Subheading>Asymmetric Gaps</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Asymmetric Gaps code'}
+          react={`import React from 'react';
+import { PixelGrid } from '@pxlkit/ui-kit';
+
+function Cell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {children}
+    </div>
+  );
+}
+
+export function AsymmetricGaps() {
   return (
     <PixelGrid cols={2} colGap={8} rowGap={2}>
       <Cell>A</Cell>
@@ -124,16 +392,46 @@ export function Default() {
       <Cell>D</Cell>
     </PixelGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGrid } from '@pxlkit/ui-kit-vue';
+
+const cells = ['A', 'B', 'C', 'D'];
+</script>
+
+<template>
+  <PixelGrid :cols="2" :col-gap="8" :row-gap="2">
+    <div v-for="cell in cells" :key="cell" class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {{ cell }}
+    </div>
+  </PixelGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGrid],
+  template: \`
+    <div pxlGrid [cols]="2" [colGap]="8" [rowGap]="2">
+      @for (cell of cells; track cell) {
+        <div class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">{{ cell }}</div>
+      }
+    </div>
+  \`,
+})
+export class AsymmetricGaps {
+  readonly cells = ['A', 'B', 'C', 'D'];
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-stack">PixelStack</a></li>
-        <li><a href="#pixel-cluster">PixelCluster</a></li>
-        <li><a href="#pixel-bento">PixelBento</a></li>
-        <li><a href="#pixel-equal-height-grid">PixelEqualHeightGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stack' : '#pixel-stack'}>PixelStack</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-cluster' : '#pixel-cluster'}>PixelCluster</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bento' : '#pixel-bento'}>PixelBento</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-equal-height-grid' : '#pixel-equal-height-grid'}>PixelEqualHeightGrid</a></li>
       </ul>
     </section>
     </section>

@@ -46,7 +46,7 @@ export default defineManifest({
       { key: 'Paste', does: 'Distribute sanitized characters across remaining cells' },
     ],
     notes:
-      'Invalid characters are silently rejected based on the type prop. onComplete fires once when all cells are filled.',
+      'Invalid characters are silently rejected based on the type prop. The completion event (`onComplete`, `@complete` in Vue, `(complete)` in Angular) fires once when all cells are filled.',
   },
   related: ['PixelInput', 'PixelPasswordInput'],
   apiStability: 'stable',

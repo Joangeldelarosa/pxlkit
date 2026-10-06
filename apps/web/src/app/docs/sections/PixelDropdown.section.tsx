@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDropdownDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelDropdownDocsMeta = {
@@ -17,13 +23,351 @@ export const PixelDropdownDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSectionProps): React.ReactElement {
+/** PixelDropdown's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelDropdown } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelDropdown',
+        props: [
+          { name: 'label', type: 'string', description: 'Trigger button label (legacy items[] API).' },
+          { name: 'items', type: 'DropdownOption[]', description: 'Items to render (legacy items[] API).' },
+          { name: 'onSelect', type: '(value: string) => void', description: "Called with the selected item's `value` (legacy items[] API)." },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Trigger tone.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Optional icon at the right side of the trigger button. Defaults to a chevron.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the trigger button.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override. Falls back to nearest `<PxlKitProvider>` surface.' },
+          { name: 'ariaLabel', type: 'string', description: 'ARIA label override when the trigger label is purely decorative.' },
+          { name: 'children', type: 'React.ReactNode', description: 'When using compositional API, children replace items[] rendering.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDropdown.Root',
+        props: [
+          { name: 'open', type: 'boolean', description: 'Whether the menu is open; leave unset for an uncontrolled menu.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Initial open state while uncontrolled.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', description: 'Called with every open state the menu asks for (the trigger and its keys, Escape, a press outside, an item).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override for the trigger and the menu; defaults to the nearest provider.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The trigger and the menu (`PixelDropdown.Trigger`, `PixelDropdown.Content`).' },
+        ],
+      },
+      {
+        name: 'PixelDropdown.Trigger',
+        props: [
+          { name: 'children', type: 'React.ReactNode', description: 'Button label.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Button tone.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Icon at the end of the button, in place of the chevron.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the button.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible label, for a label that is only decorative.' },
+          { name: 'id', type: 'string', description: 'Id of the button, which names the menu; generated when left out.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+      {
+        name: 'PixelDropdown.Content',
+        props: [
+          { name: 'children', type: 'React.ReactNode', description: 'The items.' },
+          { name: 'className', type: 'string', description: 'Extra classes on the menu.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDropdown.Item',
+        props: [
+          { name: 'value', type: 'string', description: 'Item identity for highlight/typeahead registration (NOT the HTML form `value`).' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Label.' },
+          { name: 'onSelect', type: '() => void', description: 'Selection callback (NOT the DOM `select` event).' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Skipped by the keyboard and ignores the pointer.' },
+          { name: 'destructive', type: 'boolean', default: 'false', description: 'Visually marks the row red; equivalent to `tone="red"`.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Text tone.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Icon before the label (plain items).' },
+          { name: 'shortcut', type: 'string', description: 'Keyboard hint shown at the end of the row (display only).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`).',
+          '`ref` points to `<button>`.',
+        ],
+      },
+      { name: 'PixelDropdown.Separator' },
+      {
+        name: 'PixelDropdown.Header',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Text of the header row.' },
+        ],
+      },
+      {
+        name: 'PixelDropdown.CheckboxItem',
+        props: [
+          { name: 'checked', type: 'boolean', description: 'Shows the check mark, and sets `aria-checked`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Label.' },
+          { name: 'onSelect', type: '() => void', description: 'Selection callback (NOT the DOM `select` event).' },
+          { name: 'value', type: 'string', description: 'Item identity for highlight/typeahead registration (NOT the HTML form `value`).' },
+          { name: 'disabled', type: 'boolean', description: 'Skipped by the keyboard and ignores the pointer.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Text tone.' },
+          { name: 'destructive', type: 'boolean', description: 'Visually marks the row red; equivalent to `tone="red"`.' },
+          { name: 'shortcut', type: 'string', description: 'Keyboard hint shown at the end of the row (display only).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`), except `icon`.',
+          '`ref` points to `<button>`.',
+        ],
+      },
+      {
+        name: 'PixelDropdown.RadioItem',
+        props: [
+          { name: 'checked', type: 'boolean', description: 'Shows the dot, and sets `aria-checked`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Label.' },
+          { name: 'onSelect', type: '() => void', description: 'Selection callback (NOT the DOM `select` event).' },
+          { name: 'value', type: 'string', description: 'Item identity for highlight/typeahead registration (NOT the HTML form `value`).' },
+          { name: 'disabled', type: 'boolean', description: 'Skipped by the keyboard and ignores the pointer.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Text tone.' },
+          { name: 'destructive', type: 'boolean', description: 'Visually marks the row red; equivalent to `tone="red"`.' },
+          { name: 'shortcut', type: 'string', description: 'Keyboard hint shown at the end of the row (display only).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`), except `icon`.',
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelDropdown, PixelDropdownCheckboxItem, PixelDropdownContent, PixelDropdownHeader, PixelDropdownItem, PixelDropdownRadioItem, PixelDropdownRoot, PixelDropdownSeparator, PixelDropdownTrigger } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelDropdown',
+        props: [
+          { name: 'label', type: 'string', description: 'Trigger label of the shorthand.' },
+          { name: 'items', type: 'DropdownOption[]', description: 'Rows of the shorthand.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Trigger tone.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the trigger.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible label of the trigger, for a label that is only decorative.' },
+        ],
+        events: [
+          { name: 'select', payload: 'value: string', description: 'The `value` of the row chosen from the shorthand.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Trigger, content and items, in place of the shorthand.' },
+          { name: 'icon', description: "Icon at the end of the shorthand's trigger, in place of the chevron." },
+        ],
+      },
+      {
+        name: 'PixelDropdownCheckboxItem',
+        props: [
+          { name: 'checked', type: 'boolean', default: 'false', description: 'Shows the check mark, and sets `aria-checked`.' },
+          { name: 'value', type: 'string', description: 'Identity of the item for highlight and typeahead (not a form value); generated when left out.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Skipped by the keyboard and ignores the pointer.' },
+          { name: 'destructive', type: 'boolean', default: 'false', description: 'Red text, for a destructive action — same as `tone="red"`.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Text tone.' },
+          { name: 'shortcut', type: 'string', description: 'Keyboard hint shown at the end of the row (display only).' },
+        ],
+        events: [
+          { name: 'select', description: 'The item was chosen; the menu closes.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Label.' },
+        ],
+      },
+      {
+        name: 'PixelDropdownContent',
+        slots: [
+          { name: 'default', description: 'The items.' },
+        ],
+      },
+      {
+        name: 'PixelDropdownHeader',
+        slots: [
+          { name: 'default', description: 'Text of the header row.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDropdownItem',
+        props: [
+          { name: 'value', type: 'string', description: 'Identity of the item for highlight and typeahead (not a form value); generated when left out.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Skipped by the keyboard and ignores the pointer.' },
+          { name: 'destructive', type: 'boolean', default: 'false', description: 'Red text, for a destructive action — same as `tone="red"`.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Text tone.' },
+          { name: 'shortcut', type: 'string', description: 'Keyboard hint shown at the end of the row (display only).' },
+        ],
+        events: [
+          { name: 'select', description: 'The item was chosen; the menu closes.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Label.' },
+          { name: 'icon', description: 'Icon before the label.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<button>`.',
+        ],
+      },
+      {
+        name: 'PixelDropdownRadioItem',
+        props: [
+          { name: 'checked', type: 'boolean', default: 'false', description: 'Shows the dot, and sets `aria-checked`.' },
+          { name: 'value', type: 'string', description: 'Identity of the item for highlight and typeahead (not a form value); generated when left out.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Skipped by the keyboard and ignores the pointer.' },
+          { name: 'destructive', type: 'boolean', default: 'false', description: 'Red text, for a destructive action — same as `tone="red"`.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Text tone.' },
+          { name: 'shortcut', type: 'string', description: 'Keyboard hint shown at the end of the row (display only).' },
+        ],
+        events: [
+          { name: 'select', description: 'The item was chosen; the menu closes.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Label.' },
+        ],
+      },
+      {
+        name: 'PixelDropdownRoot',
+        props: [
+          { name: 'open', type: 'boolean', binding: 'v-model:open', description: 'Whether the menu is open (`v-model:open`); leave unset for an uncontrolled menu.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Initial open state while uncontrolled.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override for the trigger and the menu; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: 'Every open state the menu asks for, for `v-model:open`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The trigger and the menu (`PixelDropdownTrigger`, `PixelDropdownContent`).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDropdownSeparator',
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDropdownTrigger',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Button tone.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the button.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible label, for a label that is only decorative.' },
+          { name: 'id', type: 'string', description: 'Id of the button, which names the menu; generated when left out.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Button label.' },
+          { name: 'icon', description: 'Icon at the end of the button, in place of the chevron.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelDropdown, PixelDropdownContent, PixelDropdownHeader, PixelDropdownItem, PixelDropdownRoot, PixelDropdownSeparator, PixelDropdownTrigger } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelDropdown',
+        selector: 'pxl-dropdown',
+        props: [
+          { name: 'label', type: 'string', description: 'Trigger label of the shorthand.' },
+          { name: 'items', type: 'DropdownOption[]', default: '[]', description: 'Rows of the shorthand.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Trigger tone.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Icon at the end of the trigger, in place of the chevron.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the trigger.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible label of the trigger, for a label that is only decorative.' },
+        ],
+        events: [
+          { name: 'selected', payload: 'string', description: 'The `value` of the row chosen from the shorthand.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelDropdownContent',
+        selector: '[pxlDropdownContent]',
+        notes: [
+          'Structural: write it as `*pxlDropdownContent` on the content, or on an `<ng-template>`.',
+        ],
+      },
+      {
+        name: 'PixelDropdownHeader',
+        selector: 'pxl-dropdown-header',
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelDropdownItem',
+        selector: 'button[pxlDropdownItem], button[pxlDropdownCheckboxItem], button[pxlDropdownRadioItem]',
+        props: [
+          { name: 'value', type: 'string', description: 'Identity of the item for highlight and typeahead (not a form value); generated when left out.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Skipped by the keyboard and ignores the pointer.' },
+          { name: 'destructive', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Red text, for a destructive action — same as `tone="red"`.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Text tone.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Icon before the label (plain items).' },
+          { name: 'shortcut', type: 'string', description: 'Keyboard hint shown at the end of the row (display only).' },
+          { name: 'checked', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows the mark of a checkbox or radio item.' },
+        ],
+        events: [
+          { name: 'selected', description: 'The item was chosen; the menu closes.' },
+        ],
+        notes: [
+          'Goes on a native `<button>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelDropdownRoot',
+        selector: 'pxl-dropdown-root',
+        props: [
+          { name: 'open', type: 'boolean', binding: '[(open)]', description: 'Whether the menu is open (`[(open)]`); leave unset for an uncontrolled menu.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Initial open state while uncontrolled.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override for the trigger and the menu; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: 'Every open state the menu asks for (the trigger and its keys, Escape, a press outside, an item), for `[(open)]`.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      { name: 'PixelDropdownSeparator', selector: 'pxl-dropdown-separator' },
+      {
+        name: 'PixelDropdownTrigger',
+        selector: 'pxl-dropdown-trigger',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Button tone.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Icon at the end of the button, in place of the chevron.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the button.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible label, for a label that is only decorative.' },
+          { name: 'id', type: 'string', description: 'Id of the button, which names the menu; generated when left out.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelDropdownDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelDropdownDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-dropdown-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-dropdown-heading'>PixelDropdown</h2>
+      <Title id='pixel-dropdown-heading'>PixelDropdown</Title>
       <p className="docs-lead">Button-triggered menu of actions with keyboard navigation, typeahead, and a compositional API for advanced layouts.</p>
       <ul className="docs-highlights">
-        <li>Dual API: declarative `items[]` sugar and compositional `Root/Trigger/Content/Item` parts.</li>
+        <li>Dual API: declarative <code>items[]</code> sugar and compositional <code>Root/Trigger/Content/Item</code> parts.</li>
         <li>Item kinds: item, separator, header, checkbox, radio, submenu (chevron affordance).</li>
         <li>Full keyboard support: arrow navigation, Home/End, Enter/Space activation, printable-key typeahead.</li>
         <li>Tones + destructive styling, optional shortcut kbd badges, and disabled rows skipped by focus.</li>
@@ -34,19 +378,19 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-dropdown-api">
+      <Heading id="pixel-dropdown-api">API</Heading>
+      <FrameworkApi label={'PixelDropdown API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-dropdown-a11y">
-      <h3 id="pixel-dropdown-a11y">Accessibility</h3>
+      <Heading id="pixel-dropdown-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>menu</code></li>
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">Trigger exposes `aria-haspopup=&quot;menu&quot;`, `aria-expanded`, and `aria-controls` wired to the menu id. Items use `role=&quot;menuitem&quot;` with `aria-disabled` for skipped rows. Separators use `role=&quot;separator&quot;`; headers are `role=&quot;presentation&quot;`. Click-outside and Escape both dismiss.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">Trigger exposes <code>aria-haspopup=&quot;menu&quot;</code>, <code>aria-expanded</code>, and <code>aria-controls</code> wired to the menu id while the menu is open, and names the menu through <code>aria-labelledby</code> (its own <code>id</code>, or a generated one). The open menu takes focus (<code>tabindex=&quot;-1&quot;</code>) and points <code>aria-activedescendant</code> at the highlighted item, so assistive technology follows the arrows, Home/End and typeahead. Items use <code>role=&quot;menuitem&quot;</code> — <code>menuitemcheckbox</code> and <code>menuitemradio</code> with <code>aria-checked</code> for checkbox and radio rows — with <code>aria-disabled</code> for skipped rows. Separators use <code>role=&quot;separator&quot;</code>; headers are <code>role=&quot;presentation&quot;</code>. Escape, choosing an item and Tab return focus to the trigger; a press outside closes the menu and leaves focus where the pointer put it.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -57,14 +401,29 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
         </thead>
         <tbody>
           <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Open the menu and move focus into it.</td>
+            <td>trigger focused</td>
+          </tr>
+          <tr>
             <td><kbd>ArrowDown</kbd></td>
-            <td>Open the menu (if closed) and move highlight to the next enabled item.</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Open the menu with focus in it, highlighting the first enabled item.</td>
+            <td>trigger focused</td>
           </tr>
           <tr>
             <td><kbd>ArrowUp</kbd></td>
-            <td>Open the menu (if closed) and move highlight to the previous enabled item.</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Open the menu with focus in it, highlighting the last enabled item.</td>
+            <td>trigger focused</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowDown</kbd></td>
+            <td>Highlight the next enabled item; stops at the last.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowUp</kbd></td>
+            <td>Highlight the previous enabled item; stops at the first.</td>
+            <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>Home</kbd></td>
@@ -78,17 +437,27 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
           </tr>
           <tr>
             <td><kbd>Enter</kbd></td>
-            <td>Activate the highlighted item and close the menu.</td>
+            <td>Activate the highlighted item, close the menu and return focus to the trigger.</td>
             <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>Space</kbd></td>
-            <td>Activate the highlighted item and close the menu.</td>
+            <td>Activate the highlighted item, close the menu and return focus to the trigger.</td>
             <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>Escape</kbd></td>
-            <td>Close the menu and clear the highlight.</td>
+            <td>Close the menu, clear the highlight and return focus to the trigger.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Tab</kbd></td>
+            <td>Close the menu and move focus on from the trigger to the next focusable element.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+Tab</kbd></td>
+            <td>Close the menu and move focus back from the trigger to the previous focusable element.</td>
             <td>menu open</td>
           </tr>
           <tr>
@@ -100,9 +469,11 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
       </table>
     </section>
     <section aria-labelledby="pixel-dropdown-usage">
-      <h3 id="pixel-dropdown-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelDropdown } from '@pxlkit/ui-kit';
+      <Heading id="pixel-dropdown-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelDropdown usage'}
+        react={`import { PixelDropdown } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -116,14 +487,54 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDropdown
+    label="Actions"
+    :items="[
+      { value: 'edit', label: 'Edit' },
+      { value: 'duplicate', label: 'Duplicate' },
+      { value: 'archive', label: 'Archive' },
+    ]"
+    @select="() => {}"
+  />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`
+    <pxl-dropdown
+      label="Actions"
+      [items]="[
+        { value: 'edit', label: 'Edit' },
+        { value: 'duplicate', label: 'Duplicate' },
+        { value: 'archive', label: 'Archive' },
+      ]"
+      (selected)="select()"
+    />
+  \`,
+})
+export class Default {
+  select(): void {}
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelDropdown
       label="Actions"
@@ -135,11 +546,52 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDropdown
+    label="Actions"
+    :items="[
+      { value: 'edit', label: 'Edit' },
+      { value: 'duplicate', label: 'Duplicate' },
+      { value: 'archive', label: 'Archive' },
+    ]"
+    @select="() => {}"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`
+    <pxl-dropdown
+      label="Actions"
+      [items]="[
+        { value: 'edit', label: 'Edit' },
+        { value: 'duplicate', label: 'Duplicate' },
+        { value: 'archive', label: 'Archive' },
+      ]"
+      (selected)="select()"
+    />
+  \`,
+})
+export class Default {
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-wrap items-start gap-4">
       <PixelDropdown
@@ -164,11 +616,44 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-start gap-4">
+    <PixelDropdown label="Neutral" tone="neutral" :items="[{ value: 'a', label: 'Option A' }]" />
+    <PixelDropdown label="Cyan" tone="cyan" :items="[{ value: 'a', label: 'Option A' }]" />
+    <PixelDropdown label="Green" tone="green" :items="[{ value: 'a', label: 'Option A' }]" />
+    <PixelDropdown label="Red" tone="red" :items="[{ value: 'a', label: 'Option A' }]" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`
+    <div class="flex flex-wrap items-start gap-4">
+      <pxl-dropdown label="Neutral" tone="neutral" [items]="[{ value: 'a', label: 'Option A' }]" />
+      <pxl-dropdown label="Cyan" tone="cyan" [items]="[{ value: 'a', label: 'Option A' }]" />
+      <pxl-dropdown label="Green" tone="green" [items]="[{ value: 'a', label: 'Option A' }]" />
+      <pxl-dropdown label="Red" tone="red" [items]="[{ value: 'a', label: 'Option A' }]" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap items-start gap-4">
       <PixelDropdown
@@ -189,11 +674,68 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-start gap-4">
+    <PixelDropdown
+      label="Pixel"
+      surface="pixel"
+      :items="[
+        { value: 'one', label: 'First' },
+        { value: 'two', label: 'Second' },
+      ]"
+    />
+    <PixelDropdown
+      label="Linear"
+      surface="linear"
+      :items="[
+        { value: 'one', label: 'First' },
+        { value: 'two', label: 'Second' },
+      ]"
+    />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`
+    <div class="flex flex-wrap items-start gap-4">
+      <pxl-dropdown
+        label="Pixel"
+        surface="pixel"
+        [items]="[
+          { value: 'one', label: 'First' },
+          { value: 'two', label: 'Second' },
+        ]"
+      />
+      <pxl-dropdown
+        label="Linear"
+        surface="linear"
+        [items]="[
+          { value: 'one', label: 'First' },
+          { value: 'two', label: 'Second' },
+        ]"
+      />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled trigger</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled trigger</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled trigger code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelDropdown
       label="Unavailable"
@@ -201,11 +743,32 @@ export function Default() {
       items={[{ value: 'a', label: 'Option A' }]}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDropdown label="Unavailable" disabled :items="[{ value: 'a', label: 'Option A' }]" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`<pxl-dropdown label="Unavailable" disabled [items]="[{ value: 'a', label: 'Option A' }]" />\`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icons-and-shortcuts">
-        <h4>Shortcuts</h4>
-        <pre className="docs-code"><code>{`export function WithIconsAndShortcuts() {
+        <Subheading>Shortcuts</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Shortcuts code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function WithIconsAndShortcuts() {
   return (
     <PixelDropdown
       label="File"
@@ -217,11 +780,52 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDropdown
+    label="File"
+    :items="[
+      { value: 'new', label: 'New', shortcut: 'Ctrl+N' },
+      { value: 'open', label: 'Open…', shortcut: 'Ctrl+O' },
+      { value: 'save', label: 'Save', shortcut: 'Ctrl+S' },
+    ]"
+    @select="() => {}"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`
+    <pxl-dropdown
+      label="File"
+      [items]="[
+        { value: 'new', label: 'New', shortcut: 'Ctrl+N' },
+        { value: 'open', label: 'Open…', shortcut: 'Ctrl+O' },
+        { value: 'save', label: 'Save', shortcut: 'Ctrl+S' },
+      ]"
+      (selected)="select()"
+    />
+  \`,
+})
+export class WithIconsAndShortcuts {
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-headers-and-separators">
-        <h4>Headers + separators</h4>
-        <pre className="docs-code"><code>{`export function HeadersAndSeparators() {
+        <Subheading>Headers + separators</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Headers + separators code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function HeadersAndSeparators() {
   return (
     <PixelDropdown
       label="Account"
@@ -236,11 +840,52 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-vue';
+
+const items: DropdownOption[] = [
+  { value: 'h1', label: 'Profile', kind: 'header' },
+  { value: 'view', label: 'View profile' },
+  { value: 'edit', label: 'Edit profile' },
+  { value: 'sep1', label: '', kind: 'separator' },
+  { value: 'h2', label: 'Danger Zone', kind: 'header' },
+  { value: 'delete', label: 'Delete account', tone: 'red' },
+];
+</script>
+
+<template>
+  <PixelDropdown label="Account" :items="items" @select="() => {}" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`<pxl-dropdown label="Account" [items]="items" (selected)="select()" />\`,
+})
+export class HeadersAndSeparators {
+  readonly items: DropdownOption[] = [
+    { value: 'h1', label: 'Profile', kind: 'header' },
+    { value: 'view', label: 'View profile' },
+    { value: 'edit', label: 'Edit profile' },
+    { value: 'sep1', label: '', kind: 'separator' },
+    { value: 'h2', label: 'Danger Zone', kind: 'header' },
+    { value: 'delete', label: 'Delete account', tone: 'red' },
+  ];
+
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-checkbox-and-radio">
-        <h4>Checkbox + radio items</h4>
-        <pre className="docs-code"><code>{`export function CheckboxAndRadio() {
+        <Subheading>Checkbox + radio items</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Checkbox + radio items code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function CheckboxAndRadio() {
   return (
     <PixelDropdown
       label="View"
@@ -257,11 +902,56 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-vue';
+
+const items: DropdownOption[] = [
+  { value: 'g1', label: 'Show', kind: 'header' },
+  { value: 'grid', label: 'Grid lines', kind: 'checkbox', checked: true },
+  { value: 'ruler', label: 'Ruler', kind: 'checkbox', checked: false },
+  { value: 'sep', label: '', kind: 'separator' },
+  { value: 'g2', label: 'Density', kind: 'header' },
+  { value: 'compact', label: 'Compact', kind: 'radio', checked: false },
+  { value: 'cozy', label: 'Cozy', kind: 'radio', checked: true },
+  { value: 'spacious', label: 'Spacious', kind: 'radio', checked: false },
+];
+</script>
+
+<template>
+  <PixelDropdown label="View" :items="items" @select="() => {}" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`<pxl-dropdown label="View" [items]="items" (selected)="select()" />\`,
+})
+export class CheckboxAndRadio {
+  readonly items: DropdownOption[] = [
+    { value: 'g1', label: 'Show', kind: 'header' },
+    { value: 'grid', label: 'Grid lines', kind: 'checkbox', checked: true },
+    { value: 'ruler', label: 'Ruler', kind: 'checkbox', checked: false },
+    { value: 'sep', label: '', kind: 'separator' },
+    { value: 'g2', label: 'Density', kind: 'header' },
+    { value: 'compact', label: 'Compact', kind: 'radio', checked: false },
+    { value: 'cozy', label: 'Cozy', kind: 'radio', checked: true },
+    { value: 'spacious', label: 'Spacious', kind: 'radio', checked: false },
+  ];
+
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled-items">
-        <h4>Disabled items</h4>
-        <pre className="docs-code"><code>{`export function DisabledItems() {
+        <Subheading>Disabled items</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled items code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function DisabledItems() {
   return (
     <PixelDropdown
       label="Edit"
@@ -276,11 +966,52 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-vue';
+
+const items: DropdownOption[] = [
+  { value: 'undo', label: 'Undo', shortcut: 'Ctrl+Z' },
+  { value: 'redo', label: 'Redo', shortcut: 'Ctrl+Y', disabled: true },
+  { value: 'sep', label: '', kind: 'separator' },
+  { value: 'cut', label: 'Cut' },
+  { value: 'copy', label: 'Copy' },
+  { value: 'paste', label: 'Paste', disabled: true },
+];
+</script>
+
+<template>
+  <PixelDropdown label="Edit" :items="items" @select="() => {}" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`<pxl-dropdown label="Edit" [items]="items" (selected)="select()" />\`,
+})
+export class DisabledItems {
+  readonly items: DropdownOption[] = [
+    { value: 'undo', label: 'Undo', shortcut: 'Ctrl+Z' },
+    { value: 'redo', label: 'Redo', shortcut: 'Ctrl+Y', disabled: true },
+    { value: 'sep', label: '', kind: 'separator' },
+    { value: 'cut', label: 'Cut' },
+    { value: 'copy', label: 'Copy' },
+    { value: 'paste', label: 'Paste', disabled: true },
+  ];
+
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-composition">
-        <h4>Compositional API</h4>
-        <pre className="docs-code"><code>{`export function Composition() {
+        <Subheading>Compositional API</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Compositional API code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function Composition() {
   return (
     <PixelDropdown.Root>
       <PixelDropdown.Trigger>Menu</PixelDropdown.Trigger>
@@ -299,11 +1030,69 @@ export function Default() {
       </PixelDropdown.Content>
     </PixelDropdown.Root>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import {
+  PixelDropdownContent,
+  PixelDropdownHeader,
+  PixelDropdownItem,
+  PixelDropdownRoot,
+  PixelDropdownSeparator,
+  PixelDropdownTrigger,
+} from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDropdownRoot>
+    <PixelDropdownTrigger>Menu</PixelDropdownTrigger>
+    <PixelDropdownContent>
+      <PixelDropdownHeader>Project</PixelDropdownHeader>
+      <PixelDropdownItem value="rename" @select="() => {}">Rename</PixelDropdownItem>
+      <PixelDropdownItem value="share" shortcut="Ctrl+E" @select="() => {}">Share</PixelDropdownItem>
+      <PixelDropdownSeparator />
+      <PixelDropdownItem value="delete" destructive @select="() => {}">Delete</PixelDropdownItem>
+    </PixelDropdownContent>
+  </PixelDropdownRoot>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdownContent, PixelDropdownHeader, PixelDropdownItem, PixelDropdownRoot, PixelDropdownSeparator, PixelDropdownTrigger } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [
+    PixelDropdownRoot,
+    PixelDropdownTrigger,
+    PixelDropdownContent,
+    PixelDropdownHeader,
+    PixelDropdownItem,
+    PixelDropdownSeparator,
+  ],
+  template: \`
+    <pxl-dropdown-root>
+      <pxl-dropdown-trigger>Menu</pxl-dropdown-trigger>
+      <div *pxlDropdownContent>
+        <pxl-dropdown-header>Project</pxl-dropdown-header>
+        <button pxlDropdownItem value="rename" (selected)="select()">Rename</button>
+        <button pxlDropdownItem value="share" shortcut="Ctrl+E" (selected)="select()">Share</button>
+        <pxl-dropdown-separator />
+        <button pxlDropdownItem value="delete" destructive (selected)="select()">Delete</button>
+      </div>
+    </pxl-dropdown-root>
+  \`,
+})
+export class Composition {
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled-open">
-        <h4>Controlled open</h4>
-        <pre className="docs-code"><code>{`export function ControlledOpen() {
+        <Subheading>Controlled open</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled open code'}
+          react={`import { useState } from 'react';
+import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function ControlledOpen() {
   const [open, setOpen] = useState(false);
   return (
     <PixelDropdown.Root open={open} onOpenChange={setOpen}>
@@ -318,16 +1107,53 @@ export function Default() {
       </PixelDropdown.Content>
     </PixelDropdown.Root>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDropdownContent, PixelDropdownItem, PixelDropdownRoot, PixelDropdownTrigger } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelDropdownRoot v-model:open="open">
+    <PixelDropdownTrigger>{{ open ? 'Close' : 'Open' }} menu</PixelDropdownTrigger>
+    <PixelDropdownContent>
+      <PixelDropdownItem value="one" @select="() => {}">One</PixelDropdownItem>
+      <PixelDropdownItem value="two" @select="() => {}">Two</PixelDropdownItem>
+    </PixelDropdownContent>
+  </PixelDropdownRoot>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDropdownContent, PixelDropdownItem, PixelDropdownRoot, PixelDropdownTrigger } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdownRoot, PixelDropdownTrigger, PixelDropdownContent, PixelDropdownItem],
+  template: \`
+    <pxl-dropdown-root [(open)]="open">
+      <pxl-dropdown-trigger>{{ open() ? 'Close' : 'Open' }} menu</pxl-dropdown-trigger>
+      <div *pxlDropdownContent>
+        <button pxlDropdownItem value="one" (selected)="select()">One</button>
+        <button pxlDropdownItem value="two" (selected)="select()">Two</button>
+      </div>
+    </pxl-dropdown-root>
+  \`,
+})
+export class ControlledOpen {
+  readonly open = signal(false);
+
+  select(): void {}
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-select">PixelSelect</a></li>
-        <li><a href="#pixel-menubar">PixelMenubar</a></li>
-        <li><a href="#pixel-navigation-menu">PixelNavigationMenu</a></li>
-        <li><a href="#pixel-tooltip">PixelTooltip</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-select' : '#pixel-select'}>PixelSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-menubar' : '#pixel-menubar'}>PixelMenubar</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-navigation-menu' : '#pixel-navigation-menu'}>PixelNavigationMenu</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tooltip' : '#pixel-tooltip'}>PixelTooltip</a></li>
       </ul>
     </section>
     </section>

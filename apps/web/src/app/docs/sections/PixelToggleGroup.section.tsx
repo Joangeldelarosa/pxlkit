@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelToggleGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelToggleGroupDocsMeta = {
@@ -17,10 +23,100 @@ export const PixelToggleGroupDocsMeta = {
   deprecated: false,
 } as const;
 
-export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsSectionProps): React.ReactElement {
+/** PixelToggleGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelToggleGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelToggleGroup',
+        props: [
+          { name: 'type', type: "'single' | 'multiple'", default: "'single'", description: '`single`: one value, a radiogroup of radios; `multiple`: any number of values, pressed buttons.' },
+          { name: 'value', type: 'string | string[]', description: "Value: a string in single mode (`''` for none), an array in multiple mode; leave unset for an uncontrolled group." },
+          { name: 'defaultValue', type: 'string | string[]', description: 'Initial value while uncontrolled; nothing pressed by default.' },
+          { name: 'onChange', type: '((next: string) => void) | ((next: string[]) => void)', description: 'Called with the new value, after each press.' },
+          { name: 'rovingFocus', type: 'boolean', default: 'false', description: 'Only one toggle is in the tab order; the arrow keys, Home and End move between them.' },
+          { name: 'loop', type: 'boolean', default: 'false', description: 'The arrow keys wrap from the last toggle to the first and back.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the toggles.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'soft'", description: 'Variant of the toggles.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toggles; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible label for the toolbar / radiogroup.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The `PixelToggle`s.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelToggleGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelToggleGroup',
+        props: [
+          { name: 'type', type: "'single' | 'multiple'", description: '`single`: one value, a radiogroup of radios; `multiple`: any number of values, pressed buttons. Default `single`.' },
+          { name: 'modelValue', type: 'ToggleGroupValue<T>', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled group.' },
+          { name: 'defaultValue', type: 'ToggleGroupValue<T>', description: 'Initial value while uncontrolled; nothing pressed by default.' },
+          { name: 'rovingFocus', type: 'boolean', default: 'false', description: 'Only one toggle is in the tab order; the arrow keys, Home and End move between them.' },
+          { name: 'loop', type: 'boolean', default: 'false', description: 'The arrow keys wrap from the last toggle to the first and back.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the toggles.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'soft'", description: 'Variant of the toggles.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toggles; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name of the group (`aria-label`).' },
+          { name: 'ariaLabelledby', type: 'string', description: 'Id of the element that names the group (`aria-labelledby`).' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: ToggleGroupValue<T>', description: 'The new value, after each press.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The `PixelToggle`s.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelToggleGroup } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelToggleGroup',
+        selector: 'pxl-toggle-group',
+        props: [
+          { name: 'type', type: "'single' | 'multiple'", default: "'single'", description: '`single`: one value, a radiogroup of radios; `multiple`: any number of values, pressed buttons.' },
+          { name: 'value', type: 'string | string[]', binding: '[(value)]', description: "Value (`[(value)]`): a string in single mode (`''` for none), an array in multiple mode; leave unset for an uncontrolled group." },
+          { name: 'defaultValue', type: 'string | string[]', description: 'Initial value while uncontrolled; nothing pressed by default.' },
+          { name: 'rovingFocus', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Only one toggle is in the tab order; the arrow keys, Home and End move between them.' },
+          { name: 'loop', type: 'boolean', default: 'false', accepts: 'unknown', description: 'The arrow keys wrap from the last toggle to the first and back.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the toggles.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'soft'", description: 'Variant of the toggles.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toggles; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the group.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string | string[]', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string | string[]`).',
+        ],
+      },
+    ],
+  },
+};
+
+export function PixelToggleGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelToggleGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-toggle-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-toggle-group-heading'>PixelToggleGroup</h2>
+      <Title id='pixel-toggle-group-heading'>PixelToggleGroup</Title>
       <p className="docs-lead">Grouped pressable toggles with single- or multi-select semantics, roving focus, and surface-aware styling.</p>
       <ul className="docs-highlights">
         <li>Discriminated union API: type=&quot;single&quot; → string value, type=&quot;multiple&quot; → string[] value</li>
@@ -33,19 +129,19 @@ export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsS
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-toggle-group-api">
+      <Heading id="pixel-toggle-group-api">API</Heading>
+      <FrameworkApi label={'PixelToggleGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-toggle-group-a11y">
-      <h3 id="pixel-toggle-group-a11y">Accessibility</h3>
+      <Heading id="pixel-toggle-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>radiogroup</code></li>
         <li><code>toolbar</code></li>
       </ul>
       <p className="docs-aria-notes">Provide an aria-label (or aria-labelledby) for screen reader context. Single-select renders role=&quot;radiogroup&quot; with role=&quot;radio&quot; children; multi-select renders role=&quot;group&quot; only when named.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -84,8 +180,11 @@ export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsS
       </table>
     </section>
     <section aria-labelledby="pixel-toggle-group-usage">
-      <h3 id="pixel-toggle-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <Heading id="pixel-toggle-group-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PixelToggleGroup usage'}
+        react={`import { useState } from 'react';
 import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -102,14 +201,50 @@ export function Default() {
       <PixelToggle value="right">Right</PixelToggle>
     </PixelToggleGroup>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-vue';
+
+const value = ref('left');
+</script>
+
+<template>
+  <PixelToggleGroup v-model="value" type="single" aria-label="Text alignment">
+    <PixelToggle value="left">Left</PixelToggle>
+    <PixelToggle value="center">Center</PixelToggle>
+    <PixelToggle value="right">Right</PixelToggle>
+  </PixelToggleGroup>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle, PixelToggleGroup],
+  template: \`
+    <pxl-toggle-group type="single" [(value)]="value" aria-label="Text alignment">
+      <button pxlToggle value="left">Left</button>
+      <button pxlToggle value="center">Center</button>
+      <button pxlToggle value="right">Right</button>
+    </pxl-toggle-group>
+  \`,
+})
+export class Default {
+  readonly value = signal('left');
+}`}
+      />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [value, setValue] = useState<string>('left');
   return (
     <PixelToggleGroup
@@ -123,11 +258,48 @@ export function Default() {
       <PixelToggle value="right">Right</PixelToggle>
     </PixelToggleGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-vue';
+
+const value = ref('left');
+</script>
+
+<template>
+  <PixelToggleGroup v-model="value" type="single" aria-label="Text alignment">
+    <PixelToggle value="left">Left</PixelToggle>
+    <PixelToggle value="center">Center</PixelToggle>
+    <PixelToggle value="right">Right</PixelToggle>
+  </PixelToggleGroup>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle, PixelToggleGroup],
+  template: \`
+    <pxl-toggle-group type="single" [(value)]="value" aria-label="Text alignment">
+      <button pxlToggle value="left">Left</button>
+      <button pxlToggle value="center">Center</button>
+      <button pxlToggle value="right">Right</button>
+    </pxl-toggle-group>
+  \`,
+})
+export class Default {
+  readonly value = signal('left');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-multiple">
-        <h4>Multiple</h4>
-        <pre className="docs-code"><code>{`export function Multiple() {
+        <Subheading>Multiple</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Multiple code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function Multiple() {
   const [value, setValue] = useState<string[]>(['bold']);
   return (
     <PixelToggleGroup
@@ -141,11 +313,48 @@ export function Default() {
       <PixelToggle value="underline">Underline</PixelToggle>
     </PixelToggleGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-vue';
+
+const value = ref(['bold']);
+</script>
+
+<template>
+  <PixelToggleGroup v-model="value" type="multiple" aria-label="Text formatting">
+    <PixelToggle value="bold">Bold</PixelToggle>
+    <PixelToggle value="italic">Italic</PixelToggle>
+    <PixelToggle value="underline">Underline</PixelToggle>
+  </PixelToggleGroup>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle, PixelToggleGroup],
+  template: \`
+    <pxl-toggle-group type="multiple" [(value)]="value" aria-label="Text formatting">
+      <button pxlToggle value="bold">Bold</button>
+      <button pxlToggle value="italic">Italic</button>
+      <button pxlToggle value="underline">Underline</button>
+    </pxl-toggle-group>
+  \`,
+})
+export class Multiple {
+  readonly value = signal(['bold']);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-variants">
-        <h4>Variants</h4>
-        <pre className="docs-code"><code>{`export function Variants() {
+        <Subheading>Variants</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Variants code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function Variants() {
   const [a, setA] = useState<string>('one');
   const [b, setB] = useState<string>('one');
   const [c, setC] = useState<string>('one');
@@ -174,11 +383,88 @@ export function Default() {
       </PixelToggleGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-vue';
+
+const a = ref('one');
+const b = ref('one');
+const c = ref('one');
+const d = ref('one');
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelToggleGroup v-model="a" type="single" variant="soft" aria-label="Soft">
+      <PixelToggle value="one">One</PixelToggle>
+      <PixelToggle value="two">Two</PixelToggle>
+      <PixelToggle value="three">Three</PixelToggle>
+    </PixelToggleGroup>
+    <PixelToggleGroup v-model="b" type="single" variant="solid" aria-label="Solid">
+      <PixelToggle value="one">One</PixelToggle>
+      <PixelToggle value="two">Two</PixelToggle>
+      <PixelToggle value="three">Three</PixelToggle>
+    </PixelToggleGroup>
+    <PixelToggleGroup v-model="c" type="single" variant="outline" aria-label="Outline">
+      <PixelToggle value="one">One</PixelToggle>
+      <PixelToggle value="two">Two</PixelToggle>
+      <PixelToggle value="three">Three</PixelToggle>
+    </PixelToggleGroup>
+    <PixelToggleGroup v-model="d" type="single" variant="ghost" aria-label="Ghost">
+      <PixelToggle value="one">One</PixelToggle>
+      <PixelToggle value="two">Two</PixelToggle>
+      <PixelToggle value="three">Three</PixelToggle>
+    </PixelToggleGroup>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle, PixelToggleGroup],
+  template: \`
+    <div class="space-y-3">
+      <pxl-toggle-group type="single" variant="soft" [(value)]="a" aria-label="Soft">
+        <button pxlToggle value="one">One</button>
+        <button pxlToggle value="two">Two</button>
+        <button pxlToggle value="three">Three</button>
+      </pxl-toggle-group>
+      <pxl-toggle-group type="single" variant="solid" [(value)]="b" aria-label="Solid">
+        <button pxlToggle value="one">One</button>
+        <button pxlToggle value="two">Two</button>
+        <button pxlToggle value="three">Three</button>
+      </pxl-toggle-group>
+      <pxl-toggle-group type="single" variant="outline" [(value)]="c" aria-label="Outline">
+        <button pxlToggle value="one">One</button>
+        <button pxlToggle value="two">Two</button>
+        <button pxlToggle value="three">Three</button>
+      </pxl-toggle-group>
+      <pxl-toggle-group type="single" variant="ghost" [(value)]="d" aria-label="Ghost">
+        <button pxlToggle value="one">One</button>
+        <button pxlToggle value="two">Two</button>
+        <button pxlToggle value="three">Three</button>
+      </pxl-toggle-group>
+    </div>
+  \`,
+})
+export class Variants {
+  readonly a = signal('one');
+  readonly b = signal('one');
+  readonly c = signal('one');
+  readonly d = signal('one');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   const [sm, setSm] = useState<string>('a');
   const [md, setMd] = useState<string>('a');
   const [lg, setLg] = useState<string>('a');
@@ -201,11 +487,76 @@ export function Default() {
       </PixelToggleGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-vue';
+
+const sm = ref('a');
+const md = ref('a');
+const lg = ref('a');
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelToggleGroup v-model="sm" type="single" size="sm" aria-label="Small">
+      <PixelToggle value="a">A</PixelToggle>
+      <PixelToggle value="b">B</PixelToggle>
+      <PixelToggle value="c">C</PixelToggle>
+    </PixelToggleGroup>
+    <PixelToggleGroup v-model="md" type="single" size="md" aria-label="Medium">
+      <PixelToggle value="a">A</PixelToggle>
+      <PixelToggle value="b">B</PixelToggle>
+      <PixelToggle value="c">C</PixelToggle>
+    </PixelToggleGroup>
+    <PixelToggleGroup v-model="lg" type="single" size="lg" aria-label="Large">
+      <PixelToggle value="a">A</PixelToggle>
+      <PixelToggle value="b">B</PixelToggle>
+      <PixelToggle value="c">C</PixelToggle>
+    </PixelToggleGroup>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle, PixelToggleGroup],
+  template: \`
+    <div class="space-y-3">
+      <pxl-toggle-group type="single" size="sm" [(value)]="sm" aria-label="Small">
+        <button pxlToggle value="a">A</button>
+        <button pxlToggle value="b">B</button>
+        <button pxlToggle value="c">C</button>
+      </pxl-toggle-group>
+      <pxl-toggle-group type="single" size="md" [(value)]="md" aria-label="Medium">
+        <button pxlToggle value="a">A</button>
+        <button pxlToggle value="b">B</button>
+        <button pxlToggle value="c">C</button>
+      </pxl-toggle-group>
+      <pxl-toggle-group type="single" size="lg" [(value)]="lg" aria-label="Large">
+        <button pxlToggle value="a">A</button>
+        <button pxlToggle value="b">B</button>
+        <button pxlToggle value="c">C</button>
+      </pxl-toggle-group>
+    </div>
+  \`,
+})
+export class Sizes {
+  readonly sm = signal('a');
+  readonly md = signal('a');
+  readonly lg = signal('a');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-roving-focus">
-        <h4>Roving focus</h4>
-        <pre className="docs-code"><code>{`export function RovingFocus() {
+        <Subheading>Roving focus</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Roving focus code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function RovingFocus() {
   const [value, setValue] = useState<string>('list');
   return (
     <PixelToggleGroup
@@ -221,11 +572,48 @@ export function Default() {
       <PixelToggle value="board">Board</PixelToggle>
     </PixelToggleGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-vue';
+
+const value = ref('list');
+</script>
+
+<template>
+  <PixelToggleGroup v-model="value" type="single" roving-focus loop aria-label="View mode">
+    <PixelToggle value="list">List</PixelToggle>
+    <PixelToggle value="grid">Grid</PixelToggle>
+    <PixelToggle value="board">Board</PixelToggle>
+  </PixelToggleGroup>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle, PixelToggleGroup],
+  template: \`
+    <pxl-toggle-group type="single" rovingFocus loop [(value)]="value" aria-label="View mode">
+      <button pxlToggle value="list">List</button>
+      <button pxlToggle value="grid">Grid</button>
+      <button pxlToggle value="board">Board</button>
+    </pxl-toggle-group>
+  \`,
+})
+export class RovingFocus {
+  readonly value = signal('list');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   const [pixel, setPixel] = useState<string>('one');
   const [linear, setLinear] = useState<string>('one');
   return (
@@ -252,15 +640,58 @@ export function Default() {
       </PixelToggleGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-vue';
+
+const pixel = ref('one');
+const linear = ref('one');
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelToggleGroup v-model="pixel" type="single" surface="pixel" aria-label="Pixel surface">
+      <PixelToggle value="one">One</PixelToggle>
+      <PixelToggle value="two">Two</PixelToggle>
+    </PixelToggleGroup>
+    <PixelToggleGroup v-model="linear" type="single" surface="linear" aria-label="Linear surface">
+      <PixelToggle value="one">One</PixelToggle>
+      <PixelToggle value="two">Two</PixelToggle>
+    </PixelToggleGroup>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle, PixelToggleGroup],
+  template: \`
+    <div class="space-y-3">
+      <pxl-toggle-group type="single" surface="pixel" [(value)]="pixel" aria-label="Pixel surface">
+        <button pxlToggle value="one">One</button>
+        <button pxlToggle value="two">Two</button>
+      </pxl-toggle-group>
+      <pxl-toggle-group type="single" surface="linear" [(value)]="linear" aria-label="Linear surface">
+        <button pxlToggle value="one">One</button>
+        <button pxlToggle value="two">Two</button>
+      </pxl-toggle-group>
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly pixel = signal('one');
+  readonly linear = signal('one');
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-toggle">PixelToggle</a></li>
-        <li><a href="#pixel-segmented-control">PixelSegmentedControl</a></li>
-        <li><a href="#pixel-checkbox">PixelCheckbox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toggle' : '#pixel-toggle'}>PixelToggle</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-segmented-control' : '#pixel-segmented-control'}>PixelSegmentedControl</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-checkbox' : '#pixel-checkbox'}>PixelCheckbox</a></li>
       </ul>
     </section>
     </section>

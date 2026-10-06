@@ -1,4 +1,4 @@
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * ❤️‍🩹 HealthPotion — a rounded red bottle with a cork and a white "+" health

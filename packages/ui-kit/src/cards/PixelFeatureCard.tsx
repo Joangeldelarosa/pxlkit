@@ -1,30 +1,24 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
-import { tone as toneTokens, ToneKey } from '../tokens';
-
-type IconSize = 48 | 56 | 64 | 80;
-type DescLines = 2 | 3 | 4;
-type Orientation = 'vertical' | 'horizontal';
-
-const iconSizeMap: Record<IconSize, string> = {
-  48: 'w-12',
-  56: 'w-14',
-  64: 'w-16',
-  80: 'w-20',
-};
-
-const descLinesMap: Record<DescLines, string> = {
-  2: 'line-clamp-2 min-h-[2lh]',
-  3: 'line-clamp-3 min-h-[3lh]',
-  4: 'line-clamp-4 min-h-[4lh]',
-};
+import {
+  featureCardClasses,
+  isCardActivationKey,
+  type FeatureCardDescriptionLines as DescLines,
+  type FeatureCardIconSize as IconSize,
+  type FeatureCardOrientation as Orientation,
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ToneKey } from '../tokens';
 
 export interface PixelFeatureCardProps extends React.HTMLAttributes<HTMLElement> {
+  /** Icon in the toned frame. */
   icon?: React.ReactNode;
+  /** Width of the icon frame, in px. */
   iconSize?: IconSize;
+  /** Badge above the icon: its label and tone (cyan by default). */
   badge?: { label: string; tone?: ToneKey };
+  /** The heading, clamped to two lines. */
   title: string;
   /** Muted paragraph rendered under the title. */
   description?: string;
@@ -34,8 +28,11 @@ export interface PixelFeatureCardProps extends React.HTMLAttributes<HTMLElement>
   desc?: string;
   /** @deprecated Use `descriptionLines` for consistency with PixelCard / PixelPricingCard. */
   descLines?: DescLines;
+  /** Footer under the description. */
   footer?: React.ReactNode;
+  /** Tone of the icon frame. */
   tone?: ToneKey;
+  /** Hover lift and focus ring; without an `href` the card is a button: give it an `onClick`. */
   interactive?: boolean;
   /**
    * When provided, the card renders as `<a href>` and accepts anchor-specific
@@ -51,7 +48,9 @@ export interface PixelFeatureCardProps extends React.HTMLAttributes<HTMLElement>
   download?: React.AnchorHTMLAttributes<HTMLAnchorElement>['download'];
   /** When `interactive=true` without `href`, an onClick is REQUIRED for accessibility. */
   onClick?: React.MouseEventHandler<HTMLElement>;
+  /** Icon above the text, or beside it. */
   orientation?: Orientation;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Render with surface-aware border + radius chrome. Defaults to true — a feature card needs visible chrome. */
   bordered?: boolean;
@@ -76,6 +75,7 @@ export const PixelFeatureCard = forwardRef<HTMLElement, PixelFeatureCardProps>(
       rel,
       download,
       onClick,
+      onKeyDown,
       orientation = 'vertical',
       surface: surfaceProp,
       bordered = true,
@@ -86,108 +86,59 @@ export const PixelFeatureCard = forwardRef<HTMLElement, PixelFeatureCardProps>(
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
-    const t = toneTokens[tone];
     const isLink = typeof href === 'string';
     const isInteractive = interactive || isLink;
     const isHorizontal = orientation === 'horizontal';
     const resolvedDescription = description ?? desc;
-    const resolvedDescLines: DescLines = descriptionLines ?? descLines ?? 3;
+    const classes = featureCardClasses(surface, {
+      tone,
+      orientation,
+      bordered,
+      interactive: isInteractive,
+      iconSize,
+      badge,
+      descriptionLines: descriptionLines ?? descLines,
+    });
 
     const handleKeyDown: React.KeyboardEventHandler<HTMLElement> = (e) => {
+      onKeyDown?.(e);
+      if (e.defaultPrevented) return;
       if (!interactive || isLink) return;
-      if (e.key === 'Enter' || e.key === ' ') {
+      if (isCardActivationKey(e.key)) {
         e.preventDefault();
         onClick?.(e as unknown as React.MouseEvent<HTMLElement>);
       }
     };
 
-    const root = cn(
-      'relative p-5',
-      isHorizontal ? 'grid grid-cols-[auto_1fr] gap-4 items-start' : 'flex flex-col',
-      bordered && s.border,
-      bordered && s.radiusLg,
-      s.transition,
-      bordered && 'border-retro-border bg-retro-surface/40',
-      isInteractive && 'cursor-pointer hover:-translate-y-[2px]',
-      isInteractive && s.shadowHover,
-      isInteractive && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
-      className,
-    );
+    const root = cn(classes.root, className);
 
     const badgeSlot = (
-      <div
-        data-pxl-badge-slot
-        className={cn(
-          'min-h-[28px] flex items-center',
-          !badge && 'invisible',
-          isHorizontal && 'col-span-2',
-        )}
-      >
-        {badge && (
-          <span
-            className={cn(
-              'inline-flex items-center px-2.5 py-1 text-[11px] leading-none',
-              s.border,
-              s.radiusFull,
-              s.font,
-              toneTokens[badge.tone ?? 'cyan'].text,
-              toneTokens[badge.tone ?? 'cyan'].border,
-              toneTokens[badge.tone ?? 'cyan'].soft,
-            )}
-          >
-            {badge.label}
-          </span>
-        )}
+      <div data-pxl-badge-slot className={classes.badgeRow}>
+        {badge && <span className={classes.badge}>{badge.label}</span>}
       </div>
     );
 
     const iconSlot = icon ? (
-      <div
-        data-pxl-icon-frame
-        className={cn(
-          'aspect-square flex items-center justify-center',
-          iconSizeMap[iconSize],
-          s.border,
-          s.radius,
-          t.bg,
-          t.border,
-          t.text,
-          isHorizontal ? 'self-start' : 'mb-4',
-        )}
-      >
+      <div data-pxl-icon-frame className={classes.icon}>
         {icon}
       </div>
     ) : null;
 
-    const titleSlot = (
-      <h3
-        className={cn(
-          'text-base font-semibold text-retro-text line-clamp-2 min-h-[2lh]',
-          s.fontDisplay,
-        )}
-      >
-        {title}
-      </h3>
-    );
+    const titleSlot = <h3 className={classes.title}>{title}</h3>;
 
     const descSlot = resolvedDescription ? (
-      <p className={cn('mt-2 text-sm text-retro-muted', s.font, descLinesMap[resolvedDescLines])}>
-        {resolvedDescription}
-      </p>
+      <p className={classes.description}>{resolvedDescription}</p>
     ) : null;
 
-    const spacer = !isHorizontal ? <div className="flex-1" /> : null;
+    const spacer = !isHorizontal ? <div className={classes.spacer} /> : null;
 
-    const footerSlot = footer ? (
-      <div className={cn(!isHorizontal && 'mt-4')}>{footer}</div>
-    ) : null;
+    const footerSlot = footer ? <div className={classes.footer}>{footer}</div> : null;
 
     const body = isHorizontal ? (
       <>
         {badgeSlot}
         {iconSlot}
-        <div className="min-w-0 flex flex-col">
+        <div className={classes.column}>
           {titleSlot}
           {descSlot}
           {footerSlot}
@@ -214,6 +165,7 @@ export const PixelFeatureCard = forwardRef<HTMLElement, PixelFeatureCardProps>(
           rel={rel}
           download={download}
           onClick={onClick as React.MouseEventHandler<HTMLAnchorElement> | undefined}
+          onKeyDown={onKeyDown}
           className={root}
           {...anchorRest}
         >
@@ -246,6 +198,7 @@ export const PixelFeatureCard = forwardRef<HTMLElement, PixelFeatureCardProps>(
       <article
         ref={ref as React.Ref<HTMLElement>}
         className={root}
+        onKeyDown={onKeyDown}
         {...rest}
       >
         {body}

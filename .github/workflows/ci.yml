@@ -38,4 +38,4 @@ jobs:
         run: npm test
 
       - name: Run test coverage
-        run: npx turbo test:coverage --filter=@pxlkit/core
+        run: npx turbo test:coverage --filter=@pxlkit/core --filter=@pxlkit/vue --filter=@pxlkit/angular --filter=@pxlkit/ui-kit-core --filter=@pxlkit/ui-kit-vue --filter=@pxlkit/ui-kit-angular

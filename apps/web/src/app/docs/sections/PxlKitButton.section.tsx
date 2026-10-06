@@ -3,9 +3,15 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitButtonDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PxlKitButtonDocsMeta = {
@@ -17,17 +23,85 @@ export const PxlKitButtonDocsMeta = {
   deprecated: true,
 } as const;
 
-export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionProps): React.ReactElement {
+/** PxlKitButton's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PxlKitButton } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PxlKitButton',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Accessible label — set as `aria-label` and `title`. Required.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size; the button is a square of it (`sizeSquare`).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to nearest provider.' },
+          { name: 'icon', type: 'React.ReactNode', required: true, description: 'The icon to render inside the square.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`), except `children`.',
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PxlKitButton } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PxlKitButton',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Accessible name, set as `aria-label` and `title`.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size; the button is a square of it (`sizeSquare`).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to the nearest provider.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Native `disabled`; a disabled button also drops its shadows.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'The icon.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<button>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PxlKitButton } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PxlKitButton',
+        selector: 'button[pxlIconButton], button[pxlKitButton]',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Accessible name, set as `aria-label` and `title`.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', required: true, description: 'The icon.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size; the button is a square of it (`sizeSquare`).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to the nearest provider.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Native `disabled`; a disabled button also drops its shadows.' },
+        ],
+        notes: [
+          'Goes on a native `<button>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
+
+export function PxlKitButtonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PxlKitButtonDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pxl-kit-button-heading'} className={className} data-status='deprecated'>
-      <h2 id='pxl-kit-button-heading'>PxlKitButton</h2>
+      <Title id='pxl-kit-button-heading'>PxlKitButton</Title>
       <aside role="alert" className="docs-deprecation">
                 <strong>Deprecated.</strong>{' '}Renamed to PixelIconButton. The PxlKit* prefix is reserved for system primitives (providers); leaf components use the Pixel* prefix.{' '}Use <code>PixelIconButton</code> instead.{' '}Removed in v3.0.0.
       </aside>
       <p className="docs-lead">Deprecated alias for PixelIconButton — a square icon-only button with a required accessible label.</p>
       <ul className="docs-highlights">
         <li>Identical runtime to PixelIconButton (re-exported as-is).</li>
-        <li>Renders a square, icon-only button with required `label` exposed as aria-label and title.</li>
+        <li>Renders a square, icon-only button with required <code>label</code> exposed as aria-label and title.</li>
         <li>Supports tones, sizes, and pixel/linear surface aesthetics.</li>
         <li>Kept as an alias for backward compatibility; removal carried forward to v3.0.0 (see ADR-0004).</li>
       </ul>
@@ -36,18 +110,18 @@ export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionPr
       <dt>Category</dt><dd>actions</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pxl-kit-button-api">
+      <Heading id="pxl-kit-button-api">API</Heading>
+      <FrameworkApi label={'PxlKitButton API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-button-a11y">
-      <h3 id="pxl-kit-button-a11y">Accessibility</h3>
+      <Heading id="pxl-kit-button-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">The `label` prop is required and is wired to both aria-label and title so screen reader and tooltip discovery stay in sync for an icon-only control.</p>
-      <h4>Keyboard</h4>
+      <p className="docs-aria-notes">The <code>label</code> prop is required and is wired to both aria-label and title so screen reader and tooltip discovery stay in sync for an icon-only control.</p>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -71,8 +145,11 @@ export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionPr
       </table>
     </section>
     <section aria-labelledby="pxl-kit-button-usage">
-      <h3 id="pxl-kit-button-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PxlKitButton } from '@pxlkit/ui-kit';
+      <Heading id="pxl-kit-button-usage">Usage</Heading>
+      <FrameworkCode
+        variant="docs"
+        label={'PxlKitButton usage'}
+        react={`import { PxlKitButton } from '@pxlkit/ui-kit';
 
 const StarIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -80,28 +157,101 @@ const StarIcon = () => (
   </svg>
 );
 
-const PlusIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-    <path d="M12 5v14M5 12h14" />
+export function Default() {
+  return <PxlKitButton label="Favorite" icon={<StarIcon />} />;
+}`}
+        vue={`<script setup lang="ts">
+import { PxlKitButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitButton label="Favorite">
+    <template #icon>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+      </svg>
+    </template>
+  </PxlKitButton>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PxlKitButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitButton],
+  template: \`
+    <button pxlKitButton label="Favorite" [icon]="star"></button>
+    <ng-template #star>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Default {}`}
+      />
+    </section>
+    <section aria-label="Examples">
+      <Heading>Examples</Heading>
+      <article className="docs-example" id="example-default">
+        <Subheading>Default</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PxlKitButton } from '@pxlkit/ui-kit';
+
+const StarIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
   </svg>
 );
 
 export function Default() {
   return <PxlKitButton label="Favorite" icon={<StarIcon />} />;
-}
-`}</code></pre>
-    </section>
-    <section aria-label="Examples">
-      <h3>Examples</h3>
-      <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
-  return <PxlKitButton label="Favorite" icon={<StarIcon />} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PxlKitButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitButton label="Favorite">
+    <template #icon>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+      </svg>
+    </template>
+  </PxlKitButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PxlKitButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitButton],
+  template: \`
+    <button pxlKitButton label="Favorite" [icon]="star"></button>
+    <ng-template #star>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <Subheading>Tones</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PxlKitButton } from '@pxlkit/ui-kit';
+
+const StarIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+  </svg>
+);
+
+export function Tones() {
   return (
     <div className="flex flex-wrap gap-2">
       <PxlKitButton label="Neutral" icon={<StarIcon />} tone="neutral" />
@@ -113,11 +263,71 @@ export function Default() {
       <PxlKitButton label="Pink" icon={<StarIcon />} tone="pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PxlKitButton, type Tone } from '@pxlkit/ui-kit-vue';
+
+const tones: { tone: Tone; label: string }[] = [
+  { tone: 'neutral', label: 'Neutral' },
+  { tone: 'green', label: 'Green' },
+  { tone: 'cyan', label: 'Cyan' },
+  { tone: 'gold', label: 'Gold' },
+  { tone: 'red', label: 'Red' },
+  { tone: 'purple', label: 'Purple' },
+  { tone: 'pink', label: 'Pink' },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PxlKitButton v-for="item in tones" :key="item.tone" :label="item.label" :tone="item.tone">
+      <template #icon>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+        </svg>
+      </template>
+    </PxlKitButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PxlKitButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlKitButton label="Neutral" [icon]="star" tone="neutral"></button>
+      <button pxlKitButton label="Green" [icon]="star" tone="green"></button>
+      <button pxlKitButton label="Cyan" [icon]="star" tone="cyan"></button>
+      <button pxlKitButton label="Gold" [icon]="star" tone="gold"></button>
+      <button pxlKitButton label="Red" [icon]="star" tone="red"></button>
+      <button pxlKitButton label="Purple" [icon]="star" tone="purple"></button>
+      <button pxlKitButton label="Pink" [icon]="star" tone="pink"></button>
+    </div>
+    <ng-template #star>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <Subheading>Sizes</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PxlKitButton } from '@pxlkit/ui-kit';
+
+const PlusIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+);
+
+export function Sizes() {
   return (
     <div className="flex items-center gap-2">
       <PxlKitButton label="Small" icon={<PlusIcon />} size="sm" />
@@ -125,32 +335,165 @@ export function Default() {
       <PxlKitButton label="Large" icon={<PlusIcon />} size="lg" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PxlKitButton, type Size } from '@pxlkit/ui-kit-vue';
+
+const sizes: { size: Size; label: string }[] = [
+  { size: 'sm', label: 'Small' },
+  { size: 'md', label: 'Medium' },
+  { size: 'lg', label: 'Large' },
+];
+</script>
+
+<template>
+  <div class="flex items-center gap-2">
+    <PxlKitButton v-for="item in sizes" :key="item.size" :label="item.label" :size="item.size">
+      <template #icon>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </template>
+    </PxlKitButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PxlKitButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitButton],
+  template: \`
+    <div class="flex items-center gap-2">
+      <button pxlKitButton label="Small" [icon]="plus" size="sm"></button>
+      <button pxlKitButton label="Medium" [icon]="plus" size="md"></button>
+      <button pxlKitButton label="Large" [icon]="plus" size="lg"></button>
+    </div>
+    <ng-template #plus>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <Subheading>Surfaces</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PxlKitButton } from '@pxlkit/ui-kit';
+
+const StarIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+  </svg>
+);
+
+export function Surfaces() {
   return (
     <div className="flex gap-2">
       <PxlKitButton label="Pixel surface" icon={<StarIcon />} surface="pixel" />
       <PxlKitButton label="Linear surface" icon={<StarIcon />} surface="linear" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PxlKitButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex gap-2">
+    <PxlKitButton label="Pixel surface" surface="pixel">
+      <template #icon>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+        </svg>
+      </template>
+    </PxlKitButton>
+    <PxlKitButton label="Linear surface" surface="linear">
+      <template #icon>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+        </svg>
+      </template>
+    </PxlKitButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PxlKitButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitButton],
+  template: \`
+    <div class="flex gap-2">
+      <button pxlKitButton label="Pixel surface" [icon]="star" surface="pixel"></button>
+      <button pxlKitButton label="Linear surface" [icon]="star" surface="linear"></button>
+    </div>
+    <ng-template #star>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <Subheading>Disabled</Subheading>
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PxlKitButton } from '@pxlkit/ui-kit';
+
+const StarIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+  </svg>
+);
+
+export function Disabled() {
   return <PxlKitButton label="Disabled" icon={<StarIcon />} disabled />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PxlKitButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitButton label="Disabled" disabled>
+    <template #icon>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+      </svg>
+    </template>
+  </PxlKitButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PxlKitButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitButton],
+  template: \`
+    <button pxlKitButton label="Disabled" [icon]="star" disabled></button>
+    <ng-template #star>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Disabled {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-icon-button">PixelIconButton</a></li>
-        <li><a href="#pixel-button">PixelButton</a></li>
-        <li><a href="#pixel-split-button">PixelSplitButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-icon-button' : '#pixel-icon-button'}>PixelIconButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-button' : '#pixel-button'}>PixelButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-split-button' : '#pixel-split-button'}>PixelSplitButton</a></li>
       </ul>
     </section>
     </section>

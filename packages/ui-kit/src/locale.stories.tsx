@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { PxlKitLocaleProvider, TURKISH_CHARACTERS } from './locale';
 import { PixelButton } from './actions';
 import { PixelAvatar } from './data/PixelAvatar';
