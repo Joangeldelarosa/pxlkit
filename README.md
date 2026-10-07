@@ -633,7 +633,7 @@ Every public package but the `@pxlkit/voxel` preview is published to npm automat
 The workflow (`.github/workflows/publish.yml`) runs on:
 
 - **Push to `main`** — automatically publishes when a PR is merged (most common)
-- **Tag push** — pushing a tag matching `v*` (e.g. `v1.2.0`)
+- **Tag push** — pushing a tag matching `v*` (e.g. `v2.2.1`)
 - **GitHub Release** — creating/publishing a release in the GitHub UI
 
 **Pipeline:**
@@ -642,6 +642,8 @@ The workflow (`.github/workflows/publish.yml`) runs on:
 2. **Publish** (only if quality gate passes) — compares each package's local version against the npm registry and publishes only the packages whose version has changed. Packages already at the same version on npm are safely skipped.
 
 > Packages publish in dependency order: `@pxlkit/core` first, then the icon packs, the icon components (`@pxlkit/vue`, `@pxlkit/angular`), and `@pxlkit/ui-kit-core` before the three kits built on it.
+
+The publish job runs in the `npm` environment, so the repository's **Deployments** list every publish. After a successful publish from `main`, the **GitHub Release** workflow (`.github/workflows/github-release.yml`) creates the release `v<version>` of `@pxlkit/ui-kit`, tagged on the commit npm published it from, with its CHANGELOG section and a table of the packages published with it. Versions that already have a release are left alone; **Actions → GitHub Release → Run workflow** creates any that are missing.
 
 ### Setup
 
@@ -670,11 +672,11 @@ git push
 # 3. Merge the PR — publish triggers automatically on main
 ```
 
-**Manual (tag-based):** Create and push a version tag, or create a GitHub Release.
+**Manual (tag-based):** Push a tag named after the kit's new version on the commit to publish, or create a GitHub Release with that tag; the workflow publishes from the tagged commit. Then **Actions → GitHub Release → Run workflow** creates the release of a pushed tag.
 
 ```bash
-git tag v1.2.0
-git push origin main --follow-tags
+git tag -a v2.2.1 -m "v2.2.1" <commit>
+git push origin v2.2.1
 ```
 
 ### Published Packages
@@ -702,16 +704,19 @@ git push origin main --follow-tags
 
 | Error | Cause | Fix |
 | --- | --- | --- |
-| `403 Forbidden` | Invalid or expired `NPM_TOKEN` | Regenerate the token on npmjs.com and update the GitHub secret |
+| `404 Not Found` on `PUT`, for every package | Expired or revoked `NPM_TOKEN` | Create a new token on npmjs.com, update the GitHub secret and re-run the failed job |
+| `403 Forbidden` | `NPM_TOKEN` may not write to the package | Give the token read and write access to the `@pxlkit` scope |
 | `402 Payment Required` | Publishing a scoped package as private | Ensure `--access public` is used (already set in the workflow) |
 | `EPUBLISHCONFLICT` / `You cannot publish over the previously published versions` | Version already exists on npm | Bump the `version` field in the package's `package.json` before tagging |
 | `npm ERR! Workspaces: ...` | Incorrect `--workspace` path | Verify that the workspace path in the workflow matches the actual directory |
+| GitHub Release: `HTTP 403`, `Resource not accessible by integration` | The version sits on an older commit than the tip of `main`, which GitHub does not let the workflow's own token tag | Add the `RELEASE_TOKEN` secret and run the GitHub Release workflow |
 
 ### Secrets Reference
 
 | Secret | Required | Description |
 | --- | --- | --- |
 | `NPM_TOKEN` | **Yes** | npm access token with publish permissions for the `@pxlkit` scope |
+| `RELEASE_TOKEN` | No | Fine-grained GitHub token for this repository with **Contents** and **Workflows**: Read and write. The GitHub Release workflow uses it for the versions the workflow's own token may not tag |
 
 ## Contributing
 

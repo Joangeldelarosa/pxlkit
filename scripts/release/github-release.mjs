@@ -17,12 +17,22 @@
  *   --since <version>  oldest version to consider (default 2.0.0, the first
  *                      version with a GitHub Release)
  *
- * Without --dry-run it runs `gh` with a token that may write contents
- * (GH_TOKEN). Tags and releases made with a workflow's own token start no
- * other workflow, so this never re-triggers the publish workflow.
+ * Without --dry-run it runs `gh`, with GH_TOKEN when set: in the workflow, the
+ * workflow's own token. GitHub lets that token tag the version just
+ * published, at the tip of main, but may refuse it a tag on an older commit
+ * (HTTP 403, "Resource not accessible by integration"): a new tag there can
+ * count as a change to the workflow files, which takes the Workflows
+ * permission no workflow token has. RELEASE_TOKEN, when set, is a token with
+ * that permission, and creates the releases GitHub refused the first token.
+ * Tags and releases made with the workflow's token start no other workflow;
+ * ones made with RELEASE_TOKEN start the publish workflow of the tagged
+ * commit, which publishes nothing that is already on npm.
+ *
+ * The run fails when the newest version is left without its release, or on an
+ * error it does not expect. An older version left without one is a warning.
  */
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -97,6 +107,51 @@ export function releaseNotes({ packages, section, changelogUrl }) {
   return head + body + tail;
 }
 
+/** Each tag's commit, from `git ls-remote --tags`: an annotated tag's peeled `^{}` line wins. */
+export function tagCommits(lsRemote) {
+  const commits = new Map();
+  for (const line of lsRemote.split('\n').filter(Boolean)) {
+    const [sha, ref] = line.split('\t');
+    const peeled = ref.endsWith('^{}');
+    const tag = ref.replace(/^refs\/tags\//, '').replace(/\^\{\}$/, '');
+    if (peeled || !commits.has(tag)) commits.set(tag, sha);
+  }
+  return commits;
+}
+
+/** What `gh` said when it failed, on one line and without the API's URL. */
+function reason(error) {
+  return String(error?.stderr || error?.message || error)
+    .replace(/\s*\(https:\/\/api\.github\.com\/[^)]*\)/g, '')
+    .trim()
+    .replace(/\s*\n\s*/g, ' ');
+}
+
+/** Whether GitHub refused the workflow's token the release's tag. */
+export function refusedTag(error) {
+  return /HTTP 403: Resource not accessible by integration/.test(reason(error));
+}
+
+/**
+ * Creates a release with `run(env)`: as is, then — when GitHub refused that
+ * token the tag and there is a release token — with GH_TOKEN set to it.
+ */
+export function createRelease(run, releaseToken) {
+  try {
+    run({});
+    return { ok: true, fallback: false };
+  } catch (error) {
+    if (!refusedTag(error)) return { ok: false, refused: false, error };
+    if (!releaseToken) return { ok: false, refused: true, error };
+    try {
+      run({ GH_TOKEN: releaseToken });
+      return { ok: true, fallback: true };
+    } catch (retryError) {
+      return { ok: false, refused: false, error: retryError, withReleaseToken: true };
+    }
+  }
+}
+
 async function packument(name) {
   const res = await fetch(`${REGISTRY}/${name.replace('/', '%2f')}`, { headers: { accept: 'application/json' } });
   if (res.status === 404) return null;
@@ -117,13 +172,13 @@ function hasCommit(sha) {
   }
 }
 
-function remoteTags() {
-  const out = git('ls-remote', '--tags', 'origin');
-  return new Set(out.split('\n').filter(Boolean).map((line) => line.split('\t')[1].replace(/^refs\/tags\//, '').replace(/\^\{\}$/, '')));
-}
-
-function gh(args) {
-  return execFileSync('gh', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+function gh(args, env = {}) {
+  return execFileSync('gh', args, {
+    cwd: ROOT,
+    encoding: 'utf8',
+    env: { ...process.env, ...env },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  }).trim();
 }
 
 function releaseExists(tag) {
@@ -162,28 +217,54 @@ async function main() {
     .filter((v) => parseVersion(v) && compareVersions(v, since) >= 0)
     .sort(compareVersions);
   const newest = versions.at(-1);
-  const tags = remoteTags();
+  const tags = tagCommits(git('ls-remote', '--tags', 'origin'));
   const base = repoUrl();
+  const releaseToken = process.env.RELEASE_TOKEN || '';
+  const annotate = process.env.GITHUB_ACTIONS === 'true';
+  const missing = [];
   let created = 0;
+
+  /** A version left without its release: an error for the newest or an unexpected cause, else a warning. */
+  const leave = (version, message, expected = true) => {
+    const error = version === newest || !expected;
+    if (error) process.exitCode = 1;
+    missing.push(`v${version}`);
+    const text = `v${version}: ${message}`;
+    if (!annotate) console.log(`${error ? '✗' : '!'} ${text}`);
+    else {
+      const data = text.replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+      console.log(`::${error ? 'error' : 'warning'}::${data}`);
+    }
+  };
 
   for (const version of versions) {
     const tag = `v${version}`;
     const sha = kit.versions[version].gitHead;
+    const tagged = tags.get(tag);
+    const elsewhere = Boolean(tagged && sha && tagged !== sha);
+    const on = elsewhere ? ` on ${tagged.slice(0, 7)} while npm published from ${sha.slice(0, 7)}` : '';
     if (!dryRun && releaseExists(tag)) {
-      console.log(`= ${tag}: the release exists`);
+      console.log(`= ${tag}: the release exists${elsewhere ? `, tagged${on}` : ''}`);
       continue;
     }
-    if (dryRun && tags.has(tag)) {
-      console.log(`= ${tag}: the tag exists (the real run creates its release only if it has none)`);
+    if (dryRun && tagged) {
+      console.log(`= ${tag}: the tag exists${elsewhere ? `,${on}` : ''}; the real run creates its release only if it has none`);
       continue;
     }
     if (!sha || !hasCommit(sha)) {
-      console.warn(`! ${tag}: npm records no commit for ${KIT}@${version}, or the repository lacks ${sha}; skipped`);
+      leave(version, `npm records no commit for ${KIT}@${version}, or the repository lacks ${sha}`);
+      continue;
+    }
+    if (elsewhere) {
+      leave(
+        version,
+        `the tag ${tag} is on ${tagged.slice(0, 7)}, not on ${sha.slice(0, 7)} that npm published ${KIT}@${version} from`,
+      );
       continue;
     }
     const section = rootReleaseSection(rootChangelog, version) ?? kitReleaseSection(kitChangelog, version);
     if (!section) {
-      console.warn(`! ${tag}: no changelog section for ${version}; skipped`);
+      leave(version, `no changelog section for ${version}`);
       continue;
     }
     const packages = [];
@@ -199,13 +280,36 @@ async function main() {
       `+ ${tag} on ${sha.slice(0, 7)}: "${title}", ${packages.length} package(s), ${notes.length} characters of notes${latest ? ', Latest' : ''}`,
     );
     if (dryRun) continue;
-    const file = path.join(mkdtempSync(path.join(tmpdir(), 'release-')), 'notes.md');
+    const dir = mkdtempSync(path.join(tmpdir(), 'release-'));
+    const file = path.join(dir, 'notes.md');
     writeFileSync(file, notes);
-    const where = tags.has(tag) ? ['--verify-tag'] : ['--target', sha];
-    gh(['release', 'create', tag, ...where, '--title', title, '--notes-file', file, `--latest=${latest}`]);
-    created++;
+    const where = tagged ? ['--verify-tag'] : ['--target', sha];
+    const command = ['release', 'create', tag, ...where, '--title', title, '--notes-file', file, `--latest=${latest}`];
+    const result = createRelease((env) => gh(command, env), releaseToken);
+    rmSync(dir, { recursive: true, force: true });
+    if (result.ok) {
+      created++;
+      if (result.fallback) console.log('  created with RELEASE_TOKEN: GitHub refused the workflow token the tag');
+    } else if (result.refused) {
+      leave(
+        version,
+        `GitHub refused the workflow token a tag on ${sha.slice(0, 7)}, an older commit ` +
+          '(HTTP 403, "Resource not accessible by integration"). Add a RELEASE_TOKEN secret, a fine-grained ' +
+          'token for this repository with Contents and Workflows: Read and write, and run this workflow again.',
+      );
+    } else if (result.withReleaseToken) {
+      leave(
+        version,
+        `RELEASE_TOKEN was refused too (${reason(result.error)}). It needs Contents and Workflows: ` +
+          'Read and write on this repository; replace it if it has expired.',
+        false,
+      );
+    } else {
+      leave(version, reason(result.error), false);
+    }
   }
-  console.log(dryRun ? 'dry run: nothing created' : `${created} release(s) created`);
+  const without = missing.length ? `; without a release: ${missing.join(', ')}` : '';
+  console.log(dryRun ? `dry run: nothing created${without}` : `${created} release(s) created${without}`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

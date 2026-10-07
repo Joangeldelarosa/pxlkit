@@ -4,8 +4,15 @@ name: GitHub Release
 # v<version> on the commit npm published it from, with that release's
 # CHANGELOG section and the packages published with it. Runs after each
 # successful npm publish from main, and on demand. Versions that already have
-# a release are left alone. Tags and releases made with the workflow token
-# start no other workflow, so this never re-triggers the publish workflow.
+# a release are left alone.
+#
+# The workflow token tags the version just published, at the tip of main.
+# GitHub may refuse it a tag on an older commit, which takes the Workflows
+# permission no workflow token has: the optional RELEASE_TOKEN secret, a
+# fine-grained token for this repository with Contents and Workflows: Read and
+# write, creates those. Tags made with the workflow token start no other
+# workflow; ones made with RELEASE_TOKEN start the publish workflow of the
+# tagged commit, which publishes nothing that is already on npm.
 
 on:
   workflow_run:
@@ -40,4 +47,5 @@ jobs:
       - name: Create the missing releases
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: node scripts/release/github-release.mjs
